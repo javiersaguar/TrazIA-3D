@@ -516,8 +516,8 @@ def _recommend(variants_out, results, by_id, scored) -> dict:
         ok, score, winner, m = scores[0]
         out[label] = winner
         notes.append(
-            f"{label}: {winner} (puntuación {score:.3f}, geometría {m['geometry']:.0%}, "
-            f"atributos {m['attributes']:.0%})" + ("" if ok else " — no cumple las restricciones")
+            f"{label}: {winner} (puntuación {_num(score)}, geometría {_pct(m['geometry'])}, "
+            f"atributos {_pct(m['attributes'])})" + ("" if ok else " — no cumple las restricciones")
         )
     out["rationale"] = (
         "Elegida por mayor Puntuación GA2MODEL entre las variantes que cumplen alucinación < 1 % "
