@@ -210,7 +210,10 @@ def test_adapter_refuses_unimplemented_strategy(client):
         "/equipment/V-101/jobs", json=job_body(client, strategy="a_vision"), headers=headers()
     )
     job = wait_job(client, response.json()["job_id"])
-    assert job["status"] == "error" and "temporal" in job["error"]
+    # Con el motor de Lectura una estrategia aún no implementada se rechaza por su nombre;
+    # sin él, el adaptador temporal lo dice.
+    assert job["status"] == "error"
+    assert "Estrategia desconocida" in job["error"] or "temporal" in job["error"]
     assert client.get("/equipment/V-101/revisions/C").status_code == 404
 
 

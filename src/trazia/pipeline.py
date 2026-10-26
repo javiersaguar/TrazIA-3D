@@ -11,7 +11,7 @@ from typing import Literal
 
 from .extraction import Candidate, assemble
 from .ingest import ingest_bytes
-from .model import Revision
+from .model import Revision, RunInfo
 from .reconcile import resolve
 from .strategies import STRATEGIES, StageEvent, StrategyContext, get_strategy
 
@@ -23,21 +23,6 @@ class InputDocument:
     filename: str  # GAD_<TAG>_rev1.pdf, HDM_<TAG>_rev1.xlsx, VESOR_<TAG>.pdf…
     data: bytes
     document_id: str  # GA-<TAG>, HDM-<TAG>, VESOR-<TAG>
-
-
-@dataclass
-class RunInfo:
-    """Metadatos de ejecución. Misma forma que `RunInfo` del contrato 0.3; cuando Plataforma
-    la publique en `trazia.model`, este tipo pasará a ser un alias."""
-
-    strategy: str
-    providers: list[str] = field(default_factory=list)
-    seconds: float = 0.0
-    gpu_seconds: float | None = None
-    tokens_in: int | None = None
-    tokens_out: int | None = None
-    cost_eur: float | None = None
-    external_calls: int = 0
 
 
 @dataclass
@@ -84,7 +69,8 @@ def process(
         if on_event:
             on_event(event)
 
-    run = RunInfo(strategy=strategy)
+    # RunInfo del contrato 0.3: la API lo guarda tal cual en revision.run y en la contabilidad.
+    run = RunInfo(strategy=strategy, providers=list(providers or []), seconds=0.0, external_calls=0)
     warnings: list[str] = []
 
     def finish(rev, candidates, error, conflicts=()):
@@ -143,7 +129,7 @@ def process(
         emit(StageEvent("reconcile", "error", equipment_id, f"La estrategia falló: {exc}"))
         return finish(None, [], f"La estrategia {strategy} falló: {exc}")
     warnings += output.warnings
-    run.providers = output.cost.providers
+    run.providers = list(output.cost.providers) or run.providers
     run.gpu_seconds = output.cost.gpu_seconds
     run.tokens_in, run.tokens_out = output.cost.tokens_in, output.cost.tokens_out
     run.cost_eur, run.external_calls = output.cost.cost_eur, output.cost.external_calls
