@@ -4,6 +4,7 @@
   Para conectar la API real basta con sustituir el cuerpo por fetch al endpoint indicado.
 */
 import type { Revision } from "@/lib/types/revision";
+import type { BenchReport } from "./bench-types";
 import type { DiffReport } from "./diff-types";
 import { flattenRevision, type FieldStatus, type ReviewField } from "./fields";
 
@@ -82,6 +83,14 @@ export async function updateField(update: FieldUpdate, current: ReviewField): Pr
 /** GET /diff?from=A&to=B */
 export async function getChanges(): Promise<DiffReport> {
   const [data] = await Promise.all([getJson<DiffReport>(DEMO.changes), wait()]);
+  return data;
+}
+
+export type BenchExtractor = "etiquetas" | "combinado";
+
+/** GET /bench?extractor=… — informe del bench sobre el conjunto sintético (bench/report.py). */
+export async function getBench(extractor: BenchExtractor): Promise<BenchReport> {
+  const [data] = await Promise.all([getJson<BenchReport>(`/demo/json/bench-${extractor}.json`), wait(200)]);
   return data;
 }
 

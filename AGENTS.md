@@ -14,3 +14,9 @@ Producto del reto GA2MODEL de IndesIAhack 2026. El código Python vive en `src/t
   verificación de originales y aprobación vinculada a la huella de los datos.
 - Una modificación de los datos invalida la aprobación anterior.
 - El visor debe leer la geometría del IFC, no dibujar una segunda versión aproximada.
+
+## Autoría
+
+- Commits sin `Co-authored-by` ni firmas de herramientas o asistentes en mensajes, PR, código o docs.
+  Los únicos autores son los cuatro miembros del equipo (ver `CONTRIBUTING.md`).
+- Trabajar solo en las carpetas asignadas y en un worktree propio (`docs/ROADMAP.md`, sección 5.4).

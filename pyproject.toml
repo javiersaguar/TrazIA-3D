@@ -27,6 +27,8 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100
+# Skills de terceros para los asistentes: no son código del proyecto.
+extend-exclude = [".claude", ".agents"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]

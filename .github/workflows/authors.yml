@@ -1,0 +1,23 @@
+name: Autoría
+on: [push, pull_request]
+jobs:
+  authors:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Solo miembros del equipo y sin coautores
+        run: |
+          allowed=$(grep -Ev '^\s*(#|$)' .github/autores.txt | tr -d '\r')
+          unknown=$(git log --format='%ae%n%ce' | sort -u | grep -vxF "$allowed" || true)
+          if [ -n "$unknown" ]; then
+            echo "Correos que no están en .github/autores.txt:"
+            echo "$unknown"
+            exit 1
+          fi
+          if git log --format='%B' | grep -Eiq '^[[:space:]]*co-authored-by:'; then
+            echo "Hay commits con Co-authored-by"
+            git log --format='%h %s' --grep='co-authored-by' -i
+            exit 1
+          fi

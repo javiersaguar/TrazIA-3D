@@ -1,0 +1,187 @@
+{
+  "generated_at": "2026-10-26T17:58:44+00:00",
+  "dataset": "generated\\synthetic",
+  "seed": 2026,
+  "extractor": "combinado",
+  "styles": {
+    "rotulado": {
+      "equipment": 20,
+      "revisions": 40,
+      "models_built": 40,
+      "geometry": {
+        "field_coverage": 1.0,
+        "field_accuracy": 1.0,
+        "dimension_mae_mm": 0.0,
+        "nozzle_recall": 1.0,
+        "nozzle_precision": 1.0,
+        "nozzle_position_mae_mm": 0.0,
+        "nozzle_orientation_mae_deg": 0.0,
+        "nozzle_dn_accuracy": 1.0,
+        "ifc_element_recall": 1.0,
+        "ifc_mean_iou": 1.0,
+        "ifc_center_error_mm": 0.0
+      },
+      "attributes": {
+        "coverage": 1.0,
+        "accuracy_value_unit": 1.0,
+        "ece": 0.25,
+        "brier": 0.0625,
+        "calibration_points": 1304,
+        "reliability": [
+          {
+            "bin": [
+              0.7,
+              0.8
+            ],
+            "confidence": 0.75,
+            "accuracy": 1.0,
+            "n": 1304
+          }
+        ]
+      },
+      "delta": {
+        "evaluable_equipment": 20,
+        "tp": 80,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "magnitude_mae": 0.0
+      },
+      "scale": {
+        "seconds_per_revision": 0.04735164750045442,
+        "revisions_per_hour": 76026.92176582561,
+        "llm_calls": 0,
+        "cost_eur": 0.0
+      },
+      "failures": []
+    },
+    "plano": {
+      "equipment": 20,
+      "revisions": 40,
+      "models_built": 40,
+      "geometry": {
+        "field_coverage": 1.0,
+        "field_accuracy": 1.0,
+        "dimension_mae_mm": 0.0,
+        "nozzle_recall": 1.0,
+        "nozzle_precision": 1.0,
+        "nozzle_position_mae_mm": 0.0,
+        "nozzle_orientation_mae_deg": 0.0,
+        "nozzle_dn_accuracy": 1.0,
+        "ifc_element_recall": 1.0,
+        "ifc_mean_iou": 1.0,
+        "ifc_center_error_mm": 0.0
+      },
+      "attributes": {
+        "coverage": 1.0,
+        "accuracy_value_unit": 1.0,
+        "ece": 0.1184049079754601,
+        "brier": 0.016901840490797543,
+        "calibration_points": 1304,
+        "reliability": [
+          {
+            "bin": [
+              0.7,
+              0.8
+            ],
+            "confidence": 0.75,
+            "accuracy": 1.0,
+            "n": 160
+          },
+          {
+            "bin": [
+              0.8,
+              0.9
+            ],
+            "confidence": 0.85,
+            "accuracy": 1.0,
+            "n": 120
+          },
+          {
+            "bin": [
+              0.9,
+              1.0
+            ],
+            "confidence": 0.905859375,
+            "accuracy": 1.0,
+            "n": 1024
+          }
+        ]
+      },
+      "delta": {
+        "evaluable_equipment": 20,
+        "tp": 80,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "magnitude_mae": 0.0
+      },
+      "scale": {
+        "seconds_per_revision": 0.055746112499491574,
+        "revisions_per_hour": 64578.49415119007,
+        "llm_calls": 0,
+        "cost_eur": 0.0
+      },
+      "failures": []
+    },
+    "escaneado": {
+      "equipment": 20,
+      "revisions": 40,
+      "models_built": 0,
+      "geometry": {
+        "field_coverage": 0.0,
+        "field_accuracy": 0.0,
+        "dimension_mae_mm": null,
+        "nozzle_recall": 0.0,
+        "nozzle_precision": null,
+        "nozzle_position_mae_mm": null,
+        "nozzle_orientation_mae_deg": null,
+        "nozzle_dn_accuracy": 0.0,
+        "ifc_element_recall": null,
+        "ifc_mean_iou": null,
+        "ifc_center_error_mm": null
+      },
+      "attributes": {
+        "coverage": 1.0,
+        "accuracy_value_unit": 1.0,
+        "ece": 0.25,
+        "brier": 0.0625,
+        "calibration_points": 160,
+        "reliability": [
+          {
+            "bin": [
+              0.7,
+              0.8
+            ],
+            "confidence": 0.75,
+            "accuracy": 1.0,
+            "n": 160
+          }
+        ]
+      },
+      "delta": {
+        "evaluable_equipment": 0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "magnitude_mae": null
+      },
+      "scale": {
+        "seconds_per_revision": null,
+        "revisions_per_hour": null,
+        "llm_calls": 0,
+        "cost_eur": 0.0
+      },
+      "failures": [
+        "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness"
+      ]
+    }
+  }
+}

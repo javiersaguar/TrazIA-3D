@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start --port 3000",
     "typecheck": "tsc --noEmit",
+    "test:unit": "vitest run",
     "lint": "eslint .",
     "gen:types": "node scripts/gen-types.mjs",
     "test:e2e": "playwright test --project=humo",
@@ -55,6 +56,7 @@
     "eslint-config-next": "16.4.3",
     "json-schema-to-typescript": "16.0.0",
     "tailwindcss": "4.3.3",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "3.2.4"
   }
 }

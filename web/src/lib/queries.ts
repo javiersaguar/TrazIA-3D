@@ -1,7 +1,15 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getChanges, getEquipment, getReviewFields, getRevision, type RevisionId } from "./mock/api";
+import {
+  getBench,
+  getChanges,
+  getEquipment,
+  getReviewFields,
+  getRevision,
+  type BenchExtractor,
+  type RevisionId,
+} from "./mock/api";
 
 export const qk = {
   revision: (rev: RevisionId) => ["revision", rev] as const,
@@ -18,3 +26,6 @@ export const useReviewFields = (rev: RevisionId) =>
 export const useChanges = () => useQuery({ queryKey: qk.changes(), queryFn: getChanges });
 
 export const useEquipment = () => useQuery({ queryKey: qk.equipment(), queryFn: getEquipment });
+
+export const useBench = (extractor: BenchExtractor) =>
+  useQuery({ queryKey: ["bench", extractor] as const, queryFn: () => getBench(extractor) });

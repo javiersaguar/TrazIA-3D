@@ -64,7 +64,7 @@ export const NAV: NavGroup[] = [
         label: "Bench",
         icon: Gauge,
         shortcut: "5",
-        description: "Métricas del jurado medidas contra los IFC de referencia de Técnicas Reunidas. Pendiente del dataset oficial.",
+        description: "Métricas del jurado medidas sobre un conjunto sintético con verdad conocida. Con el dataset del reto se medirá contra sus IFC de referencia.",
       },
       {
         href: "/impacto",

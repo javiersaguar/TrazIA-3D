@@ -1,7 +1,7 @@
 "use client";
 
 import { Command } from "cmdk";
-import { CircleDot, Download, Keyboard, MessageSquareText, Moon, Ruler, Sun, type LucideIcon } from "lucide-react";
+import { Box, CircleDot, Download, Keyboard, MessageSquareText, Moon, Ruler, Sparkles, Sun, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import type { ReactNode } from "react";
@@ -58,6 +58,15 @@ export function CommandMenu() {
               {item.label}
             </Item>
           ))}
+        </Group>
+
+        <Group heading="Laboratorio 3D">
+          <Item icon={Box} value="laboratorio 3d visor planta morph" onSelect={() => run(() => router.push("/lab/3d"))}>
+            Laboratorio 3D: visor, planta y comparación
+          </Item>
+          <Item icon={Sparkles} value="firma plano modelo" onSelect={() => run(() => router.push("/lab/firma"))}>
+            Del plano al modelo
+          </Item>
         </Group>
 
         {nozzles.length ? (
