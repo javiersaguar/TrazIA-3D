@@ -38,11 +38,16 @@ def ingest_bytes(data: bytes, filename: str, document_id: str, revision: str) ->
     )
     bundle = Bundle(document=document, media_type=suffix.lstrip("."))
     if suffix == ".pdf":
-        with pdfplumber.open(io.BytesIO(data)) as pdf:
+        try:
+            pdf = pdfplumber.open(io.BytesIO(data))
+        except Exception as exc:  # pdfminer lanza sus propias excepciones con bytes corruptos
+            raise ValueError(f"No es un PDF válido: {exc}") from None
+        with pdf:
             if len(pdf.pages) > MAX_PAGES:
                 raise ValueError("Límite de la base: 100 páginas por PDF")
             document.page_count = len(pdf.pages)
             for page in pdf.pages:
+                clipped = dropped = 0
                 rows = page.extract_text_lines(return_chars=True)
                 if not rows:
                     bundle.warnings.append(
@@ -64,12 +69,17 @@ def ingest_bytes(data: bytes, filename: str, document_id: str, revision: str) ->
                         text = "".join(parts).strip()
                         if not text:
                             continue
-                        bbox = (
-                            max(0.0, min(c["x0"] for c in group) / page.width),
-                            max(0.0, min(c["top"] for c in group) / page.height),
-                            min(1.0, max(c["x1"] for c in group) / page.width),
-                            min(1.0, max(c["bottom"] for c in group) / page.height),
+                        raw = (
+                            min(c["x0"] for c in group) / page.width,
+                            min(c["top"] for c in group) / page.height,
+                            max(c["x1"] for c in group) / page.width,
+                            max(c["bottom"] for c in group) / page.height,
                         )
+                        bbox = _clip_bbox(raw)
+                        if bbox is None:
+                            dropped += 1
+                            continue
+                        clipped += bbox != raw
                         bundle.lines.append(
                             EvidenceLine(
                                 text=text,
@@ -82,6 +92,15 @@ def ingest_bytes(data: bytes, filename: str, document_id: str, revision: str) ->
                                 ),
                             )
                         )
+                if dropped:
+                    bundle.warnings.append(
+                        f"Página {page.page_number}: {dropped} texto(s) fuera de la página, "
+                        "descartado(s)"
+                    )
+                if clipped:
+                    bundle.warnings.append(
+                        f"Página {page.page_number}: {clipped} texto(s) recortado(s) al borde"
+                    )
     elif suffix == ".xlsx":
         with zipfile.ZipFile(io.BytesIO(data)) as archive:
             if sum(f.file_size for f in archive.infolist()) > 100 * 1024 * 1024:
@@ -133,6 +152,14 @@ def ingest_bytes(data: bytes, filename: str, document_id: str, revision: str) ->
     else:
         raise ValueError("Formato admitido: PDF, XLSX, PNG o JPEG")
     return bundle
+
+
+def _clip_bbox(raw: tuple[float, float, float, float]) -> tuple | None:
+    """Recorta una caja normalizada a la página; None si queda fuera del todo."""
+    x0, y0, x1, y1 = (min(1.0, max(0.0, v)) for v in raw)
+    if x1 <= x0 or y1 <= y0:
+        return None
+    return (x0, y0, x1, y1)
 
 
 def render_evidence(

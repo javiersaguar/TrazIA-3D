@@ -97,12 +97,12 @@ Los dos están corregidos y cubiertos por pruebas.
 
 ## Hallazgos para el núcleo
 
-1. **Un texto fuera de la página tumba la ingesta del PDF.** `ingest_bytes` limita la caja a [0, 1]
-   coordenada a coordenada. Si un texto queda por completo encima del borde, `y0` y `y1` acaban
-   invertidos y `Source` lanza un error de validación. Esto hace fallar el documento entero. En planos
-   reales con anotaciones en el margen puede pasar. Propuesta: descartar o recortar esa línea y dejar
-   un aviso, en vez de abortar. El bench registra ahora estos casos como ingesta fallida en lugar de
-   detenerse.
+1. **Un texto fuera de la página tumbaba la ingesta del PDF.** `ingest_bytes` limitaba la caja a
+   [0, 1] coordenada a coordenada; un texto por completo fuera del borde dejaba `y0` y `y1`
+   invertidos y `Source` rechazaba la línea, con lo que fallaba el documento entero. **Corregido:**
+   ahora la caja se recorta al borde si el texto se sale en parte, y se descarta si queda fuera del
+   todo. En los dos casos queda un aviso por página. Un PDF corrupto da `ValueError` en vez de una
+   excepción de pdfminer. Prueba: `tests/test_lectura_ingest.py`.
 
 ## Siguiente paso
 
