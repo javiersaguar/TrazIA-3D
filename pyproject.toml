@@ -1,0 +1,32 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "trazia-3d"
+version = "0.2.0"
+description = "TrazIA-3D: del plano al modelo, con cada cambio trazado"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "pydantic>=2.11,<3", "ifcopenshell>=0.8.3,<0.9",
+  "pdfplumber>=0.11,<1", "openpyxl>=3.1,<4", "pillow>=11,<13",
+  "streamlit>=1.50,<2", "plotly>=6,<7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1", "reportlab>=4,<5"]
+
+[project.scripts]
+trazia = "trazia.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/trazia"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]

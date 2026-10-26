@@ -1,0 +1,438 @@
+{
+  "schema_version": "0.2",
+  "project_id": "DEMO-PLANT",
+  "revision": "A",
+  "dataset": "synthetic",
+  "documents": [
+    {
+      "id": "GA-V101",
+      "filename": "GAD_V-101_revA.pdf",
+      "revision": "A",
+      "sha256": "468bb29a7c64e8a9e391e648250328f6e20ab7b44c004e10db4ebb9f2fa0a1b1",
+      "page_count": 1
+    },
+    {
+      "id": "HDM-V101",
+      "filename": "HDM_V-101_revA.xlsx",
+      "revision": "A",
+      "sha256": "1a2eedf7f63f66fecccb2a78bf1997093a9d572e22f80bedb97d74161bd72d2b",
+      "page_count": null
+    }
+  ],
+  "equipment": {
+    "id": "vessel-001",
+    "tag": {
+      "value": "V-101",
+      "unit": "1",
+      "source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.1786145882750926,
+          0.4874784868518863,
+          0.19286823524884145
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      }
+    },
+    "kind": "vertical_vessel",
+    "diameter": {
+      "value": 2000.0,
+      "unit": "mm",
+      "source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.2166243135384228,
+          0.5339544463025944,
+          0.23087796051217163
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      }
+    },
+    "height": {
+      "value": 6000.0,
+      "unit": "mm",
+      "source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.24869501922935766,
+          0.51995420607769,
+          0.2629486662031065
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      }
+    },
+    "head_depth": {
+      "value": 500.0,
+      "unit": "mm",
+      "source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.2807657249202925,
+          0.5440338129151964,
+          0.2950193718940413
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      }
+    },
+    "skirt_height": {
+      "value": 1200.0,
+      "unit": "mm",
+      "source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.31283643061122735,
+          0.55524206858841,
+          0.32709007758497616
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      }
+    },
+    "skirt_thickness": {
+      "value": 20.0,
+      "unit": "mm",
+      "source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.3449071363021622,
+          0.5636381809767075,
+          0.359160783275911
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      }
+    },
+    "attributes": {
+      "design_pressure": {
+        "value": 16.0,
+        "unit": "bar",
+        "source": {
+          "document_id": "HDM-V101",
+          "page": null,
+          "sheet": "HDM",
+          "cell": "A2:C2",
+          "locator": "HDM!A2:C2",
+          "bbox": null,
+          "confidence": 0.75,
+          "reviewed": false
+        }
+      },
+      "design_temperature": {
+        "value": 180.0,
+        "unit": "C",
+        "source": {
+          "document_id": "HDM-V101",
+          "page": null,
+          "sheet": "HDM",
+          "cell": "A3:C3",
+          "locator": "HDM!A3:C3",
+          "bbox": null,
+          "confidence": 0.75,
+          "reviewed": false
+        }
+      },
+      "material": {
+        "value": "SA-516-70",
+        "unit": "1",
+        "source": {
+          "document_id": "HDM-V101",
+          "page": null,
+          "sheet": "HDM",
+          "cell": "A4:C4",
+          "locator": "HDM!A4:C4",
+          "bbox": null,
+          "confidence": 0.75,
+          "reviewed": false
+        }
+      },
+      "operating_weight": {
+        "value": 12000.0,
+        "unit": "kg",
+        "source": {
+          "document_id": "HDM-V101",
+          "page": null,
+          "sheet": "HDM",
+          "cell": "A5:C5",
+          "locator": "HDM!A5:C5",
+          "bbox": null,
+          "confidence": 0.75,
+          "reviewed": false
+        }
+      }
+    },
+    "nozzles": [
+      {
+        "id": "N1",
+        "diameter": {
+          "value": 200.0,
+          "unit": "mm",
+          "source": {
+            "document_id": "GA-V101",
+            "page": 1,
+            "sheet": null,
+            "cell": null,
+            "locator": "Texto de página 1",
+            "bbox": [
+              0.42837308103558774,
+              0.4653255093481356,
+              0.7732688477856053,
+              0.4760157445784472
+            ],
+            "confidence": 0.75,
+            "reviewed": false
+          }
+        },
+        "projection": {
+          "value": 400.0,
+          "unit": "mm",
+          "source": {
+            "document_id": "GA-V101",
+            "page": 1,
+            "sheet": null,
+            "cell": null,
+            "locator": "Texto de página 1",
+            "bbox": [
+              0.42837308103558774,
+              0.4653255093481356,
+              0.7732688477856053,
+              0.4760157445784472
+            ],
+            "confidence": 0.75,
+            "reviewed": false
+          }
+        },
+        "elevation": {
+          "value": 2500.0,
+          "unit": "mm",
+          "source": {
+            "document_id": "GA-V101",
+            "page": 1,
+            "sheet": null,
+            "cell": null,
+            "locator": "Texto de página 1",
+            "bbox": [
+              0.42837308103558774,
+              0.4653255093481356,
+              0.7732688477856053,
+              0.4760157445784472
+            ],
+            "confidence": 0.75,
+            "reviewed": false
+          }
+        },
+        "azimuth": {
+          "value": 0.0,
+          "unit": "deg",
+          "source": {
+            "document_id": "GA-V101",
+            "page": 1,
+            "sheet": null,
+            "cell": null,
+            "locator": "Texto de página 1",
+            "bbox": [
+              0.42837308103558774,
+              0.4653255093481356,
+              0.7732688477856053,
+              0.4760157445784472
+            ],
+            "confidence": 0.75,
+            "reviewed": false
+          }
+        }
+      },
+      {
+        "id": "N2",
+        "diameter": {
+          "value": 100.0,
+          "unit": "mm",
+          "source": {
+            "document_id": "GA-V101",
+            "page": 1,
+            "sheet": null,
+            "cell": null,
+            "locator": "Texto de página 1",
+            "bbox": [
+              0.42837308103558774,
+              0.5033352346114658,
+              0.7774719436630605,
+              0.5140254698417774
+            ],
+            "confidence": 0.75,
+            "reviewed": false
+          }
+        },
+        "projection": {
+          "value": 300.0,
+          "unit": "mm",
+          "source": {
+            "document_id": "GA-V101",
+            "page": 1,
+            "sheet": null,
+            "cell": null,
+            "locator": "Texto de página 1",
+            "bbox": [
+              0.42837308103558774,
+              0.5033352346114658,
+              0.7774719436630605,
+              0.5140254698417774
+            ],
+            "confidence": 0.75,
+            "reviewed": false
+          }
+        },
+        "elevation": {
+          "value": 5500.0,
+          "unit": "mm",
+          "source": {
+            "document_id": "GA-V101",
+            "page": 1,
+            "sheet": null,
+            "cell": null,
+            "locator": "Texto de página 1",
+            "bbox": [
+              0.42837308103558774,
+              0.5033352346114658,
+              0.7774719436630605,
+              0.5140254698417774
+            ],
+            "confidence": 0.75,
+            "reviewed": false
+          }
+        },
+        "azimuth": {
+          "value": 90.0,
+          "unit": "deg",
+          "source": {
+            "document_id": "GA-V101",
+            "page": 1,
+            "sheet": null,
+            "cell": null,
+            "locator": "Texto de página 1",
+            "bbox": [
+              0.42837308103558774,
+              0.5033352346114658,
+              0.7774719436630605,
+              0.5140254698417774
+            ],
+            "confidence": 0.75,
+            "reviewed": false
+          }
+        }
+      },
+      {
+        "id": "N3",
+        "diameter": {
+          "value": 150.0,
+          "unit": "mm",
+          "source": {
+            "document_id": "GA-V101",
+            "page": 1,
+            "sheet": null,
+            "cell": null,
+            "locator": "Texto de página 1",
+            "bbox": [
+              0.42837308103558774,
+              0.541344959874796,
+              0.7816750395405155,
+              0.5520351951051076
+            ],
+            "confidence": 0.75,
+            "reviewed": false
+          }
+        },
+        "projection": {
+          "value": 350.0,
+          "unit": "mm",
+          "source": {
+            "document_id": "GA-V101",
+            "page": 1,
+            "sheet": null,
+            "cell": null,
+            "locator": "Texto de página 1",
+            "bbox": [
+              0.42837308103558774,
+              0.541344959874796,
+              0.7816750395405155,
+              0.5520351951051076
+            ],
+            "confidence": 0.75,
+            "reviewed": false
+          }
+        },
+        "elevation": {
+          "value": 3500.0,
+          "unit": "mm",
+          "source": {
+            "document_id": "GA-V101",
+            "page": 1,
+            "sheet": null,
+            "cell": null,
+            "locator": "Texto de página 1",
+            "bbox": [
+              0.42837308103558774,
+              0.541344959874796,
+              0.7816750395405155,
+              0.5520351951051076
+            ],
+            "confidence": 0.75,
+            "reviewed": false
+          }
+        },
+        "azimuth": {
+          "value": 180.0,
+          "unit": "deg",
+          "source": {
+            "document_id": "GA-V101",
+            "page": 1,
+            "sheet": null,
+            "cell": null,
+            "locator": "Texto de página 1",
+            "bbox": [
+              0.42837308103558774,
+              0.541344959874796,
+              0.7816750395405155,
+              0.5520351951051076
+            ],
+            "confidence": 0.75,
+            "reviewed": false
+          }
+        }
+      }
+    ]
+  },
+  "approval": null
+}
