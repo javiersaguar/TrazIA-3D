@@ -22,3 +22,4 @@ PyMuPDF están prohibidos. Solo se añaden líneas; cada una indica quién la ne
 
 | Modelo | Licencia | Uso | Añadido por |
 |---|---|---|---|
+| Qwen3-VL 4B Instruct (vía Ollama, Q4_K_M) | Apache-2.0 | Lectura visual local por mosaicos (tarea «lineas») | Lectura |
