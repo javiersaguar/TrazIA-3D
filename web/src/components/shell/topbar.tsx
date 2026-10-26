@@ -22,7 +22,7 @@ export function Topbar() {
       style={{ viewTransitionName: "app-topbar" }}
       className="sticky top-0 z-30 flex h-[var(--topbar-height)] items-center gap-3 border-b border-border bg-surface-sunken/95 px-5 backdrop-blur-[2px]"
     >
-      <nav aria-label="Ruta" className="flex min-w-0 items-center gap-1.5 text-[13px]">
+      <nav aria-label="Ruta" className="flex min-w-0 items-center gap-1.5 text-[13px] whitespace-nowrap">
         <span className="text-muted">DEMO-PLANT</span>
         <Icon icon={ChevronRight} size={14} className="text-faint" />
         <span className="truncate font-medium text-text">{item?.label ?? "Inicio"}</span>

@@ -5,10 +5,11 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+
 import { Tip } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
+import { useMounted } from "@/lib/use-mounted";
 import { NAV, navItemFor } from "@/lib/nav";
 import { useUi } from "@/stores/ui";
 import { LogoMark } from "./logo";
@@ -30,7 +31,7 @@ export function Sidebar() {
         {!collapsed ? (
           <div className="min-w-0 flex-1 leading-tight">
             <p className="truncate text-[15px] font-semibold text-strong">TrazIA-3D</p>
-            <p className="truncate text-xs text-muted">Técnicas Reunidas · GA2MODEL</p>
+            <p className="text-xs leading-snug text-muted">Técnicas Reunidas · GA2MODEL</p>
           </div>
         ) : null}
         {!collapsed ? (
@@ -167,8 +168,7 @@ function DemoCard() {
 
 function ThemeToggle({ collapsed }: { collapsed: boolean }) {
   const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useMounted();
   const dark = !mounted || resolvedTheme !== "light";
   const label = dark ? "Modo claro" : "Modo oscuro";
   const button = (
