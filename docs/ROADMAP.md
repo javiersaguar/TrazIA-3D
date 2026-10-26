@@ -12,6 +12,12 @@ Javier Saguar Antona · Iria Lozano Carrasco · Miguel Vera del Castillo · Alej
 **Documento vivo:** se actualiza al cerrar cada fase. Cada tarea tiene casilla `[ ]`, responsable y
 criterio de "hecho". Si una tarea no tiene criterio de "hecho", no está bien definida.
 
+**Documentos que lo acompañan:**
+- [DECISIONES.md](DECISIONES.md): análisis punto por punto de cada decisión técnica (DEC-01 a DEC-33).
+- [ESTUDIO.md](ESTUDIO.md): protocolo del estudio comparativo de las cuatro estrategias de la pág. 13.
+- [COORDINACION-BACKEND.md](COORDINACION-BACKEND.md): contrato 0.3 y reparto entre los agentes
+  Lectura y Plataforma.
+
 ---
 
 ## Índice
@@ -26,7 +32,7 @@ criterio de "hecho". Si una tarea no tiene criterio de "hecho", no está bien de
 7. [Calendario por fases](#7-calendario-por-fases)
 8. [Workstreams en detalle](#8-workstreams-en-detalle)
    - [A. Ingesta](#a-ingesta)
-   - [B. Extracción IA](#b-extracción-ia-el-corazón-del-25--parte-del-35)
+   - [B. Lectura: cuatro estrategias comparadas](#b-lectura-cuatro-estrategias-comparadas-25--y-gran-parte-del-35-)
    - [C. Normalización y contrato de datos](#c-normalización-y-contrato-de-datos)
    - [D. Geometría paramétrica e IFC](#d-geometría-paramétrica-e-ifc-35)
    - [E. Validación y humano en el bucle](#e-validación-y-humano-en-el-bucle)
@@ -47,16 +53,16 @@ criterio de "hecho". Si una tarea no tiene criterio de "hecho", no está bien de
 1. Inscribirse los **4** antes del **23/11 23:59**; hacer la formación obligatoria en la plataforma IndesIA.
 2. El código previo **está permitido si se declara al inicio del hackatón** → etiqueta `pre-hackathon-baseline` + `PREVIOUS_WORK.md`.
 3. Commits **solo** de los 4 miembros. Cero `Co-authored-by`, cero firmas de IA. Hook local + check en CI.
-4. Núcleo Python (`src/trazia`, IfcOpenShell) se mantiene. Encima: **API FastAPI** + **frontend React/Next.js con 3D real**.
-5. Extracción **híbrida (enfoque D)**: tablas vectoriales + OCR + LLM multimodal con cita obligatoria + reglas de ingeniería + reconciliación entre GA, HDM y VESOR.
-6. **Cada valor cita página y región**, y un "grounding check" verifica que la cita contiene el valor. Si no, no hay valor: se abstiene.
-7. **Confianza calibrada de verdad** (diagrama de fiabilidad, ECE) — es literalmente un criterio del 25 %.
-8. **GA2MODEL Bench:** medimos nosotros mismos contra los 4 IFC de referencia con las mismas métricas que usará el jurado (35/25/20/10/10).
+4. Núcleo Python (`src/trazia`, IfcOpenShell). Encima: **API FastAPI** + **frontend Next.js con 3D real** (hecho: 239 fps en ventana completa).
+5. **Las cuatro estrategias de la pág. 13 (A visión + 3D, B datos + reglas, C RAG, D híbrido) se desarrollan y se comparan** con el mismo bench ([ESTUDIO.md](ESTUDIO.md)). Gana la que diga el dato; la tabla del estudio es la diapositiva de trade-offs.
+6. **Cada valor cita página y región**; la cita se comprueba con OCR del recorte. Sin cita no hay valor: se abstiene.
+7. **Incertidumbre de verdad:** confianza calibrada (ECE < 0,05) + **intervalos conformes** por valor + curva riesgo-cobertura.
+8. **GA2MODEL Bench:** sintéticos de 8 o más estilos de proveedor (2 reservados para generalización) + los 4 IFC de TR con exclusión de uno, intervalos estadísticos y **Puntuación GA2MODEL** con la rúbrica 35/25/20/10.
 9. IFC "rico": `IfcTank`, boquillas como `IfcDistributionPort`, `IfcDocumentReference` al plano, `IfcApproval` para la firma humana. IFC4 + exportación IFC4X3 / IFC2X3.
 10. Delta rev1→rev2 con **animación 3D de morph por GUID**, nubes de revisión, impacto por disciplina en un grafo **React Flow** y exportación **BCF**.
 11. Frontend **0 AI slop** con el estilo de la casa (PIDS, Albertitos, Ciberconciencia — capturas en `docs/referencias-estilo/`): lenguaje visual del plano de ingeniería (líneas de cota, nubes de revisión, triángulos Δ), 3D como protagonista, animaciones con propósito.
 12. Momento firma: **el plano 2D se levanta y se extruye en el modelo 3D** delante del jurado.
-13. Demo **offline-capable** (resultados cacheados) + vídeo de respaldo + `.pptx` (obligatorio por bases).
+13. Demo **offline-capable** (resultados cacheados) + vídeo de respaldo + `.pptx` (obligatorio por bases). **Visión local** en la RTX 5070 Laptop (8 GB) para datos de TR; Gemini y Mistral solo con sintéticos salvo autorización escrita.
 14. Día 3: **congelación a las 08:00**, entrega a las **10:00**, pitch a las 11:00 y gala de clausura a las 13:00.
 15. El gran premio se decide en una **gala en diciembre**: preparar versión pulida y vídeo para ella.
 
@@ -118,12 +124,12 @@ medidos**, **ve la evidencia de cada número** y **ve el cambio** de forma espec
 
 | Criterio | Qué haremos que nadie más hará | Prueba que enseñamos en la demo |
 | --- | --- | --- |
-| 35 % geometría | Reconciliación de vistas + restricciones de ingeniería (suma de cotas, fondos 2:1, DN normalizados) + familias por tipología | Tabla y **mapa de calor 3D de error** (mm) contra el IFC de TR; error medio de dimensiones y boquillas |
-| 25 % atributos | Extracción multi-fuente (GA + HDM + VESOR) con cita verificada + **calibración** | Exactitud valor+unidad y **diagrama de fiabilidad** con ECE |
-| 20 % delta | Emparejamiento semántico de boquillas, tolerancias, cambios de evidencia y de geometría por GUID | Precisión/recall de cambios + morph 3D rev1→rev2 + log accionable + BCF |
-| 10 % escalado | Pipeline asíncrono, caché por SHA-256, idempotencia, coste/latencia medidos | Procesamos **todo el dataset** en lote en directo: N equipos, X s/equipo, Y €/equipo |
-| 10 % innovación | Grounding check anti-alucinación, cola de revisión priorizada por riesgo, aprendizaje de correcciones, aprobación dentro del IFC | Dato corregido → la siguiente extracción lo usa; `IfcApproval` visible en un visor IFC externo |
-| Ético (general) | Humano en el bucle, DRAFT por defecto, abstención en vez de invención, documentos tratados como datos (anti prompt-injection) | Intento de inyección dentro de un PDF que el sistema ignora y señala |
+| 35 % geometría | Reconciliación de vistas + restricciones de ingeniería + **verificación con la geometría vectorial del dibujo** (canal independiente del texto) + familias con niveles de detalle y envolvente de reserva | Tabla y **mapa de calor 3D de error** (mm, Hausdorff) contra el IFC de TR |
+| 25 % atributos | Lectura en cascada (reglas → OCR → detector propio → modelo de visión) con cita verificada + **calibración e intervalos conformes** | Exactitud valor + unidad, **diagrama de fiabilidad**, ECE y cobertura de intervalos |
+| 20 % delta | **Tres capas**: diferencia visual de páginas, campos emparejados y geometría por GUID; **la rev1 aprobada como memoria** para leer la rev2 | Precisión/recall de cambios + morph 3D rev1→rev2 + log accionable + BCF |
+| 10 % escalado | Cascada barata → cara, caché por SHA-256, cola intercambiable (en proceso o Redis), coste y latencia medidos por trabajo | Procesamos **todo el dataset** en lote en directo: N equipos, X s/equipo, Y €/equipo |
+| 10 % innovación | **Estudio comparativo A/B/C/D** con ablaciones y estadística; detector **entrenado con nuestro propio generador**; intervalos conformes; aprobación dentro del IFC | Pantalla «Estudio» y diapositiva «Elegimos con datos» con frontera de Pareto coste-acierto |
+| Ético (general) | Humano en el bucle, DRAFT por defecto, abstención en vez de invención, **datos de TR solo en local o plataforma**, registro de envíos, corpus adversarial de inyección | «Nada de vuestros planos salió del portátil» + intento de inyección que el sistema ignora y señala |
 | Reproducibilidad (general) | `docker compose up` / `uv run` + semillas + datasets sintéticos versionados | Un comando reproduce el bench |
 | Presentación (general) | Narrativa plano → dato → modelo → cambio → decisión; 3D cinematográfico | `.pptx` cuidado + demo en vivo + vídeo de respaldo |
 
@@ -153,8 +159,18 @@ evidencia y su historia."*
 
 ## 4. Punto de partida: qué existe hoy
 
-Base construida por el agente que trabaja en `src/trazia` (Python 3.11–3.13, uv, IfcOpenShell,
-pdfplumber, openpyxl, Pydantic, Streamlit + Plotly). Versión `0.2.0`, **aún sin commits**.
+**Estado a 26/10/2026 (en `main` y en GitHub):**
+- Núcleo Python 0.2.
+- Frontend Next.js con las 6 pantallas y el 3D real: visor IFC, planta, comparación de revisiones y
+  «del plano al modelo».
+- Generador sintético v1 (3 estilos), bench v0 con la rúbrica y lector de GA dibujados (estrategia B
+  inicial).
+- Reglas de autoría y licencia MIT.
+
+Detalle en [BENCH.md](BENCH.md), `web/docs/INFORME_A.md` y `web/docs/INFORME_B.md`. La tabla de abajo
+es la foto inicial de la base.
+
+Base inicial (Python 3.11–3.13, uv, IfcOpenShell, pdfplumber, openpyxl, Pydantic, Streamlit + Plotly).
 
 | Ya existe | Falta para ganar |
 | --- | --- |
@@ -224,20 +240,20 @@ En el repositorio **solo** aparecen como autores:
 
 ### 5.4 Coordinación humanos + agentes: no pisarse
 
-Hoy hay un agente trabajando en `src/trazia`. A partir de ahora trabajarán 4 personas y varios agentes.
+Trabajan 4 personas y varios agentes. El backend se reparte entre dos agentes, **Lectura** y
+**Plataforma**; el detalle está en [COORDINACION-BACKEND.md](COORDINACION-BACKEND.md).
 
 1. **Mapa de propiedad por carpeta** (un único dueño por carpeta; los demás proponen por PR):
 
    | Carpeta | Dueño | Contenido |
    | --- | --- | --- |
-   | `src/trazia/` (ingest, extraction, model, review, revisions, ifc) | Núcleo (agente actual + responsable de B/D) | Lógica Python |
-   | `src/trazia/extractors/` | Responsable B | Adaptadores OCR/LLM/tablas |
-   | `src/trazia/families/` | Responsable D | Familias paramétricas |
-   | `src/trazia/api/` | Responsable H | FastAPI, jobs, persistencia |
-   | `bench/` | Responsable G | Métricas, GT, informes |
-   | `web/` | Responsable I | Frontend Next.js |
-   | `synthetic/` | Responsable G | Generador de planos sintéticos |
-   | `docs/` | Todos; `ROADMAP.md` lo mantiene el líder | Documentación |
+   | `src/trazia/{pipeline,ingest,extraction}.py`, `src/trazia/{strategies,extractors,vision,ocr,geometry2d,reconcile,calibration}/` | Lectura (responsable B: Javier) | Las cuatro estrategias, proveedores de visión, OCR, geometría desde vistas, reconciliación e incertidumbre |
+   | `training/` | Lectura | Entrenamiento del detector propio con sintéticos |
+   | `bench/`, `synthetic/` | Lectura (responsable G: Alejandro) | Generador, bench y estudio comparativo |
+   | `src/trazia/{model,ifc,revisions,review,cli,app,viewer,bcf}.py`, `src/trazia/families/` | Plataforma (responsable D: Miguel) | Contrato, familias, IFC, cambios y BCF |
+   | `src/trazia/{api,store,queue}/` | Plataforma (responsable H: Javier) | FastAPI, trabajos, persistencia |
+   | `web/` | Frontend (responsable I: Iria); Plataforma conecta la API y la pantalla Estudio | Next.js; el 3D (`viewer3d`, `plant`, `delta3d`) es del responsable 3D |
+   | `docs/` | Todos; `ROADMAP.md`, `DECISIONES.md` y `ESTUDIO.md` los mantiene el líder | Documentación |
    | `pitch/` | Responsable J | `.pptx`, guion, vídeo |
 
 2. **Contrato primero.** El JSON (`docs/DATA_CONTRACT.md` + `revision.schema.json`) y el OpenAPI son
@@ -282,112 +298,144 @@ Cada persona es **dueña** de su carpeta y **revisora** de la de al lado.
      BackgroundTasks en local)             por SHA-256 (originales,          (equipos, revisiones,
                 │                          recortes, IFC)                    campos, auditoría)
                 ▼
-┌──────────────────────────────── src/trazia (núcleo, ya existe) ──────────────────────────────────────────────────┐
-│ ingest → classify → extractors/{vector_tables, ocr, vlm, hdm_excel, vesor} → reconcile → normalize (model.py)    │
-│ → families/{vertical_vessel, horizontal_vessel, column, tank, pump} → ifc.py → review.py → revisions.py → bcf.py │
+┌──────────────────────────────── src/trazia · pipeline.process(documentos, strategy=…) ──────────────────────────┐
+│ ingest → classify ─┬─ A · vision/ (local Qwen3-VL · plataforma · Gemini · Mistral) + geometry2d/ (trazos, vistas) │
+│                    ├─ B · extractors/ (texto, tablas, cotas, cajetín, HDM, VESOR) + ocr/                          │
+│                    ├─ C · rag/ (ColQwen2/ColSmol + biblioteca aprobada) · memoria de la revisión anterior        │
+│                    └─ D · cascada + verificación cruzada + fusión aprendida + selector por tipo de documento      │
+│ → reconcile/ (restricciones) → calibration/ (isotónica + conformal) → model.py (contrato 0.3)                     │
+│ → families/ (nivel 1 envolvente · nivel 2 paramétrica · nivel 3 detalle) → ifc.py → revisions.py → bcf.py        │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-                ▲
-        bench/ (GT del IFC de referencia + GT manual + sintéticos) → métricas por criterio del jurado
+                ▲                                              ▲
+        bench/ + estudio (A/B/C/D, ablaciones,          training/ (Florence-2 ajustado con
+        estadística, Puntuación GA2MODEL)               planos sintéticos, RTX 5070 8 GB)
 ```
 
 ### Decisiones y trade-offs (para defender ante el jurado)
 
-| Decisión | Elegido | Alternativa descartada | Por qué |
+Resumen. El análisis completo, con las opciones descartadas y cómo se valida cada una, está en
+[DECISIONES.md](DECISIONES.md).
+
+| Decisión | Elegido | Alternativas | Por qué |
 | --- | --- | --- | --- |
-| Enfoque (pág. 13) | **D híbrido**: datos + reglas como esqueleto, visión/LLM para leer, RAG solo como "prior" | A puro visión | Robusto y explicable; la visión sola es frágil ante ambigüedad |
-| Geometría | Familias **paramétricas** por tipología | Reconstrucción libre de malla | IFC limpio, editable, comparable por parámetro, GUID estables |
+| Enfoque (pág. 13) | **Las cuatro (A, B, C, D) implementadas y medidas**; el producto usa la ganadora y su selector por tipo de documento | Elegir una a priori | Es la única forma de *demostrar* el trade-off que pide TR (DEC-01) |
+| Visión | Adaptador con modelo local (Qwen3-VL en la RTX 5070, Ollama), plataforma, Gemini y Mistral OCR | Un proveedor fijo | Confidencialidad, coste y acierto medidos; datos de TR solo en local o plataforma (DEC-03, 31) |
+| Detector propio | **Florence-2 (MIT) ajustado con nuestros sintéticos** + ~20 páginas reales | YOLO (AGPL), solo modelos generales | La literatura muestra que el ajuste supera a modelos generales; licencia compatible (DEC-05, 30) |
+| Geometría desde vistas | Trazos con `pdfplumber` + OpenCV en raster | PyMuPDF (AGPL) | Canal independiente del texto: verifica y, en A, construye (DEC-07) |
+| Incertidumbre | Calibración isotónica + **intervalos conformes** + abstención | Score fijo del modelo | Responde a «gestionar incertidumbre» con garantía estadística (DEC-12) |
+| Geometría IFC | Familias paramétricas + **envolvente de reserva** + niveles de detalle 1/2/3 | Malla libre | IFC editable y comparable, sin huecos ante tipologías nuevas (DEC-16) |
+| Cambios | Diferencia visual + campos emparejados + geometría por GUID, con la rev1 como memoria | Solo diferencia de campos | Detecta lo que no está en nubes y explica el cambio (DEC-19) |
 | Núcleo | Python + IfcOpenShell (existe) | Reescribir en TS | Estándar de facto IFC; reutiliza la base |
-| Frontend | Next.js (App Router) + R3F | Seguir con Streamlit | Streamlit no da el nivel de 3D, animación y UX necesario |
-| Visor | **web-ifc** en Worker → mallas Three.js | Generar geometría en cliente | Regla del proyecto: el visor lee el IFC, no una segunda geometría |
-| LLM | Adaptador intercambiable (servicios GenAI de la plataforma IndesIA o API externa, p. ej. Claude con visión) | Un proveedor fijo | Coste, confidencialidad y lo que permita la plataforma; se decide con muestras reales |
-| Confianza | Fusión de señales + calibración isotónica | Score fijo del LLM | El criterio del 25 % pide **calibración** |
-| Persistencia | SQLite + almacén por hash (local); Postgres en el discurso de escala | Solo memoria | Auditoría, reproducibilidad, idempotencia |
-| Tiempo real | SSE | WebSockets | Más simple; solo servidor → cliente |
+| Frontend | Next.js (App Router) + R3F (hecho) | Streamlit | Nivel de 3D, animación y UX |
+| Visor | **web-ifc** en Worker → mallas Three.js (hecho) | Geometría en cliente | El visor lee el IFC, no una segunda geometría |
+| Cola | Interfaz con dos implementaciones: en proceso y Redis (`arq`) | Solo `BackgroundTasks` | Demo sin dependencias y escala demostrable (DEC-23) |
+| Persistencia | SQLite + almacén por hash; Postgres en el perfil de escala | Solo memoria | Auditoría, reproducibilidad, idempotencia |
+| Tiempo real | SSE | WebSockets | Solo servidor → cliente |
 
 ---
 
 ## 7. Calendario por fases
 
-Hoy: **lunes 26/10/2026**. Quedan 4 semanas hasta el evento.
+Hoy: **lunes 26/10/2026**. Quedan 4 semanas hasta el evento. Las casillas marcadas ya están hechas.
 
 | Fase | Fechas | Objetivo | Hito de salida |
 | --- | --- | --- | --- |
-| 0. Arranque | 26–28 oct | Equipo, reglas, repo, inscripción | Commit inicial, hooks, roles, inscritos |
-| 1. Cimientos | 29 oct – 4 nov | Contrato v1, API, monorepo web, generador sintético, bench v0 | `docker compose up` levanta API + web vacía; bench mide la demo sintética |
-| 2. Capacidades | 5 – 14 nov | Extracción real, familias + IFC rico, revisión UX, visor 3D | Flujo completo en web con planos sintéticos **dibujados** |
-| 3. Diferenciales | 15 – 21 nov | Delta pro, impacto, BCF, calibración, momento firma 3D, escala | Demo de 6 min completa con datos sintéticos |
+| 0. Arranque | 26–28 oct | Equipo, reglas, repo, inscripción, plataforma | Inscritos; plataforma documentada; reglas de autoría activas |
+| 1. Cimientos | 29 oct – 4 nov | Contrato 0.3, `pipeline` + interfaz `Strategy`, proveedores de visión, generador v2, arnés del estudio, API base | El estudio corre con B sobre S-dev; la API sirve la demo |
+| 2. Estrategias | 5 – 14 nov | A, C y D v1; OCR; modelo local; detector propio entrenado; familias + IFC rico | Primer estudio A/B/C/D en S-dev |
+| 3. Diferenciales | 15 – 21 nov | Cambios en tres capas, calibración + conformal, ablaciones, selector, pantalla Estudio, copiloto local, escala | Estudio completo con S-reservado; demo de 6 min con la estrategia ganadora |
 | 4. Endurecer | 22 – 24 nov | Congelar alcance, ensayo, modo offline, `.pptx` v1, `PREVIOUS_WORK.md` | 2 ensayos cronometrados; todo reproducible en un portátil limpio |
-| 5. Hackatón | 25 – 27 nov | Dataset real → métricas reales → pulido → pitch | Entrega 27/11 10:00 |
+| 5. Hackatón | 25 – 27 nov | Dataset real → estudio real con exclusión de uno → pulido → pitch | Entrega 27/11 10:00 |
 | 6. Gala | dic | Versión pulida, vídeo, narrativa del gran premio | Presentación para el premio general |
 
 ### Fase 0 · Arranque (26–28 oct)
 
 - [ ] **0.1** Los 4 se inscriben en `indesiahack.org/registro` y eligen el reto de Técnicas Reunidas. *Hecho:* 4 confirmaciones.
-- [ ] **0.2** Hacer la formación en la plataforma IndesIA y anotar en `docs/PLATAFORMA.md`: qué es (¿JupyterHub, VS Code web, nube?), recursos (CPU/GPU/RAM), **qué modelos de IA generativa ofrece**, límites, si hay salida a internet, si se puede usar Docker. *Hecho:* documento con respuestas.
-- [ ] **0.3** Comprobar si con la inscripción ya se accede al dataset o a muestras. Si sí: copiar a `data/private/` (fuera de Git) y priorizar la fase de GT. *Hecho:* respuesta registrada.
-- [ ] **0.4** Reunión 0 (1 h): leer este roadmap, confirmar roles (5.5), canales, horario semanal. *Hecho:* roles en este documento.
-- [ ] **0.5** Commit inicial de la base (Javier), push a `main`, protección de rama (PR + CI obligatorio). *Hecho:* `main` con CI verde.
-- [ ] **0.6** Reglas de autoría: `.githooks/commit-msg`, `core.hooksPath`, workflow `authors.yml`, `.claude/settings.json`, regla en `AGENTS.md` y `CLAUDE.md`. *Hecho:* un commit de prueba con coautor es rechazado localmente y en CI.
-- [ ] **0.7** `LICENSE` MIT con los 4 nombres; `CONTRIBUTING.md` con flujo de ramas y convención de commits (anexo 12.4).
-- [ ] **0.8** Instalar las skills de frontend en el repo (anexo 12.1) para que todos los agentes las usen.
-- [ ] **0.9** Pedir al mentor de TR (si hay canal): formato real de los GA (¿vectorial o escaneado?), unidades habituales, si las boquillas vienen en tabla, qué consideran "dimensiones principales" y con qué tolerancia comparan. *Hecho:* respuestas o pregunta enviada.
+- [ ] **0.2** Hacer la formación en la plataforma IndesIA y anotar en `docs/PLATAFORMA.md`: qué es (¿JupyterHub, VS Code web, nube?), recursos (CPU/GPU/RAM), **qué modelos de IA generativa y de visión ofrece**, límites, si hay salida a internet, si se puede usar Docker, y **si sus modelos pueden procesar el dataset de TR**. *Hecho:* documento con respuestas.
+- [ ] **0.3** Comprobar si con la inscripción ya se accede al dataset o a muestras. Si sí: copiar a `data/private/` (fuera de Git) y priorizar la verdad de referencia. *Hecho:* respuesta registrada.
+- [ ] **0.4** Reunión 0 (1 h): leer este roadmap y [DECISIONES.md](DECISIONES.md), confirmar roles (5.5), canales y horario semanal. *Hecho:* roles en este documento.
+- [x] **0.5** Commit inicial de la base y push a `main`. *Pendiente:* protección de rama (PR + CI obligatorio).
+- [x] **0.6** Reglas de autoría: `.githooks/commit-msg`, `core.hooksPath`, workflow `authors.yml`, `.claude/settings.json`, regla en `AGENTS.md`. *Pendiente:* correos de Iria, Miguel y Alejandro en `.github/autores.txt`.
+- [x] **0.7** `LICENSE` MIT con los 4 nombres; `CONTRIBUTING.md`.
+- [x] **0.8** Skills de frontend instaladas en el repo.
+- [ ] **0.9** Pedir al mentor de TR (si hay canal): formato real de los GA (¿vectorial o escaneado?), unidades habituales, si las boquillas vienen en tabla, qué consideran "dimensiones principales" y con qué tolerancia comparan, y **si autorizan procesar el dataset con APIs externas** (DEC-31). *Hecho:* respuestas o pregunta enviada.
+- [ ] **0.10** Medir en la RTX 5070 Laptop (8 GB) qué modelos de visión caben con imágenes A3 en mosaico: `qwen3-vl:4b`, `qwen3-vl:8b` cuantizado y PaddleOCR-VL. Anotar VRAM y segundos por página en `docs/PLATAFORMA.md`. *Hecho:* tabla medida.
 
 ### Fase 1 · Cimientos (29 oct – 4 nov)
 
-- [ ] **1.1 (C)** Contrato **0.3**: estados de campo (`candidate`, `conflict`, `abstained`, `accepted`, `corrected`), alternativas con su evidencia, confianza calibrada y bruta, `impact` por campo, `family`, `schema_version`. Migrador 0.2 → 0.3. *Hecho:* esquema publicado + ejemplos validados.
-- [ ] **1.2 (H)** `src/trazia/api` con FastAPI: endpoints de la sección H, OpenAPI, SSE de progreso, SQLite + almacén por hash. *Hecho:* tests de API y `uv run trazia api`.
-- [ ] **1.3 (I)** `web/` con Next.js + TS + Tailwind v4 + tokens de diseño; tipos generados del OpenAPI (`openapi-typescript`); TanStack Query; shell con barra lateral, barra superior y tarjeta de demostración **como en las referencias (I.2b)**; `tokens.css` con la tabla de tokens medidos, modo oscuro y claro. *Hecho:* `pnpm dev` muestra el shell con datos reales de la API y, puesto al lado de las capturas, parece del mismo producto.
-- [ ] **1.4 (G)** Generador sintético v1 (`synthetic/`): recipientes aleatorios → PDF tipo GA **dibujado** (alzado + planta con líneas de cota, tabla de boquillas, notas) + HDM Excel + rev2 con mutaciones conocidas. Variante "escaneada" (raster + ruido + rotación leve). *Hecho:* 200 equipos sintéticos con GT.
-- [ ] **1.5 (G)** Bench v0: métricas de la sección G sobre la demo sintética, informe JSON + Markdown. *Hecho:* `uv run trazia bench synthetic/` imprime la tabla 35/25/20.
-- [ ] **1.6 (H)** `docker-compose.yml` (api + web; redis opcional). *Hecho:* portátil limpio → `docker compose up` → app funcionando.
-- [ ] **1.7 (I)** Spike de visor: cargar `generated/rev_a.ifc` con web-ifc en un Worker y pintarlo en R3F a 60 fps. *Hecho:* captura y medida de fps.
+- [ ] **1.1 (Plataforma)** Contrato **0.3** según [COORDINACION-BACKEND.md](COORDINACION-BACKEND.md): estados, alternativas, intervalos, nivel de detalle, metadatos de ejecución; migrador 0.2 → 0.3; tipos de la web regenerados. *Hecho:* esquema publicado + ejemplos validados + web en verde.
+- [ ] **1.2 (Plataforma)** API base (sección H) sirviendo la demo y con la cola en proceso. *Hecho:* pruebas de API + la web funciona con `NEXT_PUBLIC_API_URL`.
+- [x] **1.3 (I)** `web/` con Next.js, tokens y estilo de la casa.
+- [x] **1.4 (G)** Generador sintético v1: tres estilos (rotulado, plano, escaneado) con verdad conocida.
+- [x] **1.5 (G)** Bench v0 con la rúbrica.
+- [ ] **1.6 (Plataforma)** `docker compose` con perfiles `local`, `gpu` y `escala` (DEC-24).
+- [x] **1.7 (I)** Visor `web-ifc` en Worker a 239 fps en ventana completa.
+- [ ] **1.8 (Lectura)** `trazia.pipeline` + interfaz `Strategy` (DEC-02) con B como primera estrategia. *Hecho:* `process(..., strategy="b_reglas")` en verde.
+- [ ] **1.9 (Lectura)** Adaptador `VisionProvider` con caché y modo offline: Ollama local, Gemini, Mistral y plataforma (cuando se sepa). Registro de envíos (DEC-31). *Hecho:* misma página leída por dos proveedores con el mismo esquema JSON.
+- [ ] **1.10 (Lectura)** Generador **v2**: 8 estilos de proveedor (2 reservados), niveles de degradación, multipágina, paquetes de proveedor, mecánicos y corpus adversarial (DEC-21). *Hecho:* S-dev, S-reservado, S-mecánico y S-adversarial generados con semilla.
+- [ ] **1.11 (Lectura)** Arnés del estudio (`python -m bench.estudio`): variantes, estadística (bootstrap, McNemar), Puntuación GA2MODEL y Pareto (DEC-22). *Hecho:* informe del estudio con B.
 
-### Fase 2 · Capacidades (5 – 14 nov)
+### Fase 2 · Estrategias (5 – 14 nov)
 
-- [ ] **2.1 (B)** Extractores: tablas vectoriales, OCR, LLM multimodal con cita, HDM Excel robusto, VESOR (orientaciones). Ver B.
-- [ ] **2.2 (B)** Reconciliación y grounding check. Ver B.4–B.6.
-- [ ] **2.3 (D)** Familias: recipiente vertical (mejorar), **horizontal con silletas**, columna (con plataformas de VESOR si hay tiempo), tanque atmosférico y bomba simplificada. Ver D.
-- [ ] **2.4 (D)** IFC rico: puertos, Psets de trazabilidad, `IfcDocumentReference`, `IfcApproval`, exportación IFC4X3 e IFC2X3. Ver D.
-- [ ] **2.5 (E/I)** Espacio de revisión completo: PDF + 3D + campos enlazados, cola por riesgo, atajos, deshacer. Ver E e I.
-- [ ] **2.6 (I)** Visor 3D de producto: selección, aislar, corte, vista explosionada, cotas 3D, rosa de orientación. Ver I.
-- [ ] **2.7 (G)** Bench v1 sobre 200 sintéticos limpios + 50 "escaneados". *Hecho:* primera tabla de errores y lista de modos de fallo.
+- [ ] **2.1 (Lectura)** **B completo**: tablas por cabecera con sinónimos es/en, cotas en cualquier orientación, cajetín, hoja de datos, VESOR; sobre texto vectorial o líneas de OCR.
+- [ ] **2.2 (Lectura)** **OCR** (RapidOCR, PaddleOCR-VL; Mistral solo sintéticos) y comprobación de cita (DEC-06, 10).
+- [ ] **2.3 (Lectura)** **A · visión + 3D**: segmentación de vistas, geometría desde trazos (`pdfplumber`/OpenCV), escala desde cotas leídas por el modelo de visión, cruce alzado ↔ planta (DEC-07).
+- [ ] **2.4 (Lectura)** **Detector propio**: Florence-2 ajustado con S-dev en la RTX 5070 (`training/`), aleatorización de dominio; medido en S-reservado (DEC-05).
+- [ ] **2.5 (Lectura)** **C · RAG**: biblioteca aprobada, recuperación visual ColQwen2/ColSmol + texto, adaptación de plantilla y parámetros (DEC-08).
+- [ ] **2.6 (Lectura)** **D v1**: cascada, verificación cruzada, reconciliación con restricciones (DEC-09, 11).
+- [ ] **2.7 (Plataforma)** Familias: vertical (mejorar), horizontal con silletas, columna por tramos, tanque, envolvente de reserva (nivel 1) para mecánicos (DEC-16).
+- [ ] **2.8 (Plataforma)** IFC rico: puertos, Psets de trazabilidad, `IfcDocumentReference`, `IfcApproval`, exportación IFC4X3 e IFC2X3, validación en CI (DEC-17, 18).
+- [x] **2.9 (E/I)** Espacio de revisión: PDF + 3D + campos enlazados, cola por riesgo, atajos, deshacer.
+- [x] **2.10 (I)** Visor 3D: selección, aislar, corte, explosionado, cotas 3D, rosa de orientación.
+- [ ] **2.11 (Lectura)** **Primer estudio A/B/C/D** en S-dev. *Hecho:* tabla con intervalos.
 
 ### Fase 3 · Diferenciales (15 – 21 nov)
 
-- [ ] **3.1 (F)** Delta pro: emparejamiento de boquillas, tolerancias, cambios de evidencia, impacto por disciplina, BCF. Ver F.
-- [ ] **3.2 (I)** Vista Delta: morph 3D por GUID, fantasma rev1, nubes de revisión, grafo de impacto en React Flow.
-- [ ] **3.3 (B/G)** Calibración: isotónica sobre sintéticos; diagrama de fiabilidad en la web.
-- [ ] **3.4 (I)** **Momento firma**: el plano se levanta y se extruye en el 3D (I.6).
-- [ ] **3.5 (H/I)** Escala: procesamiento por lotes, vista de planta (plot plan) con todos los equipos, coste y latencia por equipo.
-- [ ] **3.6 (E)** Aprendizaje de correcciones: las correcciones aprobadas se guardan como ejemplos y se usan como few-shot en la siguiente extracción.
-- [ ] **3.7 (J)** Guion de 6 min v1 + `.pptx` v0 + calculadora de ROI en la app.
+- [ ] **3.1 (Plataforma)** Cambios en **tres capas** (diferencia visual, campos emparejados, geometría por GUID) + nubes Δ + BCF 2.1 (DEC-19, 20).
+- [ ] **3.2 (Lectura)** **Memoria de revisión** en D: la rev1 aprobada guía la lectura de la rev2.
+- [ ] **3.3 (Lectura)** Calibración isotónica + **intervalos conformes** + curva riesgo-cobertura (DEC-12). *Hecho:* ECE < 0,05 y cobertura empírica ≥ nominal en S-reservado.
+- [ ] **3.4 (Lectura)** **Fusión aprendida y selector** por tipo de documento; **ablaciones** de D; estudio completo con S-reservado (H1–H6 de [ESTUDIO.md](ESTUDIO.md)).
+- [ ] **3.5 (Plataforma)** Pantalla **Estudio** en la web (DEC-28) y conexión de la pantalla Bench al estudio.
+- [ ] **3.6 (Plataforma)** **Copiloto con modelo local**, herramientas de solo lectura y citas (DEC-26).
+- [ ] **3.7 (Plataforma)** Escala: perfil Redis + workers, lote de todo el conjunto, coste y tiempo medidos por equipo (DEC-23, 25).
+- [ ] **3.8 (E)** Aprendizaje activo: las correcciones recalibran y se usan como few-shot (DEC-27).
+- [x] **3.9 (I)** Vista Cambios con morph 3D por GUID, fantasma rev1, marcadores Δ y grafo de impacto.
+- [x] **3.10 (I)** Momento firma «del plano al modelo» (`/lab/firma`).
+- [ ] **3.11 (J)** Guion de 6 min v1 + `.pptx` v0 con la diapositiva «Elegimos con datos».
 
 ### Fase 4 · Endurecer (22 – 24 nov)
 
 - [ ] **4.1** Congelar alcance el 22/11 a las 20:00: solo bugs, rendimiento y pulido.
-- [ ] **4.2** **Modo offline:** variable `TRAZIA_OFFLINE=1` que sirve resultados LLM cacheados por hash. Si cae la red el viernes, la demo funciona igual.
+- [ ] **4.2** **Modo offline:** `TRAZIA_OFFLINE=1` sirve resultados de modelos cacheados por hash. Si cae la red el viernes, la demo funciona igual.
 - [ ] **4.3** Dos ensayos cronometrados del pitch (6:00 exactos) con alguien externo haciendo de jurado de TR.
 - [ ] **4.4** `PREVIOUS_WORK.md` redactado; tag preparado.
-- [ ] **4.5** Instalación en limpio en **los 4 portátiles** (Windows y Linux) siguiendo solo el README.
-- [ ] **4.6** Vídeo de respaldo de la demo (1080p, 60 fps, sin cortes raros).
+- [ ] **4.5** Instalación en limpio en **los 4 portátiles** (Windows y Linux) siguiendo solo el README, incluidos los modelos locales descargados de antemano.
+- [ ] **4.6** Vídeo de respaldo de la demo (1080p, 60 fps).
 - [ ] **4.7** Lista de preguntas difíciles y respuestas (J.5).
-- [ ] **4.8** Kit físico: cargadores, regleta, adaptador HDMI/USB-C, ratón (orbitar 3D con trackpad sale mal), hotspot móvil.
+- [ ] **4.8** Kit físico: cargadores, regleta, adaptador HDMI/USB-C, ratón, hotspot móvil.
+- [ ] **4.9** `THIRD_PARTY.md` con cada dependencia y modelo y su licencia (DEC-30).
 
 ### Fase 5 · Hackatón (25 – 27 nov) — plan por horas
 
 **Miércoles 25**
 - 09:30 llegada (plaza por orden de llegada). 11:00 presentación de retos.
 - Al empezar: tag `pre-hackathon-baseline` + entregar `PREVIOUS_WORK.md` a la organización.
+- **Preguntar al mentor** si se autoriza procesar el dataset con APIs externas. Sin respuesta escrita:
+  solo modelo local y plataforma (DEC-31).
 - Primeras 2 h: descargar el dataset a `data/private/`, inventario automático (`trazia ingest` de todo),
-  clasificar por tipología y calidad (vectorial/escaneado).
-- Hasta la cena: **GT de los 4 equipos con IFC de referencia** (extraer automáticamente del IFC con
-  IfcOpenShell + completar a mano atributos del HDM). Ejecutar bench v-real-0. **Análisis de errores.**
-- Noche: priorizar los 3 modos de fallo con más peso en la rúbrica (35 % primero).
+  clasificar por tipología y calidad (vectorial/escaneado). Confirmar convenios (origen, azimut)
+  contra un IFC de referencia (DEC-15).
+- Hasta la cena: **verdad de referencia de los 4 equipos con IFC** (extraída automáticamente del IFC
+  con IfcOpenShell + atributos del HDM a mano). Etiquetar ~20 páginas reales para el ajuste fino del
+  detector (DEC-05). Lanzar el **estudio A/B/C/D sobre R-ref con exclusión de uno**. **Análisis de errores.**
+- Noche: ajuste fino del detector con las páginas reales; priorizar los 3 modos de fallo con más peso
+  en la rúbrica (35 % primero); recalibrar con los datos reales.
 
 **Jueves 26**
 - Mañana: arreglar modos de fallo; adaptar familias a la geometría real (p. ej. tipo de fondo, faldón vs patas, boquillas no radiales/inclinadas).
 - Mediodía: delta sobre todos los pares rev1/rev2 reales; revisar a mano y medir precisión/recall.
-- Tarde: probar en **estáticos B** (sin IFC) y **un mecánico** para demostrar generalización; calibrar con datos reales (validación cruzada dejando uno fuera para no sobreajustar a 4 equipos).
+- Tarde: probar en **estáticos B** (sin IFC) y **un mecánico** para demostrar generalización; segunda
+  pasada del estudio real; el selector queda fijado con datos reales. Las cifras del estudio pasan al `.pptx`.
 - 20:00: **congelación de funcionalidades.** Solo pulido, rendimiento, textos, capturas para el `.pptx`.
 - Noche: `.pptx` final con números reales; ensayo completo x2.
 
@@ -421,75 +469,94 @@ Objetivo: aceptar **cualquier** cosa que TR nos dé (CAP-01) y no perder nunca e
 
 *Hecho:* todos los archivos del dataset ingeridos, catalogados y agrupados por TAG sin intervención.
 
-### B. Extracción IA (el corazón del 25 % y parte del 35 %)
+### B. Lectura: cuatro estrategias comparadas (25 % y gran parte del 35 %)
 
-**Principio:** el LLM *lee*; las reglas *deciden*; el humano *aprueba*. Ningún valor sin evidencia.
+**Principio:** los modelos *leen*; las reglas *deciden*; el humano *aprueba*. Ningún valor sin evidencia.
+**Decisión de fondo:** las cuatro estrategias de la pág. 13 se implementan y se miden con el mismo
+bench ([ESTUDIO.md](ESTUDIO.md), DEC-01/02). Gana la que diga el dato.
 
-**B.1 Extractores (cada uno devuelve `Candidate` con valor, unidad, página, bbox, extractor, score bruto):**
+**B.0 Interfaz común.** `trazia.pipeline.process(documentos, strategy=…)` llama a una `Strategy`. Cada
+estrategia devuelve candidatos con su evidencia (página, caja, canal, modelo y hash del prompt), un
+registro de eventos por etapa y su coste (tokens, €, segundos y GPU). El postproceso es común:
+reconciliación, calibración, contrato 0.3, familia e IFC.
 
-| Extractor | Para qué | Técnica |
-| --- | --- | --- |
-| `vector_tables` | Tablas de boquillas, listas de datos de diseño en GA vectorial | pdfplumber (palabras + líneas), reconstrucción de celdas |
-| `vector_dims` | Cotas en planos vectoriales | Texto numérico + proximidad a líneas de cota y flechas (geometría vectorial del PDF) |
-| `ocr` | Escaneos e imágenes | PaddleOCR o docTR (local) con cajas; Tesseract como fallback |
-| `vlm` | Comprensión de vistas, notas, cotas ambiguas, orientaciones | LLM multimodal con salida JSON por esquema; recibe página + recortes + texto OCR; **debe citar bbox** |
-| `hdm_excel` | Atributos de diseño (presión, temperatura, material, código, pesos) | openpyxl, búsqueda de etiquetas multilingüe, celdas combinadas, unidades en celda contigua |
-| `vesor` | Orientación de boquillas (azimut) y plataformas | Tabla + vista en planta; ángulos respecto al Norte de planta |
+**B.1 Las cuatro estrategias**
+
+| Estrategia | Qué hace | Piezas | Pregunta clave que responde mejor |
+| --- | --- | --- | --- |
+| **A · Visión + 3D** | Segmenta vistas y reconstruye la geometría desde los trazos; la escala y las boquillas salen de un modelo de visión o del detector propio | `geometry2d/` (trazos con `pdfplumber`, OpenCV en raster), `vision/` (Qwen3-VL local, Gemini, Mistral, plataforma), detector Florence-2 | Generalización y nivel de detalle |
+| **B · Datos + reglas** | Texto vectorial, tablas por cabecera, cotas comprobadas, cajetín, hoja de datos y VESOR con reglas de ingeniería | `extractors/` (existe y se generaliza) + `ocr/` cuando no hay texto | Robustez y explicabilidad |
+| **C · RAG** | Recupera el GA más parecido de la biblioteca aprobada y adapta su plantilla y sus parámetros | `rag/` con ColQwen2/ColSmol (visual) + texto | Coste y aprovechamiento de históricos |
+| **D · Híbrido** | Cascada B → OCR → detector → modelo de visión en lo dudoso; verificación con la geometría de A; plantilla de C; memoria de la revisión anterior; fusión aprendida y selector por tipo de documento | Todo lo anterior + `reconcile/` + `calibration/` | Incertidumbre y equilibrio coste-acierto |
+
+Ablaciones de D: sin geometría, sin memoria, sin RAG, sin modelo de visión y sin detector.
 
 **B.2 Qué extraer como mínimo (CAP-02) y qué extra:**
 - Tag; diámetro interior/exterior; longitud entre tangentes; tipo y altura de fondos; altura total;
   soporte (faldón: altura, diámetro, espesor / patas / silletas: posición y número).
 - Por boquilla: marca (N1…), servicio, DN/tamaño, rating, elevación o distancia desde referencia,
   proyección, azimut/orientación, tipo (radial, tangencial, superior, inferior).
-- Extra para "valor no previsto": pesos (vacío, operación, prueba), centro de gravedad, material, presión
-  y temperatura de diseño, código (ASME VIII…), corrosión admisible.
+- Extra para "valor no previsto": pesos (vacío, operación, prueba), centro de gravedad, material,
+  presión y temperatura de diseño, código (ASME VIII…), corrosión admisible.
+- Mecánicos (bombas y compresores): envolvente por vistas, bancada y boquillas de aspiración e
+  impulsión (nivel de detalle 1, DEC-16).
 
-**B.3 Prompting del VLM (plantilla en `src/trazia/extractors/prompts/`):**
-- Instrucción de sistema fija; el contenido del documento va como **dato delimitado**. Cualquier texto
-  del documento que parezca una instrucción se ignora y se registra como alerta (anti prompt-injection).
-- Salida estricta con esquema JSON (structured outputs / tool use). Campos: `value`, `unit_as_written`,
-  `page`, `bbox`, `quote` (texto literal leído), `reasoning_short`, `self_confidence`.
-- Unidades: devolver la unidad **tal como aparece**; la normalización la hace el código, no el LLM.
-- Pasos: 1) identificar vistas (alzado, planta, detalles) y su escala; 2) leer tabla de boquillas;
-  3) leer cotas generales; 4) asociar boquillas a posiciones en alzado/planta; 5) listar dudas.
-- **Autoconsistencia:** N muestras (3–5) con temperatura > 0 o dos modelos distintos; el acuerdo entre
-  muestras es una señal de confianza.
-- Few-shot dinámico: ejemplos recuperados de equipos ya aprobados de la misma tipología (B.7).
+**B.3 Proveedores de visión (DEC-03, 04)**
+- Adaptador `VisionProvider` con salida JSON por esquema, cajas normalizadas, caché por (hash de
+  página, versión de prompt, modelo) y modo offline.
+- Implementaciones:
+  - **Ollama local** (`qwen3-vl:4b`, `qwen3-vl:8b` cuantizado si cabe en los 8 GB);
+  - **plataforma IndesIA** (si existe);
+  - **Gemini** (cajas `box_2d` nativas);
+  - **Mistral OCR 4.1 / Document AI**.
+- Las páginas A3 se trocean en mosaicos con solape y las coordenadas se reproyectan.
+- **Datos de TR solo con local o plataforma**, salvo autorización escrita (DEC-31). Cada envío queda
+  registrado.
+- Prompt: instrucción fija; el documento va como **dato delimitado**; se devuelve la unidad tal como
+  aparece; pasos (vistas → tabla → cotas → asociación de boquillas → dudas); autoconsistencia con
+  N muestras.
 
-**B.4 Grounding check (anti-alucinación, innovación clave):**
-Para cada candidato del VLM: recortar la bbox citada → OCR del recorte → ¿aparece el número (con
-tolerancia de formato: `2.000`, `2000`, `2,000`)? Si sí: confianza ↑ y estado `grounded`. Si no:
-reintento de localización; si sigue sin aparecer: **se descarta** o queda `abstained` con aviso. En la
-demo esto se enseña en directo: "el modelo dijo 2.150, pero en la región citada pone 2.105 → corregido".
+**B.4 Detector propio entrenado con nuestro generador (DEC-05)**
+- Florence-2 (MIT) ajustado en la RTX 5070 con S-dev: detección de cotas y lectura de región.
+- Aleatorización de dominio: fuentes, grosor de línea, ruido, rotación, idioma y unidades.
+- El día 1, ajuste fino con ~20 páginas reales etiquetadas en Label Studio.
+- **Prohibido YOLO de Ultralytics (AGPL).**
 
-**B.5 Reconciliación ("razonar", pág. 6):**
-- Agrupar candidatos por campo; resolver por prioridad de fuente configurable (p. ej. tabla de boquillas
-  > cota en alzado > nota) y por acuerdo entre extractores.
-- **Restricciones de ingeniería** como sistema de ecuaciones: altura total = faldón + virola + fondo;
-  fondo 2:1 semielíptico → altura ≈ D/4; boquillas dentro de la virola; DN en serie normalizada;
-  azimut en [0, 360). Un pequeño solver (mínimos cuadrados con pesos = confianza) detecta qué valor
-  es el inconsistente y lo marca `conflict` con explicación legible.
-- Reconciliar GA vs HDM vs VESOR: si difieren → `conflict` con ambas evidencias, nunca "elegir en silencio".
-- Desconocidos explícitos: si falta un dato, `abstained`. La geometría puede usar un **valor por defecto
-  de familia marcado como supuesto** (color distinto en 3D) solo en DRAFT.
+**B.5 Comprobación de cita (DEC-10).** Recortar la caja citada → OCR del recorte → ¿aparece el
+número con tolerancia de formato? Si sí, `grounded`; si no, reintento y después `abstained`. El bench
+mide la tasa de alucinación por estrategia y proveedor.
 
-**B.6 Confianza calibrada:**
-- Señales: acuerdo entre extractores, acuerdo entre muestras, grounding, calidad OCR, cumplimiento de
-  restricciones, tipo de fuente, `self_confidence` del LLM (peso bajo).
-- Modelo: regresión logística sobre señales → **calibración isotónica** sobre sintéticos y validación
-  cruzada sobre reales. Publicar el **diagrama de fiabilidad** y el **ECE** (meta: < 0,05).
-- Interpretación para el usuario: alta (≥ 0,9) verde, media naranja, baja roja; umbral de revisión
-  obligatoria configurable.
+**B.6 Reconciliación (DEC-11)**
+- Búsqueda exacta de lecturas + mínimos cuadrados ponderados.
+- Restricciones:
+  - cadena de cotas;
+  - fondo 2:1;
+  - boquillas dentro de la virola;
+  - DN normalizados;
+  - azimut en [0, 360);
+  - GA ↔ HDM ↔ VESOR ↔ geometría dibujada.
+- El valor que rompe una restricción queda `conflict` con su explicación. Nunca se elige en silencio.
+- Falta un dato → `abstained`; el valor por defecto de familia se marca como supuesto y solo existe
+  en DRAFT.
 
-**B.7 RAG como "prior", nunca como fuente:**
-Índice de equipos aprobados (embeddings de página + parámetros). Se usa para: elegir familia, sugerir
-qué campos buscar, few-shot. Un valor recuperado **nunca** entra al JSON sin evidencia en el documento actual.
+**B.7 Incertidumbre (DEC-12)**
+- Señales: acuerdo entre canales y entre muestras, cita comprobada, calidad del OCR, restricciones
+  cumplidas, tipo de fuente, similitud con el caso recuperado.
+- Fusión aprendida (regresión logística) → **calibración isotónica** (ECE < 0,05) → **intervalos
+  conformes** por valor numérico → curva riesgo-cobertura para fijar el umbral de revisión.
 
-**B.8 Coste y latencia:** registrar tokens, llamadas y segundos por equipo; caché por (hash de página,
-versión de prompt, modelo). Objetivo: < 60 s y < 0,50 € por equipo (ajustar con datos reales).
+**B.8 Memoria de la revisión anterior (DEC-19).** Al leer la rev2, la rev1 aprobada es el prior: se
+alinean las páginas, la lectura se concentra donde cambian y el resto se valida contra la rev1.
 
-*Hecho:* en sintéticos limpios ≥ 98 % de campos correctos; en escaneados ≥ 90 %; en reales, lo que diga
-el bench, con análisis de errores documentado.
+**B.9 Coste y latencia (DEC-25).** Registro por trabajo: tokens, llamadas, € según la tabla de
+precios versionada, segundos de GPU y segundos totales. Objetivo para D: < 60 s y < 0,50 € por equipo.
+
+*Hecho:*
+- Estudio completo con intervalos.
+- En S-reservado, la estrategia ganadora con ≥ 95 % de campos correctos en vectorial y ≥ 85 % en
+  escaneado.
+- Alucinación < 1 % y ECE < 0,05.
+- En real, lo que diga la exclusión de uno, con análisis de errores documentado.
 
 ### C. Normalización y contrato de datos
 
@@ -502,6 +569,10 @@ el bench, con análisis de errores documentado.
   0°, sentido horario como en VESOR **o** el convenio que use TR — confirmar con el IFC de referencia).
 - [ ] **C.5** Versionado del esquema + migradores + ejemplos válidos en CI.
 - [ ] **C.6** JSON exportable "para humanos": también CSV/Excel de campos con evidencia para el ingeniero.
+- [ ] **C.7** **Contrato 0.3** cerrado de antemano (DEC-13, especificación en
+  [COORDINACION-BACKEND.md](COORDINACION-BACKEND.md)): estado por campo, alternativas, intervalo
+  conforme, unidad original, procedencia ampliada (estrategia, canal, modelo, prompt), `kind` y `lod`
+  por equipo y metadatos de ejecución por revisión.
 
 ### D. Geometría paramétrica e IFC (35 %)
 
@@ -514,7 +585,15 @@ generador de geometría IFC y prueba de ida y vuelta (parámetros → IFC → pa
 | Recipiente horizontal | Virola, 2 fondos, 2 silletas, boquillas en generatrices | P0 |
 | Columna | Virola por tramos (diámetros distintos, conos de transición), faldón, plataformas y escaleras simplificadas (VESOR) | P1 |
 | Tanque atmosférico | Virola, techo cónico/domo, fondo plano | P1 |
-| Bomba / compresor | Bancada, carcasa y motor como volúmenes simplificados, boquillas de aspiración/impulsión | P2 (demostrar generalización) |
+| Bomba / compresor | Bancada, carcasa y motor como volúmenes simplificados, boquillas de aspiración/impulsión | P1 (generalización a mecánicos) |
+| **Envolvente de reserva** | Caja o cilindro envolvente leído de las vistas + puertos; para cualquier tipología no prevista | P0 (el sistema nunca se queda sin modelo) |
+
+**D.1b Niveles de detalle (DEC-16):**
+- **1:** envolvente + puertos;
+- **2:** familia paramétrica;
+- **3:** bridas por DN/rating y plataformas y escaleras del VESOR y de ESTRUCTURA.
+
+Cada equipo declara su nivel en el contrato y en el IFC, y el visor lo muestra.
 
 **D.2 Boquillas:** cuello + brida simplificada (disco con espesor y diámetro según DN/rating de tabla
 ASME B16.5 simplificada) — da realismo visual y es útil a piping. Orientación por vector (radial,
@@ -532,7 +611,8 @@ tangencial con offset, inclinadas), no solo azimut.
 - GUID estables por ID semántico (existe) → los visores reconocen "el mismo objeto" entre revisiones.
 - Exportar **IFC4** (por defecto), **IFC4X3** y **IFC2X3** (compatibilidad con SP3D/Tekla).
 
-**D.4 Validación IFC:** `ifcopenshell.validate` (esquema + reglas) en CI; abrir en ≥ 3 visores
+**D.4 Validación IFC:** `ifcopenshell.validate` (esquema + reglas) en CI; Hausdorff y Chamfer de
+malla con `trimesh` contra la referencia (DEC-18); abrir en ≥ 3 visores
 (Bonsai/BlenderBIM, el visor web propio basado en web-ifc, y uno de escritorio tipo xBIM/Solibri
 Anywhere/BIMvision) y guardar capturas en `docs/ifc-checks/`. El validador online de buildingSMART
 solo con sintéticos.
@@ -552,7 +632,9 @@ dependa solo de la extracción, no de la familia.
   supuesto, rechazar. Todo con **deshacer** y registro de auditoría (quién, cuándo, antes/después).
 - [ ] **E.4** Aprobación ligada a la huella (existe) + idempotencia + bloqueo si hay `conflict` sin resolver.
 - [ ] **E.5** Medir **tiempo de revisión por equipo** con el propio log → cifra de impacto del pitch.
-- [ ] **E.6** Aprendizaje de correcciones (3.6): corrección aprobada → ejemplo few-shot + ajuste de prioridad de fuentes.
+- [ ] **E.6** Aprendizaje activo (DEC-27): corrección aprobada → ejemplo few-shot + recalibración + ajuste de prioridad de fuentes.
+- [ ] **E.7** Intervalo conforme visible por campo («2.000 mm ± 3 mm, 90 %») y umbral de revisión
+  obligatoria fijado con la curva riesgo-cobertura (DEC-12).
 
 ### F. Revisiones y delta (20 %)
 
@@ -570,6 +652,11 @@ dependa solo de la extracción, no de la familia.
 - [ ] **F.6** Salidas: `changes.json`, informe legible (Markdown/PDF), **BCF 2.1/3.0** con un topic por
   cambio (vista de cámara, GUID del elemento, descripción) → abre en herramientas BIM de coordinación.
 - [ ] **F.7** El IFC rev2 conserva GUID; la rev1 se conserva intacta (pág. 11: "conservación de la versión anterior").
+- [ ] **F.8** **Diferencia visual de páginas** (DEC-19): alinear rev1 y rev2 (ECC de OpenCV) y
+  localizar zonas cambiadas en píxeles o trazos. Se cruza con las nubes Δ y con la diferencia de
+  campos: un cambio visual sin cambio de campo, o al revés, se señala como sospechoso.
+- [ ] **F.9** **Memoria de revisión**: la rev1 aprobada guía la lectura de la rev2 (B.8). Se mide su
+  aporte al F1 con la ablación correspondiente.
 
 *Hecho:* en sintéticos con mutaciones conocidas, F1 ≥ 0,95; en reales, precisión/recall medidos a mano.
 
@@ -596,6 +683,14 @@ Es nuestra arma principal: **llegamos al jurado con su propia rúbrica ya medida
 - [ ] **G.5** Anti-sobreajuste: con 4 IFC de referencia, validación **dejando uno fuera**; sintéticos
   como conjunto grande; reportar siempre por separado sintético / real.
 - [ ] **G.6** El bench corre en CI sobre sintéticos (regresiones = PR rojo).
+- [x] **G.0** Bench v0 y generador v1 hechos ([BENCH.md](BENCH.md)).
+- [ ] **G.7** **Generador v2** (DEC-21): 8 o más estilos de proveedor (2 reservados), niveles de
+  degradación, multipágina, paquetes de proveedor, mecánicos y corpus adversarial.
+- [ ] **G.8** **Estudio comparativo** ([ESTUDIO.md](ESTUDIO.md)): variantes A/B/C/D y ablaciones,
+  bootstrap del 95 %, McNemar, **Puntuación GA2MODEL** (DEC-22), frontera de Pareto coste-acierto y
+  recomendación del selector.
+- [ ] **G.9** Métricas nuevas: tasa de alucinación, cobertura de cita, cobertura de intervalos
+  conformes, curva riesgo-cobertura y coste por equipo.
 
 ### H. Backend, API y escalado (10 %)
 
@@ -607,10 +702,13 @@ Es nuestra arma principal: **llegamos al jurado con su propia rúbrica ya medida
   - `POST /revisions/{id}/approve` (`Idempotency-Key`)
   - `GET /revisions/{id}/ifc?schema=IFC4|IFC4X3|IFC2X3&draft=`
   - `GET /diff?from=&to=`, `GET /diff/bcf`, `GET /bench`, `GET /plant`
+  - `POST /estudio` (lanza el estudio como trabajo) y `GET /estudio` (resultados para la pantalla Estudio)
+  - `POST /copiloto` (preguntas con herramientas de solo lectura y citas, DEC-26)
 - [ ] **H.2 Idempotency keys** en todo POST con efecto (subida, jobs, aprobación): repetir la petición
   devuelve el mismo resultado, sin duplicar. Clave guardada 24 h con hash del cuerpo.
-- [ ] **H.3 Trabajos asíncronos:** `arq` + Redis (o `BackgroundTasks` en modo local), reintentos con
-  backoff para el LLM, timeouts, cancelación.
+- [ ] **H.3 Trabajos asíncronos** (DEC-23): interfaz de cola con **dos implementaciones**, en
+  proceso (por defecto) y Redis con `arq` y workers (perfil `escala`); reintentos con backoff para los
+  modelos, timeouts y cancelación. El estudio comparativo también se lanza como trabajo.
 - [ ] **H.4 Persistencia:** SQLModel sobre SQLite (local) con migraciones Alembic; Postgres en
   `docker-compose.prod.yml` para el discurso de escala. Almacén de archivos direccionado por contenido.
 - [ ] **H.5 Observabilidad:** logs estructurados (JSON), traza por job, métricas de coste y latencia.
@@ -799,6 +897,16 @@ el estilo.
    error** sobre la malla comparada con la referencia de TR (superpuesta en fantasma).
 7. **Impacto.** Calculadora de ROI con los datos de TR (300–500 equipos, 3–5 revisiones, 2–4 h) y nuestro
    tiempo de revisión medido.
+8. **Estudio (DEC-28).** La respuesta visual a la pág. 13:
+   - tabla A/B/C/D y ablaciones de D con intervalos del 95 %;
+   - **frontera de Pareto** coste-acierto;
+   - resultados por estilo, proveedor de visión y nivel de degradación;
+   - tasa de alucinación;
+   - la recomendación del selector con su justificación.
+
+   Mismo lenguaje visual que Bench.
+9. **Copiloto con modelo local (DEC-26).** El panel actual pasa de reglas a un modelo local con
+   herramientas de solo lectura. Cada respuesta cita evidencia, propone y nunca modifica.
 
 #### I.5 3D: todo lo que debe poder hacer el visor
 
@@ -895,14 +1003,20 @@ cambio → decisión):
 | --- | --- | --- | --- |
 | 0:00–0:45 | Problema | Un GA real anonimizado y la cifra 1.800–10.000 h | "La geometría viaja como documento, no como dato" |
 | 0:45–1:30 | Input | Soltamos el paquete del equipo; pipeline vivo | Ingesta autónoma, hashes, clasificación |
-| 1:30–2:30 | Extracción | Espacio de revisión: valor → recorte del plano → confianza | Grounding check y confianza calibrada (diagrama) |
+| 1:30–2:30 | Extracción | Espacio de revisión: valor → recorte del plano → confianza e intervalo; **pantalla Estudio**: A/B/C/D y Pareto | «Probamos las cuatro estrategias que proponéis y elegimos con datos»; cita comprobada; intervalos conformes |
 | 2:30–3:45 | 3D | Momento firma: el plano se convierte en modelo; IFC abierto también en un visor externo | IFC4 con puertos, trazabilidad y aprobación dentro |
 | 3:45–5:00 | Cambio | Morph rev1→rev2, nubes Δ, grafo de impacto, BCF | "Qué cambió, cuánto, dónde y a quién afecta" |
 | 5:00–6:00 | Impacto y escala | Bench contra el IFC de TR + lote de todo el dataset + ROI | Números medidos, límites honestos, siguientes pasos |
 
-**J.2 `.pptx`** (obligatorio por bases): 8–10 diapositivas con el mismo lenguaje visual que la app;
-capturas y números **reales del dataset**; una diapositiva de arquitectura; una de "qué hicimos antes y
-durante el evento"; una de límites y siguientes pasos. Guardado en `pitch/` del repo antes de las 10:00.
+**J.2 `.pptx`** (obligatorio por bases): 8–10 diapositivas con el mismo lenguaje visual que la app.
+- Capturas y números **reales del dataset**.
+- Una diapositiva de arquitectura.
+- **«Elegimos con datos»**: la tabla del estudio A/B/C/D con intervalos y la frontera de Pareto. Es
+  la respuesta directa a la pág. 13 y nuestra diapositiva más diferencial.
+- Una de "qué hicimos antes y durante el evento".
+- Una de límites y siguientes pasos.
+
+Se guarda en `pitch/` del repo antes de las 10:00.
 
 **J.3 Demo:** en vivo sobre la app, con el **modo offline** activado de reserva y el vídeo listo en
 otra pestaña. Ratón físico. Pantalla a 1920×1080, zoom de interfaz ajustado para el proyector, modo claro
@@ -922,6 +1036,14 @@ sincronizadas, atributos consultables.
   locales; nada sale sin autorización; procesamiento local por defecto.
 - ¿Se integra con SP3D / Tekla? → IFC2X3/IFC4 estándar con puertos y GUID estables; BCF para coordinación.
 - ¿Por qué no reconstrucción geométrica libre? → Trade-off pág. 13: paramétrico = robusto y comparable.
+- ¿Por qué no usar solo un modelo de visión? → Lo medimos: estrategia A frente a D. Cifra de
+  alucinación, coste por equipo y acierto en estilos no vistos.
+- ¿Un detector entrenado con planos sintéticos sirve con planos reales? → Aleatorización de dominio,
+  medido en estilos reservados y ajuste fino con ~20 páginas reales; cifra de exclusión de uno.
+- ¿Qué significa el «± 3 mm»? → Intervalo conforme: cobertura del 90 % garantizada y comprobada
+  empíricamente.
+- ¿Habéis mandado nuestros planos a una IA externa? → No: modelo local en el portátil (o el de la
+  plataforma). Registro de envíos para demostrarlo.
 - ¿Qué parte existía antes? → `PREVIOUS_WORK.md`, enseñado al inicio.
 - ¿Cuánto cuesta por equipo? → Cifra medida (B.8).
 - ¿Qué haríais con 3 meses más? → Más familias, entrenamiento con históricos de TR, integración con su CDE.
@@ -938,8 +1060,10 @@ tiempo y tiene el vídeo listo. Todos pueden responder preguntas de su área.
 - **Web:** ESLint + typecheck estricto, Vitest para lógica, **Playwright** que recorre la demo entera
   (ingesta → revisión → aprobación → delta → exportación) en CI, capturas de regresión visual de las
   pantallas clave.
-- **CI** (GitHub Actions): Windows + Linux para Python (existe), job web, job de autoría (anexo 12.3),
-  job de bench sintético, artefactos (IFC, BCF, informe del bench).
+- **CI** (GitHub Actions): Windows + Linux para Python (existe), job web, job de autoría (existe),
+  job de bench sintético y **estudio reducido** (B y D sin modelos de visión, con caché), artefactos
+  (IFC, BCF, informe del bench y del estudio). Los modelos de visión no corren en CI: se usan
+  respuestas cacheadas y versionadas.
 - **Definition of Done de un PR:** CI verde, tests nuevos para lo nuevo, sin coautores, sin datos
   privados, documentación tocada si cambia el contrato, capturas si cambia la UI.
 - **Reproducibilidad:** `uv.lock` y `pnpm-lock.yaml` comprometidos, semillas fijas en el generador
@@ -962,6 +1086,12 @@ tiempo y tiene el vídeo listo. Todos pueden responder preguntas de su área.
 | Commit con coautor en el historial | Baja | Medio | Hook local + check en CI + revisión antes de push |
 | Rendimiento 3D pobre en el proyector/portátil | Baja | Medio | Presupuesto de triángulos, DPR adaptativo, ensayo en el portátil de la demo |
 | Agotamiento | Alta | Medio | Turnos de descanso el día 2; nadie programa después de las 02:00 |
+| Cuatro estrategias no llegan a tiempo | Media | Alto | B y D tienen prioridad; A y C con versión mínima medible el 14/11; el estudio vale aunque una estrategia sea básica, si se dice |
+| Enviar datos de TR a un tercero sin permiso | Baja | **Descalificación** | Solo modelo local o plataforma por defecto; autorización escrita para APIs externas; registro de envíos (DEC-31) |
+| Licencia AGPL en una dependencia | Media | Alto | Lista negra (Ultralytics, PyMuPDF) y `THIRD_PARTY.md` revisado antes de la entrega (DEC-30) |
+| El modelo local no cabe o va lento en 8 GB | Media | Medio | `qwen3-vl:4b` como mínimo; mosaicos; caché; plataforma o API como alternativa medida |
+| El detector entrenado con sintéticos falla con planos reales | Media | Medio | Aleatorización de dominio, estilos reservados, ~20 páginas reales etiquetadas el día 1, D cae a B y al modelo de visión |
+| Sobreajuste del estudio al generador propio | Media | Alto | Estilos reservados nunca vistos y resultados reales con exclusión de uno, siempre separados de los sintéticos |
 
 ---
 
