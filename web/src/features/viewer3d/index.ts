@@ -5,7 +5,7 @@
 */
 export { IfcViewer } from "./ifc-viewer";
 export { PlantScene } from "../plant/plant-scene";
-export { RevisionMorph } from "./stub";
+export { RevisionMorph } from "../delta3d/revision-morph";
 export type {
   Annotation,
   IfcViewerProps,
