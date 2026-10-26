@@ -19,3 +19,19 @@ Licencias comprobadas en los metadatos de PyPI el 26/10/2026.
 
 No se añade ninguna dependencia AGPL. El contenedor Redis utilizará una versión 7.2 BSD;
 no se incluye ni se modifica su código en este repositorio.
+
+
+## Herramientas e imágenes
+
+| Componente | Licencia | Uso |
+| --- | --- | --- |
+| uv 0.11.30 | MIT o Apache-2.0 | Instalación reproducible con uv.lock |
+| Python 3.12 | PSF-2.0 | Runtime de API |
+| Node.js 22 | MIT (con avisos de sus componentes) | Runtime web |
+| PostgreSQL 16 | PostgreSQL License | Base de datos del perfil escala |
+| Redis 7.2 | BSD-3-Clause | Servidor de cola (rama 7.2, no Redis posterior) |
+| Ollama 0.40.11 | MIT | Servicio local; sin pesos incluidos |
+| PyYAML 6.0.3 | MIT | Herramienta temporal de validación YAML; no dependencia de runtime |
+
+Licencia de [Redis 7.2](https://raw.githubusercontent.com/redis/redis/7.2/COPYING).
+Las imágenes upstream conservan los avisos de sus componentes de sistema.

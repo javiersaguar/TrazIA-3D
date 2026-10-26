@@ -1,0 +1,10 @@
+**
+!web/
+!web/**
+web/node_modules
+web/node_modules/**
+web/.next
+web/.next/**
+web/test-results
+web/playwright-report
+web/.env*

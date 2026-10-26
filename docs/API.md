@@ -109,3 +109,35 @@ avisa si algún intento no devolvió contabilidad; en ese caso tokens/coste/GPU 
 external_calls representa solo las llamadas contabilizadas, no un total garantizado.
 El RunInfo de la revisión conserva la ejecución de Lectura; el del trabajo mide también la
 orquestación y los reintentos. Así no se cambia la huella del IFC ya producido al cerrar el trabajo.
+
+
+## Docker Compose
+
+Usar un perfil cada vez (local/gpu/escala comparten el puerto de API):
+
+```bash
+docker compose --profile local up --build
+docker compose --profile gpu up --build
+docker compose --profile gpu exec ollama ollama pull qwen3:4b
+docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile escala up --build
+# Aumentar workers; todos comparten Postgres y el almacén de contenido:
+docker compose --profile escala up --scale worker=4
+```
+
+Local: web 3000 y API 8000. Escala: web 3200 y API 8000, Redis y Postgres internos.
+GPU: Ollama con reserva de GPU NVIDIA; descargar el modelo en su volumen antes de usarlo.
+La configuración de escala añade dos workers por defecto en docker-compose.prod.yml.
+Los puertos publicados se limitan a 127.0.0.1. Las credenciales de la base de datos son de demo local.
+API y web se ejecutan como usuarios sin privilegios. Los contextos de build excluyen .env,
+datos privados, cachés y dependencias del host mediante archivos Dockerfile.*.dockerignore.
+
+El cliente Next recibe NEXT_PUBLIC_API_URL al compilar la imagen. Dejar el build arg vacío
+produce la demo offline. Para el perfil local con Ollama en el host, usar
+TRAZIA_OLLAMA_URL=http://host.docker.internal:11434; GPU usa el servicio interno ollama.
+Sin Docker, las variables de .env se pueden cargar con `uv run --env-file .env --extra api ...`.
+
+**Validación disponible:** ambos YAML cumplen el esquema oficial Compose, con SHA-256
+`d549057ebc2925f39f62799eab0db7b9e2c18b35b6c00595199116da3ed10e64` consultado el 26/10/2026.
+Docker no está instalado en el equipo de desarrollo de esta fase. No se han construido ni arrancado
+las imágenes ni se ha medido GPU/Redis/Postgres en contenedores. Hay que ejecutar esos comandos
+antes de presentar el perfil de escala como probado.

@@ -1,0 +1,13 @@
+FROM python:3.12-slim-bookworm
+ENV PYTHONUNBUFFERED=1 UV_LINK_MODE=copy TRAZIA_ROOT=/app TRAZIA_DATA=/data TRAZIA_HOST=0.0.0.0
+WORKDIR /app
+RUN pip install --no-cache-dir uv==0.11.30
+COPY pyproject.toml uv.lock ./
+COPY src ./src
+RUN uv sync --frozen --extra api --no-dev
+COPY examples ./examples
+COPY web/public/demo ./web/public/demo
+RUN useradd --uid 10001 --create-home trazia && mkdir /data && chown -R trazia:trazia /app /data
+USER trazia
+EXPOSE 8000
+CMD [".venv/bin/python", "-m", "trazia.api"]

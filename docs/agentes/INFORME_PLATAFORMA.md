@@ -85,3 +85,14 @@ Nueve pruebas nuevas cubren errores transitorios, límite de intentos, errores d
 timeout, cancelación, lease activa, suma de coste, concurrencia local y contrato del adaptador Redis.
 Redis se ha probado con un doble del cliente; no se presenta como prueba con un servidor real.
 Docker no está instalado en este equipo; se registrará esa limitación al preparar los perfiles.
+
+
+## Fase 4 · Contenedores y perfiles
+
+Dockerfile.api y Dockerfile.web, perfiles local/gpu/escala, Postgres, Redis persistente,
+workers replicables, healthchecks y usuarios sin privilegios. Contextos de build acotados;
+los originales privados y .env no entran en las imágenes.
+Ambos YAML se han validado contra el esquema oficial de Compose (hash en API.md).
+No hay Docker instalado: construcción, arranque de contenedores, GPU, Redis y Postgres reales
+quedan sin verificar. No se atribuyen cifras de rendimiento a esos perfiles.
+Los pesos de Ollama no se incluyen en el repositorio ni en la imagen.
