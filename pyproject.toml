@@ -8,9 +8,16 @@ version = "0.2.0"
 description = "TrazIA-3D: del plano al modelo, con cada cambio trazado"
 requires-python = ">=3.11,<3.14"
 dependencies = [
-  "pydantic>=2.11,<3", "ifcopenshell>=0.8.3,<0.9",
-  "pdfplumber>=0.11,<1", "openpyxl>=3.1,<4", "pillow>=11,<13",
-  "streamlit>=1.50,<2", "plotly>=6,<7",
+  "pydantic>=2.11,<3",
+  "ifcopenshell>=0.8.3,<0.9",
+  "pdfplumber>=0.11,<1",
+  "openpyxl>=3.1,<4",
+  "pillow>=11,<13",
+  "streamlit>=1.50,<2",
+  "plotly>=6,<7",
+  "pint>=0.24,<1",
+  "scipy>=1.14,<2",
+  "scikit-learn>=1.5,<2",
 ]
 
 [project.optional-dependencies]
