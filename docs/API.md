@@ -83,3 +83,29 @@ En PowerShell, usar `curl.exe` para evitar el alias de Invoke-WebRequest.
 [Sesiones SQLModel](https://sqlmodel.tiangolo.com/tutorial/fastapi/session-with-dependency/),
 [Alembic programático](https://alembic.sqlalchemy.org/en/latest/api/config.html),
 [cola arq](https://arq-docs.helpmanual.io/).
+
+
+## Cola local y Redis
+
+`TRAZIA_QUEUE=process` es el valor por defecto. Con `TRAZIA_QUEUE=redis`, configurar
+`TRAZIA_REDIS_URL` y arrancar uno o más workers:
+
+```bash
+uv run --extra api arq trazia.queue.worker.WorkerSettings
+```
+
+Los workers comparten la base de datos y data/store con la API. La migración 0002 incorpora
+leases: solo un ejecutor reclama un trabajo, incluso ante una entrega repetida de Redis.
+Un trabajo interrumpido se puede recuperar al caducar su lease. Un cierre limpio deja la tarea
+pendiente; el reinicio conserva sus intentos anteriores y no duplica la revisión.
+
+JobInput admite timeout_seconds (plazo total, máximo 3.600), max_attempts (1–5) y
+retry_backoff_seconds (0–30). Se reintentan errores de transporte y fallos que Lectura marque
+opcionalmente retryable=true; los datos inválidos no se reintentan. El backoff es exponencial,
+limitado a 30 segundos y contenido en el plazo total.
+
+RunInfo suma consumo de los intentos que lo devuelven. El campo opcional accounting_complete=false
+avisa si algún intento no devolvió contabilidad; en ese caso tokens/coste/GPU son null y
+external_calls representa solo las llamadas contabilizadas, no un total garantizado.
+El RunInfo de la revisión conserva la ejecución de Lectura; el del trabajo mide también la
+orquestación y los reintentos. Así no se cambia la huella del IFC ya producido al cerrar el trabajo.

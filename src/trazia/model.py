@@ -245,6 +245,7 @@ class RunInfo(Model):
     tokens_out: int | None = Field(default=None, ge=0)
     cost_eur: float | None = Field(default=None, ge=0)
     external_calls: int = Field(ge=0)
+    accounting_complete: bool = True
 
 
 class Revision(Model):

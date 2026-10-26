@@ -48,6 +48,8 @@ class JobRecord(SQLModel, table=True):
     error: str | None = None
     run_json: str | None = None
     revision_id: str | None = None
+    lease_until: float | None = None
+    warnings_json: str = "[]"
 
 
 class EventRecord(SQLModel, table=True):

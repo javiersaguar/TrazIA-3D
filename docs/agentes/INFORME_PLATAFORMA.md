@@ -67,3 +67,21 @@ Las nuevas dependencias están inventariadas en THIRD_PARTY.md.
 - No hay autenticación multiusuario: el actor es una declaración del revisor local.
 - La web todavía usa mocks: el transporte real se conectará en la fase 5.
 
+
+
+## Fase 3 · Cola intercambiable y contabilidad
+
+Interfaz compartida para cola en proceso y Redis/arq, worker configurable, migración 0002 con
+leases y reclamación atómica. Reintentos con backoff y plazo total; cancelación que descarta los
+resultados tardíos. Avisos de Lectura visibles en GET /jobs/{id}.
+
+RunInfo añade accounting_complete opcional. El consumo conocido se suma entre intentos;
+cuando falta un intento, coste/tokens/GPU quedan null. El contador de llamadas es parcial y se
+marca como tal. La revisión conserva el RunInfo de Lectura y el trabajo mide la orquestación.
+No se modifica la huella del IFC almacenado al cerrar la contabilidad del trabajo.
+
+La batería completa pasa 61/61 pruebas Python; lint y formato Python correctos.
+Nueve pruebas nuevas cubren errores transitorios, límite de intentos, errores definitivos,
+timeout, cancelación, lease activa, suma de coste, concurrencia local y contrato del adaptador Redis.
+Redis se ha probado con un doble del cliente; no se presenta como prueba con un servidor real.
+Docker no está instalado en este equipo; se registrará esa limitación al preparar los perfiles.

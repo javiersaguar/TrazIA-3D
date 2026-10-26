@@ -18,6 +18,7 @@ from sqlmodel import Session, select
 from trazia.ifc import build_ifc
 from trazia.model import FieldState, Identifier, Model, Revision, Source, fields
 from trazia.queue import ProcessQueue
+from trazia.queue.redis import RedisQueue
 from trazia.review import approve
 from trazia.revisions import compare
 from trazia.store import (
@@ -47,6 +48,8 @@ class JobInput(Model):
     dataset: Literal["synthetic", "real"] = "synthetic"
     previous_id: str | None = None
     timeout_seconds: float = Field(default=300, gt=0, le=3600)
+    max_attempts: int = Field(default=3, ge=1, le=5)
+    retry_backoff_seconds: float = Field(default=1, ge=0, le=30)
 
 
 class FieldInput(Model):
@@ -96,7 +99,15 @@ def create_app(
         app.state.store = store
         if seed:
             seed_demo(store, repo)
-        queue = ProcessQueue(lambda identity: run_job(store, identity))
+        queue_mode = os.getenv("TRAZIA_QUEUE", "process")
+        if queue_mode == "redis":
+            queue = await RedisQueue.connect(
+                os.getenv("TRAZIA_REDIS_URL", "redis://localhost:6379/0")
+            )
+        elif queue_mode == "process":
+            queue = ProcessQueue(lambda identity: run_job(store, identity))
+        else:
+            raise ValueError("TRAZIA_QUEUE debe ser process o redis")
         app.state.queue = queue
         await recover_jobs(store, queue)
         try:
@@ -129,7 +140,11 @@ def create_app(
 
     @app.get("/health")
     def health():
-        return {"status": "ok", "schema_version": "0.3", "queue": "process"}
+        return {
+            "status": "ok",
+            "schema_version": "0.3",
+            "queue": os.getenv("TRAZIA_QUEUE", "process"),
+        }
 
     @app.post("/documents", status_code=201)
     async def upload(
@@ -390,7 +405,11 @@ def create_app(
                     )
                 if not Revision.model_validate_json(previous.payload).approval:
                     raise HTTPException(409, "La revisión usada como memoria debe estar aprobada")
-            job = JobRecord(id=str(uuid4()), tag=tag, request_json=body.model_dump_json())
+            job = JobRecord(
+                id=str(uuid4()),
+                tag=tag,
+                request_json=json.dumps({**body.model_dump(mode="json"), "tag": tag}),
+            )
             session.add(job)
             return {"data": {"job_id": job.id, "status": "queued"}, "status": 202}
 
@@ -406,8 +425,9 @@ def create_app(
             record = session.get(JobRecord, identity)
             if record is None:
                 raise HTTPException(404, "No existe ese trabajo")
-            result = record.model_dump(exclude={"request_json", "run_json"})
+            result = record.model_dump(exclude={"request_json", "run_json", "warnings_json"})
             result["run"] = json.loads(record.run_json) if record.run_json else None
+            result["warnings"] = json.loads(record.warnings_json)
             return result
 
     @app.post("/jobs/{identity}/cancel")

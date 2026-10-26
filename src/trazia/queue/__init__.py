@@ -11,7 +11,7 @@ class JobQueue(Protocol):
 
 
 class ProcessQueue:
-    def __init__(self, execute: Callable[[str], Awaitable[None]], concurrency: int = 2):
+    def __init__(self, execute: Callable[[str], Awaitable[float | None]], concurrency: int = 2):
         self.execute = execute
         self.limit = asyncio.Semaphore(concurrency)
         self.tasks: dict[str, asyncio.Task] = {}
@@ -22,7 +22,11 @@ class ProcessQueue:
 
         async def run():
             async with self.limit:
-                await self.execute(job_id)
+                while True:
+                    delay = await self.execute(job_id)
+                    if delay is None:
+                        break
+                    await asyncio.sleep(max(0.05, delay))
 
         task = asyncio.create_task(run(), name=f"trazia:{job_id}")
         self.tasks[job_id] = task

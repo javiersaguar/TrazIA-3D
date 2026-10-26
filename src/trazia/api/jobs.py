@@ -3,10 +3,13 @@ import json
 import logging
 import time
 
+import httpx
+from sqlalchemy import and_, or_, update
 from sqlmodel import Session, select
 
 from trazia.ifc import build_ifc
-from trazia.model import Revision
+from trazia.model import Revision, RunInfo
+from trazia.queue.accounting import Accounting
 from trazia.store import DocumentRecord, EventRecord, JobRecord, RevisionRecord, Store
 
 from .pipeline_adapter import InputDocument, process
@@ -18,6 +21,12 @@ TERMINAL = {"done", "error", "cancelled", "timeout"}
 
 class JobCancelled(RuntimeError):
     pass
+
+
+class TransientPipelineFailure(RuntimeError):
+    def __init__(self, detail, run):
+        super().__init__(detail)
+        self.run = run
 
 
 def emit(store: Store, job_id: str, stage: str, status: str, file: str, detail: str):
@@ -64,10 +73,13 @@ def execute_pipeline(store: Store, job_id: str, request: dict):
         dataset=request["dataset"],
         on_event=event,
     )
+    if result.error and getattr(result, "retryable", False):
+        raise TransientPipelineFailure(result.error, result.run)
     if result.error or result.revision is None:
         return result, None
     revision = Revision.model_validate_json(result.revision.model_dump_json())
     revision.approval = None
+    revision.run = result.run
     expected = (
         request["project_id"],
         request["equipment_id"],
@@ -75,7 +87,9 @@ def execute_pipeline(store: Store, job_id: str, request: dict):
         request["dataset"],
     )
     actual = (revision.project_id, revision.equipment.id, revision.revision, revision.dataset)
-    if expected != actual:
+    if expected != actual or revision.equipment.tag.value != request.get(
+        "tag", revision.equipment.tag.value
+    ):
         raise ValueError("La salida de Lectura no coincide con los identificadores del trabajo")
     emit(
         store,
@@ -94,31 +108,96 @@ def execute_pipeline(store: Store, job_id: str, request: dict):
 
 async def run_job(store: Store, job_id: str):
     started = time.perf_counter()
+    now = time.time()
     with Session(store.engine) as session:
         job = session.get(JobRecord, job_id)
         if job is None or job.status in TERMINAL or job.cancel_requested:
-            return
+            return None
+        if job.status == "running" and job.lease_until and job.lease_until > now:
+            return job.lease_until - now
         request = json.loads(job.request_json)
-        job.status = "running"
-        job.attempts += 1
-        job.updated_at = time.time()
-        session.add(job)
+        maximum = request.get("max_attempts", 3)
+        previous_attempts = job.attempts
+        accounting = Accounting(request["strategy"])
+        if previous_attempts:
+            accounting.add(RunInfo.model_validate_json(job.run_json) if job.run_json else None)
+        if previous_attempts >= maximum:
+            job.status, job.error, job.lease_until = "error", "Límite de intentos agotado", None
+            session.add(job)
+            session.commit()
+            return None
+        claim = session.exec(
+            update(JobRecord)
+            .where(
+                JobRecord.id == job_id,
+                JobRecord.cancel_requested.is_(False),
+                or_(
+                    JobRecord.status == "queued",
+                    and_(
+                        JobRecord.status == "running",
+                        or_(JobRecord.lease_until.is_(None), JobRecord.lease_until <= now),
+                    ),
+                ),
+            )
+            .values(
+                status="running",
+                attempts=previous_attempts + 1,
+                updated_at=now,
+                lease_until=now + request.get("timeout_seconds", 300) + 30,
+            )
+        )
+        if claim.rowcount != 1:
+            return 0.1
         session.commit()
+    in_flight = False
     try:
         async with asyncio.timeout(request.get("timeout_seconds", 300)):
-            result, revision = await asyncio.to_thread(execute_pipeline, store, job_id, request)
+            for attempt in range(maximum - previous_attempts):
+                if attempt:
+                    with Session(store.engine) as session:
+                        job = session.get(JobRecord, job_id)
+                        if job.cancel_requested or job.status != "running":
+                            raise JobCancelled("Trabajo cancelado")
+                        job.attempts += 1
+                        session.add(job)
+                        session.commit()
+                in_flight = True
+                try:
+                    result, revision = await asyncio.to_thread(
+                        execute_pipeline, store, job_id, request
+                    )
+                except (ConnectionError, httpx.TransportError, TransientPipelineFailure) as error:
+                    in_flight = False
+                    accounting.add(
+                        error.run if isinstance(error, TransientPipelineFailure) else None
+                    )
+                    if attempt + previous_attempts + 1 >= maximum:
+                        raise
+                    delay = min(30, request.get("retry_backoff_seconds", 1) * 2**attempt)
+                    emit(
+                        store,
+                        job_id,
+                        "job",
+                        "omitido",
+                        "",
+                        f"Fallo transitorio; reintento en {delay:g} s",
+                    )
+                    await asyncio.sleep(delay)
+                else:
+                    in_flight = False
+                    accounting.add(result.run)
+                    break
         with Session(store.engine) as session:
             job = session.get(JobRecord, job_id)
             if job.cancel_requested or job.status != "running":
-                return
-            run = result.run.model_copy(update={"seconds": time.perf_counter() - started})
-            job.run_json = run.model_dump_json()
-            job.updated_at = time.time()
+                return None
+            job.run_json = accounting.finish(time.perf_counter() - started).model_dump_json()
+            job.warnings_json = json.dumps(result.warnings, ensure_ascii=False)
+            job.updated_at, job.lease_until = time.time(), None
             if revision:
                 identity = revision_id(revision)
                 if session.get(RevisionRecord, identity):
                     raise ValueError("La revisión de destino ya existe; no se sobrescribe")
-                revision.run = run
                 session.add(
                     RevisionRecord(
                         id=identity,
@@ -129,8 +208,7 @@ async def run_job(store: Store, job_id: str):
                         payload=revision.model_dump_json(),
                     )
                 )
-                job.revision_id = identity
-                job.status = "done"
+                job.revision_id, job.status = identity, "done"
             else:
                 job.status, job.error = "error", result.error or "Lectura no produjo una revisión"
             session.add(job)
@@ -145,22 +223,29 @@ async def run_job(store: Store, job_id: str):
             )
             session.commit()
     except asyncio.CancelledError:
+        if in_flight:
+            accounting.add(None)
         with Session(store.engine) as session:
             job = session.get(JobRecord, job_id)
             job.status = "cancelled" if job.cancel_requested else "queued"
-            job.updated_at = time.time()
+            job.updated_at, job.lease_until = time.time(), None
+            job.run_json = accounting.finish(time.perf_counter() - started).model_dump_json()
             session.add(job)
             session.commit()
         raise
     except Exception as error:
+        if in_flight:
+            accounting.add(None)
         with Session(store.engine) as session:
             job = session.get(JobRecord, job_id)
-            if job.cancel_requested:
-                job.status = "cancelled"
-            else:
-                job.status = "timeout" if isinstance(error, TimeoutError) else "error"
+            job.status = (
+                "cancelled"
+                if job.cancel_requested
+                else ("timeout" if isinstance(error, TimeoutError) else "error")
+            )
             job.error = "Tiempo máximo agotado" if isinstance(error, TimeoutError) else str(error)
-            job.updated_at = time.time()
+            job.updated_at, job.lease_until = time.time(), None
+            job.run_json = accounting.finish(time.perf_counter() - started).model_dump_json()
             session.add(job)
             session.add(
                 EventRecord(
@@ -168,6 +253,7 @@ async def run_job(store: Store, job_id: str):
                 )
             )
             session.commit()
+    return None
 
 
 async def recover_jobs(store: Store, queue):
@@ -177,9 +263,10 @@ async def recover_jobs(store: Store, queue):
         ).all()
         identities = []
         for job in jobs:
-            job.status = "cancelled" if job.cancel_requested else "queued"
-            session.add(job)
-            if not job.cancel_requested:
+            if job.cancel_requested:
+                job.status, job.lease_until = "cancelled", None
+                session.add(job)
+            else:
                 identities.append(job.id)
         session.commit()
     for identity in identities:
