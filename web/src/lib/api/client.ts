@@ -1,6 +1,7 @@
 import type { Revision } from "@/lib/types/revision";
 import type { BenchExtractor, EquipmentRow, FieldUpdate, RevisionId } from "../mock/api";
 import type { BenchReport } from "../mock/bench-types";
+import type { StudyResponse } from "../mock/estudio-types";
 import type { DiffReport } from "../mock/diff-types";
 import { flattenRevision, type ReviewField } from "../mock/fields";
 import { apiURL, rememberVersion, revisionVersion } from "./config";
@@ -61,6 +62,7 @@ export async function apiUpdate(update: FieldUpdate): Promise<ReviewField> {
 }
 
 export const apiChanges = () => get<DiffReport>("/diff?from=A&to=B");
+export const apiStudy = () => get<StudyResponse>("/estudio");
 export const apiBench = (extractor: BenchExtractor) => get<BenchReport>(`/bench?extractor=${extractor}`);
 export async function apiEquipment(): Promise<EquipmentRow[]> {
   const rows = await get<EquipmentRow[]>("/equipment");

@@ -8,6 +8,7 @@ const SCREENS = [
   { path: "/cambios", title: "Cambios" },
   { path: "/bench", title: "Bench" },
   { path: "/impacto", title: "Impacto" },
+  { path: "/estudio", title: "Estudio" },
 ];
 
 function trackErrors(page: Page) {
@@ -18,7 +19,7 @@ function trackErrors(page: Page) {
   return errors;
 }
 
-test("las 6 pantallas cargan sin errores y avisan de que los datos son sintéticos", async ({ page }) => {
+test("las 7 pantallas cargan sin errores y avisan de que los datos son sintéticos", async ({ page }) => {
   const errors = trackErrors(page);
   for (const s of SCREENS) {
     await page.goto(s.path);

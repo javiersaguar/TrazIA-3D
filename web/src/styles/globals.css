@@ -182,6 +182,16 @@
     }
   }
 
+  /* Estudio: cada fila del diagrama de bosque entra con un leve desplazamiento escalonado */
+  .estudio-row {
+    animation: estudio-row-in var(--dur-slow) var(--ease-out) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .estudio-row {
+      animation: none;
+    }
+  }
+
   /* Retícula de delineación para lienzos (plano / escena) */
   .drafting-grid {
     background-color: var(--surface-sunken);
@@ -270,4 +280,11 @@
   --xy-controls-button-background-color-hover: var(--surface-sunken);
   --xy-controls-button-color: var(--text-muted);
   --xy-controls-button-border-color: var(--border);
+}
+
+@keyframes estudio-row-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
 }
