@@ -23,7 +23,7 @@ for (const theme of THEMES) {
       if (screen === "cambios") {
         await page.getByText("Longitud entre tangentes").first().click();
       }
-      await page.waitForTimeout(600);
+      await page.waitForTimeout(2500);
       await page.screenshot({ path: `docs/capturas/${screen}-${theme}.png`, fullPage: true });
     });
   }

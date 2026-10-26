@@ -166,6 +166,8 @@ export function ChangesWorkspace() {
               changes={diff}
               progress={morphProgress}
               onProgress={(p) => {
+                // Arrastrar el avance en el visor pausa también la reproducción de la pantalla.
+                setPlaying(false);
                 setMode("delta");
                 setProgress(p);
               }}
