@@ -7,7 +7,7 @@ import { Camera, Maximize, Minus, Plus, RotateCcw } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { useTheme } from "next-themes";
 import { Component, createContext, useContext, useEffect, useImperativeHandle, useRef, type ComponentProps, type ReactNode, type Ref, type RefObject } from "react";
-import { Box3, OrthographicCamera, Sphere, Vector3 } from "three";
+import { Box3, Matrix4, OrthographicCamera, Vector3 } from "three";
 import type { Bounds, Vec3 } from "@/workers/ifc-protocol";
 import styles from "./viewer.module.css";
 
@@ -27,31 +27,36 @@ export function CameraRig({ bounds, view = "iso", handle, onUserControl, measure
   measureKey?: number; onMeasure?(sample: PerformanceSample): void;
 }) {
   const controls = useRef<CameraControls>(null);
-  const { camera, gl, scene, invalidate } = useThree();
+  const { camera, gl, scene, invalidate, size: viewport } = useThree();
   const reduce = useReducedMotion();
   const sample = useRef({ key: 0, started: 0, previous: 0, deltas: [] as number[] });
+  const frame = (box: Box3, eye: Vector3, smooth: boolean) => {
+    const center = box.getCenter(new Vector3());
+    const transform = new Matrix4().lookAt(eye, center, camera.up).setPosition(eye).invert();
+    const projected = box.clone().applyMatrix4(transform).getSize(new Vector3());
+    const zoom = Math.min(viewport.width / Math.max(projected.x, .1), viewport.height / Math.max(projected.y, .1)) / 1.4;
+    void controls.current?.setLookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z, smooth && !reduce);
+    void controls.current?.zoomTo(Math.min(650, Math.max(5, zoom)), smooth && !reduce);
+    invalidate();
+  };
   const show = (next: View, smooth: boolean) => {
     const box = asBox(bounds), center = box.getCenter(new Vector3()), size = box.getSize(new Vector3());
     const distance = Math.max(size.x, size.y, size.z, 1) * 2;
     const offsets: Record<View, Vec3> = { iso: [distance, distance * .65, distance],
       front: [0, 0, distance], plan: [0, 0, distance], top: [0, distance, .001] };
-    const offset = offsets[next];
-    void controls.current?.setLookAt(center.x + offset[0], center.y + offset[1], center.z + offset[2],
-      center.x, center.y, center.z, smooth && !reduce);
-    // fitToBox ajusta la cámara al eje más cercano; la esfera conserva la isometría elegida.
-    const sphere = box.getBoundingSphere(new Sphere()); sphere.radius *= 1.2;
-    void controls.current?.fitToSphere(sphere, smooth && !reduce);
-    invalidate();
+    // Proyectar los límites conserva la isometría y aprovecha el tamaño real del panel.
+    frame(box, center.add(new Vector3(...offsets[next])), smooth);
   };
   useEffect(() => {
     show(view, false);
     // La vista cambia solo por una orden explícita, nunca por selección de campos con teclado.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view, bounds]);
+  }, [view, bounds, viewport.width, viewport.height]);
   useImperativeHandle(handle, () => ({
     view: next => show(next, true),
-    fit: target => { const sphere = asBox(target ?? bounds).getBoundingSphere(new Sphere()); sphere.radius *= 1.2;
-      void controls.current?.fitToSphere(sphere, !reduce); invalidate(); },
+    fit: target => { const box = asBox(target ?? bounds), center = box.getCenter(new Vector3());
+      const direction = camera.getWorldDirection(new Vector3());
+      frame(box, center.addScaledVector(direction, -Math.max(10, box.getSize(new Vector3()).length() * 2)), true); },
     zoom: factor => { void controls.current?.zoomTo((camera as OrthographicCamera).zoom * factor, !reduce); invalidate(); },
     capture: () => {
       gl.render(scene, camera);
@@ -128,9 +133,9 @@ export function SceneCanvas({ children, label }: { children: ReactNode; label: s
   </Canvas><div ref={portal} className={styles.labels} /></RenderBoundary>;
 }
 
-export function CameraTools({ handle, container }: { handle: RefObject<CameraHandle | null>; container: RefObject<HTMLDivElement | null> }) {
+export function CameraTools({ handle, container, onReset }: { handle: RefObject<CameraHandle | null>; container: RefObject<HTMLDivElement | null>; onReset?(): void }) {
   return <div className={styles.tools} role="group" aria-label="Controles de cámara">
-    <button className={styles.button} title="Restablecer vista" aria-label="Restablecer vista" onClick={() => handle.current?.view("iso")}><RotateCcw /></button>
+    <button className={styles.button} title="Restablecer vista" aria-label="Restablecer vista" onClick={() => onReset ? onReset() : handle.current?.view("iso")}><RotateCcw /></button>
     <button className={styles.button} title="Acercar" aria-label="Acercar" onClick={() => handle.current?.zoom(1.25)}><Plus /></button>
     <button className={styles.button} title="Alejar" aria-label="Alejar" onClick={() => handle.current?.zoom(.8)}><Minus /></button>
     <button className={styles.button} title="Capturar PNG" aria-label="Capturar PNG" onClick={() => handle.current?.capture()}><Camera /></button>

@@ -13,3 +13,8 @@
   usa el árbol y el raycast 0.9; conviene unificar esa dependencia al actualizar el manifiesto.
 - La narración interna del morph se oculta al recibir `progress` controlado: la pantalla Cambios
   ya dibuja la suya. `showNarration` opcional permite activarla explícitamente en otros contextos.
+- En Cambios, A mantiene su propio temporizador. El callback `onProgress` debería pausar
+  también ese temporizador (`setPlaying(false)`) al arrastrar el scrub del visor. B pausa su
+  reproductor interno, pero no puede detener el de la pantalla sin ampliar el contrato.
+- `Como el plano` ofrece un alzado ortográfico canónico. La alineación automática con un
+  plano arbitrario requerirá la transformación del plano/calibración aportada por el núcleo.

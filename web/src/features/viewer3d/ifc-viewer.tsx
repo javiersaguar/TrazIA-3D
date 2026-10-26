@@ -36,18 +36,35 @@ export function IfcViewer({ ifcUrl, selectedId, hoveredId, onSelect, onHover, an
   const activeView = suppliedView ?? view, activeMode = suppliedMode ?? mode;
   const model = load.model;
   const cutHeight = model ? model.bounds.min[1] + (model.bounds.max[1] - model.bounds.min[1]) * cutFraction : 0;
-  const planes = useMemo(() => cut ? [new Plane(new Vector3(0, -1, 0), cutHeight)] : [], [cut, cutHeight]);
+  const planes = useMemo(() => cut && activeMode !== "exploded" ? [new Plane(new Vector3(0, -1, 0), cutHeight)] : [], [cut, cutHeight, activeMode]);
   const select = (id: string) => { setSelection(id); onSelect?.(id); };
   const highlight = (id: string | null) => { setHover(id); onHover?.(id); };
   const focus = (id: string) => { const product = products.find(p => p.semanticId === id); if (product) camera.current?.fit(product.bounds); };
   const selected = products.find(p => p.semanticId === activeId);
   const visibleProducts = useMemo(() => products.filter(p => !hidden.has(p.semanticId) && (!isolate || p.semanticId === activeId)), [products, hidden, isolate, activeId]);
+  const displayBounds = useMemo(() => {
+    if (!model) return undefined;
+    if (activeView === "top" && activeMode !== "exploded") {
+      const shell = products.find(p => p.semanticId === "shell"), x = shell?.center[0] ?? 0, z = shell?.center[2] ?? 0;
+      const radius = Math.max(Math.abs(model.bounds.max[0] - x), Math.abs(model.bounds.min[0] - x),
+        Math.abs(model.bounds.max[2] - z), Math.abs(model.bounds.min[2] - z)) + .9;
+      return { min: [x - radius, model.bounds.min[1], z - radius] as Vec3,
+        max: [x + radius, model.bounds.max[1], z + radius] as Vec3 };
+    }
+    if (activeMode !== "exploded") return model.bounds;
+    const low = [Infinity, Infinity, Infinity], high = [-Infinity, -Infinity, -Infinity];
+    for (const product of products) {
+      const offset = explosionOffset(product, 1);
+      for (let i = 0; i < 3; i++) { low[i] = Math.min(low[i]!, product.bounds.min[i]! + offset[i]!); high[i] = Math.max(high[i]!, product.bounds.max[i]! + offset[i]!); }
+    }
+    return { min: low as Vec3, max: high as Vec3 };
+  }, [model, products, activeMode, activeView]);
   return <div className={styles.frame} ref={container} data-testid="ifc-viewer" data-phase={model ? "ready" : load.error ? "error" : "loading"}
     data-products={model?.products.length} data-triangles={model?.triangles} data-height={model?.bounds.max[1]}
     data-parse-ms={model?.parseMs.toFixed(2)}>
     {model ? <SceneCanvas label="Modelo IFC sintético; usa el árbol para seleccionar componentes">
       <Studio />
-      <CameraRig bounds={model.bounds} view={activeView} handle={camera} measureKey={measureKey} onMeasure={onMeasure} />
+      <CameraRig bounds={displayBounds ?? model.bounds} view={activeView} handle={camera} measureKey={measureKey} onMeasure={onMeasure} />
       <Grid position={[0, -.015, 0]} args={[20, 20]} cellSize={.5} sectionSize={2} cellColor="#253345"
         sectionColor="#3b4d63" fadeDistance={20} infiniteGrid />
       {visibleProducts.map(product => {
@@ -60,10 +77,12 @@ export function IfcViewer({ ifcUrl, selectedId, hoveredId, onSelect, onHover, an
           onSelect={select} onHover={highlight} onFocus={focus} />;
       })}
       {cut && activeMode !== "exploded" ? <SectionCaps products={visibleProducts} height={cutHeight} /> : null}
-      {activeMode !== "exploded" ? <Dimensions annotations={annotations} products={products} /> : null}
+      {activeMode !== "exploded" ? <Dimensions annotations={activeView === "top" ? annotations.filter(a => a.id === "diameter") : annotations} products={products} /> : null}
       {activeView === "top" ? <AzimuthRing model={model} /> : null}
     </SceneCanvas> : <LoadingState error={load.error} />}
-    <CameraTools handle={camera} container={container} />
+    <CameraTools handle={camera} container={container} onReset={() => {
+      if (suppliedView) camera.current?.view(suppliedView); else { setView("iso"); camera.current?.view("iso"); }
+    }} />
     <div className={styles.selectors}>
       {!suppliedView ? <div className={styles.group} aria-label="Vistas guardadas">
         {([["iso", "Iso"], ["front", "Alzado"], ["top", "Planta"], ["plan", "Como el plano"]] as const).map(([key, label]) =>
@@ -76,11 +95,11 @@ export function IfcViewer({ ifcUrl, selectedId, hoveredId, onSelect, onHover, an
     </div>
     <div className={styles.secondary}>
       <button className={styles.button} aria-pressed={tree} onClick={() => setTree(v => !v)}><TreePine /> Elementos</button>
-      <button className={styles.button} aria-pressed={cut} disabled={activeMode === "exploded"} onClick={() => setCut(v => !v)}><Scissors /> Corte</button>
+      <button className={styles.button} aria-pressed={cut && activeMode !== "exploded"} disabled={activeMode === "exploded"} onClick={() => setCut(v => !v)}><Scissors /> Corte</button>
       <button className={styles.button} disabled={!selected} onClick={() => selected && focus(selected.semanticId)} title="Encuadrar selección"><Crosshair /></button>
       <button className={styles.button} disabled={!selected} aria-pressed={isolate} onClick={() => setIsolate(v => !v)} title="Aislar selección"><Layers /></button>
     </div>
-    {cut ? <label className={styles.cut}>Plano de corte · {cutHeight.toFixed(2)} m
+    {cut && activeMode !== "exploded" ? <label className={styles.cut}>Plano de corte · {cutHeight.toFixed(2)} m
       <input className={styles.range} aria-label="Altura del plano de corte" type="range" min="0" max="1" step=".005" value={cutFraction} onChange={e => setCutFraction(Number(e.target.value))} />
     </label> : null}
     {tree ? <div className={styles.tree} aria-label="Árbol IFC"><h4>{model?.schema ?? "IFC"} / Equipo</h4>

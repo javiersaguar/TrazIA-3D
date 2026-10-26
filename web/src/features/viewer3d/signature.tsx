@@ -55,15 +55,17 @@ function useDrawing() {
   return { drawing, error };
 }
 
-function LiftScene({ products, drawing, timeline, onPhase, onFinish, reduced }: {
+function LiftScene({ products, drawing, timeline, onPhase, onFinish, reduced, playing }: {
   products: PreparedProduct[]; drawing: { texture: CanvasTexture; aspect: number; evidence: Evidence[] };
-  timeline: RefObject<Timeline>; onPhase(phase: number): void; onFinish(): void; reduced: boolean;
+  timeline: RefObject<Timeline>; onPhase(phase: number): void; onFinish(): void; reduced: boolean; playing: boolean;
 }) {
   const model = useRef<Group>(null), steel = useRef<Group>(null), wire = useRef<Group>(null), lights = useRef<Group>(null);
   const phase = useRef(-1), { invalidate } = useThree();
   const paper = useRef<Mesh>(null);
+  useEffect(() => { invalidate(); }, [playing, reduced, invalidate]);
   useFrame((_, delta) => {
     const t = timeline.current;
+    if (reduced && t.progress < 1) { t.advance(0, true); t.pause(); onFinish(); }
     if (t.playing) t.advance(delta, reduced);
     const progress = t.progress, q = ease(Math.max(0, (progress - .28) / .72));
     if (model.current) {
@@ -122,7 +124,7 @@ export function Signature() {
     {ready ? <SceneCanvas label="Secuencia sintética: evidencia del plano y geometría del IFC">
       <Studio effects={false} />
       <CameraRig bounds={SIGNATURE_BOUNDS} handle={camera} onUserControl={pause} />
-      <LiftScene key={version} products={products} drawing={drawing} timeline={timeline} onPhase={setPhase} onFinish={() => setPlaying(false)} reduced={!!reduced} />
+      <LiftScene key={version} products={products} drawing={drawing} timeline={timeline} onPhase={setPhase} onFinish={() => setPlaying(false)} reduced={!!reduced} playing={playing} />
     </SceneCanvas> : <LoadingState error={error ?? load.error} label="Leyendo el PDF y el IFC sintéticos" />}
     <CameraTools handle={camera} container={container} />
     <div className={styles.badge}>Prototipo · datos sintéticos · 5 s</div>
