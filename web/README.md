@@ -32,6 +32,17 @@ uv run trazia schema -o generated/revision.schema.json   # desde la raíz del re
 pnpm gen:types                                           # desde web/
 ```
 
+La pantalla Bench lee `public/demo/json/bench-etiquetas.json` y `bench-combinado.json`, copias de
+`generated/bench*/report.json` (ver `docs/BENCH.md`). Para refrescarlas, desde la raíz:
+
+```bash
+uv run python -m synthetic --casos 20 --semilla 2026
+uv run python -m bench --extractor etiquetas --salida generated/bench-etiquetas
+uv run python -m bench --extractor combinado --salida generated/bench-combinado
+```
+
+y copiar los dos `report.json` a `web/public/demo/json/`.
+
 ## Propiedad de carpetas
 
 | Carpeta | Responsable |
