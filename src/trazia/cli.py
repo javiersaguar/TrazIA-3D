@@ -22,6 +22,9 @@ def main(argv=None) -> int:
         description="TrazIA-3D: del plano al modelo, con cada cambio trazado"
     )
     commands = parser.add_subparsers(dest="command", required=True)
+    migrate = commands.add_parser("migrate", help="Migrar un contrato 0.2 a 0.3 (DRAFT)")
+    migrate.add_argument("input", type=Path)
+    migrate.add_argument("--output", "-o", type=Path, required=True)
     validate = commands.add_parser("validate", help="Validar contrato y estado de revisión")
     validate.add_argument("input", type=Path)
     export = commands.add_parser("export", help="Exportar IFC4")
@@ -61,6 +64,8 @@ def main(argv=None) -> int:
     try:
         if args.command == "schema":
             write_json(Revision.model_json_schema(), args.output)
+        elif args.command == "migrate":
+            write_json(load_revision(args.input).model_dump(mode="json"), args.output)
         elif args.command == "validate":
             revision = load_revision(args.input)
             write_json(
