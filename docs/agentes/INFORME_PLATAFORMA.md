@@ -40,6 +40,30 @@ rechaza el formato de `docs/COORDINACION-BACKEND.md`, que está protegido por el
 No se modifica ese documento. La comprobación de los archivos Python se ejecuta por separado.
 Se propone al propietario excluir Markdown del formato del código o formatear el documento.
 
-## Siguiente fase
+## Fase 2 · API base
 
-API persistente y adaptador de pipeline según la interfaz pactada. Todavía no hay endpoints nuevos.
+API FastAPI con SQLModel, migración Alembic 0001, SQLite/Postgres configurable y almacén SHA-256.
+Seed idempotente de A/B; documentos, revisiones, campos, auditoría, aprobación, trabajos,
+cancelación y SSE persistente. Endpoints y ejemplos en [API.md](../API.md).
+ETag/If-Match y claves idempotentes de 24 horas protegen las escrituras.
+El multipart tiene límite también sin Content-Length. Solo se permite CORS local.
+
+El adaptador usa la firma pactada de process. Hasta que Lectura publique trazia.pipeline,
+solo ejecuta b_reglas; rechaza explícitamente estrategias/proveedores inexistentes.
+No modifica las carpetas de Lectura. Los resultados siguen siendo DRAFT.
+
+Comprobación completa: 52/52 pruebas Python pasan; lint y formato Python correctos.
+Pruebas de API: 12 casos (persistencia tras reiniciar, dedupe, idempotencia, concurrencia,
+aprobación/invalidez, SSE/reanudación, trabajos y límites). Costes y GPU no medidos permanecen null;
+el baseline registra cero llamadas externas y cero coste de proveedor.
+Las nuevas dependencias están inventariadas en THIRD_PARTY.md.
+
+### Necesidades de Lectura y límites de esta fase
+
+- process e InputDocument/StageEvent/PipelineResult según el contrato compartido.
+- Ejecutable/interfaz del estudio para conectar POST /estudio; GET ya sirve su archivo si existe.
+- BCF/multiesquema y copiloto tienen rutas explícitas pendientes (501/503) hasta sus fases.
+- La cancelación impide publicar tras cancelación; un parseo nativo en curso es cooperativo.
+- No hay autenticación multiusuario: el actor es una declaración del revisor local.
+- La web todavía usa mocks: el transporte real se conectará en la fase 5.
+

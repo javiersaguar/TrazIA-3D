@@ -12,3 +12,6 @@ data/private/
 !.env.example
 .streamlit/secrets.toml
 *.log
+
+data/store/
+data/*.sqlite*
