@@ -19,10 +19,12 @@ export type ExtendedViewerProps = IfcViewerProps & {
   elementStates?: Record<string, ElementState>;
   measureKey?: number;
   onMeasure?(sample: PerformanceSample): void;
+  onRequestMeasure?(): void;
+  performanceSample?: PerformanceSample | null;
 };
 
 export function IfcViewer({ ifcUrl, selectedId, hoveredId, onSelect, onHover, annotations = [],
-  view: suppliedView, mode: suppliedMode, elementStates, measureKey, onMeasure }: ExtendedViewerProps) {
+  view: suppliedView, mode: suppliedMode, elementStates, measureKey, onMeasure, onRequestMeasure, performanceSample }: ExtendedViewerProps) {
   const load = useIfcModel(ifcUrl), products = usePreparedModel(load.model);
   const [selection, setSelection] = useState<string>();
   const [hover, setHover] = useState<string | null>(null);
@@ -94,6 +96,7 @@ export function IfcViewer({ ifcUrl, selectedId, hoveredId, onSelect, onHover, an
       </select> : null}
     </div>
     <div className={styles.secondary}>
+      {onRequestMeasure ? <button className={styles.button} onClick={onRequestMeasure}>Medir 5 s</button> : null}
       <button className={styles.button} aria-pressed={tree} onClick={() => setTree(v => !v)}><TreePine /> Elementos</button>
       <button className={styles.button} aria-pressed={cut && activeMode !== "exploded"} disabled={activeMode === "exploded"} onClick={() => setCut(v => !v)}><Scissors /> Corte</button>
       <button className={styles.button} disabled={!selected} onClick={() => selected && focus(selected.semanticId)} title="Encuadrar selección"><Crosshair /></button>
@@ -115,6 +118,7 @@ export function IfcViewer({ ifcUrl, selectedId, hoveredId, onSelect, onHover, an
     </div> : null}
     <div className={styles.caption}><strong>{selected ? elementLabel(selected.semanticId) : "Selecciona un componente"}</strong><br />
       {model ? `${model.schema} · ${model.triangles.toLocaleString("es-ES")} triángulos · sintético` : "Geometría leída del IFC"}
+      {performanceSample ? <><br />{performanceSample.fps.toFixed(1)} fps medios · p95 {performanceSample.p95Ms.toFixed(1)} ms</> : null}
     </div>
     <Legend />
     <p className={styles.srOnly} role="status">{selected ? `${elementLabel(selected.semanticId)} seleccionado. ${selected.globalId}` : "Sin selección"}</p>

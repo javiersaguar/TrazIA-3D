@@ -1,6 +1,6 @@
 "use client";
 
-import { AdaptiveDpr, CameraControls, Environment, Html as DreiHtml, Lightformer } from "@react-three/drei";
+import { CameraControls, Environment, Html as DreiHtml, Lightformer } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { EffectComposer, SSAO } from "@react-three/postprocessing";
 import { Camera, Maximize, Minus, Plus, RotateCcw } from "lucide-react";
@@ -96,6 +96,17 @@ export function CameraRig({ bounds, view = "iso", handle, onUserControl, measure
     onControlStart={() => { controls.current?.stop(); onUserControl?.(); }} />;
 }
 
+function AdaptiveResolution() {
+  const { size, setDpr } = useThree();
+  const quality = useThree(state => state.performance.current);
+  useEffect(() => {
+    // Presupuesto de píxeles: el coste del posprocesado no crece sin límite al maximizar.
+    const budget = Math.sqrt(1_000_000 / Math.max(1, size.width * size.height));
+    setDpr(Math.min(window.devicePixelRatio, 1.6, budget) * quality);
+  }, [size.width, size.height, quality, setDpr]);
+  return null;
+}
+
 export function Studio({ effects = true }: { effects?: boolean }) {
   const { resolvedTheme } = useTheme();
   return <>
@@ -108,9 +119,9 @@ export function Studio({ effects = true }: { effects?: boolean }) {
       <Lightformer position={[-5, 4, 4]} rotation={[0, Math.PI, 0]} scale={[5, 8, 1]} intensity={2} />
       <Lightformer position={[0, 9, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[7, 7, 1]} intensity={2} />
     </Environment>
-    <AdaptiveDpr pixelated />
-    {effects ? <EffectComposer enableNormalPass multisampling={0}>
-      <SSAO samples={8} rings={3} intensity={1.1} radius={.1} luminanceInfluence={.7} />
+    <AdaptiveResolution />
+    {effects ? <EffectComposer enableNormalPass multisampling={0} resolutionScale={.5}>
+      <SSAO resolutionScale={.5} depthAwareUpsampling samples={8} rings={3} intensity={1.1} radius={.1} luminanceInfluence={.7} />
     </EffectComposer> : null}
   </>;
 }
