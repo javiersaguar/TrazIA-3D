@@ -1,0 +1,143 @@
+/*
+  Tokens de diseño de TrazIA-3D.
+  Origen: docs/ROADMAP.md, sección I.2b (colores medidos en las capturas de referencia).
+  Oscuro = "sala de control" (Ciberconciencia), por defecto. Claro = "mesa de delineación" (PIDS).
+  Cada color de estado significa una sola cosa:
+    revisión (naranja) = cambios rev A → rev B · aprobado (verde) = estado aprobado
+    peligro (rojo) = conflicto o error · aviso (ámbar) = honestidad sobre los datos
+*/
+
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0e131a;
+  --surface: #161d26;
+  --surface-raised: #1b2430;
+  --surface-sunken: #10161e;
+  --sidebar: #121820;
+  --border: #2a3441;
+  --border-strong: #3a4656;
+  --grid-line: rgb(134 174 232 / 0.06);
+
+  --text: #f0f4f9;
+  --text-strong: #f0f4f9;
+  --text-muted: #9eabbb;
+  --text-faint: #6f7d8f;
+
+  --accent: #86aee8;
+  --accent-text: #9cbdee;
+  --accent-strong: #4f8ef7;
+  --accent-soft: #1f3150;
+  --accent-contrast: #0e131a;
+
+  --live: #53a47f;
+  --live-dot: #3fcf8e;
+  --live-soft: rgb(83 164 127 / 0.14);
+
+  --danger: #f07468;
+  --danger-soft: rgb(240 116 104 / 0.14);
+
+  --warning-text: #e8b44c;
+  --warning-bg: #242423;
+  --warning-border: #4a3f22;
+
+  --revision: #f5a35c;
+  --revision-soft: rgb(245 163 92 / 0.14);
+
+  --approved: #5cc08f;
+  --approved-soft: rgb(92 192 143 / 0.14);
+
+  --assistant: #6d4aff;
+  --assistant-contrast: #ffffff;
+
+  --chip-violet: #a99bff;
+  --chip-violet-soft: rgb(109 74 255 / 0.16);
+  --chip-sky: #7cc7f2;
+  --chip-sky-soft: rgb(124 199 242 / 0.12);
+
+  --shadow-1: 0 0 0 1px rgb(0 0 0 / 0);
+  --shadow-pop: 0 12px 32px -12px rgb(0 0 0 / 0.55);
+  --scrim: rgb(5 8 12 / 0.6);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f3f6fb;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-sunken: #f1f5f9;
+  --sidebar: #ffffff;
+  --border: #e6edf5;
+  --border-strong: #d3dde9;
+  --grid-line: rgb(30 58 138 / 0.05);
+
+  --text: #1e293b;
+  --text-strong: #1e3a8a;
+  --text-muted: #5f7086;
+  --text-faint: #8796a8;
+
+  --accent: #3b82f6;
+  --accent-text: #2563eb;
+  --accent-strong: #2563eb;
+  --accent-soft: #e8f1ff;
+  --accent-contrast: #ffffff;
+
+  --live: #047857;
+  --live-dot: #00bc7d;
+  --live-soft: #ecfdf5;
+
+  --danger: #d93a3f;
+  --danger-soft: #fdecec;
+
+  --warning-text: #a15c07;
+  --warning-bg: #fff7e6;
+  --warning-border: #f5d9a8;
+
+  --revision: #c2410c;
+  --revision-soft: #fff1e8;
+
+  --approved: #15803d;
+  --approved-soft: #eaf7ef;
+
+  --assistant: #6d4aff;
+  --assistant-contrast: #ffffff;
+
+  --chip-violet: #4f39f6;
+  --chip-violet-soft: #eef2ff;
+  --chip-sky: #0084d1;
+  --chip-sky-soft: #f0f9ff;
+
+  --shadow-1: 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-pop: 0 16px 40px -16px rgb(15 23 42 / 0.25);
+  --scrim: rgb(15 23 42 / 0.32);
+}
+
+:root {
+  /* Forma */
+  --radius-panel: 14px;
+  --radius-card: 12px;
+  --radius-control: 8px;
+  --radius-chip: 6px;
+
+  /* Medidas del shell */
+  --sidebar-width: 236px;
+  --sidebar-collapsed: 64px;
+  --topbar-height: 48px;
+
+  /* Movimiento: entradas con ease-out, salidas más rápidas */
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-slow: 240ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+  }
+}
