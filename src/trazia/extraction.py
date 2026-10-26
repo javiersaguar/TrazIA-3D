@@ -2,10 +2,30 @@
 
 import json
 import re
-from typing import Protocol
+from typing import Literal, Protocol
+
+from pydantic import Field
 
 from .ingest import Bundle
 from .model import GEOMETRY_FIELDS, Model, Revision, Source
+
+
+class Interval(Model):
+    """Intervalo conforme de un valor numérico (contrato 0.3, DEC-12)."""
+
+    low: float
+    high: float
+    level: float = Field(gt=0, lt=1)
+    method: Literal["conformal"] = "conformal"
+
+
+class Alternative(Model):
+    """Otro valor candidato para el mismo campo, con su evidencia."""
+
+    value: float | str
+    unit: str
+    source: Source
+    channel: str | None = None
 
 
 class Candidate(Model):
@@ -13,6 +33,18 @@ class Candidate(Model):
     value: float | str
     unit: str
     source: Source
+    # Procedencia ampliada (contrato 0.3). Todo opcional: los extractores antiguos no lo rellenan.
+    channel: str | None = None
+    strategy: str | None = None
+    model: str | None = None
+    prompt_sha256: str | None = None
+    grounded: bool | None = None
+    confidence_raw: float | None = None
+    text_original: str | None = None
+    unit_original: str | None = None
+    alternatives: list[Alternative] = Field(default_factory=list)
+    interval: Interval | None = None
+    explanation: str | None = None
 
 
 class Extractor(Protocol):

@@ -65,3 +65,27 @@ Metadatos de las distribuciones instaladas comprobados el 26/10/2026. Se conserv
 Metadatos instalados comprobados el 26/10/2026.
 [Licencias OpenCV y ruedas](https://github.com/opencv/opencv-python#licensing).
 Los XSD oficiales de BCF 2.1 se descargan solo a generated/ para comprobación local; no se redistribuyen.
+
+
+## Núcleo y lectura (Lectura)
+
+Prohibido todo lo AGPL: Ultralytics/YOLO y PyMuPDF no se usan (DEC-30).
+
+| Dependencia | Licencia | Uso |
+| --- | --- | --- |
+| pydantic | MIT | Contrato de datos |
+| ifcopenshell | LGPL-3.0 | Escritura y validación IFC |
+| pdfplumber | MIT | Texto, trazos y tablas de PDF vectorial |
+| openpyxl | MIT | Hojas de datos mecánicos |
+| pillow | MIT-CMU (HPND) | Imágenes de página |
+| streamlit | Apache-2.0 | Demo de escritorio |
+| plotly | MIT | Gráficos de la demo |
+| pint | BSD-3-Clause | Unidades del estudio (pulgadas, ft-in, psig, °F) |
+| scipy | BSD-3-Clause | McNemar exacto y estadística del estudio |
+| scikit-learn | BSD-3-Clause | Calibración isotónica y fusión aprendida (próximas fases) |
+
+## Modelos (Lectura)
+
+| Modelo | Licencia | Uso |
+| --- | --- | --- |
+| Qwen3-VL 4B Instruct (vía Ollama, Q4_K_M) | Apache-2.0 | Lectura visual local por mosaicos (tarea «lineas»); los pesos no se incluyen |
