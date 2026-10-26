@@ -1,0 +1,8 @@
+# Correos permitidos como autor o committer (uno por línea).
+# Cada miembro añade aquí el correo que usa en `git config user.email`
+# y, si hace merges desde GitHub, su dirección <id>+<usuario>@users.noreply.github.com.
+javisaguarantona@gmail.com
+noreply@github.com
+# Iria Lozano Carrasco: pendiente
+# Miguel Vera del Castillo: pendiente
+# Alejandro Cuevas Cid: pendiente
