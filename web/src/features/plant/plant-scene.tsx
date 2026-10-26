@@ -56,10 +56,12 @@ function PlantInstances({ url, items, selected, onSelect, onFocus, onLoaded }: {
   return <>
     {products.flatMap(product => product.geometries.map((_, part) => <InstancePart key={`${product.globalId}:${part}`}
       product={product} part={part} items={items} selected={selected} onSelect={onSelect} onFocus={onFocus} />))}
-    {items.map(item => <Html key={item.tag} position={[item.position[0], .18, item.position[2] + 1.85]} center
+    {/* Etiqueta sobre la cabeza de cada recipiente: al pie se solapaban con la fila delantera. */}
+    {items.map(item => <Html key={item.tag} position={[item.position[0], load.model!.bounds.max[1] + .9, item.position[2]]} center
       zIndexRange={[8, 0]}>
-      <button className={styles.button} aria-pressed={selected === item.tag} onClick={() => onSelect(item.tag)}>
-        {item.tag}{item.tag !== sourceTag ? <small> · ilustrativo</small> : null}
+      <button className={styles.button} aria-pressed={selected === item.tag} onClick={() => onSelect(item.tag)}
+        title={item.tag !== sourceTag ? `${item.tag} · instancia ilustrativa` : `${item.tag} · equipo con datos`}>
+        {item.tag}
       </button>
     </Html>)}
   </>;
@@ -102,7 +104,7 @@ export function PlantScene({ equipment, onSelect }: PlantSceneProps) {
       {areas.map((area, index) => <group key={area} position={[(index - (areas.length - 1) / 2) * 12, -.16, 0]}>
         <mesh position={[0, 0, 0]}><boxGeometry args={[10, .25, 10]} /><meshStandardMaterial color="#263343" roughness={.9} /></mesh>
         <Grid position={[0, .14, 0]} args={[10, 10]} cellSize={1} sectionSize={5} cellColor="#425369" sectionColor="#60768e" fadeDistance={70} />
-        <Html position={[0, .25, 5.4]} center zIndexRange={[5, 0]} style={{ pointerEvents: "none" }}><span className={styles.label}>{area}</span></Html>
+        <Html position={[0, .25, 6.3]} center zIndexRange={[5, 0]} style={{ pointerEvents: "none" }}><span className={styles.label}>{area}</span></Html>
       </group>)}
       {groups.map(group => <PlantInstances key={group.url} {...group} selected={selected} onSelect={select} onFocus={focus} onLoaded={loaded} />)}
     </SceneCanvas>

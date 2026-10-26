@@ -40,7 +40,8 @@ export default function Lab3D() {
     <section className="grid gap-5 xl:grid-cols-[1.1fr_1fr]">
       <div><h2 className="mb-3 text-lg font-semibold">Visor IFC</h2><div className="h-[680px]">
         <IfcViewer ifcUrl="/demo/ifc/rev_a.ifc" selectedId={selected} onSelect={setSelected} annotations={selected === "shell" ? ANNOTATIONS : []}
-          measureKey={measureKey} onMeasure={setSample} /></div>
+          measureKey={measureKey} onMeasure={setSample} performanceSample={sample}
+          onRequestMeasure={() => { setSample(null); setMeasureKey(k => k + 1); }} /></div>
         <p className="mt-2 text-xs text-muted" data-testid="selected-element">Selección: {selected}</p>
       </div>
       <div><h2 className="mb-3 text-lg font-semibold">Revisiones A → B</h2><div className="h-[680px]">

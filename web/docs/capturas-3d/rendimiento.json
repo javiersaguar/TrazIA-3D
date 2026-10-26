@@ -1,0 +1,18 @@
+{
+  "measuredAt": "2026-10-26T17:58:39.758Z",
+  "scenario": "Visor A, virola seleccionada, dos cotas, SSAO; otras dos escenas en reposo",
+  "viewer": {
+    "height": 680,
+    "parseMs": "297.20",
+    "products": "7",
+    "triangles": "4184",
+    "width": 629.6146240234375
+  },
+  "fps": 97.49665354722542,
+  "p95Ms": 22.800000000745058,
+  "frames": 488,
+  "renderer": "ANGLE (AMD, AMD Radeon(TM) 610M (0x0000164E) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "drawCalls": 49,
+  "triangles": 10831,
+  "dpr": 0.9750000000000001
+}

@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  three-mesh-bvh: 0.9.16
+
 importers:
 
   .:
@@ -3291,11 +3294,6 @@ packages:
     resolution: {integrity: sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A==}
     engines: {node: '>=6'}
 
-  three-mesh-bvh@0.8.3:
-    resolution: {integrity: sha512-4G5lBaF+g2auKX3P0yqx+MJC6oVt6sB5k+CchS6Ob0qvH0YIhuUk1eYr7ktsIpY+albCqE80/FVQGV190PmiAg==}
-    peerDependencies:
-      three: '>= 0.159.0'
-
   three-mesh-bvh@0.9.16:
     resolution: {integrity: sha512-2RK+5MJOaiHJhopURn2CUkOHiF3tFloD0uZBfhebV0CKB7mgVLpWUWaDpOyhNJRDkKKe7x4rRfTHZ32GwpXdkw==}
     peerDependencies:
@@ -4562,7 +4560,7 @@ snapshots:
       stats.js: 0.17.0
       suspend-react: 0.1.3(react@19.3.1)
       three: 0.186.1
-      three-mesh-bvh: 0.8.3(three@0.186.1)
+      three-mesh-bvh: 0.9.16(three@0.186.1)
       three-stdlib: 2.36.1(three@0.186.1)
       troika-three-text: 0.52.5(three@0.186.1)
       tunnel-rat: 0.1.2(@types/react@19.3.0)(react@19.3.1)
@@ -6841,10 +6839,6 @@ snapshots:
   tailwindcss@4.3.3: {}
 
   tapable@2.3.3: {}
-
-  three-mesh-bvh@0.8.3(three@0.186.1):
-    dependencies:
-      three: 0.186.1
 
   three-mesh-bvh@0.9.16(three@0.186.1):
     dependencies:
