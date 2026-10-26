@@ -1,4 +1,9 @@
 import { defineConfig } from "@playwright/test";
+import { resolve } from "node:path";
+const connected = Boolean(process.env.NEXT_PUBLIC_API_URL);
+const port = Number(process.env.PW_PORT ?? (connected ? 3100 : 3200));
+const apiURL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
+const root = resolve(__dirname, "..");
 
 /*
   Usa el Google Chrome instalado en el sistema (channel "chrome") para no descargar navegadores.
@@ -10,22 +15,27 @@ export default defineConfig({
   testDir: "./tests/e2e",
   timeout: 45_000,
   fullyParallel: false,
+  workers: 1,
   reporter: [["list"]],
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: `http://localhost:${port}`,
     channel: process.env.PW_CHANNEL ?? "chrome",
     viewport: { width: 1600, height: 940 },
     locale: "es-ES",
     trace: "retain-on-failure",
   },
   projects: [
-    { name: "humo", testMatch: /humo\.spec\.ts/ },
+    { name: "humo", testMatch: /(?:humo|api)\.spec\.ts/ },
     { name: "capturas", testMatch: /capturas\.spec\.ts/ },
   ],
-  webServer: {
-    command: "corepack pnpm@10.18.0 dev",
-    url: "http://localhost:3000/proyecto",
-    reuseExistingServer: true,
-    timeout: 120_000,
-  },
+  webServer: [
+    ...(connected && !process.env.PW_EXTERNAL_API ? [{
+      command: "uv run --extra api python -m trazia.api", cwd: root,
+      url: `${apiURL}/health`, reuseExistingServer: false, timeout: 120_000,
+      env: { TRAZIA_DATA: `${root}/generated/e2e-api-${process.pid}`,
+        TRAZIA_ROOT: root, TRAZIA_PORT: new URL(apiURL).port || "8000", TRAZIA_QUEUE: "process" },
+    }] : []),
+    { command: `corepack pnpm@10.18.0 dev --port ${port}`,
+      url: `http://localhost:${port}/proyecto`, reuseExistingServer: false, timeout: 120_000 },
+  ],
 });

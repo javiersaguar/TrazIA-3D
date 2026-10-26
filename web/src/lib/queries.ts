@@ -9,7 +9,7 @@ import {
   getRevision,
   type BenchExtractor,
   type RevisionId,
-} from "./mock/api";
+} from "./api";
 
 export const qk = {
   revision: (rev: RevisionId) => ["revision", rev] as const,

@@ -141,3 +141,31 @@ Sin Docker, las variables de .env se pueden cargar con `uv run --env-file .env -
 Docker no está instalado en el equipo de desarrollo de esta fase. No se han construido ni arrancado
 las imágenes ni se ha medido GPU/Redis/Postgres en contenedores. Hay que ejecutar esos comandos
 antes de presentar el perfil de escala como probado.
+
+
+## Web conectada y tipos
+
+Sin `NEXT_PUBLIC_API_URL`, la web conserva la demo offline. Para conectar:
+
+```powershell
+# Terminal 1, raíz del repositorio
+uv run --extra api python -m trazia.api
+# Terminal 2, web/
+$env:NEXT_PUBLIC_API_URL = "http://127.0.0.1:8000"
+corepack pnpm dev
+```
+
+El cliente no sustituye errores de API por datos simulados. Las ediciones envían ETag e
+Idempotency-Key; se serializan por revisión y un conflicto 412 actualiza la consulta.
+Los IFC llevan una versión en la URL para cargar la geometría vigente sin cambiar el visor.
+Pipeline permite subir documentos de V-101 o reprocesar sus originales, crea una revisión
+nueva y muestra eventos SSE persistidos. La navegación conserva la conexión del trabajo.
+El selector A/B de Revisión sigue limitado a las revisiones de la demo; las revisiones de
+trabajos se consultan por su identificador en la API.
+
+`web/src/lib/api/openapi.json` refleja `create_app().openapi()`. Después de actualizarlo,
+ejecutar `corepack pnpm gen:api` desde web/ regenera schema.ts con openapi-typescript.
+`corepack pnpm gen:types` regenera el contrato de revisión desde su JSON Schema.
+Para verificar ambos transportes, ejecutar los comandos web con la variable definida y
+sin ella. Playwright arranca una API aislada y persistencia bajo generated/ para el modo
+conectado; `PW_EXTERNAL_API=1` permite usar un servidor ya iniciado.

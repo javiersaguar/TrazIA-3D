@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
+const connected = Boolean(process.env.NEXT_PUBLIC_API_URL);
 const SCREENS = [
   { path: "/proyecto", title: "Proyecto" },
   { path: "/pipeline", title: "Pipeline" },
@@ -22,7 +23,7 @@ test("las 6 pantallas cargan sin errores y avisan de que los datos son sintétic
   for (const s of SCREENS) {
     await page.goto(s.path);
     await expect(page.getByRole("heading", { level: 1, name: s.title })).toBeVisible();
-    await expect(page.getByText("Datos sintéticos · sin backend")).toBeVisible();
+    await expect(page.getByText(connected ? "Datos sintéticos · API local" : "Datos sintéticos · sin backend")).toBeVisible();
   }
   expect(errors, errors.join("\n")).toEqual([]);
 });
@@ -34,7 +35,7 @@ test("la barra lateral navega entre pantallas", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1, name: "Cambios" })).toBeVisible();
 });
 
-test("revisión por teclado: J selecciona, A acepta y Ctrl+Z deshace", async ({ page }) => {
+test("revisión por teclado: J selecciona, A acepta y Ctrl+Z deshace", async ({ page, request }) => {
   await page.goto("/revision");
   const queue = page.getByRole("listbox", { name: "Campos por revisar" });
   await expect(queue.getByRole("option").first()).toBeVisible();
@@ -49,6 +50,7 @@ test("revisión por teclado: J selecciona, A acepta y Ctrl+Z deshace", async ({ 
 
   await page.keyboard.press("Control+z");
   await expect(page.getByText("0 de 22")).toBeVisible();
+  if (connected) await expect.poll(async () => (await (await request.get(`${process.env.NEXT_PUBLIC_API_URL}/equipment/V-101/revisions/A`)).json()).equipment.diameter.state).toBe("candidate");
 });
 
 test("el menú de comandos lleva a una boquilla", async ({ page }) => {
@@ -64,6 +66,7 @@ test("el menú de comandos lleva a una boquilla", async ({ page }) => {
 
 test("el pipeline repite el recorrido y registra eventos", async ({ page }) => {
   await page.goto("/pipeline");
+  if (connected) await page.getByRole("button", { name: "Procesar demo", exact: true }).click();
   await expect(page.getByText("Pipeline: último trabajo")).toBeVisible({ timeout: 15_000 });
   await expect(page.getByRole("cell", { name: "GAD_V-101_revA.pdf" }).first()).toBeVisible();
 });

@@ -3,6 +3,8 @@
   Cada función es async y lee los archivos sintéticos de public/demo/.
   Para conectar la API real basta con sustituir el cuerpo por fetch al endpoint indicado.
 */
+import { apiEnabled, revisionResource } from "../api/config";
+import { apiUpdate } from "../api/client";
 import type { Revision } from "@/lib/types/revision";
 import type { BenchReport } from "./bench-types";
 import type { DiffReport } from "./diff-types";
@@ -25,13 +27,13 @@ export const DEMO = {
   revisions: {
     A: {
       json: "/demo/json/vessel_rev_a.json",
-      ifc: "/demo/ifc/rev_a.ifc",
-      pdf: "/demo/docs/GAD_V-101_revA.pdf",
+      get ifc() { return revisionResource("A", "ifc"); },
+      get pdf() { return revisionResource("A", "pdf"); },
     },
     B: {
       json: "/demo/json/vessel_rev_b.json",
-      ifc: "/demo/ifc/rev_b.ifc",
-      pdf: "/demo/docs/GAD_V-101_revB.pdf",
+      get ifc() { return revisionResource("B", "ifc"); },
+      get pdf() { return revisionResource("B", "pdf"); },
     },
   },
   changes: "/demo/json/changes.json",
@@ -69,6 +71,7 @@ export type FieldUpdate = {
 
 /** PATCH /revisions/{id}/fields/{path} */
 export async function updateField(update: FieldUpdate, current: ReviewField): Promise<ReviewField> {
+  if (apiEnabled) return apiUpdate(update);
   const seen = idempotency.get(update.idempotencyKey);
   if (seen) return seen;
   await wait(220);

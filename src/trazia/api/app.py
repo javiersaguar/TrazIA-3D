@@ -41,7 +41,9 @@ MAX_UPLOAD = 25 * 1024 * 1024
 class JobInput(Model):
     documents: list[str] = Field(min_length=1, max_length=30)
     project_id: Identifier = "DEMO-PLANT"
-    equipment_id: Identifier = "V101"
+    equipment_id: Identifier = Field(
+        default="vessel-001", description="ID estable del equipo; no cambia al renombrar el tag"
+    )
     revision: str = Field(default="C", min_length=1, max_length=50)
     strategy: str = Field(default="b_reglas", min_length=1, max_length=80)
     providers: list[str] = Field(default_factory=list, max_length=10)
@@ -215,7 +217,9 @@ def create_app(
                 revision = Revision.model_validate_json(row.payload)
                 item["kind"] = revision.equipment.kind
                 item["revisions"].append(row.revision)
-                item["ifcUrl"] = f"/revisions/{quote(row.id, safe='')}/ifc?draft=true"
+                item["ifcUrl"] = (
+                    f"/revisions/{quote(row.id, safe='')}/ifc?draft=true&v={row.version}"
+                )
                 item["status"] = "approved" if revision.approval else "draft"
             return list(grouped.values())
 

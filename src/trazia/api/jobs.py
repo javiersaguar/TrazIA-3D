@@ -51,7 +51,12 @@ def execute_pipeline(store: Store, job_id: str, request: dict):
             if document is None:
                 raise ValueError("Ha desaparecido un documento del trabajo")
             documents.append(
-                InputDocument(document.filename, store.read(document.sha256), document.document_id)
+                InputDocument(
+                    document.filename,
+                    store.read(document.sha256),
+                    document.document_id,
+                    document.revision,
+                )
             )
         previous = None
         if request.get("previous_id"):

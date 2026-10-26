@@ -13,6 +13,7 @@ class InputDocument:
     filename: str
     data: bytes
     document_id: str
+    revision: str | None = None
 
 
 @dataclass(frozen=True)
@@ -76,7 +77,10 @@ def process(
         try:
             for document in documents:
                 bundle = ingest_bytes(
-                    document.data, document.filename, document.document_id, revision
+                    document.data,
+                    document.filename,
+                    document.document_id,
+                    document.revision or revision,
                 )
                 bundles.append(bundle)
                 warnings.extend(bundle.warnings)
@@ -90,7 +94,17 @@ def process(
                     )
                 )
             candidates = LabelExtractor().extract(bundles)
-            emit(StageEvent("extract_labels", "ok", "", f"{len(candidates)} candidatos de reglas"))
+            emit(
+                StageEvent(
+                    "extract_labels",
+                    "ok",
+                    "",
+                    f"{sum(c.source.page is not None for c in candidates)} candidatos del plano",
+                )
+            )
+            hdm_count = sum(c.source.sheet is not None for c in candidates)
+            if hdm_count:
+                emit(StageEvent("extract_hdm", "ok", "", f"{hdm_count} atributos de hoja de datos"))
             result = assemble(
                 bundles,
                 candidates,

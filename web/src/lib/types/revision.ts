@@ -94,6 +94,7 @@ export type TokensIn = number | null;
 export type TokensOut = number | null;
 export type CostEur = number | null;
 export type ExternalCalls = number;
+export type AccountingComplete = boolean;
 
 export interface Revision {
   schema_version?: SchemaVersion;
@@ -241,4 +242,5 @@ export interface RunInfo {
   tokens_out?: TokensOut;
   cost_eur?: CostEur;
   external_calls: ExternalCalls;
+  accounting_complete?: AccountingComplete;
 }

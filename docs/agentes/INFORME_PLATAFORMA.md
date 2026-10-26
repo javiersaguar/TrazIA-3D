@@ -96,3 +96,45 @@ Ambos YAML se han validado contra el esquema oficial de Compose (hash en API.md)
 No hay Docker instalado: construcción, arranque de contenedores, GPU, Redis y Postgres reales
 quedan sin verificar. No se atribuyen cifras de rendimiento a esos perfiles.
 Los pesos de Ollama no se incluyen en el repositorio ni en la imagen.
+
+
+### Excepciones al reparto autorizadas
+
+Javier autorizó excluir Markdown del formateador de Ruff en pyproject.toml. La comprobación
+`uv run ruff format --check .` vuelve a pasar sin editar el documento de coordinación.
+También autorizó integrar Pipeline en features/pipeline, stores/pipeline y sus pruebas/configuración
+Playwright. El 3D permanece fuera del alcance y sin cambios.
+
+
+## Fase 5 · Web conectada
+
+Cliente con tipos OpenAPI, transporte conmutado por NEXT_PUBLIC_API_URL, ediciones con
+ETag/If-Match e idempotencia y sincronización de consultas. La URL del IFC cambia al editar
+para recargar la versión actual sin modificar el visor. La píldora identifica API local,
+dataset y errores de conexión. Un error de API no devuelve mocks como si fueran datos reales.
+
+Pipeline permite documentos propios de V-101 o los originales de la demo, crea revisiones
+nuevas y consume eventos SSE persistidos, con reanudación nativa y deduplicación. Las 16
+etapas del contrato están en el grafo. Solo los eventos recibidos activan sus tarjetas; las
+etapas no ejecutadas no se presentan como disponibles. El modo offline conserva su guion.
+El trabajo presenta segundos medidos, coste conocido y avisos/contabilidad parcial.
+
+Endpoints usados: documentos, equipo/revisiones, campos, IFC/documentos originales,
+trabajos/cancelación/eventos, diff y bench. Instrucciones de conexión y generación en API.md.
+Se conserva la revisión del documento al reprocesarlo, independiente de la revisión del modelo.
+
+### Límites y necesidades
+
+El selector de revisión de la pantalla de revisión sigue mostrando A/B. Los resultados de
+nuevos trabajos se acceden por ID desde la API; falta generalizar ese selector. Las estrategias
+A/C/D necesitan process de Lectura: el adaptador solo implementa B y devuelve un error explícito
+para las otras. No hay nuevos resultados de precisión ni coste GPU en esta fase.
+La autorización adicional sobre la pantalla de revisión está pendiente; no se ha editado.
+
+### Comprobaciones de cierre
+
+61/61 pruebas Python; Ruff check y format globales correctos. Typecheck, lint (sin errores,
+un aviso previo de TanStack Table), 13/13 pruebas unitarias y build pasan en ambos modos.
+Playwright: 9/9 con API real y 6/6 offline (las tres pruebas exclusivas de API se omiten).
+Inspección visual de Pipeline offline a 1600 px: grafo de 16 etapas, tarjetas y tabla cargan;
+captura local en generated/qa/pipeline-offline.png. No se modifica código del visor ni de Lectura.

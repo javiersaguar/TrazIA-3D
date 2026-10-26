@@ -38,7 +38,7 @@ export const NAV: NavGroup[] = [
         label: "Pipeline",
         icon: Workflow,
         shortcut: "2",
-        description: "Etapas que convierten los documentos en modelo. Repetición simulada sobre los documentos sintéticos de V-101.",
+        description: "Etapas que convierten los documentos en modelo. El aviso indica el origen de los eventos de cada ejecución.",
       },
       {
         href: "/revision",

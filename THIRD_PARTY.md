@@ -16,6 +16,7 @@ Licencias comprobadas en los metadatos de PyPI el 26/10/2026.
 | arq | MIT | Cola Redis y workers |
 | redis-py (transitiva de arq) | MIT | Cliente Redis |
 | psycopg / psycopg-binary | LGPL-3.0-only | Adaptador Postgres sin modificar |
+| openapi-typescript 7.13.0 | MIT | Tipos del cliente desde el esquema OpenAPI |
 
 No se añade ninguna dependencia AGPL. El contenedor Redis utilizará una versión 7.2 BSD;
 no se incluye ni se modifica su código en este repositorio.

@@ -37,3 +37,6 @@ extend-exclude = [".claude", ".agents"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
+
+[tool.ruff.format]
+exclude = ["*.md"]
