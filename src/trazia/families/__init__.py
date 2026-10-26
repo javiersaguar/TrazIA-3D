@@ -218,7 +218,7 @@ def parts(equipment: Equipment) -> list[Part]:
                 origin=origin,
                 direction=direction,
             ),
-            key=f"nozzle/{nozzle.id}",
+            key=f"nozzle/{nozzle.stable_id or nozzle.id}",
             ifc_class="IfcPipeSegment",
             kind="NOZZLE",
         )
@@ -235,7 +235,7 @@ def parts(equipment: Equipment) -> list[Part]:
                     origin=tuple(a + distance * b for a, b in zip(origin, direction)),
                     direction=direction,
                 ),
-                key=f"nozzle/{nozzle.id}/flange",
+                key=f"nozzle/{nozzle.stable_id or nozzle.id}/flange",
                 ifc_class="IfcPipeFitting",
                 kind="FLANGE",
             )

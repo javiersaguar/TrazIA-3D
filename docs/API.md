@@ -163,8 +163,8 @@ nueva y muestra eventos SSE persistidos. La navegación conserva la conexión de
 El selector A/B de Revisión sigue limitado a las revisiones de la demo; las revisiones de
 trabajos se consultan por su identificador en la API.
 
-`web/src/lib/api/openapi.json` refleja `create_app().openapi()`. Después de actualizarlo,
-ejecutar `corepack pnpm gen:api` desde web/ regenera schema.ts con openapi-typescript.
+`corepack pnpm gen:api` desde web/ exporta `create_app().openapi()` con uv y regenera
+openapi.json y schema.ts con openapi-typescript, sin necesitar un servidor en ejecución.
 `corepack pnpm gen:types` regenera el contrato de revisión desde su JSON Schema.
 Para verificar ambos transportes, ejecutar los comandos web con la variable definida y
 sin ella. Playwright arranca una API aislada y persistencia bajo generated/ para el modo
@@ -208,3 +208,35 @@ Fuentes: [validación IfcOpenShell](https://docs.ifcopenshell.org/autoapi/ifcope
 Para referencias externas con GUID distintos pero nombres coincidentes y únicos, usar
 `compare-ifc ... --match name`. Este modo se elige explícitamente y rechaza nombres
 ambiguos; no empareja elementos por parecido visual sin una correspondencia comprobable.
+
+
+## Cambios en tres capas y BCF 2.1
+
+- GET /diff?from=A&to=B conserva la respuesta rápida de campos para la web.
+- GET /diff?from=A&to=B&layers=true añade páginas alineadas con OpenCV ECC, geometría
+  por GUID y comprobaciones cruzadas de regiones/campos y marcadores de revisión.
+- GET /diff/visual?from=A&to=B&document_id=GA-V101&page=1 devuelve PNG con diferencias
+  resaltadas; 409 si no se puede alinear, 422 si la página no existe.
+- GET /diff/bcf?from=A&to=B descarga un topic por cambio de campo, selección IFC y cámara.
+
+```bash
+uv run --extra api trazia diff examples/vessel_rev_a.json examples/vessel_rev_b.json --geometry -o generated/changes.json
+uv run --extra api trazia bcf examples/vessel_rev_a.json examples/vessel_rev_b.json -o generated/changes_DRAFT.bcfzip
+```
+
+La API instala el extra geo a través de su dependencia de extras; el CLI geométrico también
+puede instalarlo por separado. La diferencia visual verifica originales por SHA-256, usa
+traslación/rotación ECC acotada a 3 grados y 5 % de página y transforma evidencias y marcadores
+al marco de la página anterior. Si falla la alineación se informa, sin atribuir cambios.
+Se procesan hasta diez páginas por PDF común y hasta 200 regiones/marcadores por página.
+Los triángulos y nubes son candidatos heurísticos que hay que confirmar. Los cruces señalan
+campos sin región y regiones sin campo; un cajetín modificado también puede producir avisos.
+
+La capa geométrica usa distancias de vértices de mallas propias con discretización fija,
+en metros y por GUID; compare-ifc ofrece el contraste adicional contra superficies.
+No se incorpora un mapa de calor al visor protegido. BCF contiene cámaras, GUID, huellas y
+referencias documentales; no incluye originales privados ni declara aprobación automática.
+El formato se ha contrastado con los XSD oficiales de la etiqueta v2.1 de buildingSMART.
+
+Fuentes: [BCF 2.1](https://github.com/buildingSMART/BCF-XML/releases/tag/v2.1),
+[ECC OpenCV](https://docs.opencv.org/4.x/dc/d6b/group__video__track.html).

@@ -46,6 +46,11 @@ def main(argv=None) -> int:
     diff.add_argument("before", type=Path)
     diff.add_argument("after", type=Path)
     diff.add_argument("--output", "-o", type=Path)
+    diff.add_argument("--geometry", action="store_true")
+    bcf = commands.add_parser("bcf", help="Exportar cambios como BCF 2.1 DRAFT")
+    bcf.add_argument("before", type=Path)
+    bcf.add_argument("after", type=Path)
+    bcf.add_argument("--output", "-o", type=Path, required=True)
     schema = commands.add_parser("schema", help="Emitir JSON Schema")
     schema.add_argument("--output", "-o", type=Path)
     ingest = commands.add_parser("ingest", help="Leer PDF/XLSX/imagen y catalogar evidencia")
@@ -101,8 +106,22 @@ def main(argv=None) -> int:
             issues = validate_ifc(args.input)
             write_json({"valid": not issues, "issues": issues}, None)
             return 1 if issues else 0
+        elif args.command == "bcf":
+            from .bcf import export_bcf
+
+            payload = export_bcf(load_revision(args.before), load_revision(args.after))
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_bytes(payload)
+            print(f"BCF DRAFT: {args.output}")
         elif args.command == "diff":
-            write_json(compare(load_revision(args.before), load_revision(args.after)), args.output)
+            write_json(
+                compare(
+                    load_revision(args.before),
+                    load_revision(args.after),
+                    include_geometry=args.geometry,
+                ),
+                args.output,
+            )
         elif args.command == "ingest":
             from .ingest import ingest_bytes
 

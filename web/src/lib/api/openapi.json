@@ -727,6 +727,16 @@
               "default": "B",
               "title": "To"
             }
+          },
+          {
+            "name": "layers",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Layers"
+            }
           }
         ],
         "responses": {
@@ -755,12 +765,112 @@
       "get": {
         "summary": "Bcf",
         "operationId": "bcf_diff_bcf_get",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "A",
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "B",
+              "title": "To"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/diff/visual": {
+      "get": {
+        "summary": "Diff Visual",
+        "operationId": "diff_visual_diff_visual_get",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "A",
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "B",
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -1001,8 +1111,8 @@
           },
           "value": {
             "type": "number",
-            "exclusiveMaximum": 360.0,
-            "minimum": 0.0,
+            "exclusiveMaximum": 360,
+            "minimum": 0,
             "title": "Value"
           },
           "unit": {
@@ -1427,7 +1537,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 1.0
+                "minimum": 1
               },
               {
                 "type": "null"
@@ -1494,7 +1604,7 @@
           },
           "value": {
             "type": "number",
-            "minimum": 0.0,
+            "minimum": 0,
             "title": "Value"
           },
           "unit": {
@@ -1788,8 +1898,8 @@
             "anyOf": [
               {
                 "type": "number",
-                "maximum": 3600.0,
-                "minimum": 0.0
+                "maximum": 3600,
+                "minimum": 0
               },
               {
                 "type": "null"
@@ -1891,8 +2001,8 @@
           },
           "level": {
             "type": "number",
-            "exclusiveMaximum": 1.0,
-            "exclusiveMinimum": 0.0,
+            "exclusiveMaximum": 1,
+            "exclusiveMinimum": 0,
             "title": "Level"
           },
           "method": {
@@ -1981,22 +2091,22 @@
           },
           "timeout_seconds": {
             "type": "number",
-            "maximum": 3600.0,
-            "exclusiveMinimum": 0.0,
+            "maximum": 3600,
+            "exclusiveMinimum": 0,
             "title": "Timeout Seconds",
             "default": 300
           },
           "max_attempts": {
             "type": "integer",
-            "maximum": 5.0,
-            "minimum": 1.0,
+            "maximum": 5,
+            "minimum": 1,
             "title": "Max Attempts",
             "default": 3
           },
           "retry_backoff_seconds": {
             "type": "number",
-            "maximum": 30.0,
-            "minimum": 0.0,
+            "maximum": 30,
+            "minimum": 0,
             "title": "Retry Backoff Seconds",
             "default": 1
           }
@@ -2051,6 +2161,19 @@
             "minLength": 1,
             "pattern": "^[A-Za-z0-9_-]+$",
             "title": "Id"
+          },
+          "stable_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stable Id"
           },
           "diameter": {
             "$ref": "#/components/schemas/Dimension"
@@ -2216,7 +2339,7 @@
           },
           "value": {
             "type": "number",
-            "exclusiveMinimum": 0.0,
+            "exclusiveMinimum": 0,
             "title": "Value"
           },
           "unit": {
@@ -2319,14 +2442,14 @@
           },
           "seconds": {
             "type": "number",
-            "minimum": 0.0,
+            "minimum": 0,
             "title": "Seconds"
           },
           "gpu_seconds": {
             "anyOf": [
               {
                 "type": "number",
-                "minimum": 0.0
+                "minimum": 0
               },
               {
                 "type": "null"
@@ -2338,7 +2461,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 0.0
+                "minimum": 0
               },
               {
                 "type": "null"
@@ -2350,7 +2473,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 0.0
+                "minimum": 0
               },
               {
                 "type": "null"
@@ -2362,7 +2485,7 @@
             "anyOf": [
               {
                 "type": "number",
-                "minimum": 0.0
+                "minimum": 0
               },
               {
                 "type": "null"
@@ -2372,7 +2495,7 @@
           },
           "external_calls": {
             "type": "integer",
-            "minimum": 0.0,
+            "minimum": 0,
             "title": "External Calls"
           },
           "accounting_complete": {
@@ -2403,7 +2526,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 1.0
+                "minimum": 1
               },
               {
                 "type": "null"
@@ -2467,8 +2590,8 @@
           },
           "confidence": {
             "type": "number",
-            "maximum": 1.0,
-            "minimum": 0.0,
+            "maximum": 1,
+            "minimum": 0,
             "title": "Confidence"
           },
           "reviewed": {

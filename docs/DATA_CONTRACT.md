@@ -101,7 +101,7 @@ del contenido. Modificar datos requiere una nueva revisión.
 
 La comparación separa cambios semánticos (valor/unidad), de evidencia y de catálogo.
 La unidad de un atributo es parte del significado: el mismo número en bar y MPa cambia.
-No se aplica todavía equivalencia entre 1 bar y 100 kPa.
+Con el extra geo/API se reconocen equivalencias físicas; 1 bar y 100 kPa se registran como cambio de procedencia, sin cambio de valor físico.
 
 Los JSON sintéticos de la fase 0.1 eran un borrador local sin publicar. La versión 0.2
 añade unidades por campo, tag trazable, fondos, faldón y aprobación; no es compatible con
@@ -145,3 +145,20 @@ orejetas u otros soportes de nivel 2/3 falla hasta aportar una familia compatibl
 `fields()` recorre todos los parámetros: IDs estables para boquillas/tramos/detalles, índices
 0/1 solo para saddle_positions. Se conservan las rutas históricas y los GUID del ejemplo.
 El IFC incluye LOD, Family y campos completos en TrazIA_Traceability.
+
+
+## Identidad de boquillas y comparación
+
+`nozzles[].stable_id` es opcional y administrativo: preserva el GUID si cambia el nombre `id`.
+Sin él, se conserva el algoritmo histórico basado en id. Los stable_id efectivos deben ser
+únicos. Con previous_id aprobado, el trabajo empareja boquillas y propaga identidades en una
+copia DRAFT; no hereda una aprobación. La comparación de consulta no modifica revisiones.
+El emparejamiento húngaro de nombres nuevos usa servicio, DN, posición y dirección;
+los empates cercanos quedan ambiguos y no reciben identidad automáticamente. Su coste
+es heurístico, no una probabilidad de acierto calibrada.
+
+La comparación separa equivalencia física y tolerancia de la huella: ignorar una diferencia
+menor de 0,1 mm para el informe no conserva una aprobación si el dato fue modificado.
+Tolerancia angular por defecto: 0,01 grados con distancia circular. Los atributos numéricos
+usan equivalencia de unidades con Pint; las temperaturas con C se interpretan como degC
+solo en campos de temperatura. Las tolerancias se pueden pasar por ruta al comparador.

@@ -272,6 +272,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/diff/visual": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Diff Visual */
+        get: operations["diff_visual_diff_visual_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/bench": {
         parameters: {
             query?: never;
@@ -701,6 +718,8 @@ export interface components {
         Nozzle: {
             /** Id */
             id: string;
+            /** Stable Id */
+            stable_id?: string | null;
             diameter: components["schemas"]["Dimension"];
             projection: components["schemas"]["Dimension"];
             elevation: components["schemas"]["Elevation"];
@@ -1348,6 +1367,7 @@ export interface operations {
             query?: {
                 from?: string;
                 to?: string;
+                layers?: boolean;
             };
             header?: never;
             path?: never;
@@ -1377,7 +1397,10 @@ export interface operations {
     };
     bcf_diff_bcf_get: {
         parameters: {
-            query?: never;
+            query?: {
+                from?: string;
+                to?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1391,6 +1414,49 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    diff_visual_diff_visual_get: {
+        parameters: {
+            query: {
+                document_id: string;
+                page?: number;
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

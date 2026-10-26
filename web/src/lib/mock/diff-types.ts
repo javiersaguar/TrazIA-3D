@@ -9,7 +9,7 @@ export type DiffValue = { value: number | string; unit: string };
 
 export type FieldChange = {
   path: string;
-  operation: "added" | "removed" | "modified";
+  operation: "added" | "removed" | "modified" | "renamed";
   before: DiffValue | null;
   after: DiffValue | null;
   affects_geometry: boolean;

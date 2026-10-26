@@ -489,18 +489,78 @@ def create_app(
         request: Request,
         before: str = Query("A", alias="from"),
         after: str = Query("B", alias="to"),
+        layers: bool = False,
     ):
         with Session(request.app.state.store.engine) as session:
             a = Revision.model_validate_json(get_revision(session, before).payload)
             b = Revision.model_validate_json(get_revision(session, after).payload)
         try:
-            return compare(a, b)
+            originals = (
+                {
+                    d.sha256: request.app.state.store.read(d.sha256)
+                    for d in a.documents + b.documents
+                }
+                if layers
+                else None
+            )
+            return compare(a, b, include_geometry=layers, originals=originals)
         except ValueError as error:
             raise HTTPException(422, str(error)) from error
 
     @app.get("/diff/bcf")
-    def bcf():
-        raise HTTPException(501, "BCF estará disponible al cerrar la fase de cambios")
+    def bcf(
+        request: Request,
+        before: str = Query("A", alias="from"),
+        after: str = Query("B", alias="to"),
+    ):
+        from trazia.bcf import export_bcf
+
+        with Session(request.app.state.store.engine) as session:
+            a = Revision.model_validate_json(get_revision(session, before).payload)
+            b = Revision.model_validate_json(get_revision(session, after).payload)
+        try:
+            payload = export_bcf(a, b)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from error
+        return Response(
+            payload,
+            media_type="application/zip",
+            headers={"Content-Disposition": "attachment; filename=changes_DRAFT.bcfzip"},
+        )
+
+    @app.get("/diff/visual")
+    def diff_visual(
+        request: Request,
+        document_id: str,
+        page: int = Query(1, ge=1),
+        before: str = Query("A", alias="from"),
+        after: str = Query("B", alias="to"),
+    ):
+        from trazia.families.change_detection import render_pdf, visual_diff_images
+
+        with Session(request.app.state.store.engine) as session:
+            a = Revision.model_validate_json(get_revision(session, before).payload)
+            b = Revision.model_validate_json(get_revision(session, after).payload)
+        originals = []
+        for revision in (a, b):
+            document = next(
+                (
+                    d
+                    for d in revision.documents
+                    if d.id == document_id and d.filename.lower().endswith(".pdf")
+                ),
+                None,
+            )
+            if document is None:
+                raise HTTPException(404, "Falta ese PDF en una revisión")
+            try:
+                originals.append(render_pdf(request.app.state.store.read(document.sha256), page))
+            except ValueError as error:
+                raise HTTPException(422, str(error)) from error
+        result, image = visual_diff_images(*originals, return_png=True)
+        if image is None:
+            raise HTTPException(409, result.get("detail", "No se pudo alinear"))
+        return Response(image, media_type="image/png", headers={"X-Alignment": result["method"]})
 
     @app.get("/bench")
     def bench(extractor: Literal["etiquetas", "combinado"] = "etiquetas"):

@@ -91,6 +91,7 @@ export type Explanation3 = string | null;
 export type Value4 = number | string;
 export type Unit4 = string;
 export type Id5 = string;
+export type StableId = string | null;
 export type State4 = "candidate" | "conflict" | "abstained" | "accepted" | "corrected" | "assumed";
 export type Alternatives4 = Alternative[];
 export type Explanation4 = string | null;
@@ -278,6 +279,7 @@ export interface Attribute {
 }
 export interface Nozzle {
   id: Id5;
+  stable_id?: StableId;
   diameter: Dimension;
   projection: Dimension;
   elevation: Elevation;

@@ -192,3 +192,36 @@ específicas de IFC son ahora 21. Typecheck, lint (aviso TanStack previo), 13 pr
 y build correctos. Playwright: 10/10 con API y 7/7 offline (3 exclusivas omitidas), incluido
 /lab/3d. La espera de pruebas para procesamiento/visor admite la validación EXPRESS real;
 no se altera la lógica ni se simula su finalización. No hay push ni cambios en el 3D.
+
+
+## Fase 8 · Cambios y BCF
+
+Campos con equivalencias Pint, tolerancias y emparejamiento húngaro de boquillas nuevas.
+Identidad estable opcional, propagada en trabajos con revisión previa aprobada. Los casos
+ambiguos no se asignan. Diferencia por GUID en mallas IFC; comparación visual ECC con
+originales verificados, marco de coordenadas común, regiones y marcadores candidatos.
+Cruces señalan discrepancias para revisión. Todas las operaciones conservan datos DRAFT.
+
+GET /diff admite layers=true; el modo rápido permite que la pantalla de cambios muestre
+campos sin esperar al contraste de todas las capas. Rutas nuevas /diff/visual (PNG) y
+/diff/bcf (BCF 2.1), y comandos diff --geometry y bcf. El comparador no escribe ni aprueba.
+El visor 3D permanece intacto. Contrato/types actualizados para stable_id y operación renamed.
+
+14 pruebas específicas pasan: equivalencias, unidades incompatibles, tolerancias sin alterar
+huella, renombrados/GUID, ambigüedad, desplazamiento de página, nubes/triángulos candidatos,
+transformación de evidencia, rechazo de hash y geometría de las revisiones de la demo.
+El BCF de A→B tiene ocho topics; sus 18 documentos XML pasan los XSD oficiales v2.1.
+Hashes de esquemas usados: markup 15e9af22065870d93ad45431147748adc5b32ef830d6dfe7b4eb10cf5e6c4441;
+visinfo c46100eeab8211ecd62b888fdb41d1c0c47b74fa210e35da18259ddf6156e7b9;
+version bb1d108e349423fef4a69ecc1648797e7e73a18ee994bcdf98f978a6a3adf899;
+project a1b45e394cadf076209f22ec9f2225039932f580a50cd898c14c4cb9b1c9d5d2.
+
+Límites: umbrales heurísticos por validar con datos TR; diez páginas por PDF y 200 regiones
+por página. Nubes/Δ no son detecciones certificadas; el resultado puede ser un aviso falso.
+La UI de Cambios existente consume campos/IFC; las nuevas capas se consultan por API/PNG/BCF.
+No se editan pantallas protegidas para incorporar nuevos controles fuera del reparto.
+
+Cierre: 119/119 pruebas Python, Ruff global correcto. Typecheck, lint (aviso TanStack previo),
+13 pruebas unitarias y build correctos. Playwright 10/10 conectado y 7/7 offline (3 exclusivas
+omitidas), incluido el laboratorio 3D. gen:api exporta ahora el esquema desde FastAPI con uv
+antes de generar tipos, para no dejar un JSON de OpenAPI desactualizado. Sin push.

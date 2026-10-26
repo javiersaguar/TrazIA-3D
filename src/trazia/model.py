@@ -267,6 +267,7 @@ class Document(Model):
 
 class Nozzle(Model):
     id: Identifier
+    stable_id: Identifier | None = None
     diameter: Dimension
     projection: Dimension
     elevation: Elevation
@@ -338,6 +339,9 @@ class Equipment(Model):
         ids = [n.id for n in self.nozzles]
         if len(ids) != len(set(ids)):
             raise ValueError("Las boquillas deben tener identificadores únicos")
+        stable_ids = [n.stable_id or n.id for n in self.nozzles]
+        if len(stable_ids) != len(set(stable_ids)):
+            raise ValueError("Las identidades estables de boquillas deben ser únicas")
         for name in GEOMETRY_FIELDS:
             value = getattr(self, name)
             if value is not None and value.value <= 0:

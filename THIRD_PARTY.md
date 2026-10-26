@@ -49,3 +49,19 @@ Las imágenes upstream conservan los avisos de sus componentes de sistema.
 
 Metadatos de las distribuciones instaladas comprobados el 26/10/2026. Se conservan sus avisos.
 [Licencia de libspatialindex](https://raw.githubusercontent.com/libspatialindex/libspatialindex/master/COPYING).
+
+
+## Cambios visuales y unidades
+
+| Dependencia | Licencia | Uso |
+| --- | --- | --- |
+| Pint 0.26.2 | BSD-3-Clause | Equivalencias de unidades y temperaturas con offset |
+| flexcache 0.3 / flexparser 0.4 | BSD-3-Clause | Dependencias de Pint |
+| platformdirs 4.13.5 | MIT | Rutas de caché de Pint |
+| opencv-python-headless 4.14.0.94 | Apache-2.0 (OpenCV), MIT (empaquetado) | ECC y contornos sin GUI |
+| FFmpeg incluido en la rueda OpenCV | LGPL-2.1 | Binario sin modificar; se conservan sus avisos |
+| lxml (herramienta temporal de validación XML) | BSD-3-Clause, más avisos de libxml2/libxslt incluidos | Verificar BCF frente a XSD oficiales; no se añade al runtime |
+
+Metadatos instalados comprobados el 26/10/2026.
+[Licencias OpenCV y ruedas](https://github.com/opencv/opencv-python#licensing).
+Los XSD oficiales de BCF 2.1 se descargan solo a generated/ para comprobación local; no se redistribuyen.

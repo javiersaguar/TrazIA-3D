@@ -263,3 +263,21 @@ def test_api_downloads_valid_multischema_ifc(client, schema):
     assert model.schema == schema
     assert len(model.by_type("IfcDistributionPort")) == 3
     assert not validate_ifc(model)
+
+
+def test_diff_serves_three_layers_bcf_and_aligned_page(client):
+    import io
+    import zipfile
+
+    report = client.get("/diff?layers=true").json()
+    assert report["summary"]["changes"] == 8
+    assert report["layers"]["visual"]["status"] == "ok"
+    assert report["layers"]["geometry"]["status"] == "ok"
+    image = client.get("/diff/visual?document_id=GA-V101&page=1")
+    assert image.status_code == 200 and image.content.startswith(b"\x89PNG")
+    assert client.get("/diff/visual?document_id=unknown").status_code == 404
+    assert client.get("/diff/visual?document_id=GA-V101&page=999").status_code == 422
+    bcf = client.get("/diff/bcf")
+    assert bcf.status_code == 200
+    with zipfile.ZipFile(io.BytesIO(bcf.content)) as archive:
+        assert len([n for n in archive.namelist() if n.endswith("markup.bcf")]) == 8

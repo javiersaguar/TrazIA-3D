@@ -86,7 +86,7 @@ def enrich(model, revision, products, *, draft, pset, axis, guid):
         port = ifcopenshell.api.root.create_entity(
             model, ifc_class="IfcDistributionPort", name=f"{equipment.tag.value}/{nozzle.id}/port"
         )
-        port.GlobalId = guid(f"{base}/nozzle/{nozzle.id}/port")
+        port.GlobalId = guid(f"{base}/nozzle/{nozzle.stable_id or nozzle.id}/port")
         port.FlowDirection = "NOTDEFINED"
         if model.schema != "IFC2X3":
             port.PredefinedType = "PIPE"
@@ -99,14 +99,14 @@ def enrich(model, revision, products, *, draft, pset, axis, guid):
         if model.schema == "IFC2X3":
             relation(
                 "IfcRelConnectsPortToElement",
-                f"nozzle/{nozzle.id}/port/attachment",
+                f"nozzle/{nozzle.stable_id or nozzle.id}/port/attachment",
                 RelatingPort=port,
                 RelatedElement=product,
             )
         else:
             relation(
                 "IfcRelNests",
-                f"nozzle/{nozzle.id}/port/attachment",
+                f"nozzle/{nozzle.stable_id or nozzle.id}/port/attachment",
                 RelatingObject=product,
                 RelatedObjects=[port],
             )

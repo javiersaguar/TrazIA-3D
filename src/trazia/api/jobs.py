@@ -84,6 +84,10 @@ def execute_pipeline(store: Store, job_id: str, request: dict):
         return result, None
     revision = Revision.model_validate_json(result.revision.model_dump_json())
     revision.approval = None
+    if previous is not None:
+        from trazia.families.change_detection import preserve_nozzle_identity
+
+        revision = preserve_nozzle_identity(previous, revision)
     revision.run = result.run
     expected = (
         request["project_id"],
