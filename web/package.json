@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "gen:types": "node scripts/gen-types.mjs",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --project=humo",
     "capturas": "playwright test --project=capturas"
   },
   "dependencies": {

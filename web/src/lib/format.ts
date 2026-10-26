@@ -1,7 +1,9 @@
-const numberFormat = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 2 });
+// useGrouping "always": en es-ES los números de 4 cifras no se agrupan por defecto (4800 → 4.800)
+const numberFormat = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 2, useGrouping: "always" });
 const signedFormat = new Intl.NumberFormat("es-ES", {
   maximumFractionDigits: 2,
   signDisplay: "exceptZero",
+  useGrouping: "always",
 });
 const percentFormat = new Intl.NumberFormat("es-ES", {
   style: "percent",

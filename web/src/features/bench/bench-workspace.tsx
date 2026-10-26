@@ -138,7 +138,7 @@ function ReliabilityFrame() {
   const ticks = [0, 0.25, 0.5, 0.75, 1];
   return (
     <figure className="relative">
-      <svg viewBox="0 0 320 240" className="h-[260px] w-full text-muted" role="img" aria-label="Diagrama de fiabilidad vacío">
+      <svg viewBox="0 0 320 252" className="h-[270px] w-full text-muted" role="img" aria-label="Diagrama de fiabilidad vacío">
         <g transform="translate(40 12)">
           {ticks.map((t) => (
             <g key={t}>
@@ -160,7 +160,7 @@ function ReliabilityFrame() {
           Acierto real
         </text>
       </svg>
-      <figcaption className="absolute inset-x-0 top-[38%] text-center text-[13px] text-muted">
+      <figcaption className="absolute top-[34%] left-1/2 -translate-x-1/2 rounded-[var(--radius-control)] border border-border bg-surface px-3 py-1.5 text-[13px] whitespace-nowrap text-muted">
         Sin datos de calibración todavía
       </figcaption>
     </figure>

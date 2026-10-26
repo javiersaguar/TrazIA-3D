@@ -17,7 +17,8 @@ pnpm dev          # http://localhost:3000
 pnpm typecheck
 pnpm lint
 pnpm build
-pnpm test:e2e     # Playwright con Microsoft Edge instalado en el sistema
+pnpm test:e2e     # Playwright con el Chrome del sistema (PW_CHANNEL=msedge para Edge)
+pnpm capturas     # capturas de las 6 pantallas en oscuro y claro → docs/capturas/
 ```
 
 ## Datos

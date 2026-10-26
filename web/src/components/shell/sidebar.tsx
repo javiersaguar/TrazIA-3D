@@ -21,11 +21,12 @@ export function Sidebar() {
   const toggle = useUi((s) => s.toggleSidebar);
 
   return (
+    // El fondo ocupa toda la altura de la página; el contenido queda fijo al desplazarse
     <aside
-      style={{ viewTransitionName: "app-sidebar", width: collapsed ? "var(--sidebar-collapsed)" : "var(--sidebar-width)" }}
-      className="sticky top-0 flex h-dvh shrink-0 flex-col border-r border-border bg-sidebar"
-      aria-label="Navegación principal"
+      style={{ width: collapsed ? "var(--sidebar-collapsed)" : "var(--sidebar-width)" }}
+      className="shrink-0 border-r border-border bg-sidebar"
     >
+      <div style={{ viewTransitionName: "app-sidebar" }} className="sticky top-0 flex h-dvh flex-col">
       <div className={cn("flex h-16 items-center gap-3 px-3.5", collapsed && "justify-center px-0")}>
         <LogoMark />
         {!collapsed ? (
@@ -61,7 +62,7 @@ export function Sidebar() {
         </Tip>
       ) : null}
 
-      <nav className="flex-1 overflow-y-auto px-2.5 pb-4">
+      <nav aria-label="Navegación principal" className="flex-1 overflow-y-auto px-2.5 pb-4">
         {NAV.map((group) => (
           <div key={group.label} className="mt-4 first:mt-1">
             {!collapsed ? (
@@ -137,6 +138,7 @@ export function Sidebar() {
             {!collapsed ? "Salir" : null}
           </span>
         </Tip>
+      </div>
       </div>
     </aside>
   );

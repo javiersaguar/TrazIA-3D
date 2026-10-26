@@ -147,9 +147,9 @@ function StageCard({ def, run, onShowEvents }: { def: StageDef; run: StageRunSta
           <Icon icon={STAGE_ICON[def.id]} size={18} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="flex items-baseline gap-2">
-            <span className="font-semibold text-strong">{def.name}</span>
-            <Code>{def.code}</Code>
+          <p className="flex flex-wrap items-baseline gap-x-2">
+            <span className="font-semibold whitespace-nowrap text-strong">{def.name}</span>
+            <Code className="whitespace-nowrap">{def.code}</Code>
           </p>
           <div className="mt-1.5">{badge}</div>
         </div>
