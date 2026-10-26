@@ -178,6 +178,68 @@ p {
   }
 }
 
+/* Diálogos y menú de comandos: aparecen desde 98 % y se van más rápido de lo que llegan */
+.cmd-overlay[data-state="open"] {
+  animation: fade-in var(--dur-base) var(--ease-out);
+}
+.cmd-overlay[data-state="closed"] {
+  animation: fade-out var(--dur-fast) var(--ease-out);
+}
+.cmd-content[data-state="open"] {
+  animation: pop-in var(--dur-base) var(--ease-out);
+}
+.cmd-content[data-state="closed"] {
+  animation: pop-out var(--dur-fast) var(--ease-out);
+}
+.sheet-content[data-state="open"] {
+  animation: sheet-in var(--dur-slow) var(--ease-out);
+}
+.sheet-content[data-state="closed"] {
+  animation: sheet-out var(--dur-base) var(--ease-out);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    scale: 0.98;
+  }
+}
+@keyframes pop-out {
+  to {
+    opacity: 0;
+    scale: 0.98;
+  }
+}
+@keyframes sheet-in {
+  from {
+    translate: 24px 0;
+    opacity: 0;
+  }
+}
+@keyframes sheet-out {
+  to {
+    translate: 24px 0;
+    opacity: 0;
+  }
+}
+
+@keyframes tip-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
 /* Retícula de delineación para lienzos (plano / escena) */
 .drafting-grid {
   background-color: var(--surface-sunken);
