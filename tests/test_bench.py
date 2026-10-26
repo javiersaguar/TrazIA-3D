@@ -73,3 +73,44 @@ def test_report_is_written_in_spanish_and_labels_synthetic(bench_summary):
     assert "Datos sintéticos" in text
     assert "Fidelidad geométrica · 35 %" in text
     json.dumps(bench_summary)
+
+
+@pytest.fixture(scope="module")
+def combined_summary(tmp_path_factory):
+    dataset = tmp_path_factory.mktemp("synthetic-combined")
+    generate(dataset, cases=3, seed=21, styles=("plano",))
+    return summarize(run_bench(dataset, "combinado"))
+
+
+def test_drawing_extractor_reads_drawn_ga(combined_summary):
+    s = combined_summary["styles"]["plano"]
+    assert s["models_built"] == s["revisions"] == 6
+    assert s["geometry"]["field_accuracy"] == 1.0
+    assert s["geometry"]["ifc_mean_iou"] == pytest.approx(1.0)
+    assert s["delta"]["f1"] == 1.0
+
+
+def test_vertical_dimensions_are_checked_by_the_chain():
+    from trazia.extractors.drawing import DrawingExtractor
+    from trazia.ingest import Bundle, EvidenceLine
+    from trazia.model import Document, Source
+
+    def line(text, bbox):
+        source = Source(document_id="GA", page=1, locator="t", bbox=bbox, confidence=0.75)
+        return EvidenceLine(text=text, source=source)
+
+    doc = Document(id="GA", filename="ga.pdf", revision="1", sha256="0" * 64, page_count=1)
+    lines = [
+        line("T.L.", (0.32, 0.18, 0.33, 0.19)),
+        line("T.L.", (0.32, 0.70, 0.33, 0.71)),
+        line("05611", (0.05, 0.50, 0.06, 0.53)),  # 11650 al revés: total
+        line("0078", (0.08, 0.43, 0.09, 0.46)),  # 8700: virola
+        line("0562", (0.08, 0.77, 0.09, 0.80)),  # 2650: faldón
+        line("003", (0.11, 0.16, 0.12, 0.18)),  # 300: fondo
+    ]
+    bundle = Bundle(document=doc, media_type="pdf", lines=lines)
+    found = {c.path: c for c in DrawingExtractor().extract([bundle])}
+    assert found["height"].value == 8700
+    assert found["skirt_height"].value == 2650
+    assert found["head_depth"].value == 300
+    assert found["height"].source.confidence == 0.95

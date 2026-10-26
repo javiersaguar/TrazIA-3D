@@ -53,24 +53,47 @@ de sus elementos.
 El extractor es un parámetro (`--extractor`). Para medir uno nuevo, se implementa
 `trazia.extraction.Extractor` y se registra en `EXTRACTORS` de `bench/runner.py`.
 
-## Resultado actual (20 equipos, semilla 2026, extractor de etiquetas)
+## Extractores medidos
+
+| Nombre (`--extractor`) | Qué es |
+| --- | --- |
+| `etiquetas` | `LabelExtractor` del núcleo: líneas `ETIQUETA = valor unidad` |
+| `tablas` | `trazia.extractors.DrawingExtractor`: tabla de boquillas por cabecera, datos de diseño, diámetro, faldón, tag del cajetín y cotas verticales comprobadas con la cadena faldón + virola + fondo = total |
+| `combinado` | Los dos anteriores; los conflictos los bloquea el ensamblado |
+
+## Resultado actual (20 equipos, semilla 2026)
 
 | | rotulado | plano | escaneado |
 | --- | --- | --- | --- |
-| Revisiones con modelo IFC | 40 / 40 | 0 / 40 | 0 / 40 |
-| Campos geométricos correctos | 100 % | 0 % | 0 % |
-| Atributos correctos (valor + unidad) | 100 % | 100 % | 100 % |
-| F1 de cambios | 100 % | — | — |
-| ECE de la confianza | 0,25 | 0,25 | 0,25 |
+| **etiquetas** · revisiones con modelo IFC | 40 / 40 | 0 / 40 | 0 / 40 |
+| **etiquetas** · campos geométricos correctos | 100 % | 0 % | 0 % |
+| **combinado** · revisiones con modelo IFC | 40 / 40 | 40 / 40 | 0 / 40 |
+| **combinado** · campos geométricos correctos | 100 % | 100 % | 0 % |
+| **combinado** · F1 de cambios | 100 % | 100 % | — |
+| **combinado** · atributos correctos (valor + unidad) | 100 % | 100 % | 100 % |
+| **combinado** · ECE de la confianza | 0,25 | 0,12 | 0,25 |
+
+Con otra semilla (99, 40 equipos, solo «plano») el combinado da 80 de 80 modelos, 100 % de geometría y
+F1 de cambios del 100 %.
 
 Cómo leerlo:
 
-- La cadena funciona de punta a punta cuando el dato está rotulado: el error es 0 mm, el IoU de IFC es
-  1 y el F1 de cambios es 100 %.
-- El extractor actual **no lee planos dibujados ni escaneados**. Los atributos salen bien en todos los
-  estilos porque vienen del Excel.
-- La confianza fija de 0,75 está **mal calibrada** (acierta el 100 %). El ECE de 0,25 es la cifra que
-  la calibración (B.6) tiene que bajar por debajo de 0,05.
+- La cadena funciona de punta a punta: con el dato bien leído, el error es 0 mm, el IoU de IFC es 1 y
+  el F1 de cambios es 100 %.
+- `DrawingExtractor` lee los GA dibujados **de este generador**. Está pensado para su maqueta, así que
+  el 100 % mide robustez dentro de ese formato (cotas giradas con dígitos invertidos, rótulos
+  solapados, triángulos Δ), **no** frente a planos reales. Con el dataset del reto habrá que ajustar
+  nombres de columnas, posición del cajetín y convenciones de cotas, y medir de nuevo.
+- Los planos escaneados siguen a 0 %: falta OCR.
+- La confianza no está calibrada: las cifras fijas (0,75 a 0,95) aciertan casi siempre. El ECE es la
+  cifra que la calibración (B.6) tiene que bajar por debajo de 0,05.
+
+Durante el desarrollo, el bench encontró dos fallos de lectura del plano:
+
+- La cabecera de la tabla compartía altura con la cota de diámetro.
+- El número del triángulo Δ se tomaba por una cota.
+
+Los dos están corregidos y cubiertos por pruebas.
 
 ## Hallazgos para el núcleo
 
@@ -83,7 +106,9 @@ Cómo leerlo:
 
 ## Siguiente paso
 
-El hueco más grande con más peso es la geometría del estilo `plano` (35 %). Primero conviene un
-extractor de **tablas vectoriales** (tabla de boquillas y datos de diseño) y de **cotas** en PDF
-vectorial (ROADMAP B.1). Después, OCR para `escaneado`. Cada mejora se medirá aquí con las mismas
-cifras.
+1. **OCR** para el estilo `escaneado`: convertir la imagen en líneas con caja, para que
+   `DrawingExtractor` funcione igual.
+2. **Calibración** (B.6): usar los pares (confianza, acierto) de `report.json` para ajustar las
+   confianzas y bajar el ECE.
+3. Con el dataset del reto: ejecutar `bench` contra los 4 IFC de referencia y ajustar
+   `DrawingExtractor` a sus planos. Medir siempre separando lo sintético de lo real.

@@ -11,6 +11,7 @@ from pathlib import Path
 
 from synthetic.cases import VesselSpec, flatten, spec_from_dict, spec_to_revision
 from trazia.extraction import Candidate, Extractor, LabelExtractor, assemble
+from trazia.extractors import DrawingExtractor
 from trazia.ifc import build_ifc
 from trazia.ingest import ingest_bytes
 from trazia.model import Revision
@@ -19,7 +20,22 @@ from trazia.revisions import compare
 from .ifc_geometry import compare_models
 from .metrics import angle_error, distance, nozzle_face_center, same_value
 
-EXTRACTORS: dict[str, type] = {"etiquetas": LabelExtractor}
+
+class CombinedExtractor:
+    """Une los candidatos de varios extractores; los conflictos los resuelve el ensamblado."""
+
+    def __init__(self, *extractors: Extractor):
+        self.extractors = extractors or (LabelExtractor(), DrawingExtractor())
+
+    def extract(self, bundles):
+        return [c for extractor in self.extractors for c in extractor.extract(bundles)]
+
+
+EXTRACTORS: dict[str, type] = {
+    "etiquetas": LabelExtractor,
+    "tablas": DrawingExtractor,
+    "combinado": CombinedExtractor,
+}
 DIMENSIONS = ("diameter", "height", "head_depth", "skirt_height", "skirt_thickness")
 
 
