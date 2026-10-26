@@ -1,18 +1,22 @@
 import json
 from pathlib import Path
+from typing import Literal
 from uuid import NAMESPACE_URL, uuid5
 
 import ifcopenshell
 import ifcopenshell.api.aggregate
 import ifcopenshell.api.context
+import ifcopenshell.api.owner
 import ifcopenshell.api.pset
 import ifcopenshell.api.root
 import ifcopenshell.api.spatial
+import ifcopenshell.api.type
 import ifcopenshell.api.unit
 import ifcopenshell.guid
 
 from .families import Solid, parts
 from .families.geometry import head_mesh  # API histórica usada en pruebas geométricas.
+from .families.ifc_metadata import enrich, initialize_owner
 from .model import Revision, fields
 
 __all__ = ["build_ifc", "export_ifc", "head_mesh", "stable_guid"]
@@ -22,7 +26,12 @@ def stable_guid(key: str) -> str:
     return ifcopenshell.guid.compress(uuid5(NAMESPACE_URL, f"trazia:{key}").hex)
 
 
-def build_ifc(revision: Revision, *, draft: bool = True) -> ifcopenshell.file:
+def build_ifc(
+    revision: Revision,
+    *,
+    draft: bool = True,
+    schema: Literal["IFC4", "IFC4X3", "IFC2X3"] = "IFC4",
+) -> ifcopenshell.file:
     revision = Revision.model_validate_json(revision.model_dump_json())
     pending = revision.pending_review()
     if pending and not draft:
@@ -31,7 +40,10 @@ def build_ifc(revision: Revision, *, draft: bool = True) -> ifcopenshell.file:
         )
     if not draft and revision.approval is None:
         raise ValueError("Falta aprobación humana de esta revisión. Use --draft para borrador.")
-    model = ifcopenshell.file(schema="IFC4")
+    if schema not in ("IFC4", "IFC4X3", "IFC2X3"):
+        raise ValueError("Esquema IFC no soportado")
+    model = ifcopenshell.file(schema=schema)
+    initialize_owner(model)
     base = revision.project_id
 
     def root(ifc_class, name, key, **kwargs):
@@ -84,6 +96,19 @@ def build_ifc(revision: Revision, *, draft: bool = True) -> ifcopenshell.file:
 
     def solid_item(solid: Solid):
         if solid.kind == "mesh":
+            if schema == "IFC2X3":
+                points = [
+                    model.create_entity("IfcCartesianPoint", Coordinates=v) for v in solid.vertices
+                ]
+                faces = []
+                for triangle in solid.triangles:
+                    loop = model.create_entity(
+                        "IfcPolyLoop", Polygon=[points[i - 1] for i in triangle]
+                    )
+                    bound = model.create_entity("IfcFaceOuterBound", Bound=loop, Orientation=True)
+                    faces.append(model.create_entity("IfcFace", Bounds=[bound]))
+                shell = model.create_entity("IfcClosedShell", CfsFaces=faces)
+                return model.create_entity("IfcFacetedBrep", Outer=shell), "Brep"
             return model.create_entity(
                 "IfcTriangulatedFaceSet",
                 Coordinates=model.create_entity(
@@ -94,6 +119,11 @@ def build_ifc(revision: Revision, *, draft: bool = True) -> ifcopenshell.file:
             ), "Tessellation"
         if solid.kind == "cylinder":
             args = {"ProfileType": "AREA", "Radius": solid.diameter / 2000}
+            if schema == "IFC2X3":
+                args["Position"] = model.create_entity(
+                    "IfcAxis2Placement2D",
+                    Location=model.create_entity("IfcCartesianPoint", Coordinates=(0.0, 0.0)),
+                )
             if solid.thickness:
                 args["WallThickness"] = solid.thickness / 1000
             profile = model.create_entity(
@@ -172,23 +202,58 @@ def build_ifc(revision: Revision, *, draft: bool = True) -> ifcopenshell.file:
         "generic": "IfcBuildingElementProxy",
     }
     main_class = classes.get(equipment.kind, "IfcTank")
+    semantic_class = main_class
+    if schema == "IFC2X3":
+        main_class = {
+            "IfcTank": "IfcFlowStorageDevice",
+            "IfcPump": "IfcFlowMovingDevice",
+            "IfcCompressor": "IfcFlowMovingDevice",
+        }.get(main_class, main_class)
     vessel = root(
         main_class,
         tag,
         key,
         predefined_type="PRESSUREVESSEL"
-        if main_class == "IfcTank" and equipment.kind != "tank"
+        if semantic_class == "IfcTank" and equipment.kind != "tank"
         else "NOTDEFINED",
     )
     vessel.Tag = tag
+    if schema == "IFC2X3" and semantic_class != "IfcBuildingElementProxy":
+        element_type = root(
+            semantic_class + "Type",
+            f"{tag}/type",
+            f"{key}/type",
+            predefined_type="PRESSUREVESSEL"
+            if semantic_class == "IfcTank" and equipment.kind != "tank"
+            else "NOTDEFINED",
+        )
+        ifcopenshell.api.type.assign_type(
+            model, related_objects=[vessel], relating_type=element_type
+        )
     products = []
     traced = fields(equipment)
     for index, part in enumerate(parts(equipment)):
+        component_class = part.ifc_class
+        if schema == "IFC2X3":
+            component_class = {
+                "IfcPipeSegment": "IfcFlowSegment",
+                "IfcPipeFitting": "IfcFlowFitting",
+            }.get(component_class, component_class)
         product = (
             vessel
             if index == 0
-            else root(part.ifc_class, f"{tag}/{part.id}", f"{key}/{part.guid_key}")
+            else root(component_class, f"{tag}/{part.id}", f"{key}/{part.guid_key}")
         )
+        if index > 0 and schema == "IFC2X3" and component_class != part.ifc_class:
+            component_type = root(
+                part.ifc_class + "Type",
+                f"{tag}/{part.id}/type",
+                f"{key}/{part.guid_key}/type",
+                predefined_type="RIGIDSEGMENT" if part.ifc_class == "IfcPipeSegment" else "FLANGE",
+            )
+            ifcopenshell.api.type.assign_type(
+                model, related_objects=[product], relating_type=component_type
+            )
         if index > 0:
             product.Tag = part.id
             product.ObjectType = part.object_type
@@ -223,14 +288,12 @@ def build_ifc(revision: Revision, *, draft: bool = True) -> ifcopenshell.file:
             },
         )
         products.append(product)
-    ifcopenshell.api.spatial.assign_container(model, products=products, relating_structure=storey)
+    ifcopenshell.api.spatial.assign_container(model, products=[vessel], relating_structure=storey)
     if len(products) > 1:
-        model.create_entity(
-            "IfcRelAssignsToProduct",
-            GlobalId=stable_guid(f"{base}/{key}/components"),
-            RelatedObjects=products[1:],
-            RelatingProduct=vessel,
+        aggregation = ifcopenshell.api.aggregate.assign_object(
+            model, products=products[1:], relating_object=vessel
         )
+        aggregation.GlobalId = stable_guid(f"{base}/{key}/components")
     pset(
         vessel,
         "TrazIA_Traceability",
@@ -247,11 +310,27 @@ def build_ifc(revision: Revision, *, draft: bool = True) -> ifcopenshell.file:
             "TrazIA_Technical",
             {k: f"{v.value} {v.unit}" for k, v in equipment.attributes.items()},
         )
+    enrich(model, revision, products, draft=draft, pset=pset, axis=axis, guid=stable_guid)
     return model
 
 
-def export_ifc(revision: Revision, destination: Path, *, draft: bool = False) -> Path:
-    model = build_ifc(revision, draft=draft)
+def export_ifc(
+    revision: Revision,
+    destination: Path,
+    *,
+    draft: bool = False,
+    schema: Literal["IFC4", "IFC4X3", "IFC2X3"] = "IFC4",
+) -> Path:
+    model = build_ifc(revision, draft=draft, schema=schema)
     destination.parent.mkdir(parents=True, exist_ok=True)
     model.write(str(destination))
     return destination
+
+
+def validate_ifc(model_or_path, *, express_rules=True) -> list[dict]:
+    """Errores estructurales/EXPRESS; no certifica exactitud frente al plano."""
+    import ifcopenshell.validate
+
+    logger = ifcopenshell.validate.json_logger()
+    ifcopenshell.validate.validate(model_or_path, logger, express_rules=express_rules)
+    return [{"level": s["level"], "message": s["message"]} for s in logger.statements]

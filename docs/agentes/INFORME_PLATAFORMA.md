@@ -164,3 +164,31 @@ verifican por sus mallas IFC, dimensiones y GUID. Typecheck, lint, 13 pruebas un
 build pasan con/sin API; Playwright 9/9 conectado y 6/6 offline (3 exclusivas omitidas).
 Vista local revisable: generated/families/familias.html y cuatro IFC DRAFT de fixtures
 sintéticos (horizontal, columna, tanque y reserva de bomba). No son métricas de extracción.
+
+
+## Fase 7 · Semántica IFC, esquemas y métricas
+
+IFC4/4X3 y conversión explícita a las clases/tipos de IFC2X3; fondos BRep en 2X3.
+Componentes agregados, puertos con posición/dirección, documentos referenciados por SHA-256,
+Psets comunes y TrazIA_Provenance. IfcApproval solo en exportación humana aprobada.
+Names, GUID y número de productos con geometría del ejemplo permanecen estables.
+No se editan archivos del visor. Exportación API/CLI con selector schema; comando validate-ifc.
+
+Los trabajos validan IFC y reglas EXPRESS antes de publicar. Métricas opcionales con extra geo:
+IoU, Chamfer y Hausdorff muestreado por GUID, semilla fija y error por vértice. No se presenta
+el muestreo como máximo continuo garantizado ni como precisión contra el IFC de TR aún ausente.
+CLI compare-ifc y ejemplos en API.md. Docker instala geo; no se dispone de Docker para probar imagen.
+Licencias añadidas a THIRD_PARTY. Lectura puede seguir produciendo Revision sin tocar su interfaz.
+
+Las pruebas específicas cubren tres esquemas, cinco familias/reservas, puertos y originales,
+aprobación/invalidez y desplazamiento conocido de 0,2 m entre cajas. La batería específica
+pasa 20/20. El desplazamiento produce Hausdorff muestreado 0,2 m e IoU 2/3; son pruebas
+analíticas sintéticas, no resultados de extracción. El mapa por vértice queda disponible en JSON;
+la integración de ese mapa dentro del visor requiere al responsable del 3D.
+
+Cierre: 104/104 pruebas Python, Ruff global correcto. Se añade una prueba específica para
+referencias externas con GUID distintos y nombres únicos (--match name); las pruebas
+específicas de IFC son ahora 21. Typecheck, lint (aviso TanStack previo), 13 pruebas unitarias
+y build correctos. Playwright: 10/10 con API y 7/7 offline (3 exclusivas omitidas), incluido
+/lab/3d. La espera de pruebas para procesamiento/visor admite la validación EXPRESS real;
+no se altera la lógica ni se simula su finalización. No hay push ni cambios en el 3D.

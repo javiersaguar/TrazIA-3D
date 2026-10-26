@@ -34,7 +34,7 @@ test("Pipeline consume SSE y no utiliza el temporizador simulado", async ({ page
   const events = page.waitForResponse(response => response.url().startsWith(base!) && response.url().endsWith("/events"));
   await page.getByRole("button", { name: "Procesar demo", exact: true }).click();
   expect((await events).status()).toBe(200);
-  await expect(page.getByText(/Pipeline: último trabajo/)).toBeVisible();
+  await expect(page.getByText(/Pipeline: último trabajo/)).toBeVisible({ timeout: 30_000 });
   await expect(page.getByRole("cell", { name: /IFC4 DRAFT almacenado/ })).toBeVisible();
   const identity = (await page.getByText(/Trabajo [0-9a-f-]+/).innerText()).replace("Trabajo ", "");
   const job = await (await request.get(`${base}/jobs/${identity}`)).json();

@@ -27,10 +27,21 @@ def main(argv=None) -> int:
     migrate.add_argument("--output", "-o", type=Path, required=True)
     validate = commands.add_parser("validate", help="Validar contrato y estado de revisión")
     validate.add_argument("input", type=Path)
-    export = commands.add_parser("export", help="Exportar IFC4")
+    export = commands.add_parser("export", help="Exportar IFC4, IFC4X3 o IFC2X3")
     export.add_argument("input", type=Path)
     export.add_argument("--output", "-o", type=Path, required=True)
     export.add_argument("--draft", action="store_true")
+    export.add_argument("--schema", choices=("IFC4", "IFC4X3", "IFC2X3"), default="IFC4")
+    geometry = commands.add_parser(
+        "compare-ifc", help="Distancias de superficie por GUID (extra geo)"
+    )
+    geometry.add_argument("before", type=Path)
+    geometry.add_argument("after", type=Path)
+    geometry.add_argument("--samples", type=int, default=1024)
+    geometry.add_argument("--match", choices=("guid", "name"), default="guid")
+    geometry.add_argument("--output", "-o", type=Path)
+    ifc_validation = commands.add_parser("validate-ifc", help="Validar IFC y reglas EXPRESS")
+    ifc_validation.add_argument("input", type=Path)
     diff = commands.add_parser("diff", help="Comparar revisiones y evidencia")
     diff.add_argument("before", type=Path)
     diff.add_argument("after", type=Path)
@@ -77,6 +88,19 @@ def main(argv=None) -> int:
                 },
                 None,
             )
+        elif args.command == "compare-ifc":
+            from .families.metrics import compare_ifc
+
+            write_json(
+                compare_ifc(args.before, args.after, samples=args.samples, match=args.match),
+                args.output,
+            )
+        elif args.command == "validate-ifc":
+            from .ifc import validate_ifc
+
+            issues = validate_ifc(args.input)
+            write_json({"valid": not issues, "issues": issues}, None)
+            return 1 if issues else 0
         elif args.command == "diff":
             write_json(compare(load_revision(args.before), load_revision(args.after)), args.output)
         elif args.command == "ingest":
@@ -134,7 +158,9 @@ def main(argv=None) -> int:
         else:
             from .ifc import export_ifc
 
-            destination = export_ifc(load_revision(args.input), args.output, draft=args.draft)
+            destination = export_ifc(
+                load_revision(args.input), args.output, draft=args.draft, schema=args.schema
+            )
             print(f"IFC generado: {destination}")
     except (OSError, ValueError) as error:
         print(f"Error: {error}", file=sys.stderr)

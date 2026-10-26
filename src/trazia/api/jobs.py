@@ -7,7 +7,7 @@ import httpx
 from sqlalchemy import and_, or_, update
 from sqlmodel import Session, select
 
-from trazia.ifc import build_ifc
+from trazia.ifc import build_ifc, validate_ifc
 from trazia.model import Revision, RunInfo
 from trazia.queue.accounting import Accounting
 from trazia.store import DocumentRecord, EventRecord, JobRecord, RevisionRecord, Store
@@ -105,9 +105,12 @@ def execute_pipeline(store: Store, job_id: str, request: dict):
         f"{revision.equipment.kind}, nivel {revision.equipment.lod}",
     )
     model = build_ifc(revision, draft=True)
+    issues = validate_ifc(model)
+    if issues:
+        raise ValueError("IFC inválido: " + issues[0]["message"][:1000])
     digest = store.put(model.to_string().encode())
     emit(store, job_id, "ifc", "ok", "", f"IFC4 DRAFT almacenado: {digest[:12]}")
-    emit(store, job_id, "validate", "ok", "", "Contrato 0.3 válido y geometría IFC exportable")
+    emit(store, job_id, "validate", "ok", "", "Contrato 0.3 y validación IFC/EXPRESS correctos")
     return result, revision
 
 

@@ -36,3 +36,16 @@ no se incluye ni se modifica su código en este repositorio.
 
 Licencia de [Redis 7.2](https://raw.githubusercontent.com/redis/redis/7.2/COPYING).
 Las imágenes upstream conservan los avisos de sus componentes de sistema.
+
+
+## Geometría (extra geo)
+
+| Dependencia | Licencia | Uso |
+| --- | --- | --- |
+| trimesh 4.12.2 | MIT | Muestreo de superficies y distancias a triángulos |
+| scipy 1.18.1 | BSD-3-Clause (más avisos de bibliotecas incluidas en su distribución) | Índices y cálculos geométricos |
+| Rtree 1.4.1 | MIT | Índice espacial para proximidad |
+| libspatialindex incluida por Rtree (versión >=1.8) | MIT | Motor nativo de índice espacial, sin modificar |
+
+Metadatos de las distribuciones instaladas comprobados el 26/10/2026. Se conservan sus avisos.
+[Licencia de libspatialindex](https://raw.githubusercontent.com/libspatialindex/libspatialindex/master/COPYING).

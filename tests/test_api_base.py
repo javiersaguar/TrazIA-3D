@@ -249,3 +249,17 @@ def test_upload_limit_without_content_length(client):
         headers={**headers(), "Content-Type": "multipart/form-data; boundary=x"},
     )
     assert response.status_code == 413
+
+
+@pytest.mark.parametrize("schema", ["IFC4", "IFC4X3", "IFC2X3"])
+def test_api_downloads_valid_multischema_ifc(client, schema):
+    import ifcopenshell
+
+    from trazia.ifc import validate_ifc
+
+    response = client.get(f"/revisions/A/ifc?draft=true&schema={schema}")
+    assert response.status_code == 200
+    model = ifcopenshell.file.from_string(response.text)
+    assert model.schema == schema
+    assert len(model.by_type("IfcDistributionPort")) == 3
+    assert not validate_ifc(model)

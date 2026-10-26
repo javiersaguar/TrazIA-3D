@@ -169,3 +169,42 @@ ejecutar `corepack pnpm gen:api` desde web/ regenera schema.ts con openapi-types
 Para verificar ambos transportes, ejecutar los comandos web con la variable definida y
 sin ella. Playwright arranca una API aislada y persistencia bajo generated/ para el modo
 conectado; `PW_EXTERNAL_API=1` permite usar un servidor ya iniciado.
+
+
+## IFC multiesquema y comparación geométrica
+
+`GET /revisions/{id}/ifc?draft=true&schema=IFC4X3` admite IFC4 (por defecto), IFC4X3 e IFC2X3.
+La ruta mantiene las comprobaciones de aprobación y originales del flujo de revisión.
+Los trabajos validan contrato y reglas EXPRESS antes de publicar el IFC; un error no se
+presenta como modelo válido. Esta validación verifica estructura IFC, no exactitud del plano.
+
+```bash
+uv run --extra api trazia export examples/vessel_rev_a.json --draft --schema IFC2X3 -o generated/rev_a_2x3.ifc
+uv run --extra api trazia validate-ifc generated/rev_a_2x3.ifc
+uv run --extra geo trazia compare-ifc generated/rev_a.ifc referencia.ifc --samples 1024 -o generated/geometry.json
+```
+
+La comparación empareja elementos por GlobalId y usa mallas trianguladas del IFC en metros.
+Informa IoU de cajas, Chamfer simétrico no cuadrático y Hausdorff **muestreado**, con semilla
+reproducible y distancias por vértice para un mapa de error. Se comparan muestras con
+triángulos; el máximo observado no garantiza el máximo continuo de toda la superficie.
+Un GUID sin pareja aparece añadido/eliminado, sin inventar una correspondencia.
+Instalar `--extra geo` para estas métricas; Docker.api ya lo incluye.
+
+Entidades IFC4/4X3: Tank/Pump/Compressor, componentes agregados y un DistributionPort por
+boquilla en su extremo. IFC2X3 usa FlowStorageDevice/FlowMovingDevice/FlowSegment/FlowFitting
+con tipos TankType/PumpType/CompressorType/PipeSegmentType/PipeFittingType: esas clases de
+ocurrencia modernas no existen en 2X3. Conserva Names, GUID y geometría; los fondos usan BRep.
+
+DocumentReference apunta a urn:sha256 del original; su asociación y TrazIA_Provenance
+conservan hashes, fuentes y RunInfo. Los psets comunes añaden referencias y diámetro nominal.
+IfcApproval solo se añade a una exportación aprobada, tras revisión humana; un DRAFT no crea
+una aprobación automática. OwnerHistory identifica la aplicación local, sin autenticar personas.
+
+Fuentes: [validación IfcOpenShell](https://docs.ifcopenshell.org/autoapi/ifcopenshell/validate/index.html),
+[proximidad trimesh](https://trimesh.org/trimesh.proximity.html) y
+[metadatos de autor IFC](https://docs.ifcopenshell.org/autoapi/ifcopenshell/api/owner/settings/index.html).
+
+Para referencias externas con GUID distintos pero nombres coincidentes y únicos, usar
+`compare-ifc ... --match name`. Este modo se elige explícitamente y rechaza nombres
+ambiguos; no empareja elementos por parecido visual sin una correspondencia comprobable.

@@ -349,13 +349,11 @@ def create_app(
         schema: Literal["IFC4", "IFC4X3", "IFC2X3"] = "IFC4",
         draft: bool = False,
     ):
-        if schema != "IFC4":
-            raise HTTPException(501, "La exportación multiesquema está pendiente de la fase IFC")
         with Session(request.app.state.store.engine) as session:
             row = get_revision(session, identity)
             model = Revision.model_validate_json(row.payload)
         try:
-            content = build_ifc(model, draft=draft).to_string().encode()
+            content = build_ifc(model, draft=draft, schema=schema).to_string().encode()
         except ValueError as error:
             raise HTTPException(409, str(error)) from error
         filename = quote(f"{model.equipment.tag.value}_{model.revision}", safe="")
