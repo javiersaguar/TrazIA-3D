@@ -1,0 +1,327 @@
+{
+  "project_id": "DEMO-PLANT",
+  "equipment_id": "vessel-001",
+  "from_revision": "A",
+  "to_revision": "B",
+  "summary": {
+    "changes": 8,
+    "geometry_changes": 7,
+    "provenance_changes": 0,
+    "document_changes": 2
+  },
+  "changes": [
+    {
+      "path": "attributes.operating_weight",
+      "operation": "modified",
+      "before": {
+        "value": 12000.0,
+        "unit": "kg"
+      },
+      "after": {
+        "value": 12800.0,
+        "unit": "kg"
+      },
+      "affects_geometry": false,
+      "impact": "Actualizar propiedades IFC; revisar el dato técnico.",
+      "before_source": {
+        "document_id": "HDM-V101",
+        "page": null,
+        "sheet": "HDM",
+        "cell": "A5:C5",
+        "locator": "HDM!A5:C5",
+        "bbox": null,
+        "confidence": 0.75,
+        "reviewed": false
+      },
+      "after_source": {
+        "document_id": "HDM-V101",
+        "page": null,
+        "sheet": "HDM",
+        "cell": "A5:C5",
+        "locator": "HDM!A5:C5",
+        "bbox": null,
+        "confidence": 0.75,
+        "reviewed": false
+      }
+    },
+    {
+      "path": "height",
+      "operation": "modified",
+      "before": {
+        "value": 6000.0,
+        "unit": "mm"
+      },
+      "after": {
+        "value": 6500.0,
+        "unit": "mm"
+      },
+      "affects_geometry": true,
+      "impact": "Actualizar envolvente o soporte; revisar interfaces de civil y piping.",
+      "before_source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.24869501922935766,
+          0.51995420607769,
+          0.2629486662031065
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      },
+      "after_source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.24869501922935766,
+          0.51995420607769,
+          0.2629486662031065
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      }
+    },
+    {
+      "path": "nozzles.N3.elevation",
+      "operation": "modified",
+      "before": {
+        "value": 3500.0,
+        "unit": "mm"
+      },
+      "after": {
+        "value": 3700.0,
+        "unit": "mm"
+      },
+      "affects_geometry": true,
+      "impact": "Actualizar boquilla; revisar interfaces con piping.",
+      "before_source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.541344959874796,
+          0.7816750395405155,
+          0.5520351951051076
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      },
+      "after_source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.541344959874796,
+          0.7816750395405155,
+          0.5520351951051076
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      }
+    },
+    {
+      "path": "nozzles.N4.azimuth",
+      "operation": "added",
+      "before": null,
+      "after": {
+        "value": 270.0,
+        "unit": "deg"
+      },
+      "affects_geometry": true,
+      "impact": "Actualizar boquilla; revisar interfaces con piping.",
+      "before_source": null,
+      "after_source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.5793546851381262,
+          0.7816750395405155,
+          0.5900449203684378
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      }
+    },
+    {
+      "path": "nozzles.N4.diameter",
+      "operation": "added",
+      "before": null,
+      "after": {
+        "value": 100.0,
+        "unit": "mm"
+      },
+      "affects_geometry": true,
+      "impact": "Actualizar boquilla; revisar interfaces con piping.",
+      "before_source": null,
+      "after_source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.5793546851381262,
+          0.7816750395405155,
+          0.5900449203684378
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      }
+    },
+    {
+      "path": "nozzles.N4.elevation",
+      "operation": "added",
+      "before": null,
+      "after": {
+        "value": 6200.0,
+        "unit": "mm"
+      },
+      "affects_geometry": true,
+      "impact": "Actualizar boquilla; revisar interfaces con piping.",
+      "before_source": null,
+      "after_source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.5793546851381262,
+          0.7816750395405155,
+          0.5900449203684378
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      }
+    },
+    {
+      "path": "nozzles.N4.projection",
+      "operation": "added",
+      "before": null,
+      "after": {
+        "value": 300.0,
+        "unit": "mm"
+      },
+      "affects_geometry": true,
+      "impact": "Actualizar boquilla; revisar interfaces con piping.",
+      "before_source": null,
+      "after_source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.5793546851381262,
+          0.7816750395405155,
+          0.5900449203684378
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      }
+    },
+    {
+      "path": "skirt_height",
+      "operation": "modified",
+      "before": {
+        "value": 1200.0,
+        "unit": "mm"
+      },
+      "after": {
+        "value": 1350.0,
+        "unit": "mm"
+      },
+      "affects_geometry": true,
+      "impact": "Actualizar envolvente o soporte; revisar interfaces de civil y piping.",
+      "before_source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.31283643061122735,
+          0.55524206858841,
+          0.32709007758497616
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      },
+      "after_source": {
+        "document_id": "GA-V101",
+        "page": 1,
+        "sheet": null,
+        "cell": null,
+        "locator": "Texto de página 1",
+        "bbox": [
+          0.42837308103558774,
+          0.31283643061122735,
+          0.55524206858841,
+          0.32709007758497616
+        ],
+        "confidence": 0.75,
+        "reviewed": false
+      }
+    }
+  ],
+  "provenance_changes": [],
+  "document_changes": [
+    {
+      "id": "GA-V101",
+      "before": {
+        "id": "GA-V101",
+        "filename": "GAD_V-101_revA.pdf",
+        "revision": "A",
+        "sha256": "468bb29a7c64e8a9e391e648250328f6e20ab7b44c004e10db4ebb9f2fa0a1b1",
+        "page_count": 1
+      },
+      "after": {
+        "id": "GA-V101",
+        "filename": "GAD_V-101_revB.pdf",
+        "revision": "B",
+        "sha256": "832e8cd6e467a0e8cc5147b697950c1285506f6b94836157793b7950c2882cd0",
+        "page_count": 1
+      }
+    },
+    {
+      "id": "HDM-V101",
+      "before": {
+        "id": "HDM-V101",
+        "filename": "HDM_V-101_revA.xlsx",
+        "revision": "A",
+        "sha256": "1a2eedf7f63f66fecccb2a78bf1997093a9d572e22f80bedb97d74161bd72d2b",
+        "page_count": null
+      },
+      "after": {
+        "id": "HDM-V101",
+        "filename": "HDM_V-101_revB.xlsx",
+        "revision": "B",
+        "sha256": "c4b62987f748c164c77e2d83c432892a47414a13e6dd6f620b1421dea1e6f887",
+        "page_count": null
+      }
+    }
+  ],
+  "before_sha256": "18172b1ffd94901f1c77c7c965e261e0c09fee766348af14303ae5e89192d522",
+  "after_sha256": "5f1138ad9f02b89687c7a69e568235378e3ce512c2ba9a83bac08489cc581ff1"
+}

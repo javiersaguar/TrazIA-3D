@@ -1,0 +1,199 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-sidebar: var(--sidebar);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-text: var(--text);
+  --color-strong: var(--text-strong);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-contrast: var(--accent-contrast);
+
+  --color-live: var(--live);
+  --color-live-dot: var(--live-dot);
+  --color-live-soft: var(--live-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning: var(--warning-text);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-border: var(--warning-border);
+  --color-revision: var(--revision);
+  --color-revision-soft: var(--revision-soft);
+  --color-approved: var(--approved);
+  --color-approved-soft: var(--approved-soft);
+  --color-assistant: var(--assistant);
+  --color-violet: var(--chip-violet);
+  --color-violet-soft: var(--chip-violet-soft);
+  --color-sky: var(--chip-sky);
+  --color-sky-soft: var(--chip-sky-soft);
+
+  --radius-panel: var(--radius-panel);
+  --radius-card: var(--radius-card);
+  --radius-control: var(--radius-control);
+  --radius-chip: var(--radius-chip);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, "Cascadia Mono", monospace;
+
+  --ease-out: var(--ease-out);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  /* Todas las cifras tabulares: valores de ingeniería alineados en tablas, KPI y deltas */
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+  color: var(--text-strong);
+  letter-spacing: -0.01em;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Barras de desplazamiento discretas */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+/*
+  Transiciones entre pantallas (React <ViewTransition>, ver components/shell/page-transition.tsx).
+  Las pantallas son hermanas en la barra lateral: fundido corto con un ligero ascenso, sin
+  deslizamiento lateral. Barra lateral y superior quedan ancladas.
+*/
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(.page) {
+  animation: vt-fade-out 110ms var(--ease-out) both;
+}
+::view-transition-new(.page) {
+  animation: vt-rise-in 220ms var(--ease-out) 60ms both;
+}
+
+::view-transition-group(app-sidebar),
+::view-transition-group(app-topbar) {
+  animation: none;
+  z-index: 50;
+}
+::view-transition-old(app-sidebar),
+::view-transition-old(app-topbar) {
+  display: none;
+}
+::view-transition-new(app-sidebar),
+::view-transition-new(app-topbar) {
+  animation: none;
+}
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-rise-in {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/* Skeleton: barrido sutil, desactivado con movimiento reducido */
+@keyframes skeleton-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-sunken);
+  border-radius: var(--radius-chip);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--grid-line), transparent);
+  animation: skeleton-sweep 1.4s var(--ease-in-out) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
+}
+
+/* Retícula de delineación para lienzos (plano / escena) */
+.drafting-grid {
+  background-color: var(--surface-sunken);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* React Flow con los tokens del producto */
+.react-flow {
+  --xy-background-color: transparent;
+  --xy-edge-stroke: var(--border-strong);
+  --xy-edge-stroke-selected: var(--accent);
+  --xy-controls-button-background-color: var(--surface);
+  --xy-controls-button-background-color-hover: var(--surface-sunken);
+  --xy-controls-button-color: var(--text-muted);
+  --xy-controls-button-border-color: var(--border);
+}
