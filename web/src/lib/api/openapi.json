@@ -1165,6 +1165,58 @@
         ],
         "title": "Body_upload_documents_post"
       },
+      "ColumnParameters": {
+        "properties": {
+          "sections": {
+            "items": {
+              "$ref": "#/components/schemas/ColumnSection"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Sections"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sections"
+        ],
+        "title": "ColumnParameters"
+      },
+      "ColumnSection": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Id"
+          },
+          "diameter": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "top_diameter": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PositiveDimension"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "height": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "diameter",
+          "height"
+        ],
+        "title": "ColumnSection"
+      },
       "CopilotInput": {
         "properties": {
           "question": {
@@ -1261,6 +1313,92 @@
           "value"
         ],
         "title": "Dimension"
+      },
+      "Direction3": {
+        "properties": {
+          "x": {
+            "$ref": "#/components/schemas/DirectionComponent"
+          },
+          "y": {
+            "$ref": "#/components/schemas/DirectionComponent"
+          },
+          "z": {
+            "$ref": "#/components/schemas/DirectionComponent"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "x",
+          "y",
+          "z"
+        ],
+        "title": "Direction3"
+      },
+      "DirectionComponent": {
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "conflict",
+              "abstained",
+              "accepted",
+              "corrected",
+              "assumed"
+            ],
+            "title": "State",
+            "default": "candidate"
+          },
+          "interval": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Interval"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "alternatives": {
+            "items": {
+              "$ref": "#/components/schemas/Alternative"
+            },
+            "type": "array",
+            "title": "Alternatives"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "const": "1",
+            "title": "Unit",
+            "default": "1"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "value"
+        ],
+        "title": "DirectionComponent"
       },
       "Document": {
         "properties": {
@@ -1505,6 +1643,50 @@
               }
             ]
           },
+          "horizontal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HorizontalParameters"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "column": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ColumnParameters"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tank": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TankParameters"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "platforms": {
+            "items": {
+              "$ref": "#/components/schemas/PlatformParameters"
+            },
+            "type": "array",
+            "title": "Platforms"
+          },
+          "ladders": {
+            "items": {
+              "$ref": "#/components/schemas/LadderParameters"
+            },
+            "type": "array",
+            "title": "Ladders"
+          },
           "attributes": {
             "patternProperties": {
               "^[A-Za-z0-9_-]+$": {
@@ -1624,6 +1806,23 @@
         ],
         "title": "FieldInput"
       },
+      "FlangeParameters": {
+        "properties": {
+          "outer_diameter": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "thickness": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "outer_diameter",
+          "thickness"
+        ],
+        "title": "FlangeParameters"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1636,6 +1835,49 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "HorizontalParameters": {
+        "properties": {
+          "diameter": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "length": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "head_depth": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "support_height": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "saddle_width": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "saddle_span": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "saddle_positions": {
+            "items": {
+              "$ref": "#/components/schemas/Dimension"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Saddle Positions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "diameter",
+          "length",
+          "head_depth",
+          "support_height",
+          "saddle_width",
+          "saddle_span",
+          "saddle_positions"
+        ],
+        "title": "HorizontalParameters"
       },
       "Interval": {
         "properties": {
@@ -1766,6 +2008,42 @@
         ],
         "title": "JobInput"
       },
+      "LadderParameters": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Id"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/Vector3"
+          },
+          "width": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "height": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "rail_diameter": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "rung_spacing": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "origin",
+          "width",
+          "height",
+          "rail_diameter",
+          "rung_spacing"
+        ],
+        "title": "LadderParameters"
+      },
       "Nozzle": {
         "properties": {
           "id": {
@@ -1785,6 +2063,36 @@
           },
           "azimuth": {
             "$ref": "#/components/schemas/Angle"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Vector3"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "direction": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Direction3"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "flange": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FlangeParameters"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "service": {
             "anyOf": [
@@ -1835,6 +2143,96 @@
           "azimuth"
         ],
         "title": "Nozzle"
+      },
+      "PlatformParameters": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Id"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/Vector3"
+          },
+          "size": {
+            "$ref": "#/components/schemas/Vector3"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "origin",
+          "size"
+        ],
+        "title": "PlatformParameters"
+      },
+      "PositiveDimension": {
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "conflict",
+              "abstained",
+              "accepted",
+              "corrected",
+              "assumed"
+            ],
+            "title": "State",
+            "default": "candidate"
+          },
+          "interval": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Interval"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "alternatives": {
+            "items": {
+              "$ref": "#/components/schemas/Alternative"
+            },
+            "type": "array",
+            "title": "Alternatives"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "value": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "const": "mm",
+            "title": "Unit",
+            "default": "mm"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "value"
+        ],
+        "title": "PositiveDimension"
       },
       "Revision": {
         "properties": {
@@ -2257,6 +2655,37 @@
           "value"
         ],
         "title": "Tag"
+      },
+      "TankParameters": {
+        "properties": {
+          "diameter": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "height": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "roof": {
+            "type": "string",
+            "enum": [
+              "flat",
+              "conical",
+              "domed"
+            ],
+            "title": "Roof"
+          },
+          "roof_height": {
+            "$ref": "#/components/schemas/Dimension"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "diameter",
+          "height",
+          "roof",
+          "roof_height"
+        ],
+        "title": "TankParameters"
       },
       "ValidationError": {
         "properties": {

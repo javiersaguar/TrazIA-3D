@@ -138,3 +138,29 @@ un aviso previo de TanStack Table), 13/13 pruebas unitarias y build pasan en amb
 Playwright: 9/9 con API real y 6/6 offline (las tres pruebas exclusivas de API se omiten).
 Inspección visual de Pipeline offline a 1600 px: grafo de 16 etapas, tarjetas y tabla cargan;
 captura local en generated/qa/pipeline-offline.png. No se modifica código del visor ni de Lectura.
+
+
+## Fase 6 · Familias y niveles de detalle
+
+Registro paramétrico en families/: vertical histórica, horizontal con silletas cóncavas,
+columna por tramos y transiciones, tanque con tres tipos de techo y envolvente LOD1 para
+las siete tipologías. LOD3 admite envolventes anulares de bridas con rating y dimensiones
+trazadas, plataformas y escaleras con peldaños. Posición/dirección explícita para boquillas
+no radiales. Se rechazan familias, soportes o detalles incompletos; no se rellenan medidas.
+
+La generación IFC consume esas familias, mantiene metros de salida, nombres históricos y
+algoritmo de GUID. FieldsJSON incluye todos los nuevos campos, que cuentan para aprobar.
+Contrato y tipos OpenAPI/web regenerados. Parámetros y ejes en DATA_CONTRACT.md.
+Sin dependencias nuevas ni endpoints nuevos: GET IFC y los trabajos aceptan el contrato ampliado.
+Lectura puede importar los tipos de families.parameters y producir estas familias.
+
+Las formas representan envolventes de ingeniería, no despieces de fabricación. Bridas sin
+certificación de norma ni tabla DN/rating implícita. Las bombas/compresores se reservan con
+LOD1 hasta disponer de una familia detallada. No hay nuevos resultados de precisión real.
+
+Comprobaciones de cierre: 80/80 pruebas Python (19 específicas de familias), Ruff global
+correcto. Las familias y el LOD3 pasan ifcopenshell.validate con reglas EXPRESS y se
+verifican por sus mallas IFC, dimensiones y GUID. Typecheck, lint, 13 pruebas unitarias y
+build pasan con/sin API; Playwright 9/9 conectado y 6/6 offline (3 exclusivas omitidas).
+Vista local revisable: generated/families/familias.html y cuatro IFC DRAFT de fixtures
+sintéticos (horizontal, columna, tanque y reserva de bomba). No son métricas de extracción.

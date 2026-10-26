@@ -68,19 +68,44 @@ export type Unit2 = "mm";
 export type State2 = "candidate" | "conflict" | "abstained" | "accepted" | "corrected" | "assumed";
 export type Alternatives2 = Alternative[];
 export type Explanation2 = string | null;
-export type Value3 = number | string;
-export type Unit3 = string;
+export type Value3 = number;
+export type Unit3 = "mm";
+/**
+ * @minItems 2
+ * @maxItems 2
+ */
+export type SaddlePositions = [Dimension, Dimension];
+/**
+ * @minItems 1
+ */
+export type Sections = [ColumnSection, ...ColumnSection[]];
 export type Id2 = string;
+export type Roof = "flat" | "conical" | "domed";
+export type Id3 = string;
+export type Platforms = PlatformParameters[];
+export type Id4 = string;
+export type Ladders = LadderParameters[];
 export type State3 = "candidate" | "conflict" | "abstained" | "accepted" | "corrected" | "assumed";
 export type Alternatives3 = Alternative[];
 export type Explanation3 = string | null;
-export type Value4 = number;
-export type Unit4 = "mm";
+export type Value4 = number | string;
+export type Unit4 = string;
+export type Id5 = string;
 export type State4 = "candidate" | "conflict" | "abstained" | "accepted" | "corrected" | "assumed";
 export type Alternatives4 = Alternative[];
 export type Explanation4 = string | null;
 export type Value5 = number;
-export type Unit5 = "deg";
+export type Unit5 = "mm";
+export type State5 = "candidate" | "conflict" | "abstained" | "accepted" | "corrected" | "assumed";
+export type Alternatives5 = Alternative[];
+export type Explanation5 = string | null;
+export type Value6 = number;
+export type Unit6 = "deg";
+export type State6 = "candidate" | "conflict" | "abstained" | "accepted" | "corrected" | "assumed";
+export type Alternatives6 = Alternative[];
+export type Explanation6 = string | null;
+export type Value7 = number;
+export type Unit7 = "1";
 export type NozzleType = ("radial" | "tangential" | "top" | "bottom" | "inclined") | null;
 export type Nozzles = Nozzle[];
 export type Reviewer = string;
@@ -125,6 +150,11 @@ export interface Equipment {
   head_depth?: Dimension | null;
   skirt_height?: Dimension | null;
   skirt_thickness?: Dimension | null;
+  horizontal?: HorizontalParameters | null;
+  column?: ColumnParameters | null;
+  tank?: TankParameters | null;
+  platforms?: Platforms;
+  ladders?: Ladders;
   attributes?: Attributes;
   nozzles: Nozzles;
 }
@@ -184,6 +214,52 @@ export interface Dimension {
   value: Value2;
   unit?: Unit2;
 }
+export interface HorizontalParameters {
+  diameter: PositiveDimension;
+  length: PositiveDimension;
+  head_depth: PositiveDimension;
+  support_height: PositiveDimension;
+  saddle_width: PositiveDimension;
+  saddle_span: PositiveDimension;
+  saddle_positions: SaddlePositions;
+}
+export interface PositiveDimension {
+  source: Source;
+  state?: State2;
+  interval?: Interval | null;
+  alternatives?: Alternatives2;
+  explanation?: Explanation2;
+  value: Value3;
+  unit?: Unit3;
+}
+export interface ColumnParameters {
+  sections: Sections;
+}
+export interface ColumnSection {
+  id: Id2;
+  diameter: PositiveDimension;
+  top_diameter?: PositiveDimension | null;
+  height: PositiveDimension;
+}
+export interface TankParameters {
+  diameter: PositiveDimension;
+  height: PositiveDimension;
+  roof: Roof;
+  roof_height: Dimension;
+}
+export interface PlatformParameters {
+  id: Id3;
+  origin: Vector3;
+  size: Vector3;
+}
+export interface LadderParameters {
+  id: Id4;
+  origin: Vector3;
+  width: PositiveDimension;
+  height: PositiveDimension;
+  rail_diameter: PositiveDimension;
+  rung_spacing: PositiveDimension;
+}
 export interface Attributes {
   [k: string]: Attribute | undefined;
 }
@@ -193,33 +269,27 @@ export interface Attributes {
  */
 export interface Attribute {
   source: Source;
-  state?: State2;
-  interval?: Interval | null;
-  alternatives?: Alternatives2;
-  explanation?: Explanation2;
-  value: Value3;
-  unit: Unit3;
-}
-export interface Nozzle {
-  id: Id2;
-  diameter: Dimension;
-  projection: Dimension;
-  elevation: Elevation;
-  azimuth: Angle;
-  service?: Attribute | null;
-  rating?: Attribute | null;
-  nozzle_type?: NozzleType;
-}
-export interface Elevation {
-  source: Source;
   state?: State3;
   interval?: Interval | null;
   alternatives?: Alternatives3;
   explanation?: Explanation3;
   value: Value4;
-  unit?: Unit4;
+  unit: Unit4;
 }
-export interface Angle {
+export interface Nozzle {
+  id: Id5;
+  diameter: Dimension;
+  projection: Dimension;
+  elevation: Elevation;
+  azimuth: Angle;
+  position?: Vector3 | null;
+  direction?: Direction3 | null;
+  flange?: FlangeParameters | null;
+  service?: Attribute | null;
+  rating?: Attribute | null;
+  nozzle_type?: NozzleType;
+}
+export interface Elevation {
   source: Source;
   state?: State4;
   interval?: Interval | null;
@@ -227,6 +297,33 @@ export interface Angle {
   explanation?: Explanation4;
   value: Value5;
   unit?: Unit5;
+}
+export interface Angle {
+  source: Source;
+  state?: State5;
+  interval?: Interval | null;
+  alternatives?: Alternatives5;
+  explanation?: Explanation5;
+  value: Value6;
+  unit?: Unit6;
+}
+export interface Direction3 {
+  x: DirectionComponent;
+  y: DirectionComponent;
+  z: DirectionComponent;
+}
+export interface DirectionComponent {
+  source: Source;
+  state?: State6;
+  interval?: Interval | null;
+  alternatives?: Alternatives6;
+  explanation?: Explanation6;
+  value: Value7;
+  unit?: Unit7;
+}
+export interface FlangeParameters {
+  outer_diameter: PositiveDimension;
+  thickness: PositiveDimension;
 }
 export interface Approval {
   reviewer: Reviewer;

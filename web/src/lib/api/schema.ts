@@ -424,6 +424,19 @@ export interface components {
              */
             revision?: string;
         };
+        /** ColumnParameters */
+        ColumnParameters: {
+            /** Sections */
+            sections: components["schemas"]["ColumnSection"][];
+        };
+        /** ColumnSection */
+        ColumnSection: {
+            /** Id */
+            id: string;
+            diameter: components["schemas"]["PositiveDimension"];
+            top_diameter?: components["schemas"]["PositiveDimension"] | null;
+            height: components["schemas"]["PositiveDimension"];
+        };
         /** CopilotInput */
         CopilotInput: {
             /** Question */
@@ -458,6 +471,35 @@ export interface components {
              * @constant
              */
             unit?: "mm";
+        };
+        /** Direction3 */
+        Direction3: {
+            x: components["schemas"]["DirectionComponent"];
+            y: components["schemas"]["DirectionComponent"];
+            z: components["schemas"]["DirectionComponent"];
+        };
+        /** DirectionComponent */
+        DirectionComponent: {
+            source: components["schemas"]["Source"];
+            /**
+             * State
+             * @default candidate
+             * @enum {string}
+             */
+            state?: "candidate" | "conflict" | "abstained" | "accepted" | "corrected" | "assumed";
+            interval?: components["schemas"]["Interval"] | null;
+            /** Alternatives */
+            alternatives?: components["schemas"]["Alternative"][];
+            /** Explanation */
+            explanation?: string | null;
+            /** Value */
+            value: number;
+            /**
+             * Unit
+             * @default 1
+             * @constant
+             */
+            unit?: "1";
         };
         /** Document */
         Document: {
@@ -525,6 +567,13 @@ export interface components {
             head_depth?: components["schemas"]["Dimension"] | null;
             skirt_height?: components["schemas"]["Dimension"] | null;
             skirt_thickness?: components["schemas"]["Dimension"] | null;
+            horizontal?: components["schemas"]["HorizontalParameters"] | null;
+            column?: components["schemas"]["ColumnParameters"] | null;
+            tank?: components["schemas"]["TankParameters"] | null;
+            /** Platforms */
+            platforms?: components["schemas"]["PlatformParameters"][];
+            /** Ladders */
+            ladders?: components["schemas"]["LadderParameters"][];
             /** Attributes */
             attributes?: {
                 [key: string]: components["schemas"]["Attribute"];
@@ -551,10 +600,26 @@ export interface components {
             /** Seconds */
             seconds?: number | null;
         };
+        /** FlangeParameters */
+        FlangeParameters: {
+            outer_diameter: components["schemas"]["PositiveDimension"];
+            thickness: components["schemas"]["PositiveDimension"];
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** HorizontalParameters */
+        HorizontalParameters: {
+            diameter: components["schemas"]["PositiveDimension"];
+            length: components["schemas"]["PositiveDimension"];
+            head_depth: components["schemas"]["PositiveDimension"];
+            support_height: components["schemas"]["PositiveDimension"];
+            saddle_width: components["schemas"]["PositiveDimension"];
+            saddle_span: components["schemas"]["PositiveDimension"];
+            /** Saddle Positions */
+            saddle_positions: components["schemas"]["Dimension"][];
         };
         /** Interval */
         Interval: {
@@ -622,6 +687,16 @@ export interface components {
              */
             retry_backoff_seconds?: number;
         };
+        /** LadderParameters */
+        LadderParameters: {
+            /** Id */
+            id: string;
+            origin: components["schemas"]["Vector3"];
+            width: components["schemas"]["PositiveDimension"];
+            height: components["schemas"]["PositiveDimension"];
+            rail_diameter: components["schemas"]["PositiveDimension"];
+            rung_spacing: components["schemas"]["PositiveDimension"];
+        };
         /** Nozzle */
         Nozzle: {
             /** Id */
@@ -630,10 +705,43 @@ export interface components {
             projection: components["schemas"]["Dimension"];
             elevation: components["schemas"]["Elevation"];
             azimuth: components["schemas"]["Angle"];
+            position?: components["schemas"]["Vector3"] | null;
+            direction?: components["schemas"]["Direction3"] | null;
+            flange?: components["schemas"]["FlangeParameters"] | null;
             service?: components["schemas"]["Attribute"] | null;
             rating?: components["schemas"]["Attribute"] | null;
             /** Nozzle Type */
             nozzle_type?: ("radial" | "tangential" | "top" | "bottom" | "inclined") | null;
+        };
+        /** PlatformParameters */
+        PlatformParameters: {
+            /** Id */
+            id: string;
+            origin: components["schemas"]["Vector3"];
+            size: components["schemas"]["Vector3"];
+        };
+        /** PositiveDimension */
+        PositiveDimension: {
+            source: components["schemas"]["Source"];
+            /**
+             * State
+             * @default candidate
+             * @enum {string}
+             */
+            state?: "candidate" | "conflict" | "abstained" | "accepted" | "corrected" | "assumed";
+            interval?: components["schemas"]["Interval"] | null;
+            /** Alternatives */
+            alternatives?: components["schemas"]["Alternative"][];
+            /** Explanation */
+            explanation?: string | null;
+            /** Value */
+            value: number;
+            /**
+             * Unit
+             * @default mm
+             * @constant
+             */
+            unit?: "mm";
         };
         /** Revision */
         Revision: {
@@ -747,6 +855,17 @@ export interface components {
              * @constant
              */
             unit?: "1";
+        };
+        /** TankParameters */
+        TankParameters: {
+            diameter: components["schemas"]["PositiveDimension"];
+            height: components["schemas"]["PositiveDimension"];
+            /**
+             * Roof
+             * @enum {string}
+             */
+            roof: "flat" | "conical" | "domed";
+            roof_height: components["schemas"]["Dimension"];
         };
         /** ValidationError */
         ValidationError: {

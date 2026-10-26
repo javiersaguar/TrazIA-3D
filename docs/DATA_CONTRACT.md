@@ -106,3 +106,42 @@ No se aplica todavía equivalencia entre 1 bar y 100 kPa.
 Los JSON sintéticos de la fase 0.1 eran un borrador local sin publicar. La versión 0.2
 añade unidades por campo, tag trazable, fondos, faldón y aprobación; no es compatible con
 ese contrato anterior. Los ejemplos del repositorio ya usan 0.3.
+
+
+## Familias paramétricas y detalle (0.3, ampliación aditiva)
+
+Todos los parámetros numéricos siguientes son campos trazados (valor, unidad mm, fuente,
+estado e incertidumbre). Los tipos se publican también en `trazia.families.parameters`.
+
+| Familia | Parámetros de nivel 2 |
+| --- | --- |
+| vertical_vessel | Los cinco parámetros históricos; virola en Z, fondos semielipsoidales y faldón |
+| horizontal_vessel | horizontal: diameter, length, head_depth, support_height, saddle_width (axial), saddle_span (transversal) y dos saddle_positions en X |
+| column | column.sections: id estable, diameter inferior, top_diameter opcional y height; una transición de diámetro necesita su tramo explícito |
+| tank | tank: diameter, height, roof (flat/conical/domed) y roof_height (cero solo en flat) |
+| pump, compressor, generic | Envolvente de nivel 1; no se simula una familia detallada |
+
+La horizontal tiene su virola en X, entre 0 y length; el eje queda a support_height + D/2.
+Las silletas se dibujan en sus dos posiciones trazadas, con asiento cóncavo. La columna
+arranca en Z=0 y acumula alturas; no se interpolan saltos entre diámetros incompatibles.
+El tanque arranca en Z=0 y su altura incluye el techo. Son envolventes geométricas de equipo,
+no un modelo de espesores de fabricación. El nivel 1 usa exactamente envelope.origin/size,
+incluidos los orígenes negativos; sirve para todas las tipologías.
+
+Las boquillas conservan los cuatro campos históricos. Fuera de la familia vertical radial
+requieren también position (Vector3 en mm) y direction (componentes trazadas de unidad 1,
+vector no nulo). Se normaliza la dirección al generar geometría; elevation coincide con Z.
+En vertical se admiten también estas colocaciones explícitas para boquillas superiores,
+inferiores, tangenciales o inclinadas. Una dirección ausente no se adivina.
+
+Nivel 3 requiere al menos un detalle trazado: flange en boquilla (outer_diameter, thickness
+más rating), platforms (id, origin, size) o ladders (id, origin, width, height, rail_diameter,
+rung_spacing). Una brida representa su envolvente anular según dimensiones aportadas; no
+se atribuye conformidad ASME ni se deducen dimensiones de una clase sin tabla autorizada.
+Los campos de detalles también bloquean la aprobación. No se aceptan detalles con lod=1/2.
+
+Los soportes implementados son faldón en vertical y silletas en horizontal. Declarar patas,
+orejetas u otros soportes de nivel 2/3 falla hasta aportar una familia compatible.
+`fields()` recorre todos los parámetros: IDs estables para boquillas/tramos/detalles, índices
+0/1 solo para saddle_positions. Se conservan las rutas históricas y los GUID del ejemplo.
+El IFC incluye LOD, Family y campos completos en TrazIA_Traceability.

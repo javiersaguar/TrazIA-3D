@@ -138,6 +138,125 @@ class Envelope(Model):
         return self
 
 
+class DirectionComponent(TracedField):
+    value: float
+    unit: Literal["1"] = "1"
+
+
+class Direction3(Model):
+    x: DirectionComponent
+    y: DirectionComponent
+    z: DirectionComponent
+
+    @model_validator(mode="after")
+    def check_direction(self):
+        if sum(getattr(self, axis).value ** 2 for axis in "xyz") < 1e-12:
+            raise ValueError("La dirección no puede ser nula")
+        return self
+
+
+class PositiveDimension(Dimension):
+    value: float = Field(gt=0)
+
+
+class HorizontalParameters(Model):
+    diameter: PositiveDimension
+    length: PositiveDimension
+    head_depth: PositiveDimension
+    support_height: PositiveDimension
+    saddle_width: PositiveDimension
+    saddle_span: PositiveDimension
+    saddle_positions: list[Dimension] = Field(min_length=2, max_length=2)
+
+    @model_validator(mode="after")
+    def check_saddles(self):
+        left, right = sorted(p.value for p in self.saddle_positions)
+        width = self.saddle_width.value
+        if left < width / 2 or right + width / 2 > self.length.value or right - left <= width:
+            raise ValueError("Las dos silletas deben quedar separadas dentro de la virola")
+        if self.saddle_span.value >= self.diameter.value:
+            raise ValueError("El ancho transversal de silleta debe ser menor que el diámetro")
+        if self.head_depth.value > self.diameter.value / 2:
+            raise ValueError("La profundidad del fondo no puede superar el radio")
+        return self
+
+
+class ColumnSection(Model):
+    id: Identifier
+    diameter: PositiveDimension
+    top_diameter: PositiveDimension | None = None
+    height: PositiveDimension
+
+
+class ColumnParameters(Model):
+    sections: list[ColumnSection] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def check_sections(self):
+        if len({s.id for s in self.sections}) != len(self.sections):
+            raise ValueError("Los tramos deben tener IDs únicos")
+        for low, high in zip(self.sections, self.sections[1:]):
+            if abs((low.top_diameter or low.diameter).value - high.diameter.value) > 1e-6:
+                raise ValueError(
+                    "Los diámetros contiguos requieren un tramo de transición explícito"
+                )
+        return self
+
+
+class TankParameters(Model):
+    diameter: PositiveDimension
+    height: PositiveDimension
+    roof: Literal["flat", "conical", "domed"]
+    roof_height: Dimension
+
+    @model_validator(mode="after")
+    def check_roof(self):
+        height = self.roof_height.value
+        if (self.roof == "flat" and height != 0) or (self.roof != "flat" and height <= 0):
+            raise ValueError(
+                "El techo plano tiene altura cero; los otros requieren altura positiva"
+            )
+        if self.roof == "domed" and height > self.diameter.value / 2:
+            raise ValueError("La profundidad del techo curvo no puede superar el radio")
+        return self
+
+
+class FlangeParameters(Model):
+    outer_diameter: PositiveDimension
+    thickness: PositiveDimension
+
+
+class PlatformParameters(Model):
+    id: Identifier
+    origin: Vector3
+    size: Vector3
+
+    @model_validator(mode="after")
+    def check_size(self):
+        if any(getattr(self.size, axis).value <= 0 for axis in "xyz"):
+            raise ValueError("La plataforma requiere tamaños positivos")
+        return self
+
+
+class LadderParameters(Model):
+    id: Identifier
+    origin: Vector3
+    width: PositiveDimension
+    height: PositiveDimension
+    rail_diameter: PositiveDimension
+    rung_spacing: PositiveDimension
+
+    @model_validator(mode="after")
+    def check_spacing(self):
+        if self.rung_spacing.value > self.height.value:
+            raise ValueError("La escalera debe contener al menos un peldaño")
+        if self.width.value <= 2 * self.rail_diameter.value:
+            raise ValueError("Las barras de la escalera deben quedar separadas")
+        if self.height.value / self.rung_spacing.value > 1000:
+            raise ValueError("Demasiados peldaños: revise las unidades")
+        return self
+
+
 class Document(Model):
     id: Identifier
     filename: str = Field(min_length=1)
@@ -152,6 +271,9 @@ class Nozzle(Model):
     projection: Dimension
     elevation: Elevation
     azimuth: Angle
+    position: Vector3 | None = None
+    direction: Direction3 | None = None
+    flange: FlangeParameters | None = None
     service: Attribute | None = None
     rating: Attribute | None = None
     nozzle_type: Literal["radial", "tangential", "top", "bottom", "inclined"] | None = None
@@ -160,6 +282,14 @@ class Nozzle(Model):
     def check_sizes(self):
         if self.diameter.value <= 0 or self.projection.value <= 0:
             raise ValueError("Diámetro y proyección de boquilla deben ser positivos")
+        if (self.position is None) != (self.direction is None):
+            raise ValueError("Posición y dirección explícitas se aportan juntas")
+        if self.position is not None and abs(self.position.z.value - self.elevation.value) > 1e-6:
+            raise ValueError("La elevación debe coincidir con la coordenada Z explícita")
+        if self.flange and self.flange.outer_diameter.value <= self.diameter.value:
+            raise ValueError("La brida debe superar el diámetro de la boquilla")
+        if self.flange and self.flange.thickness.value > self.projection.value:
+            raise ValueError("La brida no puede ser más gruesa que la proyección")
         return self
 
 
@@ -177,6 +307,11 @@ class Equipment(Model):
     head_depth: Dimension | None = None  # Profundidad común de los dos fondos semielipsoidales.
     skirt_height: Dimension | None = None  # Desde suelo hasta la tangente inferior de la virola.
     skirt_thickness: Dimension | None = None
+    horizontal: HorizontalParameters | None = None
+    column: ColumnParameters | None = None
+    tank: TankParameters | None = None
+    platforms: list[PlatformParameters] = Field(default_factory=list)
+    ladders: list[LadderParameters] = Field(default_factory=list)
     attributes: dict[Identifier, Attribute] = Field(default_factory=dict)
     nozzles: list[Nozzle]
 
@@ -186,6 +321,14 @@ class Equipment(Model):
 
     @property
     def total_height(self) -> float:
+        if self.lod == 1 and self.envelope:
+            return self.envelope.origin.z.value + self.envelope.size.z.value
+        if self.horizontal:
+            return self.horizontal.support_height.value + self.horizontal.diameter.value
+        if self.column:
+            return sum(s.height.value for s in self.column.sections)
+        if self.tank:
+            return self.tank.height.value + self.tank.roof_height.value
         if self.height and self.head_depth:
             return self.shell_bottom + self.head_depth.value + self.height.value
         return self.envelope.size.z.value if self.envelope else 0
@@ -201,6 +344,40 @@ class Equipment(Model):
                 raise ValueError(f"{name}: la dimensión física debe ser positiva")
         if self.lod == 1 and self.envelope is None:
             raise ValueError("El nivel de detalle 1 requiere una envolvente con evidencia")
+        for name in ("platforms", "ladders"):
+            ids = [item.id for item in getattr(self, name)]
+            if len(ids) != len(set(ids)):
+                raise ValueError(f"{name}: IDs duplicados")
+        specs = {"horizontal_vessel": self.horizontal, "column": self.column, "tank": self.tank}
+        for kind, spec in specs.items():
+            if spec is not None and self.kind != kind:
+                raise ValueError("Parámetros de familia incompatibles con kind")
+        if self.lod >= 2:
+            allowed_supports = {
+                "vertical_vessel": (None, "skirt"),
+                "horizontal_vessel": (None, "saddles"),
+                "column": (None, "none"),
+                "tank": (None, "none"),
+            }
+            if self.support not in allowed_supports.get(self.kind, (None,)):
+                raise ValueError("Ese soporte requiere una familia aún no implementada")
+            if self.kind in specs and specs[self.kind] is None:
+                raise ValueError(f"Faltan parámetros de familia {self.kind}")
+            if self.kind in ("pump", "compressor", "generic"):
+                raise ValueError("Esta tipología requiere envolvente de nivel 1")
+        if self.lod == 3:
+            if not (any(n.flange for n in self.nozzles) or self.platforms or self.ladders):
+                raise ValueError("El nivel 3 requiere detalles con evidencia")
+            if any(n.flange and n.rating is None for n in self.nozzles):
+                raise ValueError("La brida de nivel 3 requiere rating trazado")
+        elif self.platforms or self.ladders or any(n.flange for n in self.nozzles):
+            raise ValueError("Los detalles solo se exportan declarando nivel 3")
+        if (self.kind != "vertical_vessel" or self.lod == 1) and any(
+            n.position is None for n in self.nozzles
+        ):
+            raise ValueError(
+                "Las boquillas de esta familia requieren posición y dirección explícitas"
+            )
         if self.kind != "vertical_vessel" or self.lod == 1:
             return self
         if any(getattr(self, key) is None for key in GEOMETRY_FIELDS):
@@ -214,6 +391,10 @@ class Equipment(Model):
         if self.head_depth.value > self.diameter.value / 2:
             raise ValueError("Esta familia admite fondos con profundidad hasta el radio")
         for nozzle in self.nozzles:
+            if nozzle.position is not None:
+                continue
+            if nozzle.nozzle_type not in (None, "radial"):
+                raise ValueError("Una boquilla no radial requiere posición y dirección explícitas")
             radius = nozzle.diameter.value / 2
             low = self.shell_bottom + radius
             high = self.shell_bottom + self.height.value - radius
@@ -303,22 +484,24 @@ class Revision(Model):
 GEOMETRY_FIELDS = ("diameter", "height", "head_depth", "skirt_height", "skirt_thickness")
 
 
-def fields(equipment: Equipment) -> dict:
-    result = {"tag": equipment.tag}
-    result.update(
-        {k: getattr(equipment, k) for k in GEOMETRY_FIELDS if getattr(equipment, k) is not None}
-    )
-    if equipment.envelope:
-        for vector in ("origin", "size"):
-            for axis in "xyz":
-                result[f"envelope.{vector}.{axis}"] = getattr(
-                    getattr(equipment.envelope, vector), axis
-                )
-    result.update({f"attributes.{k}": v for k, v in equipment.attributes.items()})
-    for nozzle in equipment.nozzles:
-        for key in ("diameter", "projection", "elevation", "azimuth", "service", "rating"):
-            if getattr(nozzle, key) is not None:
-                result[f"nozzles.{nozzle.id}.{key}"] = getattr(nozzle, key)
+def fields(equipment: Equipment) -> dict[str, TracedField]:
+    """Rutas estables: IDs en colecciones de componentes, índices solo en posiciones de silletas."""
+    result = {}
+
+    def visit(value, path):
+        if isinstance(value, TracedField):
+            result[path] = value
+        elif isinstance(value, BaseModel):
+            for name in type(value).model_fields:
+                visit(getattr(value, name), f"{path}.{name}" if path else name)
+        elif isinstance(value, dict):
+            for name, child in value.items():
+                visit(child, f"{path}.{name}")
+        elif isinstance(value, list):
+            for index, child in enumerate(value):
+                visit(child, f"{path}.{getattr(child, 'id', index)}")
+
+    visit(equipment, "")
     return result
 
 
