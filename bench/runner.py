@@ -56,6 +56,8 @@ def run_extraction(folder: Path, tag: str, rev: str, extractor: Extractor) -> Ex
         (f"GAD_{tag}_rev{rev}.pdf", f"GA-{tag}"),
         (f"HDM_{tag}_rev{rev}.xlsx", f"HDM-{tag}"),
     ):
+        if not (folder / name).exists():  # v2: uno de cada tres casos llega sin hoja de datos
+            continue
         try:
             bundle = ingest_bytes((folder / name).read_bytes(), name, doc_id, rev)
         except ValueError as exc:  # incluye errores de validación del contrato
@@ -195,6 +197,10 @@ def score_delta(first: Extraction, second: Extraction, expected: list[dict]) -> 
 
 def run_bench(dataset: Path, extractor_name: str = "etiquetas") -> dict:
     manifest = json.loads((dataset / "manifest.json").read_text(encoding="utf-8"))
+    if manifest.get("kind", "vessel") != "vessel":
+        raise ValueError(
+            "El bench de recipientes no mide mecánicos: el contrato aún no tiene envolvente."
+        )
     extractor = EXTRACTORS[extractor_name]()
     results = {
         "dataset": str(dataset),
@@ -214,6 +220,7 @@ def run_bench(dataset: Path, extractor_name: str = "etiquetas") -> dict:
             cases.append(
                 {
                     "tag": tag,
+                    "vendor": case.get("vendor"),
                     "rev1": score_revision(first, spec1),
                     "rev2": score_revision(second, spec2),
                     "delta": score_delta(first, second, truth["changes"]),

@@ -95,6 +95,68 @@ Durante el desarrollo, el bench encontró dos fallos de lectura del plano:
 
 Los dos están corregidos y cubiertos por pruebas.
 
+## Generador v2: ocho proveedores y cuatro conjuntos (DEC-21)
+
+```bash
+uv run python -m synthetic --conjunto todos          # generated/synthetic_v2/<conjunto>/
+uv run python -m bench --entrada generated/synthetic_v2/s-dev --extractor combinado
+```
+
+Todo es sintético y lo dice en cada hoja («SYNTHETIC TEST DOCUMENT»). Los proveedores son
+ficticios.
+
+| Proveedor | Reservado | Idioma | Unidades | Lo que cambia |
+| --- | --- | --- | --- | --- |
+| atlas | no | en | mm | El estilo del generador v1 |
+| iberica | no | es | mm | Coma decimal, punto de miles, tabla a la izquierda, Ø con línea de cota, «L.T.» |
+| gulf | no | en | pulgadas | Fracciones de 1/16", NPS, psig, °F, lb; orden de columnas distinto |
+| prairie | no | en | pies-pulgadas | Columna de rating, servicio delante, tabla abajo |
+| nordic | no | en | mm | Texto de cotas horizontal, tabla abajo |
+| levante | no | es | mm | Dos hojas (tabla en la 2), cotas de boquilla desde la tangente inferior |
+| meridian | **sí** | en | mm | Rumbo horario desde el norte, cotas desde la tangente inferior, «I.D.» |
+| cantabrico | **sí** | es | mm + NPS | Tamaños en pulgadas, cotas horizontales, cabeceras propias |
+
+| Conjunto | Semilla | Casos | Proveedores | Notas |
+| --- | --- | --- | --- | --- |
+| `s-dev` | 2026 | 24 | los 6 públicos | Único conjunto para desarrollar y entrenar |
+| `s-reservado` | 7919 | 16 | los 2 reservados | Solo mide generalización: no se mira caso a caso |
+| `s-mecanico` | 4242 | 12 | atlas, iberica, gulf | Bomba con bancada; verdad de envolvente y bridas |
+| `s-adversarial` | 6666 | 12 | atlas, iberica | Tres trampas por caso (DEC-32), sin hoja de datos |
+
+- Cada caso lo dibuja un proveedor, por turno según su índice, y se entrega en tres degradaciones:
+  `vectorial`, `escaneado_limpio` (200 ppp) y `escaneado_pobre` (120 ppp, JPEG, giro de hasta 1,5°).
+- Uno de cada cuatro casos llega dentro de un paquete de proveedor (portada, índice, GA y placa con
+  valores distractores). Uno de cada tres llega sin hoja de datos.
+- Con proveedores en pulgadas, la verdad (en mm) cae en la rejilla de 1/16": el valor del plano es
+  exacto y el error de conversión no se confunde con un error de lectura.
+- Trampas: instrucción visible en inglés, instrucción en español, fila en blanco sobre blanco, texto
+  de 2 pt, boquilla fantasma y metadatos del PDF. La verdad nunca cambia; el valor falso queda en
+  `truth/<TAG>.json` para medir la tasa de envenenamiento.
+- Las semillas se fijaron antes de medir nada y no se cambian por resultado.
+
+### B frente al generador v2 (primera medición, sin tocar el extractor)
+
+`combinado` (etiquetas + `DrawingExtractor`), degradación `vectorial`. Porcentaje de campos
+correctos; «modelos» = revisiones que llegan a IFC.
+
+| Conjunto | Proveedor | Geometría | Atributos | Modelos |
+| --- | --- | --- | --- | --- |
+| s-dev | atlas | 100 % | 100 % | 8/8 |
+| s-dev | iberica | 14 % | 100 % | 0/8 |
+| s-dev | gulf | 0 % | 25 % | 0/8 |
+| s-dev | prairie | 0 % | 100 % | 0/8 |
+| s-dev | nordic | 8 % | 100 % | 0/8 |
+| s-dev | levante | 15 % | 25 % | 0/8 |
+| s-reservado | meridian | 0 % | 72 % | 0/16 |
+| s-reservado | cantabrico | 4 % | 81 % | 0/16 |
+
+En los escaneados, la geometría es 0 % en todos los proveedores: no hay capa de texto.
+
+**Lectura honesta.** `DrawingExtractor` se escribió mirando el generador v1, que es el estilo
+`atlas`; por eso acierta todo ahí y casi nada en el resto. Los atributos se salvan cuando hay hoja
+de datos. Este es el punto de partida del estudio: cualquier mejora de B sobre `s-dev` se medirá
+después en `s-reservado`, que B no ha visto.
+
 ## Hallazgos para el núcleo
 
 1. **Un texto fuera de la página tumbaba la ingesta del PDF.** `ingest_bytes` limitaba la caja a
