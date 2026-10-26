@@ -1,12 +1,12 @@
 "use client";
 
-import { AdaptiveDpr, CameraControls, Environment, Lightformer } from "@react-three/drei";
+import { AdaptiveDpr, CameraControls, Environment, Html as DreiHtml, Lightformer } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { EffectComposer, SSAO } from "@react-three/postprocessing";
 import { Camera, Maximize, Minus, Plus, RotateCcw } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { useTheme } from "next-themes";
-import { Component, useEffect, useImperativeHandle, useRef, type ReactNode, type Ref, type RefObject } from "react";
+import { Component, createContext, useContext, useEffect, useImperativeHandle, useRef, type ComponentProps, type ReactNode, type Ref, type RefObject } from "react";
 import { Box3, OrthographicCamera, Sphere, Vector3 } from "three";
 import type { Bounds, Vec3 } from "@/workers/ifc-protocol";
 import styles from "./viewer.module.css";
@@ -15,6 +15,12 @@ export type View = "iso" | "front" | "top" | "plan";
 export type CameraHandle = { view(v: View): void; fit(bounds?: Bounds): void; zoom(factor: number): void; capture(): void };
 export type PerformanceSample = { fps: number; p95Ms: number; frames: number; renderer: string; drawCalls: number; triangles: number; dpr: number };
 export const asBox = (bounds: Bounds) => new Box3(new Vector3(...bounds.min), new Vector3(...bounds.max));
+const OverlayContext = createContext<RefObject<HTMLDivElement | null> | null>(null);
+
+export function SceneLabel(props: ComponentProps<typeof DreiHtml>) {
+  const portal = useContext(OverlayContext);
+  return <DreiHtml {...props} portal={portal as RefObject<HTMLElement> | undefined} />;
+}
 
 export function CameraRig({ bounds, view = "iso", handle, onUserControl, measureKey, onMeasure }: {
   bounds: Bounds; view?: View; handle: Ref<CameraHandle>; onUserControl?(): void;
@@ -33,7 +39,8 @@ export function CameraRig({ bounds, view = "iso", handle, onUserControl, measure
     void controls.current?.setLookAt(center.x + offset[0], center.y + offset[1], center.z + offset[2],
       center.x, center.y, center.z, smooth && !reduce);
     // fitToBox ajusta la cámara al eje más cercano; la esfera conserva la isometría elegida.
-    void controls.current?.fitToSphere(box.getBoundingSphere(new Sphere()), smooth && !reduce);
+    const sphere = box.getBoundingSphere(new Sphere()); sphere.radius *= 1.2;
+    void controls.current?.fitToSphere(sphere, smooth && !reduce);
     invalidate();
   };
   useEffect(() => {
@@ -43,7 +50,8 @@ export function CameraRig({ bounds, view = "iso", handle, onUserControl, measure
   }, [view, bounds]);
   useImperativeHandle(handle, () => ({
     view: next => show(next, true),
-    fit: target => { void controls.current?.fitToSphere(asBox(target ?? bounds).getBoundingSphere(new Sphere()), !reduce); invalidate(); },
+    fit: target => { const sphere = asBox(target ?? bounds).getBoundingSphere(new Sphere()); sphere.radius *= 1.2;
+      void controls.current?.fitToSphere(sphere, !reduce); invalidate(); },
     zoom: factor => { void controls.current?.zoomTo((camera as OrthographicCamera).zoom * factor, !reduce); invalidate(); },
     capture: () => {
       gl.render(scene, camera);
@@ -111,12 +119,13 @@ class RenderBoundary extends Component<{ children: ReactNode }, { failed: boolea
 }
 
 export function SceneCanvas({ children, label }: { children: ReactNode; label: string }) {
+  const portal = useRef<HTMLDivElement>(null);
   return <RenderBoundary><Canvas className={styles.canvas} orthographic frameloop="demand" dpr={[1, 1.6]}
     camera={{ position: [12, 9, 12], zoom: 50, near: .01, far: 1000 }} performance={{ min: .65 }}
     gl={{ antialias: true, alpha: false, localClippingEnabled: true }}
     onCreated={({ gl }) => { gl.info.autoReset = false; }} aria-label={label}>
-    {children}
-  </Canvas></RenderBoundary>;
+    <OverlayContext.Provider value={portal}>{children}</OverlayContext.Provider>
+  </Canvas><div ref={portal} className={styles.labels} /></RenderBoundary>;
 }
 
 export function CameraTools({ handle, container }: { handle: RefObject<CameraHandle | null>; container: RefObject<HTMLDivElement | null> }) {

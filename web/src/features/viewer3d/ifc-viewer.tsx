@@ -69,10 +69,10 @@ export function IfcViewer({ ifcUrl, selectedId, hoveredId, onSelect, onHover, an
         {([["iso", "Iso"], ["front", "Alzado"], ["top", "Planta"], ["plan", "Como el plano"]] as const).map(([key, label]) =>
           <button key={key} className={styles.button} aria-pressed={activeView === key} onClick={() => setView(key)}>{label}</button>)}
       </div> : <button className={styles.button} onClick={() => camera.current?.view("plan")} title="Vista ortográfica alineada con el alzado">Como el plano</button>}
-      {!suppliedMode ? <div className={styles.group} aria-label="Representación del modelo">
-        {([["solid", "Sólido"], ["xray", "Rayos X"], ["exploded", "Explosionado"]] as const).map(([key, label]) =>
-          <button key={key} className={styles.button} aria-pressed={activeMode === key} onClick={() => setMode(key)}>{label}</button>)}
-      </div> : null}
+      {!suppliedMode ? <select className={styles.select} aria-label="Representación del modelo" value={activeMode}
+        onChange={e => setMode(e.target.value as "solid" | "xray" | "exploded")}>
+        <option value="solid">Sólido</option><option value="xray">Rayos X</option><option value="exploded">Explosionado</option>
+      </select> : null}
     </div>
     <div className={styles.secondary}>
       <button className={styles.button} aria-pressed={tree} onClick={() => setTree(v => !v)}><TreePine /> Elementos</button>

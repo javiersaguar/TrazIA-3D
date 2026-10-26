@@ -1,6 +1,6 @@
 "use client";
 
-import { Html, Grid } from "@react-three/drei";
+import { Grid } from "@react-three/drei";
 import type { ThreeEvent } from "@react-three/fiber";
 import { Eye, LocateFixed, Play } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
@@ -9,7 +9,7 @@ import type { Bounds, IfcModel, Vec3 } from "@/workers/ifc-protocol";
 import { useIfcModel, usePreparedModel, type PreparedProduct } from "../viewer3d/model-resource";
 import { STATE_COLORS } from "../viewer3d/product-mesh";
 import { SteelMaterial } from "../viewer3d/materials";
-import { CameraRig, CameraTools, Legend, LoadingState, SceneCanvas, Studio, type CameraHandle } from "../viewer3d/stage";
+import { CameraRig, CameraTools, Legend, LoadingState, SceneCanvas, SceneLabel as Html, Studio, type CameraHandle } from "../viewer3d/stage";
 import type { PlantEquipment, PlantSceneProps } from "../viewer3d/types";
 import styles from "../viewer3d/viewer.module.css";
 

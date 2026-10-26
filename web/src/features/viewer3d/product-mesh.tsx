@@ -2,9 +2,10 @@
 
 import { Edges } from "@react-three/drei";
 import { animated, config, useSpring } from "@react-spring/three";
-import type { ThreeEvent } from "@react-three/fiber";
+import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { useReducedMotion } from "motion/react";
-import { BackSide, type Plane } from "three";
+import { useEffect, useMemo, useRef } from "react";
+import { BackSide, Mesh, OrthographicCamera, SphereGeometry, type Plane } from "three";
 import { acceleratedRaycast } from "three-mesh-bvh";
 import type { Vec3 } from "@/workers/ifc-protocol";
 import type { PreparedProduct } from "./model-resource";
@@ -14,6 +15,20 @@ export type ElementState = "draft" | "approved" | "assumed" | "changed" | "confl
 export const STATE_COLORS: Record<ElementState, string> = {
   draft: "#a1b4c4", approved: "#5cc08f", assumed: "#86aee8", changed: "#f5a35c", conflict: "#f07468",
 };
+
+function HitTarget({ radius, onClick, onOver, onOut, onFocus }: { radius: number;
+  onClick(event: ThreeEvent<MouseEvent>): void; onOver(event: ThreeEvent<PointerEvent>): void;
+  onOut(): void; onFocus(event: ThreeEvent<MouseEvent>): void;
+}) {
+  const ref = useRef<Mesh>(null), camera = useThree(state => state.camera);
+  const geometry = useMemo(() => new SphereGeometry(1, 10, 8), []);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  useFrame(() => { ref.current?.scale.setScalar(Math.max(radius, camera instanceof OrthographicCamera ? 12 / camera.zoom : radius)); });
+  return <mesh ref={ref} geometry={geometry} scale={radius} dispose={null} onClick={onClick}
+    onPointerOver={onOver} onPointerOut={onOut} onDoubleClick={onFocus}>
+    <BasicMaterial transparent opacity={0} colorWrite={false} depthWrite={false} />
+  </mesh>;
+}
 
 export function ProductMesh({ product, position = product.center, scale = [1, 1, 1], opacity = 1,
   selected = false, hovered = false, state = "draft", mode = "solid", planes, wireframe = false,
@@ -31,23 +46,23 @@ export function ProductMesh({ product, position = product.center, scale = [1, 1,
   const click = (event: ThreeEvent<MouseEvent>) => { event.stopPropagation(); onSelect?.(product.semanticId); };
   const over = (event: ThreeEvent<PointerEvent>) => { event.stopPropagation(); onHover?.(product.semanticId); };
   const focus = (event: ThreeEvent<MouseEvent>) => { event.stopPropagation(); onFocus?.(product.semanticId); };
+  const interactive = opacity > .05 && !wireframe && !!onSelect;
   return <animated.group position-x={spring.px} position-y={spring.py} position-z={spring.pz}
     scale-x={spring.sx} scale-y={spring.sy} scale-z={spring.sz} dispose={null}>
     {product.geometries.map((geometry, i) => <mesh key={i} geometry={geometry} raycast={acceleratedRaycast}
-      onClick={click} onPointerOver={over} onPointerOut={() => onHover?.(null)} onDoubleClick={focus}>
+      onClick={interactive ? click : undefined} onPointerOver={interactive ? over : undefined}
+      onPointerOut={interactive ? () => onHover?.(null) : undefined} onDoubleClick={interactive ? focus : undefined}>
       <SteelMaterial color={activeColor} metalness={wireframe ? 0 : .55} roughness={.45}
         transparent opacity={spring.opacity} depthWrite={mode !== "xray" && opacity >= .99}
         wireframe={wireframe || state === "assumed"} clippingPlanes={planes ?? []} />
-      {selected || hovered ? <Edges threshold={20} color={selected ? "#b8d6ff" : "#86aee8"} lineWidth={1.2} /> : null}
+      {(selected || hovered) && opacity > .01 ? <Edges threshold={20} color={selected ? "#b8d6ff" : "#86aee8"} lineWidth={1.2} /> : null}
     </mesh>)}
-    {selected ? product.geometries.map((geometry, i) => <mesh key={`outline-${i}`} geometry={geometry} scale={1.018} raycast={() => null}>
+    {selected && opacity > .01 ? product.geometries.map((geometry, i) => <mesh key={`outline-${i}`} geometry={geometry} scale={1.018} raycast={() => null}>
       <BasicMaterial side={BackSide} color="#9fc7ff" transparent opacity={.8} depthWrite={false} clippingPlanes={planes ?? []} />
     </mesh>) : null}
-    {product.semanticId.startsWith("nozzle:") && onSelect && !wireframe && opacity > .05 ?
-      <mesh onClick={click} onPointerOver={over} onPointerOut={() => onHover?.(null)} onDoubleClick={focus}>
-        <sphereGeometry args={[Math.max(.2, (product.bounds.max[1] - product.bounds.min[1]) * .8), 10, 8]} />
-        <BasicMaterial transparent opacity={0} colorWrite={false} depthWrite={false} />
-      </mesh> : null}
+    {product.semanticId.startsWith("nozzle:") && interactive ? <HitTarget
+      radius={Math.max(.15, (product.bounds.max[1] - product.bounds.min[1]) * .8)} onClick={click}
+      onOver={over} onOut={() => onHover?.(null)} onFocus={focus} /> : null}
   </animated.group>;
 }
 

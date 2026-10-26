@@ -1,5 +1,7 @@
 .frame { position:relative; width:100%; height:100%; min-height:340px; overflow:hidden; border:1px solid var(--border); border-radius:var(--radius-card); background:var(--surface-sunken); container-type:inline-size; }
 .canvas { position:absolute!important; inset:0; touch-action:none; }
+.labels { position:absolute; inset:0; z-index:2; pointer-events:none; overflow:hidden; }
+.labels button { pointer-events:auto; }
 .tools { position:absolute; z-index:3; top:12px; right:12px; display:flex; gap:4px; }
 .button { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-width:32px; min-height:32px; padding:5px 8px; border:1px solid var(--border-strong); border-radius:7px; background:var(--surface); color:var(--text-muted); cursor:pointer; font-size:12px; line-height:1.2; transition:background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out); }
 .button svg { width:15px; height:15px; stroke-width:1.5; flex-shrink:0; }
@@ -7,10 +9,10 @@
 .button:focus-visible,.range:focus-visible,.select:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
 .button[aria-pressed=true] { background:var(--accent-soft); color:var(--accent-text); border-color:var(--accent); }
 .button:disabled { opacity:.45; cursor:not-allowed; }
-.selectors { position:absolute; z-index:3; top:12px; left:12px; display:flex; flex-wrap:wrap; gap:6px; max-width:calc(100% - 168px); }
+.selectors { position:absolute; z-index:3; top:53px; left:12px; display:flex; flex-wrap:wrap; gap:6px; max-width:calc(100% - 24px); }
 .group { display:inline-flex; gap:3px; padding:3px; border:1px solid var(--border); border-radius:8px; background:var(--surface-sunken); }
 .group .button { border-color:transparent; min-height:26px; padding:4px 7px; }
-.secondary { position:absolute; z-index:3; top:55px; left:12px; display:flex; flex-wrap:wrap; gap:5px; max-width:calc(100% - 20px); }
+.secondary { position:absolute; z-index:3; top:96px; left:12px; display:flex; flex-wrap:wrap; gap:5px; max-width:calc(100% - 20px); }
 .legend { position:absolute; z-index:2; bottom:12px; right:12px; max-width:155px; padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--surface); font-size:10px; color:var(--text-muted); }
 .legend summary { cursor:pointer; font-weight:600; color:var(--text); }
 .legend ul { list-style:none; padding:5px 0 0; margin:0; display:grid; gap:5px; }
@@ -24,7 +26,7 @@
 .narration .button { flex-shrink:0; }
 .cut { position:absolute; right:12px; top:55px; z-index:3; display:grid; gap:6px; width:155px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:11px; color:var(--text-muted); }
 .range { width:100%; accent-color:var(--accent); cursor:pointer; }
-.tree { position:absolute; z-index:4; top:94px; left:12px; bottom:94px; width:205px; overflow:auto; background:var(--surface); border:1px solid var(--border-strong); border-radius:9px; padding:10px; }
+.tree { position:absolute; z-index:4; top:135px; left:12px; bottom:94px; width:205px; overflow:auto; background:var(--surface); border:1px solid var(--border-strong); border-radius:9px; padding:10px; }
 .tree h4 { font-size:12px; font-weight:600; margin:0 0 9px; }
 .treeRow { display:flex; align-items:center; gap:3px; margin:4px 0; }
 .treeRow .button:first-child { flex:1; justify-content:flex-start; }
@@ -43,4 +45,4 @@
 @media (hover:hover) and (pointer:fine) { .button:hover { color:var(--text); background:var(--surface-raised); } }
 @media (pointer:coarse) { .button { min-width:44px; min-height:44px; } }
 @media (prefers-reduced-motion:reduce) { .button { transition:none; } .button:active { transform:none; } .skeleton { animation:none; } }
-@container (max-width:560px) { .selectors { max-width:calc(100% - 55px); top:53px; } .tools { top:10px; } .secondary { top:96px; } .badge { top:10px; left:12px; right:auto; } .cut { top:137px; width:135px; } .tree { top:138px; } .narration { width:calc(100% - 24px); bottom:48px; font-size:11px; } .legend { bottom:9px; padding:5px 8px; } .legend[open] { bottom:9px; } .caption { max-width:calc(100% - 115px); font-size:10px; bottom:9px; } .scrub { bottom:133px; right:12px; } }
+@container (max-width:560px) { .selectors { max-width:calc(100% - 55px); top:53px; } .tools { top:10px; } .secondary { top:137px; } .badge { top:10px; left:12px; right:auto; } .cut { top:178px; width:135px; } .tree { top:178px; } .narration { width:calc(100% - 24px); bottom:48px; font-size:11px; } .legend { bottom:9px; padding:5px 8px; } .legend[open] { bottom:9px; } .caption { max-width:calc(100% - 115px); font-size:10px; bottom:9px; } .scrub { bottom:133px; right:12px; } }

@@ -83,7 +83,7 @@ export function usePreparedModel(model: IfcModel | null): PreparedProduct[] {
       // drei conserva tipos transitivos de BVH 0.8; el raycast y el árbol usados aquí son 0.9.
       // Recursos GPU mutables, con vida y limpieza propias, fuera del estado de React.
       // eslint-disable-next-line react-hooks/immutability
-      geometry.boundsTree = new MeshBVH(geometry, { maxLeafSize: 10 }) as unknown as NonNullable<BufferGeometry["boundsTree"]>;
+      geometry.boundsTree = new MeshBVH(geometry, { targetLeafSize: 10 }) as unknown as NonNullable<BufferGeometry["boundsTree"]>;
     }
     return () => {
       for (const product of products) for (const geometry of product.geometries) {

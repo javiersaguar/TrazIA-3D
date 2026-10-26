@@ -1,6 +1,6 @@
 "use client";
 
-import { Html, Line } from "@react-three/drei";
+import { Line } from "@react-three/drei";
 import { useMemo } from "react";
 import { Vector3 } from "three";
 import type { IfcModel, Vec3 } from "@/workers/ifc-protocol";
@@ -8,6 +8,7 @@ import type { PreparedProduct } from "./model-resource";
 import { elementForField } from "./semantic";
 import type { Annotation } from "./types";
 import styles from "./viewer.module.css";
+import { SceneLabel as Html } from "./stage";
 
 function Dimension({ from, to, anchorFrom, anchorTo, annotation }: {
   from: Vec3; to: Vec3; anchorFrom: Vec3; anchorTo: Vec3; annotation: Annotation;

@@ -1,6 +1,6 @@
 "use client";
 
-import { Html, Grid } from "@react-three/drei";
+import { Grid, Line } from "@react-three/drei";
 import { Eye, LocateFixed, Pause, Play, SkipForward } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -8,7 +8,7 @@ import type { Bounds } from "@/workers/ifc-protocol";
 import { useSelection } from "@/stores/selection";
 import { useIfcModel, usePreparedModel } from "../viewer3d/model-resource";
 import { ProductMesh } from "../viewer3d/product-mesh";
-import { CameraRig, CameraTools, Legend, LoadingState, SceneCanvas, Studio, type CameraHandle } from "../viewer3d/stage";
+import { CameraRig, CameraTools, Legend, LoadingState, SceneCanvas, SceneLabel as Html, Studio, type CameraHandle } from "../viewer3d/stage";
 import type { RevisionMorphProps } from "../viewer3d/types";
 import { changeSteps, clampProgress, morphState, pairByGlobalId } from "./morph";
 import styles from "../viewer3d/viewer.module.css";
@@ -76,6 +76,12 @@ export function RevisionMorph({ fromUrl, toUrl, changes, progress: controlledPro
     }
     return ids;
   }, [steps, pairs]);
+  const markers = useMemo(() => steps.map(change => ({ change,
+    product: b.find(p => p.semanticId === change.elementId) ?? a.find(p => p.semanticId === change.elementId),
+  })).filter(entry => !!entry.product).sort((left, right) => right.product!.center[1] - left.product!.center[1])
+    .map((entry, index) => ({ ...entry,
+      position: [index % 2 ? bounds.min[0] - .8 : bounds.max[0] + .8, entry.product!.center[1], bounds.max[2] + .6] as [number, number, number],
+    })), [steps, a, b, bounds]);
   return <div className={styles.frame} ref={container} data-testid="revision-morph" data-phase={ready ? "ready" : "loading"} data-progress={progress.toFixed(3)}>
     {ready ? <SceneCanvas label="Comparación de IFC sintéticos A y B emparejados por GlobalId">
       <Studio />
@@ -92,14 +98,12 @@ export function RevisionMorph({ fromUrl, toUrl, changes, progress: controlledPro
             selected={pair.after.semanticId === selectedId} onSelect={id => setSelected(id)} immediate /> : null}
         </group>;
       })}
-      {steps.map((change, index) => {
-        const product = b.find(p => p.semanticId === change.elementId) ?? a.find(p => p.semanticId === change.elementId);
-        if (!product) return null;
-        return <Html key={change.id} position={[product.bounds.max[0] + .3, product.center[1] + index * .12, product.center[2]]}
-          center zIndexRange={[8, 0]} style={{ pointerEvents: "none" }}>
+      {markers.map(({ change, product, position }) => <group key={change.id}>
+        <Line points={[product!.center, position]} color="#f5a35c" dashed dashSize={.07} gapSize={.05} lineWidth={.8} />
+        <Html position={position} center zIndexRange={[8, 0]} style={{ pointerEvents: "none" }}>
           <div className={styles.delta}>Δ {change.label}</div>
-        </Html>;
-      })}
+        </Html>
+      </group>)}
     </SceneCanvas> : <LoadingState error={before.error ?? after.error} />}
     <CameraTools handle={camera} container={container} />
     <div className={styles.selectors} role="group" aria-label="Cámara de revisiones">
