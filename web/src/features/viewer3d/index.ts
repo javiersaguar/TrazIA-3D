@@ -4,7 +4,8 @@
     const IfcViewer = dynamic(() => import("@/features/viewer3d").then((m) => m.IfcViewer), { ssr: false });
 */
 export { IfcViewer } from "./ifc-viewer";
-export { PlantScene, RevisionMorph } from "./stub";
+export { PlantScene } from "../plant/plant-scene";
+export { RevisionMorph } from "./stub";
 export type {
   Annotation,
   IfcViewerProps,
