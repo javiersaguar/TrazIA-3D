@@ -1,0 +1,2876 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "TrazIA-3D",
+    "version": "0.3"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents": {
+      "post": {
+        "summary": "Upload",
+        "operationId": "upload_documents_post",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_documents_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/equipment": {
+      "get": {
+        "summary": "Equipment",
+        "operationId": "equipment_equipment_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/equipment/{tag}/revisions/{rev}": {
+      "get": {
+        "summary": "Revision",
+        "operationId": "revision_equipment__tag__revisions__rev__get",
+        "parameters": [
+          {
+            "name": "tag",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tag"
+            }
+          },
+          {
+            "name": "rev",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rev"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "DEMO-PLANT",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Revision"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/revisions/{identity}/fields": {
+      "get": {
+        "summary": "Review Fields",
+        "operationId": "review_fields_revisions__identity__fields_get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/revisions/{identity}/fields/{path}": {
+      "patch": {
+        "summary": "Update Field",
+        "operationId": "update_field_revisions__identity__fields__path__patch",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          },
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Path"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FieldInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Revision"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/revisions/{identity}/approve": {
+      "post": {
+        "summary": "Approve Revision",
+        "operationId": "approve_revision_revisions__identity__approve_post",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprovalInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Revision"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/revisions/{identity}/audit": {
+      "get": {
+        "summary": "Audit",
+        "operationId": "audit_revisions__identity__audit_get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/revisions/{identity}/ifc": {
+      "get": {
+        "summary": "Ifc",
+        "operationId": "ifc_revisions__identity__ifc_get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          },
+          {
+            "name": "schema",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "IFC4",
+                "IFC4X3",
+                "IFC2X3"
+              ],
+              "type": "string",
+              "default": "IFC4",
+              "title": "Schema"
+            }
+          },
+          {
+            "name": "draft",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Draft"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/revisions/{identity}/documents/{document_id}": {
+      "get": {
+        "summary": "Original",
+        "operationId": "original_revisions__identity__documents__document_id__get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          },
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/equipment/{tag}/jobs": {
+      "post": {
+        "summary": "Create Job",
+        "operationId": "create_job_equipment__tag__jobs_post",
+        "parameters": [
+          {
+            "name": "tag",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tag"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{identity}": {
+      "get": {
+        "summary": "Job",
+        "operationId": "job_jobs__identity__get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{identity}/cancel": {
+      "post": {
+        "summary": "Cancel",
+        "operationId": "cancel_jobs__identity__cancel_post",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{identity}/events": {
+      "get": {
+        "summary": "Events",
+        "operationId": "events_jobs__identity__events_get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          },
+          {
+            "name": "last-event-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Last-Event-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/diff": {
+      "get": {
+        "summary": "Diff",
+        "operationId": "diff_diff_get",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "A",
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "B",
+              "title": "To"
+            }
+          },
+          {
+            "name": "layers",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Layers"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/diff/bcf": {
+      "get": {
+        "summary": "Bcf",
+        "operationId": "bcf_diff_bcf_get",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "A",
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "B",
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/diff/visual": {
+      "get": {
+        "summary": "Diff Visual",
+        "operationId": "diff_visual_diff_visual_get",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "A",
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "B",
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bench": {
+      "get": {
+        "summary": "Bench",
+        "operationId": "bench_bench_get",
+        "parameters": [
+          {
+            "name": "extractor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "etiquetas",
+                "combinado"
+              ],
+              "type": "string",
+              "default": "etiquetas",
+              "title": "Extractor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plant": {
+      "get": {
+        "summary": "Plant",
+        "operationId": "plant_plant_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/estudio": {
+      "get": {
+        "summary": "Study",
+        "operationId": "study_estudio_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Launch Study",
+        "operationId": "launch_study_estudio_post",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/copiloto": {
+      "post": {
+        "summary": "Copilot",
+        "operationId": "copilot_copiloto_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopilotInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Alternative": {
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Unit"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "value",
+          "unit",
+          "source"
+        ],
+        "title": "Alternative"
+      },
+      "Angle": {
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "conflict",
+              "abstained",
+              "accepted",
+              "corrected",
+              "assumed"
+            ],
+            "title": "State",
+            "default": "candidate"
+          },
+          "interval": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Interval"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "alternatives": {
+            "items": {
+              "$ref": "#/components/schemas/Alternative"
+            },
+            "type": "array",
+            "title": "Alternatives"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "value": {
+            "type": "number",
+            "exclusiveMaximum": 360,
+            "minimum": 0,
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "const": "deg",
+            "title": "Unit",
+            "default": "deg"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "value"
+        ],
+        "title": "Angle"
+      },
+      "Approval": {
+        "properties": {
+          "reviewer": {
+            "type": "string",
+            "minLength": 2,
+            "title": "Reviewer"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "input_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Input Sha256"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reviewer",
+          "timestamp",
+          "input_sha256"
+        ],
+        "title": "Approval"
+      },
+      "ApprovalInput": {
+        "properties": {
+          "reviewer": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Reviewer"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reviewer"
+        ],
+        "title": "ApprovalInput"
+      },
+      "Attribute": {
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "conflict",
+              "abstained",
+              "accepted",
+              "corrected",
+              "assumed"
+            ],
+            "title": "State",
+            "default": "candidate"
+          },
+          "interval": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Interval"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "alternatives": {
+            "items": {
+              "$ref": "#/components/schemas/Alternative"
+            },
+            "type": "array",
+            "title": "Alternatives"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Unit"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "value",
+          "unit"
+        ],
+        "title": "Attribute"
+      },
+      "Body_upload_documents_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "revision": {
+            "type": "string",
+            "title": "Revision",
+            "default": "A"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_documents_post"
+      },
+      "ColumnParameters": {
+        "properties": {
+          "sections": {
+            "items": {
+              "$ref": "#/components/schemas/ColumnSection"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Sections"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sections"
+        ],
+        "title": "ColumnParameters"
+      },
+      "ColumnSection": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Id"
+          },
+          "diameter": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "top_diameter": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PositiveDimension"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "height": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "diameter",
+          "height"
+        ],
+        "title": "ColumnSection"
+      },
+      "CopilotInput": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Question"
+          },
+          "revision_id": {
+            "type": "string",
+            "title": "Revision Id",
+            "default": "A"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question"
+        ],
+        "title": "CopilotInput"
+      },
+      "Dimension": {
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "conflict",
+              "abstained",
+              "accepted",
+              "corrected",
+              "assumed"
+            ],
+            "title": "State",
+            "default": "candidate"
+          },
+          "interval": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Interval"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "alternatives": {
+            "items": {
+              "$ref": "#/components/schemas/Alternative"
+            },
+            "type": "array",
+            "title": "Alternatives"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "const": "mm",
+            "title": "Unit",
+            "default": "mm"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "value"
+        ],
+        "title": "Dimension"
+      },
+      "Direction3": {
+        "properties": {
+          "x": {
+            "$ref": "#/components/schemas/DirectionComponent"
+          },
+          "y": {
+            "$ref": "#/components/schemas/DirectionComponent"
+          },
+          "z": {
+            "$ref": "#/components/schemas/DirectionComponent"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "x",
+          "y",
+          "z"
+        ],
+        "title": "Direction3"
+      },
+      "DirectionComponent": {
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "conflict",
+              "abstained",
+              "accepted",
+              "corrected",
+              "assumed"
+            ],
+            "title": "State",
+            "default": "candidate"
+          },
+          "interval": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Interval"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "alternatives": {
+            "items": {
+              "$ref": "#/components/schemas/Alternative"
+            },
+            "type": "array",
+            "title": "Alternatives"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "const": "1",
+            "title": "Unit",
+            "default": "1"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "value"
+        ],
+        "title": "DirectionComponent"
+      },
+      "Document": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Id"
+          },
+          "filename": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Filename"
+          },
+          "revision": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Revision"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Sha256"
+          },
+          "page_count": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Count"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "filename",
+          "revision",
+          "sha256"
+        ],
+        "title": "Document"
+      },
+      "Elevation": {
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "conflict",
+              "abstained",
+              "accepted",
+              "corrected",
+              "assumed"
+            ],
+            "title": "State",
+            "default": "candidate"
+          },
+          "interval": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Interval"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "alternatives": {
+            "items": {
+              "$ref": "#/components/schemas/Alternative"
+            },
+            "type": "array",
+            "title": "Alternatives"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "value": {
+            "type": "number",
+            "minimum": 0,
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "const": "mm",
+            "title": "Unit",
+            "default": "mm"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "value"
+        ],
+        "title": "Elevation"
+      },
+      "Envelope": {
+        "properties": {
+          "origin": {
+            "$ref": "#/components/schemas/Vector3"
+          },
+          "size": {
+            "$ref": "#/components/schemas/Vector3"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "origin",
+          "size"
+        ],
+        "title": "Envelope"
+      },
+      "Equipment": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Id"
+          },
+          "tag": {
+            "$ref": "#/components/schemas/Tag"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "vertical_vessel",
+              "horizontal_vessel",
+              "column",
+              "tank",
+              "pump",
+              "compressor",
+              "generic"
+            ],
+            "title": "Kind",
+            "default": "vertical_vessel"
+          },
+          "lod": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3
+            ],
+            "title": "Lod",
+            "default": 2
+          },
+          "support": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "skirt",
+                  "legs",
+                  "saddles",
+                  "lugs",
+                  "baseplate",
+                  "none"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "envelope": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Envelope"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "diameter": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Dimension"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "height": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Dimension"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "head_depth": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Dimension"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "skirt_height": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Dimension"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "skirt_thickness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Dimension"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "horizontal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HorizontalParameters"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "column": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ColumnParameters"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tank": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TankParameters"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "platforms": {
+            "items": {
+              "$ref": "#/components/schemas/PlatformParameters"
+            },
+            "type": "array",
+            "title": "Platforms"
+          },
+          "ladders": {
+            "items": {
+              "$ref": "#/components/schemas/LadderParameters"
+            },
+            "type": "array",
+            "title": "Ladders"
+          },
+          "attributes": {
+            "patternProperties": {
+              "^[A-Za-z0-9_-]+$": {
+                "$ref": "#/components/schemas/Attribute"
+              }
+            },
+            "propertyNames": {
+              "minLength": 1
+            },
+            "type": "object",
+            "title": "Attributes"
+          },
+          "nozzles": {
+            "items": {
+              "$ref": "#/components/schemas/Nozzle"
+            },
+            "type": "array",
+            "title": "Nozzles"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "tag",
+          "nozzles"
+        ],
+        "title": "Equipment"
+      },
+      "FieldInput": {
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "conflict",
+              "abstained",
+              "accepted",
+              "corrected",
+              "assumed"
+            ],
+            "title": "State"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Source"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "actor": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Actor"
+          },
+          "seconds": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 3600,
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seconds"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "state",
+          "actor"
+        ],
+        "title": "FieldInput"
+      },
+      "FlangeParameters": {
+        "properties": {
+          "outer_diameter": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "thickness": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "outer_diameter",
+          "thickness"
+        ],
+        "title": "FlangeParameters"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HorizontalParameters": {
+        "properties": {
+          "diameter": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "length": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "head_depth": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "support_height": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "saddle_width": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "saddle_span": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "saddle_positions": {
+            "items": {
+              "$ref": "#/components/schemas/Dimension"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Saddle Positions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "diameter",
+          "length",
+          "head_depth",
+          "support_height",
+          "saddle_width",
+          "saddle_span",
+          "saddle_positions"
+        ],
+        "title": "HorizontalParameters"
+      },
+      "Interval": {
+        "properties": {
+          "low": {
+            "type": "number",
+            "title": "Low"
+          },
+          "high": {
+            "type": "number",
+            "title": "High"
+          },
+          "level": {
+            "type": "number",
+            "exclusiveMaximum": 1,
+            "exclusiveMinimum": 0,
+            "title": "Level"
+          },
+          "method": {
+            "type": "string",
+            "const": "conformal",
+            "title": "Method",
+            "default": "conformal"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "low",
+          "high",
+          "level"
+        ],
+        "title": "Interval"
+      },
+      "JobInput": {
+        "properties": {
+          "documents": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 30,
+            "minItems": 1,
+            "title": "Documents"
+          },
+          "project_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Project Id",
+            "default": "DEMO-PLANT"
+          },
+          "equipment_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Equipment Id",
+            "description": "ID estable del equipo; no cambia al renombrar el tag",
+            "default": "vessel-001"
+          },
+          "revision": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 1,
+            "title": "Revision",
+            "default": "C"
+          },
+          "strategy": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Strategy",
+            "default": "b_reglas"
+          },
+          "providers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Providers"
+          },
+          "dataset": {
+            "type": "string",
+            "enum": [
+              "synthetic",
+              "real"
+            ],
+            "title": "Dataset",
+            "default": "synthetic"
+          },
+          "previous_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Id"
+          },
+          "timeout_seconds": {
+            "type": "number",
+            "maximum": 3600,
+            "exclusiveMinimum": 0,
+            "title": "Timeout Seconds",
+            "default": 300
+          },
+          "max_attempts": {
+            "type": "integer",
+            "maximum": 5,
+            "minimum": 1,
+            "title": "Max Attempts",
+            "default": 3
+          },
+          "retry_backoff_seconds": {
+            "type": "number",
+            "maximum": 30,
+            "minimum": 0,
+            "title": "Retry Backoff Seconds",
+            "default": 1
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "documents"
+        ],
+        "title": "JobInput"
+      },
+      "LadderParameters": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Id"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/Vector3"
+          },
+          "width": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "height": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "rail_diameter": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "rung_spacing": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "origin",
+          "width",
+          "height",
+          "rail_diameter",
+          "rung_spacing"
+        ],
+        "title": "LadderParameters"
+      },
+      "Nozzle": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Id"
+          },
+          "stable_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stable Id"
+          },
+          "diameter": {
+            "$ref": "#/components/schemas/Dimension"
+          },
+          "projection": {
+            "$ref": "#/components/schemas/Dimension"
+          },
+          "elevation": {
+            "$ref": "#/components/schemas/Elevation"
+          },
+          "azimuth": {
+            "$ref": "#/components/schemas/Angle"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Vector3"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "direction": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Direction3"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "flange": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FlangeParameters"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "service": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Attribute"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Attribute"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "nozzle_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "radial",
+                  "tangential",
+                  "top",
+                  "bottom",
+                  "inclined"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nozzle Type"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "diameter",
+          "projection",
+          "elevation",
+          "azimuth"
+        ],
+        "title": "Nozzle"
+      },
+      "PlatformParameters": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Id"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/Vector3"
+          },
+          "size": {
+            "$ref": "#/components/schemas/Vector3"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "origin",
+          "size"
+        ],
+        "title": "PlatformParameters"
+      },
+      "PositiveDimension": {
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "conflict",
+              "abstained",
+              "accepted",
+              "corrected",
+              "assumed"
+            ],
+            "title": "State",
+            "default": "candidate"
+          },
+          "interval": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Interval"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "alternatives": {
+            "items": {
+              "$ref": "#/components/schemas/Alternative"
+            },
+            "type": "array",
+            "title": "Alternatives"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "value": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "const": "mm",
+            "title": "Unit",
+            "default": "mm"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "value"
+        ],
+        "title": "PositiveDimension"
+      },
+      "Revision": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "0.3",
+            "title": "Schema Version",
+            "default": "0.3"
+          },
+          "project_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Project Id"
+          },
+          "revision": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Revision"
+          },
+          "dataset": {
+            "type": "string",
+            "enum": [
+              "synthetic",
+              "real"
+            ],
+            "title": "Dataset"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/Document"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Documents"
+          },
+          "equipment": {
+            "$ref": "#/components/schemas/Equipment"
+          },
+          "approval": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Approval"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "project_id",
+          "revision",
+          "dataset",
+          "documents",
+          "equipment"
+        ],
+        "title": "Revision"
+      },
+      "RunInfo": {
+        "properties": {
+          "strategy": {
+            "type": "string",
+            "title": "Strategy"
+          },
+          "providers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Providers"
+          },
+          "seconds": {
+            "type": "number",
+            "minimum": 0,
+            "title": "Seconds"
+          },
+          "gpu_seconds": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gpu Seconds"
+          },
+          "tokens_in": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens In"
+          },
+          "tokens_out": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens Out"
+          },
+          "cost_eur": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Eur"
+          },
+          "external_calls": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "External Calls"
+          },
+          "accounting_complete": {
+            "type": "boolean",
+            "title": "Accounting Complete",
+            "default": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "strategy",
+          "providers",
+          "seconds",
+          "external_calls"
+        ],
+        "title": "RunInfo"
+      },
+      "Source": {
+        "properties": {
+          "document_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Document Id"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "sheet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sheet"
+          },
+          "cell": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cell"
+          },
+          "locator": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Locator"
+          },
+          "bbox": {
+            "anyOf": [
+              {
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array",
+                "maxItems": 4,
+                "minItems": 4
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bbox"
+          },
+          "confidence": {
+            "type": "number",
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Confidence"
+          },
+          "reviewed": {
+            "type": "boolean",
+            "title": "Reviewed",
+            "default": false
+          },
+          "confidence_raw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence Raw"
+          },
+          "channel": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "texto",
+                  "tabla",
+                  "cota",
+                  "cajetin",
+                  "hoja_datos",
+                  "vesor",
+                  "ocr",
+                  "detector",
+                  "vision",
+                  "geometria",
+                  "rag",
+                  "memoria_revision",
+                  "humano"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel"
+          },
+          "strategy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Strategy"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "prompt_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Sha256"
+          },
+          "grounded": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grounded"
+          },
+          "text_original": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text Original"
+          },
+          "unit_original": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Original"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "document_id",
+          "locator",
+          "confidence"
+        ],
+        "title": "Source"
+      },
+      "Tag": {
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "conflict",
+              "abstained",
+              "accepted",
+              "corrected",
+              "assumed"
+            ],
+            "title": "State",
+            "default": "candidate"
+          },
+          "interval": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Interval"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "alternatives": {
+            "items": {
+              "$ref": "#/components/schemas/Alternative"
+            },
+            "type": "array",
+            "title": "Alternatives"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "const": "1",
+            "title": "Unit",
+            "default": "1"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "value"
+        ],
+        "title": "Tag"
+      },
+      "TankParameters": {
+        "properties": {
+          "diameter": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "height": {
+            "$ref": "#/components/schemas/PositiveDimension"
+          },
+          "roof": {
+            "type": "string",
+            "enum": [
+              "flat",
+              "conical",
+              "domed"
+            ],
+            "title": "Roof"
+          },
+          "roof_height": {
+            "$ref": "#/components/schemas/Dimension"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "diameter",
+          "height",
+          "roof",
+          "roof_height"
+        ],
+        "title": "TankParameters"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "Vector3": {
+        "properties": {
+          "x": {
+            "$ref": "#/components/schemas/Dimension"
+          },
+          "y": {
+            "$ref": "#/components/schemas/Dimension"
+          },
+          "z": {
+            "$ref": "#/components/schemas/Dimension"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "x",
+          "y",
+          "z"
+        ],
+        "title": "Vector3"
+      }
+    }
+  }
+}

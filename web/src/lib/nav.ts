@@ -1,5 +1,6 @@
 import {
   Calculator,
+  FlaskConical,
   Gauge,
   GitCompareArrows,
   Layers,
@@ -38,7 +39,7 @@ export const NAV: NavGroup[] = [
         label: "Pipeline",
         icon: Workflow,
         shortcut: "2",
-        description: "Etapas que convierten los documentos en modelo. Repetición simulada sobre los documentos sintéticos de V-101.",
+        description: "Etapas que convierten los documentos en modelo. El aviso indica el origen de los eventos de cada ejecución.",
       },
       {
         href: "/revision",
@@ -65,6 +66,13 @@ export const NAV: NavGroup[] = [
         icon: Gauge,
         shortcut: "5",
         description: "Métricas del jurado medidas sobre un conjunto sintético con verdad conocida. Con el dataset del reto se medirá contra sus IFC de referencia.",
+      },
+      {
+        href: "/estudio",
+        label: "Estudio",
+        icon: FlaskConical,
+        shortcut: "7",
+        description: "Las cuatro estrategias de la pág. 13 medidas con los mismos documentos: puntuación, intervalos, ablaciones y coste. Elegimos con datos.",
       },
       {
         href: "/impacto",

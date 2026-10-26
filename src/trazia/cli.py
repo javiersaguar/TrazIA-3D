@@ -22,16 +22,35 @@ def main(argv=None) -> int:
         description="TrazIA-3D: del plano al modelo, con cada cambio trazado"
     )
     commands = parser.add_subparsers(dest="command", required=True)
+    migrate = commands.add_parser("migrate", help="Migrar un contrato 0.2 a 0.3 (DRAFT)")
+    migrate.add_argument("input", type=Path)
+    migrate.add_argument("--output", "-o", type=Path, required=True)
     validate = commands.add_parser("validate", help="Validar contrato y estado de revisión")
     validate.add_argument("input", type=Path)
-    export = commands.add_parser("export", help="Exportar IFC4")
+    export = commands.add_parser("export", help="Exportar IFC4, IFC4X3 o IFC2X3")
     export.add_argument("input", type=Path)
     export.add_argument("--output", "-o", type=Path, required=True)
     export.add_argument("--draft", action="store_true")
+    export.add_argument("--schema", choices=("IFC4", "IFC4X3", "IFC2X3"), default="IFC4")
+    geometry = commands.add_parser(
+        "compare-ifc", help="Distancias de superficie por GUID (extra geo)"
+    )
+    geometry.add_argument("before", type=Path)
+    geometry.add_argument("after", type=Path)
+    geometry.add_argument("--samples", type=int, default=1024)
+    geometry.add_argument("--match", choices=("guid", "name"), default="guid")
+    geometry.add_argument("--output", "-o", type=Path)
+    ifc_validation = commands.add_parser("validate-ifc", help="Validar IFC y reglas EXPRESS")
+    ifc_validation.add_argument("input", type=Path)
     diff = commands.add_parser("diff", help="Comparar revisiones y evidencia")
     diff.add_argument("before", type=Path)
     diff.add_argument("after", type=Path)
     diff.add_argument("--output", "-o", type=Path)
+    diff.add_argument("--geometry", action="store_true")
+    bcf = commands.add_parser("bcf", help="Exportar cambios como BCF 2.1 DRAFT")
+    bcf.add_argument("before", type=Path)
+    bcf.add_argument("after", type=Path)
+    bcf.add_argument("--output", "-o", type=Path, required=True)
     schema = commands.add_parser("schema", help="Emitir JSON Schema")
     schema.add_argument("--output", "-o", type=Path)
     ingest = commands.add_parser("ingest", help="Leer PDF/XLSX/imagen y catalogar evidencia")
@@ -61,6 +80,8 @@ def main(argv=None) -> int:
     try:
         if args.command == "schema":
             write_json(Revision.model_json_schema(), args.output)
+        elif args.command == "migrate":
+            write_json(load_revision(args.input).model_dump(mode="json"), args.output)
         elif args.command == "validate":
             revision = load_revision(args.input)
             write_json(
@@ -72,8 +93,35 @@ def main(argv=None) -> int:
                 },
                 None,
             )
+        elif args.command == "compare-ifc":
+            from .families.metrics import compare_ifc
+
+            write_json(
+                compare_ifc(args.before, args.after, samples=args.samples, match=args.match),
+                args.output,
+            )
+        elif args.command == "validate-ifc":
+            from .ifc import validate_ifc
+
+            issues = validate_ifc(args.input)
+            write_json({"valid": not issues, "issues": issues}, None)
+            return 1 if issues else 0
+        elif args.command == "bcf":
+            from .bcf import export_bcf
+
+            payload = export_bcf(load_revision(args.before), load_revision(args.after))
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_bytes(payload)
+            print(f"BCF DRAFT: {args.output}")
         elif args.command == "diff":
-            write_json(compare(load_revision(args.before), load_revision(args.after)), args.output)
+            write_json(
+                compare(
+                    load_revision(args.before),
+                    load_revision(args.after),
+                    include_geometry=args.geometry,
+                ),
+                args.output,
+            )
         elif args.command == "ingest":
             from .ingest import ingest_bytes
 
@@ -129,7 +177,9 @@ def main(argv=None) -> int:
         else:
             from .ifc import export_ifc
 
-            destination = export_ifc(load_revision(args.input), args.output, draft=args.draft)
+            destination = export_ifc(
+                load_revision(args.input), args.output, draft=args.draft, schema=args.schema
+            )
             print(f"IFC generado: {destination}")
     except (OSError, ValueError) as error:
         print(f"Error: {error}", file=sys.stderr)

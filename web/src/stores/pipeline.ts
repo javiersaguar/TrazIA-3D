@@ -1,6 +1,8 @@
 "use client";
 
 import { create } from "zustand";
+import { apiEnabled, apiURL } from "@/lib/api/config";
+import { cancelJob, getJob, startJob, subscribeJob, uploadDocument, type JobStatus } from "@/lib/api/client";
 import type { Revision } from "@/lib/types/revision";
 import { STAGES, type PipelineEvent, type StageId } from "@/lib/mock/pipeline";
 
@@ -17,7 +19,7 @@ export type StageRunState = {
   lastEventAt: number | null;
 };
 
-type Step = Omit<PipelineEvent, "id" | "at">;
+type Step = Omit<PipelineEvent, "id" | "at" | "stage"> & { stage: StageId };
 
 const STEP_MS = 420;
 
@@ -56,6 +58,7 @@ export function buildScript(rev: Revision): Step[] {
   return steps;
 }
 
+export type StartOptions = { files?: File[]; strategy?: string; dataset?: "synthetic" | "real" };
 type PipelineState = {
   running: boolean;
   revision: string | null;
@@ -63,10 +66,57 @@ type PipelineState = {
   events: PipelineEvent[];
   stages: Record<StageId, StageRunState>;
   activeStage: StageId | null;
-  start: (rev: Revision) => void;
+  jobId: string | null;
+  jobRun: JobStatus["run"];
+  warnings: string[];
+  error: string | null;
+  start: (rev: Revision, options?: StartOptions) => void;
+  cancel: () => void;
 };
 
 let timer: ReturnType<typeof setInterval> | null = null;
+
+type Setter = (update: Partial<PipelineState> | ((state: PipelineState) => Partial<PipelineState>)) => void;
+let closeEvents: (() => void) | null = null;
+
+async function startApi(rev: Revision, options: StartOptions, set: Setter) {
+  closeEvents?.();
+  set({ running: true, error: null, warnings: [], jobRun: null, jobId: null,
+    revision: rev.revision, events: [], stages: initialStages(), activeStage: null });
+  try {
+    const identity = `${rev.project_id}:${rev.equipment.id}:${rev.revision}`;
+    const uploads = options.files?.length ? await Promise.all(options.files.map(file => uploadDocument(file)))
+      : await Promise.all(rev.documents.map(async document => {
+        const response = await fetch(apiURL(`/revisions/${encodeURIComponent(identity)}/documents/${encodeURIComponent(document.id)}`));
+        if (!response.ok) throw new Error(`No se pudo leer ${document.filename}`);
+        return uploadDocument(new File([await response.blob()], document.filename), document.id, document.revision);
+      }));
+    const id = await startJob({ documents: uploads.map(d => d.id), project_id: rev.project_id,
+      equipment_id: rev.equipment.id, revision: `${rev.revision}-run-${Date.now().toString(36)}`,
+      strategy: options.strategy ?? "b_reglas", dataset: options.dataset ?? (options.files?.length ? "real" : rev.dataset) });
+    const job = await getJob(id);
+    set({ jobId: id });
+    closeEvents = subscribeJob(id, event => {
+      set(state => {
+        if (state.events.some(e => e.id === String(event.id))) return {};
+        const definition = STAGES.find(d => d.id === event.stage);
+        const at = Math.max(0, event.created_at - job.created_at);
+        const events = [{ ...event, id: String(event.id), at }, ...state.events];
+        if (!definition) return { events };
+        const previous = state.stages[definition.id];
+        const next: StageRunState = { status: event.status === "omitido" ? "skipped" : "done",
+          ok: previous.ok + (event.status === "ok" ? 1 : 0),
+          total: previous.total + (event.status === "omitido" ? 0 : 1), lastEventAt: event.created_at * 1000 };
+        return { events, error: null, stages: { ...state.stages, [definition.id]: next }, activeStage: definition.id };
+      });
+    }, status => {
+      closeEvents = null;
+      set({ running: false, activeStage: null, lastFinishedAt: Date.now() });
+      void getJob(id).then(result => set({ jobRun: result.run, warnings: result.warnings,
+        error: status === "done" ? null : result.error ?? `Trabajo ${status}` })).catch(error => set({ error: String(error) }));
+    }, () => set({ error: "Conexión de eventos interrumpida; intentando reanudar con la API." }));
+  } catch (error) { set({ running: false, error: error instanceof Error ? error.message : String(error) }); }
+}
 
 export const usePipeline = create<PipelineState>()((set, get) => ({
   running: false,
@@ -76,7 +126,16 @@ export const usePipeline = create<PipelineState>()((set, get) => ({
   stages: initialStages(),
   activeStage: null,
 
-  start: (rev) => {
+  jobId: null, jobRun: null, warnings: [], error: null,
+  cancel: () => {
+    const id = get().jobId;
+    if (!id) return;
+    closeEvents?.(); closeEvents = null;
+    void cancelJob(id).then(() => set({ running: false, activeStage: null, error: "Trabajo cancelado" }))
+      .catch(error => set({ error: String(error) }));
+  },
+  start: (rev, options = {}) => {
+    if (apiEnabled) { if (!get().running) void startApi(rev, options, set); return; }
     if (get().running) return;
     if (timer) clearInterval(timer);
     const script = buildScript(rev);

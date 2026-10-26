@@ -7,6 +7,7 @@ import { HealthRing } from "@/components/ui/data";
 import { Tip } from "@/components/ui/controls";
 import { SyntheticNotice } from "@/components/ui/notice";
 import { Badge, Button, Code, EmptyState, Icon, Panel, PanelHeader, Skeleton } from "@/components/ui/primitives";
+import { apiEnabled } from "@/lib/api/config";
 import { cn } from "@/lib/cn";
 import { relativeSeconds } from "@/lib/format";
 import { STAGES, type StageDef, type StageId } from "@/lib/mock/pipeline";
@@ -28,11 +29,19 @@ export function PipelineWorkspace() {
   const start = usePipeline((s) => s.start);
   const stages = usePipeline((s) => s.stages);
   const [filter, setFilter] = useState<StageId | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [strategy, setStrategy] = useState("b_reglas");
+  const [dataset, setDataset] = useState<"real" | "synthetic">("real");
+  const error = usePipeline(s => s.error);
+  const jobId = usePipeline(s => s.jobId);
+  const run = usePipeline(s => s.jobRun);
+  const warnings = usePipeline(s => s.warnings);
+  const cancel = usePipeline(s => s.cancel);
 
   // La primera visita lanza la repetición para que la pantalla no empiece vacía.
   const autoStarted = useRef(false);
   useEffect(() => {
-    if (rev && !autoStarted.current && !lastFinishedAt && !running) {
+    if (!apiEnabled && rev && !autoStarted.current && !lastFinishedAt && !running) {
       autoStarted.current = true;
       start(rev);
     }
@@ -41,19 +50,44 @@ export function PipelineWorkspace() {
   return (
     <div className="space-y-5">
       <SyntheticNotice>
-        Repetición simulada del pipeline sobre los documentos de V-101 rev {revision}. Los recuentos salen de esos archivos;
-        el ritmo es artificial y por eso no se muestran latencias ni costes.
+        {apiEnabled ? "Eventos reales de la API local. La demo usa los originales sintéticos de V-101; los documentos propios conservan el origen que indiques."
+          : `Repetición simulada del pipeline sobre los documentos de V-101 rev ${revision}. Los recuentos salen de esos archivos; el ritmo es artificial y no se muestran latencias ni costes.`}
       </SyntheticNotice>
+      {apiEnabled ? <Panel className="space-y-3 p-4">
+        <div className="flex flex-wrap items-end gap-4 text-[13px]">
+          <label className="grid gap-1">Documentos de V-101
+            <input aria-label="Documentos para procesar" type="file" multiple accept=".pdf,.xlsx,.png,.jpg,.jpeg"
+              disabled={running} onChange={event => setFiles(Array.from(event.target.files ?? []))} className="max-w-[340px] rounded border border-border bg-surface p-2" />
+          </label>
+          <label className="grid gap-1">Estrategia
+            <select aria-label="Estrategia de lectura" value={strategy} disabled={running} onChange={event => setStrategy(event.target.value)} className="rounded border border-border bg-surface p-2">
+              <option value="b_reglas">B · reglas</option><option value="a_vision">A · visión</option>
+              <option value="c_rag">C · recuperación</option><option value="d_hibrido">D · híbrido</option>
+            </select>
+          </label>
+          {files.length ? <label className="grid gap-1">Origen de documentos
+            <select aria-label="Origen de documentos" value={dataset} onChange={event => setDataset(event.target.value as "real" | "synthetic")} className="rounded border border-border bg-surface p-2">
+              <option value="real">Reales</option><option value="synthetic">Sintéticos de prueba</option>
+            </select></label> : <p className="text-muted">Sin archivos: procesa de nuevo los originales sintéticos de la revisión activa.</p>}
+        </div>
+        {jobId ? <p className="text-xs text-muted">Trabajo <Code>{jobId}</Code></p> : null}
+        {run ? <p className="text-sm text-muted">{run.seconds.toFixed(2)} s · {run.accounting_complete === false ? "Contabilidad incompleta" : run.cost_eur == null ? "Coste sin medir" : `${run.cost_eur.toFixed(4)} € de proveedor`} · {run.external_calls} llamadas contabilizadas</p> : null}
+        {warnings.map(warning => <p key={warning} className="text-xs text-muted">{warning}</p>)}
+        {error ? <p role="alert" className="text-sm text-danger">{error}</p> : null}
+      </Panel> : null}
 
       <Panel className="overflow-hidden">
         <PanelHeader
           title="Grafo del pipeline"
-          description="Los extractores corren en paralelo entre la clasificación y la normalización. Las etapas discontinuas aún no existen."
+          description={apiEnabled ? "Las etapas se iluminan con eventos persistidos del servidor. Sin ejecutar no significa disponible ni medida." : "Los extractores corren en paralelo entre clasificación y normalización. Las etapas discontinuas aún no existen."}
           actions={
-            <Button variant="primary" size="sm" disabled={running || !rev} onClick={() => rev && start(rev)}>
+            <div className="flex gap-2">
+            {apiEnabled && running && jobId ? <Button size="sm" onClick={cancel}>Cancelar</Button> : null}
+            <Button variant="primary" size="sm" disabled={running || !rev} onClick={() => rev && start(rev, { files, strategy, dataset: files.length ? dataset : rev.dataset })}>
               <Icon icon={lastFinishedAt ? RotateCcw : Play} size={14} />
-              {running ? "Procesando…" : lastFinishedAt ? "Repetir" : "Procesar"}
+              {running ? "Procesando…" : apiEnabled ? files.length ? "Procesar documentos" : "Procesar demo" : lastFinishedAt ? "Repetir" : "Procesar"}
             </Button>
+            </div>
           }
         />
         <div className="px-3 pb-3">
@@ -68,7 +102,7 @@ export function PipelineWorkspace() {
             <p className="text-[13px] text-muted">El anillo es la salud de la etapa en la última ejecución, no un recuento de ficheros.</p>
           </div>
           <span className="text-xs text-muted">
-            {STAGES.filter((s) => s.available).length} de {STAGES.length} etapas disponibles
+            {apiEnabled ? `${STAGES.filter(s => stages[s.id].lastEventAt !== null).length} etapas con eventos` : `${STAGES.filter(s => s.available).length} de ${STAGES.length} etapas disponibles`}
           </span>
         </div>
         <StageCarousel stages={stages} onShowEvents={setFilter} />
@@ -131,19 +165,20 @@ function StageCard({ def, run, onShowEvents }: { def: StageDef; run: StageRunSta
     return () => clearInterval(id);
   }, []);
 
-  const health = def.available && run.total > 0 ? run.ok / run.total : null;
-  const badge = !def.available ? (
-    <Badge tone="neutral">Próximamente</Badge>
-  ) : run.status === "done" ? (
+  const available = apiEnabled ? run.lastEventAt !== null : def.available;
+  const health = available && run.status !== "skipped" && run.total > 0 ? run.ok / run.total : null;
+  const badge = !available ? (
+    <Badge tone="neutral">{apiEnabled ? "Sin ejecutar" : "Próximamente"}</Badge>
+  ) : run.status === "skipped" ? <Badge tone="neutral">Omitida</Badge> : run.status === "done" ? (
     run.ok === run.total ? <Badge tone="live">Al día</Badge> : <Badge tone="danger">Con errores</Badge>
   ) : (
     <Badge tone="neutral">En espera</Badge>
   );
 
   return (
-    <Panel className={cn("flex w-[340px] shrink-0 snap-start flex-col p-5", !def.available && "border-dashed bg-transparent")}>
+    <Panel className={cn("flex w-[340px] shrink-0 snap-start flex-col p-5", !available && "border-dashed bg-transparent")}>
       <div className="flex items-start gap-3">
-        <span className={cn("inline-flex size-10 items-center justify-center rounded-[var(--radius-control)]", def.available ? "bg-surface-sunken text-text" : "bg-surface-sunken text-faint")}>
+        <span className={cn("inline-flex size-10 items-center justify-center rounded-[var(--radius-control)]", available ? "bg-surface-sunken text-text" : "bg-surface-sunken text-faint")}>
           <Icon icon={STAGE_ICON[def.id]} size={18} />
         </span>
         <div className="min-w-0 flex-1">
@@ -168,8 +203,8 @@ function StageCard({ def, run, onShowEvents }: { def: StageDef; run: StageRunSta
       <p className="mt-3 min-h-[40px] text-[13px] leading-snug text-muted">{def.description}</p>
 
       <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-border pt-4 text-[13px]">
-        <Metric label="Ficheros OK" value={def.available ? `${run.ok} / ${run.total}` : "—"} />
-        <Metric label="Reintentos" value={def.available && run.total ? "0" : "—"} />
+        <Metric label={apiEnabled ? "Eventos OK" : "Ficheros OK"} value={available ? `${run.ok} / ${run.total}` : "—"} />
+        <Metric label="Reintentos" value={apiEnabled ? "Sin medir" : available && run.total ? "0" : "—"} />
         <Metric label="Latencia media" value={<span className="text-faint">Sin medir</span>} />
         <Metric label="Último evento" value={run.lastEventAt ? relativeSeconds((now - run.lastEventAt) / 1000) : "—"} />
       </dl>
@@ -194,7 +229,7 @@ function Metric({ label, value }: { label: string; value: React.ReactNode }) {
 function EventsTable({ filter, onClearFilter }: { filter: StageId | null; onClearFilter: () => void }) {
   const events = usePipeline((s) => s.events);
   const rows = filter ? events.filter((e) => e.stage === filter) : events;
-  const stageName = (id: StageId) => STAGES.find((s) => s.id === id)?.name ?? id;
+  const stageName = (id: string) => STAGES.find((s) => s.id === id)?.name ?? id;
 
   return (
     <Panel className="overflow-hidden">

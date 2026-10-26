@@ -21,9 +21,15 @@ def approve(revision: Revision, reviewer: str, originals: dict[str, bytes]) -> R
     errors = verify_originals(revision, originals)
     if errors:
         raise ValueError("; ".join(errors))
+    if any(
+        f.state in ("conflict", "abstained", "assumed") for f in fields(revision.equipment).values()
+    ):
+        raise ValueError("Resuelva los conflictos, abstenciones y supuestos antes de aprobar")
     result = revision.model_copy(deep=True)
     result.approval = None
     for field in fields(result.equipment).values():
+        if field.state != "corrected":
+            field.state = "accepted"
         field.source.reviewed = True
     result.approval = Approval(
         reviewer=reviewer.strip(),

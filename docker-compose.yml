@@ -1,0 +1,126 @@
+name: trazia
+
+x-api-env: &api-env
+  TRAZIA_DATA: /data
+  TRAZIA_HOST: 0.0.0.0
+  TRAZIA_ROOT: /app
+  TRAZIA_OLLAMA_URL: ${TRAZIA_OLLAMA_URL:-http://host.docker.internal:11434}
+  TRAZIA_OLLAMA_MODEL: ${TRAZIA_OLLAMA_MODEL:-qwen3:4b}
+
+x-api: &api
+  build:
+    context: .
+    dockerfile: Dockerfile.api
+  environment: *api-env
+  volumes:
+    - trazia-data:/data
+  healthcheck:
+    test: [CMD, .venv/bin/python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+    interval: 10s
+    timeout: 5s
+    retries: 10
+
+x-web: &web
+  build:
+    context: .
+    dockerfile: Dockerfile.web
+    args:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+  healthcheck:
+    test: [CMD, node, -e, "fetch('http://localhost:3000/proyecto').then(r=>process.exit(r.ok?0:1))"]
+    interval: 15s
+    timeout: 5s
+    retries: 10
+
+services:
+  api:
+    <<: *api
+    profiles: [local]
+    ports: [127.0.0.1:8000:8000]
+  web:
+    <<: *web
+    profiles: [local, gpu]
+    ports: [127.0.0.1:3000:3000]
+  api-gpu:
+    <<: *api
+    profiles: [gpu]
+    environment:
+      <<: *api-env
+      TRAZIA_OLLAMA_URL: http://ollama:11434
+    ports: [127.0.0.1:8000:8000]
+    depends_on:
+      ollama: {condition: service_healthy}
+  ollama:
+    image: ollama/ollama:0.40.11
+    profiles: [gpu]
+    volumes: [ollama-data:/root/.ollama]
+    healthcheck:
+      test: [CMD, ollama, list]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+  redis:
+    image: redis:7.2-alpine
+    profiles: [escala]
+    command: [redis-server, --appendonly, "yes"]
+    volumes: [redis-data:/data]
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  postgres:
+    image: postgres:16-alpine
+    profiles: [escala]
+    environment:
+      POSTGRES_DB: trazia
+      POSTGRES_USER: trazia
+      POSTGRES_PASSWORD: ${TRAZIA_POSTGRES_PASSWORD:-trazia-local-demo}
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U trazia -d trazia"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  api-scale:
+    <<: *api
+    profiles: [escala]
+    environment:
+      <<: *api-env
+      TRAZIA_QUEUE: redis
+      TRAZIA_REDIS_URL: redis://redis:6379/0
+      TRAZIA_DATABASE_URL: postgresql+psycopg://trazia:${TRAZIA_POSTGRES_PASSWORD:-trazia-local-demo}@postgres/trazia
+    ports: [127.0.0.1:8000:8000]
+    depends_on:
+      redis: {condition: service_healthy}
+      postgres: {condition: service_healthy}
+  worker:
+    <<: *api
+    profiles: [escala]
+    command: [.venv/bin/arq, trazia.queue.worker.WorkerSettings]
+    healthcheck: {disable: true}
+    environment:
+      <<: *api-env
+      TRAZIA_QUEUE: redis
+      TRAZIA_REDIS_URL: redis://redis:6379/0
+      TRAZIA_DATABASE_URL: postgresql+psycopg://trazia:${TRAZIA_POSTGRES_PASSWORD:-trazia-local-demo}@postgres/trazia
+      TRAZIA_WORKER_CONCURRENCY: ${TRAZIA_WORKER_CONCURRENCY:-2}
+    depends_on:
+      api-scale: {condition: service_healthy}
+  web-scale:
+    <<: *web
+    profiles: [escala]
+    ports: [127.0.0.1:3200:3000]
+
+volumes:
+  trazia-data:
+  ollama-data:
+  redis-data:
+  postgres-data:

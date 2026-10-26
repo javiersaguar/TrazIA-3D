@@ -1,6 +1,6 @@
 import type { Revision, Source } from "@/lib/types/revision";
 
-/** Estado de revisión humana de un campo (vista de la UI; el núcleo solo guarda `reviewed`). */
+/** Estado de revisión humana de un campo en la UI. */
 export type FieldStatus = "candidate" | "accepted" | "corrected" | "assumed";
 
 export type FieldGroup = "Identificación" | "Envolvente" | "Soporte" | "Boquillas" | "Datos de diseño";
@@ -62,7 +62,7 @@ function field(
   group: FieldGroup,
   elementId: ElementId,
   impact: number,
-  data: { value: number | string; unit?: string; source: Source },
+  data: { value: number | string; unit?: string; source: Source; state?: string },
 ): ReviewField {
   const confidence = data.source.confidence;
   return {
@@ -76,7 +76,7 @@ function field(
     confidence,
     impact,
     risk: impact * (1 - confidence),
-    status: data.source.reviewed ? "accepted" : "candidate",
+    status: data.state === "corrected" || data.state === "assumed" ? data.state : data.state === "accepted" || data.source.reviewed ? "accepted" : "candidate",
   };
 }
 
@@ -86,7 +86,8 @@ export function flattenRevision(revision: Revision): ReviewField[] {
   const out: ReviewField[] = [field("tag", "Tag del equipo", "Identificación", "shell", 0.4, eq.tag)];
 
   for (const d of DIMENSIONS) {
-    out.push(field(d.key, d.label, d.group, d.elementId, d.impact, eq[d.key]));
+    const dimension = eq[d.key];
+    if (dimension) out.push(field(d.key, d.label, d.group, d.elementId, d.impact, dimension));
   }
 
   for (const nozzle of eq.nozzles) {

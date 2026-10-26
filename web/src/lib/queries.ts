@@ -7,9 +7,10 @@ import {
   getEquipment,
   getReviewFields,
   getRevision,
+  getStudy,
   type BenchExtractor,
   type RevisionId,
-} from "./mock/api";
+} from "./api";
 
 export const qk = {
   revision: (rev: RevisionId) => ["revision", rev] as const,
@@ -29,3 +30,5 @@ export const useEquipment = () => useQuery({ queryKey: qk.equipment(), queryFn: 
 
 export const useBench = (extractor: BenchExtractor) =>
   useQuery({ queryKey: ["bench", extractor] as const, queryFn: () => getBench(extractor) });
+
+export const useStudy = () => useQuery({ queryKey: ["estudio"] as const, queryFn: getStudy });

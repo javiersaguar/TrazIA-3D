@@ -26,4 +26,9 @@ export const STAGE_ICON: Record<StageId, LucideIcon> = {
   family: Shapes,
   ifc: Box,
   validate: ShieldCheck,
+  extract_detector: ScanText,
+  geometry2d: Shapes,
+  rag: FileInput,
+  memory: FolderTree,
+  calibrate: ShieldCheck,
 };

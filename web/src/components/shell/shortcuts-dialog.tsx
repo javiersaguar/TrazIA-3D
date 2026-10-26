@@ -12,7 +12,7 @@ export const SHORTCUTS: { group: string; items: { keys: string[]; label: string 
       { keys: ["Ctrl", "K"], label: "Menú de comandos" },
       { keys: ["?"], label: "Ver estos atajos" },
       { keys: ["["], label: "Plegar o desplegar la barra lateral" },
-      { keys: ["G", "1–6"], label: "Ir a Proyecto, Pipeline, Revisión, Cambios, Bench o Impacto" },
+      { keys: ["G", "1–7"], label: "Ir a Proyecto, Pipeline, Revisión, Cambios, Bench, Impacto o Estudio" },
     ],
   },
   {

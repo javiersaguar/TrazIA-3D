@@ -3,10 +3,13 @@
   Cada función es async y lee los archivos sintéticos de public/demo/.
   Para conectar la API real basta con sustituir el cuerpo por fetch al endpoint indicado.
 */
+import { apiEnabled, revisionResource } from "../api/config";
+import { apiUpdate } from "../api/client";
 import type { Revision } from "@/lib/types/revision";
 import type { BenchReport } from "./bench-types";
 import type { DiffReport } from "./diff-types";
 import { flattenRevision, type FieldStatus, type ReviewField } from "./fields";
+import type { StudyResponse } from "./estudio-types";
 
 export type RevisionId = "A" | "B";
 
@@ -25,13 +28,13 @@ export const DEMO = {
   revisions: {
     A: {
       json: "/demo/json/vessel_rev_a.json",
-      ifc: "/demo/ifc/rev_a.ifc",
-      pdf: "/demo/docs/GAD_V-101_revA.pdf",
+      get ifc() { return revisionResource("A", "ifc"); },
+      get pdf() { return revisionResource("A", "pdf"); },
     },
     B: {
       json: "/demo/json/vessel_rev_b.json",
-      ifc: "/demo/ifc/rev_b.ifc",
-      pdf: "/demo/docs/GAD_V-101_revB.pdf",
+      get ifc() { return revisionResource("B", "ifc"); },
+      get pdf() { return revisionResource("B", "pdf"); },
     },
   },
   changes: "/demo/json/changes.json",
@@ -69,6 +72,7 @@ export type FieldUpdate = {
 
 /** PATCH /revisions/{id}/fields/{path} */
 export async function updateField(update: FieldUpdate, current: ReviewField): Promise<ReviewField> {
+  if (apiEnabled) return apiUpdate(update);
   const seen = idempotency.get(update.idempotencyKey);
   if (seen) return seen;
   await wait(220);
@@ -91,6 +95,12 @@ export type BenchExtractor = "etiquetas" | "combinado";
 /** GET /bench?extractor=… — informe del bench sobre el conjunto sintético (bench/report.py). */
 export async function getBench(extractor: BenchExtractor): Promise<BenchReport> {
   const [data] = await Promise.all([getJson<BenchReport>(`/demo/json/bench-${extractor}.json`), wait(200)]);
+  return data;
+}
+
+/** GET /estudio — sin backend se sirve el último estudio publicado por Lectura (sintético). */
+export async function getStudy(): Promise<StudyResponse> {
+  const [data] = await Promise.all([getJson<StudyResponse>("/demo/json/estudio.json"), wait(200)]);
   return data;
 }
 

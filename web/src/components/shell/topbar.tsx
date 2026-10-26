@@ -5,15 +5,20 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Tip } from "@/components/ui/controls";
 import { Icon, Kbd, LiveDot, Pill } from "@/components/ui/primitives";
+import { apiEnabled } from "@/lib/api/config";
+import { useApiSync } from "@/lib/api/use-api-sync";
+import { useRevision } from "@/lib/queries";
 import { relativeSeconds } from "@/lib/format";
 import { navItemFor } from "@/lib/nav";
 import { usePipeline } from "@/stores/pipeline";
 import { useUi } from "@/stores/ui";
 
 export function Topbar() {
+  useApiSync();
   const pathname = usePathname();
   const item = navItemFor(pathname);
   const revision = useUi((s) => s.revision);
+  const active = useRevision(revision);
   const setCommandOpen = useUi((s) => s.setCommandOpen);
   const setCopilotOpen = useUi((s) => s.setCopilotOpen);
 
@@ -35,10 +40,10 @@ export function Topbar() {
             V-101 · rev {revision}
           </Pill>
         </Tip>
-        <Tip content="Todo lo que se ve sale de archivos sintéticos de la demo; todavía no hay API">
+        <Tip content={apiEnabled ? "Datos y revisiones servidos por la API configurada; los equipos de la demo siguen siendo sintéticos" : "Archivos sintéticos de la demo offline"}>
           <Pill tone="warning">
             <Icon icon={TriangleAlert} size={14} />
-            Datos sintéticos · sin backend
+            {apiEnabled ? active.isError ? "API local · sin conexión" : active.data?.dataset === "real" ? "Datos reales · API local" : "Datos sintéticos · API local" : "Datos sintéticos · sin backend"}
           </Pill>
         </Tip>
         <PipelinePill />
@@ -65,6 +70,7 @@ export function Topbar() {
 /** "Pipeline: último trabajo hace X s", como la píldora de tiempo real de PIDS. */
 function PipelinePill() {
   const running = usePipeline((s) => s.running);
+  const error = usePipeline((s) => s.error);
   const lastFinishedAt = usePipeline((s) => s.lastFinishedAt);
   const [now, setNow] = useState(() => Date.now());
 
@@ -73,15 +79,15 @@ function PipelinePill() {
     return () => clearInterval(id);
   }, []);
 
-  const text = running
+  const text = error ? "Pipeline: requiere atención" : running
     ? "Pipeline: procesando V-101"
     : lastFinishedAt
       ? `Pipeline: último trabajo ${relativeSeconds((now - lastFinishedAt) / 1000)}`
       : "Pipeline: en espera";
 
   return (
-    <Tip content="Repetición simulada sobre los documentos sintéticos">
-      <Pill tone="live">
+    <Tip content={apiEnabled ? "Estado del trabajo real y eventos SSE de la API" : "Repetición simulada sobre los documentos sintéticos"}>
+      <Pill tone={error ? "warning" : "live"}>
         {running || lastFinishedAt ? <LiveDot /> : <span className="size-2 rounded-full bg-faint" aria-hidden />}
         <span className={running ? "text-live" : undefined}>{text}</span>
       </Pill>

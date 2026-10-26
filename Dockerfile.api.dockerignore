@@ -1,0 +1,11 @@
+**
+!pyproject.toml
+!uv.lock
+!src/
+!src/**
+!examples/
+!examples/**
+!web/
+!web/public/
+!web/public/demo/
+!web/public/demo/**

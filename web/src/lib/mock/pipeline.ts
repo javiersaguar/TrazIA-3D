@@ -11,6 +11,11 @@ export type StageId =
   | "extract_tables"
   | "extract_ocr"
   | "extract_vision"
+  | "extract_detector"
+  | "geometry2d"
+  | "rag"
+  | "memory"
+  | "calibrate"
   | "extract_hdm"
   | "reconcile"
   | "family"
@@ -80,6 +85,11 @@ export const STAGES: StageDef[] = [
     available: true,
     module: "extraction.py",
   },
+  { id: "extract_detector", name: "Detector", code: "extract.detector", description: "Localiza regiones con el detector de Lectura; no se activa hasta recibir eventos.", available: false },
+  { id: "geometry2d", name: "Geometría 2D", code: "geometry2d", description: "Contrasta trazos y vistas del plano con los valores leídos.", available: false },
+  { id: "rag", name: "Recuperación", code: "rag", description: "Recupera evidencia y plantillas; no sustituye la evidencia del documento actual.", available: false },
+  { id: "memory", name: "Memoria de revisión", code: "memory", description: "Usa una revisión anterior aprobada como referencia comprobable.", available: false },
+  { id: "calibrate", name: "Calibración", code: "calibrate", description: "Añade confianza calibrada e intervalos cuando Lectura los calcula.", available: false },
   {
     id: "reconcile",
     name: "Normalización",
@@ -127,14 +137,24 @@ export const STAGE_EDGES: [StageId, StageId][] = [
   ["extract_ocr", "reconcile"],
   ["extract_vision", "reconcile"],
   ["extract_hdm", "reconcile"],
+  ["classify", "extract_detector"],
+  ["classify", "geometry2d"],
+  ["classify", "rag"],
+  ["classify", "memory"],
+  ["extract_detector", "reconcile"],
+  ["geometry2d", "reconcile"],
+  ["rag", "reconcile"],
+  ["memory", "reconcile"],
   ["reconcile", "family"],
+  ["reconcile", "calibrate"],
+  ["calibrate", "family"],
   ["family", "ifc"],
   ["ifc", "validate"],
 ];
 
 export type PipelineEvent = {
   id: string;
-  stage: StageId;
+  stage: string;
   file: string;
   status: "ok" | "omitido" | "error";
   detail: string;
