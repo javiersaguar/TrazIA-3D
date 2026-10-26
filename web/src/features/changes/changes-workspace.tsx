@@ -125,7 +125,7 @@ export function ChangesWorkspace() {
           </ol>
         </Panel>
 
-        <Panel className="relative flex min-h-[640px] flex-col overflow-hidden">
+        <Panel className="flex min-h-[700px] flex-col overflow-hidden">
           <div className="flex items-center gap-3 px-4 pt-3 pb-2">
             <Segmented<Mode>
               label="Comparación"
@@ -140,24 +140,9 @@ export function ChangesWorkspace() {
                 { value: "delta", label: "Δ", title: "Fantasma de la rev A sobre la rev B" },
               ]}
             />
-            <label className="ml-auto flex items-center gap-2 text-xs text-muted">
-              Avance
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.01}
-                value={morphProgress}
-                onChange={(e) => {
-                  setMode("delta");
-                  setPlaying(false);
-                  setProgress(Number(e.target.value));
-                }}
-                className="w-40 accent-[var(--revision)]"
-                aria-label="Avance de la rev A a la rev B"
-              />
-              <span className="w-11 text-right whitespace-nowrap">{Math.round(morphProgress * 100)} %</span>
-            </label>
+            <span className="ml-auto text-xs text-muted">
+              Avance {Math.round(morphProgress * 100)} % · arrastra la barra del visor
+            </span>
           </div>
           <div className="min-h-0 flex-1 px-2 pb-2">
             <RevisionMorph
@@ -174,8 +159,8 @@ export function ChangesWorkspace() {
             />
           </div>
 
-          {/* Caja de narración, como en Ciberconciencia */}
-          <div className="absolute bottom-5 left-5 flex max-w-[460px] items-start gap-3 rounded-[var(--radius-card)] border border-border bg-surface-raised/95 px-3.5 py-3 shadow-[var(--shadow-pop)]">
+          {/* Narración bajo el lienzo: dentro tapaba la leyenda y la barra de avance del visor */}
+          <div className="mx-2 mb-2 flex items-start gap-3 rounded-[var(--radius-card)] border border-border bg-surface-raised px-3.5 py-3">
             <Tip content={playing ? "Pausar" : "Reproducir los cambios"} shortcut={["Espacio"]}>
               <button
                 type="button"

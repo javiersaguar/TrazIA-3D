@@ -23,8 +23,9 @@ const CONSEQUENCE: Record<ReviewField["group"], string> = {
 export function CopilotLauncher() {
   const setOpen = useUi((s) => s.setCopilotOpen);
   const pathname = usePathname();
-  // En Revisión taparía la cola de campos; allí se abre desde la barra superior.
-  if (pathname.startsWith("/revision")) return null;
+  // En Revisión y Cambios taparía la cola de campos y los controles del visor;
+  // allí se abre desde la píldora de la barra superior.
+  if (pathname.startsWith("/revision") || pathname.startsWith("/cambios")) return null;
   return (
     <button
       type="button"
