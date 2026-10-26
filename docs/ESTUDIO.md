@@ -84,3 +84,58 @@ Semillas fijas y versión del generador registradas en cada resultado.
 | 21 nov | Estudio completo con S-reservado, ablaciones y estadística; selector elegido |
 | 25 nov (día 1) | Estudio sobre R-ref con exclusión de uno; ajuste del selector con datos reales |
 | 26 nov | Cifras finales para el pitch |
+
+## Cómo se ejecuta
+
+```bash
+uv run python -m synthetic --conjunto todos     # S-dev, S-reservado, S-mecánico, S-adversarial
+uv run python -m bench.estudio                  # generated/estudio/estudio.json y estudio.md
+```
+
+Cada variante pasa por `trazia.pipeline.process`, el mismo camino que el producto; la rev2 recibe
+la rev1 como `previous`. Definiciones operativas de cada métrica: cabecera de `bench/estudio.py`.
+
+- **Geometría** = campos geométricos correctos (±1 mm, ±0,5°) × min(1, IoU/0,95) del IFC. Si la
+  revisión no llega a IFC, vale 0: sin modelo no se entrega geometría. La fracción sin penalizar
+  se publica al lado.
+- **Alucinación** = valores emitidos cuya región citada no contiene el número o el texto
+  (`bench/support.py`, con tolerancia de formato). Un error de unidad sobre un número que sí está
+  en la cita cuenta como error, no como alucinación.
+- **Escala** = 1 − (0,5·min(1, s/60) + 0,5·min(1, €/0,50)). **Innovación** = 1 para todas: no
+  cambia el orden. Por eso una variante que no lee nada puntúa 0,20, no 0.
+- La puntuación principal se calcula sobre S-dev + S-reservado. S-adversarial se informa aparte
+  (tasa de envenenamiento) y S-mecánico queda sin medir hasta que el contrato tenga envolvente.
+
+## Resultados
+
+### Estudio 1 · solo B y sus ablaciones (26/10/2026)
+
+Generador v2, conjuntos con las semillas de la tabla de `docs/BENCH.md`, 1.000 remuestreos por
+equipo. 120 equipos-degradación puntuables (240 revisiones). **Datos sintéticos.**
+
+| Variante | Puntuación | IC 95 % | Geometría | Atributos | ECE | F1 cambios | Alucinación | Cita |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `b_reglas` | 0,370 | [0,335; 0,408] | 3,3 % | 70,2 % | 0,191 | 8,0 % | 0,0 % | 100 % |
+| `b_reglas-tablas` | 0,327 | [0,311; 0,342] | 0,0 % | 67,5 % | 0,250 | 0,0 % | 0,0 % | 100 % |
+| `b_reglas-hdm` | 0,255 | [0,224; 0,293] | 3,3 % | 12,5 % | 0,125 | 8,0 % | 0,0 % | 100 % |
+
+| Ablación | Δ puntuación | IC 95 % |
+| --- | --- | --- |
+| B sin tablas ni cotas | −0,043 | [−0,076; −0,016] |
+| B sin hoja de datos | −0,115 | [−0,130; −0,099] |
+
+Lo que dice, a favor y en contra:
+
+- **H1 se confirma en su primera mitad, y con fuerza.** B solo construye modelo en el proveedor
+  `atlas` en vectorial (el estilo para el que se escribió): 5,6 % de modelos en S-dev, 0 % en
+  S-reservado. En escaneados no lee geometría (no hay capa de texto).
+- **Los atributos dependen de la hoja de datos**, no del plano: sin ella B cae del 70 % al 12,5 %.
+  Con proveedores en psig/°F/lb o en español, B no lee los datos de diseño del plano.
+- **Alucinación 0 % y cita 100 %**: B nunca inventa; cuando falla, falta el dato. Es la base que
+  las estrategias con modelos tienen que igualar.
+- **ECE 0,19**: las confianzas fijas de B no están calibradas (tarea de DEC-12).
+- **Adversarial**: 2,8 % de envenenamiento. B no obedece instrucciones, pero sí lee el texto en
+  blanco sobre blanco de la capa de texto cuando cae en una fila de «datos de diseño». La
+  comprobación visual de D (DEC-10) tiene que cerrar este hueco.
+- McNemar: B completo acierta 374 campos más que sin tablas (p < 10⁻⁶) y 554 más que sin hoja de
+  datos (p < 10⁻⁶), de 7.452 campos pareados.
