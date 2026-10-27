@@ -52,6 +52,7 @@ def test_process_builds_a_draft_revision_with_stage_events():
     assert result.run.strategy == "b_reglas"
     assert result.run.seconds > 0
     assert result.run.external_calls == 0
+    assert result.run.cost_eur == 0.0 and result.run.accounting_complete  # local: cero explícito
 
 
 def test_candidates_carry_channel_strategy_and_raw_confidence():

@@ -140,6 +140,11 @@ def process(
     run.gpu_seconds = output.cost.gpu_seconds
     run.tokens_in, run.tokens_out = output.cost.tokens_in, output.cost.tokens_out
     run.cost_eur, run.external_calls = output.cost.cost_eur, output.cost.external_calls
+    # Contabilidad (DEC-25): sin llamadas externas el coste en euros es cero, no desconocido.
+    # Si hubo llamadas externas y ningún proveedor informó de su coste, queda incompleta.
+    if run.cost_eur is None and run.external_calls == 0:
+        run.cost_eur = 0.0
+    run.accounting_complete = run.cost_eur is not None
 
     candidates = _ground(output.candidates, bundles, warnings, emit, equipment_id, output.evidence)
     resolution = resolve(candidates)
