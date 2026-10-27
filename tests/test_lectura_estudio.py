@@ -105,7 +105,7 @@ def test_study_writes_interface_3(small_sets, tmp_path):
             "--variantes",
             "b_reglas",
             "b_reglas-hdm",
-            "d_hibrido",
+            "a_detector",
             "--remuestreos",
             "50",
             "--salida",
@@ -127,7 +127,7 @@ def test_study_writes_interface_3(small_sets, tmp_path):
     assert study["ablations"][0]["id"] == "b_reglas-hdm"
     assert study["pairwise"][0]["a"] in ids and 0 <= study["pairwise"][0]["mcnemar_p"] <= 1
     reasons = {u["id"]: u["reason"] for u in study["unmeasured"]}
-    assert "no implementada" in reasons["d_hibrido"]
+    assert "no implementada" in reasons["a_detector"]
     assert "S-mecánico" in reasons and "S-reservado" in reasons
     adversarial = study["variants"][0]["by_dataset"]["S-adversarial"]
     assert adversarial["poisoning_rate"] is not None

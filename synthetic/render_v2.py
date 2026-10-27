@@ -132,9 +132,19 @@ def _ga_sheet(canvas, spec, revision, vendor: Vendor, changed, sheet: int, sheet
     _title_block(canvas, spec, revision, vendor, sheet, sheets)
 
 
-def _fit_shell(spec: VesselSpec, budget: float) -> float:
+MAX_ELEVATION_WIDTH = 190.0  # puntos: el alzado no invade las cotas ni la tabla
+PLAN_RADIUS = 110.0  # puntos: radio máximo de virola + saliente en la planta
+
+
+def elevation_scale(spec: VesselSpec, budget: float) -> float:
+    """Escala única del alzado (pt/mm): cabe en alto y en ancho. El dibujo está a escala."""
     total = spec.skirt_height + spec.height + spec.head_depth * 1.333
-    return spec.height * budget / total
+    return min(budget / total, MAX_ELEVATION_WIDTH / spec.diameter)
+
+
+def plan_scale(spec: VesselSpec) -> float:
+    reach = spec.diameter / 2 + max((n.projection for n in spec.nozzles), default=0)
+    return PLAN_RADIUS / reach
 
 
 def _dimension(canvas, vendor: Vendor, x: float, z0: float, z1: float, mm: float) -> None:
@@ -171,9 +181,10 @@ def _delta(canvas: Canvas, x: float, y: float, revision: str) -> None:
 
 
 def _elevation(canvas, spec: VesselSpec, revision, vendor: Vendor, layout: Layout, changed):
-    x, base, width = layout.elev_x, layout.elev_base, 150
-    shell = _fit_shell(spec, layout.elev_budget)
-    scale = shell / spec.height
+    x, base = layout.elev_x, layout.elev_base
+    scale = elevation_scale(spec, layout.elev_budget)
+    width = spec.diameter * scale
+    shell = spec.height * scale
     head = spec.head_depth * scale
     skirt = spec.skirt_height * scale
     bottom = base + skirt
@@ -189,8 +200,9 @@ def _elevation(canvas, spec: VesselSpec, revision, vendor: Vendor, layout: Layou
         p.close()
         canvas.drawPath(p, stroke=1, fill=1)
     canvas.setFillColor(HexColor("#dfe6ec"))
-    canvas.rect(x + 6, base, 8, skirt, fill=1)
-    canvas.rect(x + width - 14, base, 8, skirt, fill=1)
+    leg = max(3.0, min(8.0, width * 0.05))
+    canvas.rect(x + leg * 0.75, base, leg, skirt, fill=1)
+    canvas.rect(x + width - leg * 1.75, base, leg, skirt, fill=1)
     canvas.line(x - 60, base, x + width + 60, base)
     canvas.setDash(6, 3)
     canvas.setStrokeColor(FAINT)
@@ -203,20 +215,26 @@ def _elevation(canvas, spec: VesselSpec, revision, vendor: Vendor, layout: Layou
     canvas.drawString(x + width + 34, bottom - 3, vendor.tl_label)
     canvas.drawString(x + width + 34, top - 3, vendor.tl_label)
     for n in spec.nozzles:
+        # Boquilla a escala: cuello de diámetro DN y saliente real desde la virola.
         z = base + n.elevation * scale
         c = math.cos(math.radians(n.azimuth))
+        neck = max(0.8, n.diameter * scale / 2)
         canvas.setStrokeColor(ACCENT)
         canvas.setFillColor(ACCENT)
+        canvas.setLineWidth(0.7)
         canvas.setFont("Helvetica", 8)
-        if abs(c) < 0.3:
-            canvas.circle(x + width / 2 + c * width * 0.4, z, 4, fill=0)
-            canvas.drawString(x + width / 2 + c * width * 0.4 + 7, z + 4, n.id)
+        if abs(c) < 0.3:  # de frente o de espaldas: se ve como un círculo
+            cx = x + width / 2 + c * width * 0.4
+            canvas.circle(cx, z, max(1.5, neck), fill=0)
+            canvas.drawString(cx + max(1.5, neck) + 3, z + 4, n.id)
             continue
         start = x + width if c > 0 else x
-        end = start + (36 if c > 0 else -36)
-        canvas.line(start, z, end, z)
-        canvas.line(end, z - 5, end, z + 5)
-        canvas.drawString(end + (4 if c > 0 else -18), z + 4, n.id)
+        reach = n.projection * scale * abs(c)  # saliente visto de lado
+        end = start + (reach if c > 0 else -reach)
+        canvas.line(start, z - neck, end, z - neck)
+        canvas.line(start, z + neck, end, z + neck)
+        canvas.line(end, z - neck - 2.5, end, z + neck + 2.5)  # brida
+        canvas.drawString(end + (4 if c > 0 else -18), z + neck + 3, n.id)
 
     _dimension(canvas, vendor, x - 80, base, bottom, spec.skirt_height)
     _dimension(canvas, vendor, x - 80, bottom, top, spec.height)
@@ -255,7 +273,8 @@ def _elevation(canvas, spec: VesselSpec, revision, vendor: Vendor, layout: Layou
 
 def _plan(canvas, spec: VesselSpec, vendor: Vendor, layout: Layout) -> None:
     cx, cy = layout.plan
-    r = 90
+    sp = plan_scale(spec)
+    r = spec.diameter / 2 * sp
     canvas.setStrokeColor(INK)
     canvas.setLineWidth(1)
     canvas.circle(cx, cy, r)
@@ -273,19 +292,35 @@ def _plan(canvas, spec: VesselSpec, vendor: Vendor, layout: Layout) -> None:
     for angle, label in labels:
         a = math.radians(angle)
         canvas.drawCentredString(
-            cx + (r + 44) * math.cos(a), cy + (r + 44) * math.sin(a) - 3, label
+            cx + (PLAN_RADIUS + 24) * math.cos(a), cy + (PLAN_RADIUS + 24) * math.sin(a) - 3, label
         )
+    canvas.setLineWidth(0.7)
     for n in spec.nozzles:
+        # Muñón a escala: cuello de diámetro DN, saliente real y brida al final.
         a = math.radians(n.azimuth)
-        x0, y0 = cx + r * math.cos(a), cy + r * math.sin(a)
-        x1, y1 = cx + (r + 22) * math.cos(a), cy + (r + 22) * math.sin(a)
+        ux, uy = math.cos(a), math.sin(a)
+        vx, vy = -uy, ux
+        neck = max(0.8, n.diameter * sp / 2)
+        r_out = r + n.projection * sp
         canvas.setStrokeColor(ACCENT)
-        canvas.line(x0, y0, x1, y1)
+        for side in (-1, 1):
+            canvas.line(
+                cx + r * ux + side * neck * vx,
+                cy + r * uy + side * neck * vy,
+                cx + r_out * ux + side * neck * vx,
+                cy + r_out * uy + side * neck * vy,
+            )
+        canvas.line(
+            cx + r_out * ux - (neck + 2.5) * vx,
+            cy + r_out * uy - (neck + 2.5) * vy,
+            cx + r_out * ux + (neck + 2.5) * vx,
+            cy + r_out * uy + (neck + 2.5) * vy,
+        )
         canvas.setFillColor(ACCENT)
-        canvas.drawCentredString(cx + (r + 30) * math.cos(a), cy + (r + 30) * math.sin(a) + 6, n.id)
+        canvas.drawCentredString(cx + (r_out + 10) * ux, cy + (r_out + 10) * uy - 3, n.id)
     canvas.setFillColor(INK)
     canvas.setFont("Helvetica-Bold", 10)
-    canvas.drawString(cx - 50, cy - r - 72, vendor.views[1])
+    canvas.drawString(cx - 50, cy - PLAN_RADIUS - 48, vendor.views[1])
 
 
 def _nozzle_table(canvas, spec: VesselSpec, revision, vendor: Vendor, layout: Layout, changed):

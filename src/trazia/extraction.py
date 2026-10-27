@@ -149,6 +149,7 @@ def assemble(
     equipment_id: str,
     revision: str,
     dataset: str = "real",
+    warnings: list[str] | None = None,
 ) -> Revision:
     chosen = {}
     for candidate in candidates:
@@ -175,7 +176,15 @@ def assemble(
             equipment["attributes"][path.split(".", 1)[1]] = value
         else:
             equipment[path] = value
-    equipment["nozzles"] = list(nozzles.values())
+    # Una boquilla sin alguno de sus cuatro datos no se puede colocar en 3D: queda fuera del
+    # modelo, pero sus valores siguen como candidatos para la revisión humana.
+    complete = {"diameter", "projection", "elevation", "azimuth"}
+    incomplete = sorted(n for n, data in nozzles.items() if not complete <= data.keys())
+    if incomplete and warnings is not None:
+        warnings.append(
+            "Boquillas incompletas fuera del modelo (faltan datos): " + ", ".join(incomplete)
+        )
+    equipment["nozzles"] = [data for n, data in nozzles.items() if n not in incomplete]
     content = {
         "schema_version": "0.2",
         "project_id": project_id,

@@ -115,6 +115,8 @@ def is_cited(candidate: Candidate) -> bool:
 def is_supported(candidate: Candidate, bundle: Bundle | None) -> bool | None:
     if not is_cited(candidate):
         return False
+    if candidate.channel == "geometria" and not candidate.text_original:
+        return None  # medida sobre los trazos: no se puede verificar con texto
     if bundle is None:
         return False
     text = region_text(candidate, bundle)
