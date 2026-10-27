@@ -314,3 +314,43 @@ Cierre de la fase: Ruff check y format globales correctos (90 archivos); baterí
 TanStack Table en lint, sin fallos. Las verificaciones web de ambos modos y la inspección
 visual anterior completan la validación. Cambios preparados en commits separados de API
 y panel web, sin push ni PR.
+
+
+## Petición de completar y actualizar la Fase 1 · 27/10/2026
+
+El encargo actual autoriza actualizar ROADMAP y cerrar sus tareas de Fase 1. Se comprueban
+contrato/migración, API y motor compartido ya integrados; tipos regenerados sin diferencias.
+Se corrige la dependencia de ejecución pytest para la validación EXPRESS en la imagen API,
+se ubican cachés de visión bajo /data y se comprueban contenedores con el script aislado
+scripts/check_compose.py. Local, Redis/arq/Postgres y GPU pasan; la GPU es visible desde
+Ollama. El chequeo no descarga pesos ni mide inferencia dentro de ese contenedor.
+
+Dentro del alcance 1.9 se corrigen bloques Mistral, modo offline sin claves, identidad de
+caché y coherencia de variables Ollama con Compose. Registro/política aplican también a
+un Ollama remoto; se rechazan modelos cloud antes de transmitir una imagen. Se añade el
+comparador real de proveedores, una lectura real de Qwen versionada y pruebas de adaptadores.
+El comparador deja un informe parcial y código 2 cuando falta un proveedor.
+
+Dentro de 1.11, el bootstrap y la ablación pareada agrupan las degradaciones por equipo;
+una prueba con dos equipos/cuatro condiciones impide volver a contar condiciones como
+equipos independientes. El informe ya no atribuye medición a S-reservado si solo usa S-dev.
+La prueba API de estudio vacío se aísla de los informes locales y comprueba también carga real.
+
+Generados S-dev, S-reservado, S-mecánico y S-adversarial con sus semillas: 64 equipos,
+336 PDF y 162 Excel. B y ablación sin HDM medidos en 24 equipos de S-dev × tres condiciones
+× dos revisiones; resultados sintéticos completos en docs/evidencias/fase1. Sin ajuste con
+los estilos reservados ni afirmaciones sobre datos de TR.
+
+Cierre de comprobaciones: Ruff global y 177 pruebas Python pasan; no queda la omisión de
+visión offline. Web: typecheck/lint/13 unitarias/build pasan en ambos modos, Playwright
+12 conectado y ocho offline, con una/cinco omisiones por transporte respectivamente.
+Los tres perfiles Compose pasan API/trabajo/SSE/IFC/idempotencia/HTTP web/persistencia.
+Ningún archivo del visor 3D se modifica. No hay nuevas llamadas externas.
+
+ROADMAP actualizado a 10/11 tareas de Fase 1 cerradas, con enlaces a evidencias. 1.9 permanece
+parcial: Ollama real comprobado, Gemini y Mistral sin credenciales para la segunda lectura
+real exigida por el criterio de hecho. No se reemplaza esa prueba con un mock o con dos
+modelos del mismo proveedor. Plataforma IndesIA sigue sin servicio conocido, como prevé
+«cuando se sepa». Falta una clave configurada por el equipo para cerrar 1.9; se ha solicitado
+solo la ruta del archivo local, nunca que se publique la clave. Detalle y reproducción en
+[FASE1.md](../FASE1.md). Sin push ni PR.

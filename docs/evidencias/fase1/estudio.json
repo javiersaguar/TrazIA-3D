@@ -1,0 +1,448 @@
+{
+  "generated_at": "2026-10-27T11:53:12+00:00",
+  "seed": 2026,
+  "synthetic": true,
+  "generator": "v2",
+  "sets": {
+    "S-dev": {
+      "seed": 2026,
+      "cases": 24
+    }
+  },
+  "datasets": [
+    "S-dev"
+  ],
+  "variants": [
+    {
+      "id": "b_reglas",
+      "strategy": "b_reglas",
+      "providers": [],
+      "description": "B: texto, tablas, cotas, cajetín y HDM",
+      "metrics": {
+        "score": 0.3891,
+        "geometry": 0.0556,
+        "attributes": 0.6944,
+        "ece": 0.1751,
+        "f1_delta": 0.1325,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": null,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 0.0152
+      },
+      "ci95": {
+        "score": [
+          0.3269,
+          0.4493
+        ],
+        "geometry": [
+          0.0139,
+          0.0972
+        ],
+        "attributes": [
+          0.5035,
+          0.8472
+        ],
+        "f1_delta": [
+          0.0169,
+          0.242
+        ]
+      },
+      "by_dataset": {
+        "S-dev": {
+          "score": 0.3891,
+          "geometry": 0.0556,
+          "attributes": 0.6944,
+          "ece": 0.1751,
+          "f1_delta": 0.1325,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0152,
+          "equipment": 72,
+          "revisions": 144,
+          "models_built": 0.0556,
+          "geometry_fields_unpenalized": 0.0772,
+          "scale": 0.9999,
+          "emitted_fields": 751,
+          "unverifiable_fields": 0,
+          "spurious_fields": 0,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Faltan datos explícitos: height, head_depth, skirt_height",
+            "Faltan datos explícitos: tag, diameter, head_depth, skirt_height, skirt_thickness",
+            "Faltan datos explícitos: tag, diameter, head_depth, skirt_thickness",
+            "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness",
+            "Faltan datos explícitos: tag, diameter, skirt_thickness"
+          ]
+        }
+      },
+      "by_style": {
+        "atlas": {
+          "score": 0.6343,
+          "geometry": 0.3333,
+          "attributes": 1.0,
+          "ece": 0.1294,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0271
+        },
+        "iberica": {
+          "score": 0.4,
+          "geometry": 0.0,
+          "attributes": 1.0,
+          "ece": 0.2,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0129
+        },
+        "gulf": {
+          "score": 0.2126,
+          "geometry": 0.0,
+          "attributes": 0.0833,
+          "ece": 0.3963,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0113
+        },
+        "prairie": {
+          "score": 0.3896,
+          "geometry": 0.0,
+          "attributes": 1.0,
+          "ece": 0.2417,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0124
+        },
+        "nordic": {
+          "score": 0.3992,
+          "geometry": 0.0,
+          "attributes": 1.0,
+          "ece": 0.2033,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0115
+        },
+        "levante": {
+          "score": 0.2189,
+          "geometry": 0.0,
+          "attributes": 0.0833,
+          "ece": 0.09,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0161
+        }
+      },
+      "by_degradation": {
+        "vectorial": {
+          "score": 0.4904,
+          "geometry": 0.1667,
+          "attributes": 0.75,
+          "ece": 0.1364,
+          "f1_delta": 0.3509,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0408
+        },
+        "escaneado_limpio": {
+          "score": 0.325,
+          "geometry": 0.0,
+          "attributes": 0.6667,
+          "ece": 0.25,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0026
+        },
+        "escaneado_pobre": {
+          "score": 0.325,
+          "geometry": 0.0,
+          "attributes": 0.6667,
+          "ece": 0.25,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0023
+        }
+      },
+      "details": {
+        "equipment": 72,
+        "revisions": 144,
+        "models_built": 0.0556,
+        "geometry_fields_unpenalized": 0.0772,
+        "scale": 0.9999,
+        "emitted_fields": 751,
+        "unverifiable_fields": 0,
+        "spurious_fields": 0,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "Faltan datos explícitos: height, head_depth, skirt_height",
+          "Faltan datos explícitos: tag, diameter, head_depth, skirt_height, skirt_thickness",
+          "Faltan datos explícitos: tag, diameter, head_depth, skirt_thickness",
+          "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness",
+          "Faltan datos explícitos: tag, diameter, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 24
+      },
+      "eligible": true
+    },
+    {
+      "id": "b_reglas-hdm",
+      "strategy": "b_reglas-hdm",
+      "providers": [],
+      "description": "B sin hoja de datos",
+      "metrics": {
+        "score": 0.2795,
+        "geometry": 0.0556,
+        "attributes": 0.1528,
+        "ece": 0.1219,
+        "f1_delta": 0.1325,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": null,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 0.0144
+      },
+      "ci95": {
+        "score": [
+          0.2349,
+          0.3239
+        ],
+        "geometry": [
+          0.0139,
+          0.0972
+        ],
+        "attributes": [
+          0.1111,
+          0.191
+        ],
+        "f1_delta": [
+          0.0169,
+          0.242
+        ]
+      },
+      "by_dataset": {
+        "S-dev": {
+          "score": 0.2795,
+          "geometry": 0.0556,
+          "attributes": 0.1528,
+          "ece": 0.1219,
+          "f1_delta": 0.1325,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0144,
+          "equipment": 72,
+          "revisions": 144,
+          "models_built": 0.0556,
+          "geometry_fields_unpenalized": 0.0772,
+          "scale": 0.9999,
+          "emitted_fields": 439,
+          "unverifiable_fields": 0,
+          "spurious_fields": 0,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Faltan datos explícitos: height, head_depth, skirt_height",
+            "Faltan datos explícitos: tag, diameter, head_depth, skirt_height, skirt_thickness",
+            "Faltan datos explícitos: tag, diameter, head_depth, skirt_thickness",
+            "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness",
+            "Faltan datos explícitos: tag, diameter, skirt_thickness"
+          ]
+        }
+      },
+      "by_style": {
+        "atlas": {
+          "score": 0.4915,
+          "geometry": 0.3333,
+          "attributes": 0.3333,
+          "ece": 0.1014,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0269
+        },
+        "iberica": {
+          "score": 0.2189,
+          "geometry": 0.0,
+          "attributes": 0.0833,
+          "ece": 0.09,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0128
+        },
+        "gulf": {
+          "score": 0.2126,
+          "geometry": 0.0,
+          "attributes": 0.0833,
+          "ece": 0.3963,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0084
+        },
+        "prairie": {
+          "score": 0.2177,
+          "geometry": 0.0,
+          "attributes": 0.0833,
+          "ece": 0.15,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0148
+        },
+        "nordic": {
+          "score": 0.2542,
+          "geometry": 0.0,
+          "attributes": 0.25,
+          "ece": 0.1333,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0093
+        },
+        "levante": {
+          "score": 0.2189,
+          "geometry": 0.0,
+          "attributes": 0.0833,
+          "ece": 0.09,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0145
+        }
+      },
+      "by_degradation": {
+        "vectorial": {
+          "score": 0.4291,
+          "geometry": 0.1667,
+          "attributes": 0.4583,
+          "ece": 0.1219,
+          "f1_delta": 0.3509,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0374
+        },
+        "escaneado_limpio": {
+          "score": 0.2,
+          "geometry": 0.0,
+          "attributes": 0.0,
+          "ece": null,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0038
+        },
+        "escaneado_pobre": {
+          "score": 0.2,
+          "geometry": 0.0,
+          "attributes": 0.0,
+          "ece": null,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0022
+        }
+      },
+      "details": {
+        "equipment": 72,
+        "revisions": 144,
+        "models_built": 0.0556,
+        "geometry_fields_unpenalized": 0.0772,
+        "scale": 0.9999,
+        "emitted_fields": 439,
+        "unverifiable_fields": 0,
+        "spurious_fields": 0,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "Faltan datos explícitos: height, head_depth, skirt_height",
+          "Faltan datos explícitos: tag, diameter, head_depth, skirt_height, skirt_thickness",
+          "Faltan datos explícitos: tag, diameter, head_depth, skirt_thickness",
+          "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness",
+          "Faltan datos explícitos: tag, diameter, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 24
+      },
+      "eligible": true
+    }
+  ],
+  "unmeasured": [],
+  "ablations": [
+    {
+      "id": "b_reglas-hdm",
+      "of": "b_reglas",
+      "delta_score": -0.1096,
+      "ci95": [
+        -0.1392,
+        -0.077
+      ]
+    }
+  ],
+  "pairwise": [
+    {
+      "a": "b_reglas",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 2.3970182936024055e-94,
+      "only_a": 312,
+      "only_b": 0,
+      "fields": 4584
+    }
+  ],
+  "pareto": [
+    "b_reglas",
+    "b_reglas-hdm"
+  ],
+  "recommendation": {
+    "vectorial": "b_reglas",
+    "escaneado": "b_reglas",
+    "rationale": "Elegida por mayor Puntuación GA2MODEL entre las variantes que cumplen alucinación < 1 % y cita = 100 %, sobre S-dev y S-reservado (sintéticos). vectorial: b_reglas (puntuación 0,490, geometría 16,7 %, atributos 75,0 %); escaneado: b_reglas (puntuación 0,325, geometría 0,0 %, atributos 66,7 %)."
+  }
+}

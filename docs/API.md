@@ -37,8 +37,9 @@ Las credenciales se configuran por entorno y no se guardan en Git.
 | GET /estudio | Archivo de Lectura o estado vacío explícito |
 
 El id completo de revisión es `proyecto:equipo:revisión`; A/B son alias de la demo V-101.
-BCF y exportación multiesquema responden 501 hasta su fase. POST /estudio y POST /copiloto
-responden 503 mientras falten sus ejecutores. No devuelven resultados simulados.
+BCF y exportación multiesquema están implementados (ver secciones posteriores).
+POST /copiloto usa Ollama local y herramientas de lectura. POST /estudio sigue respondiendo
+503: el arnés se ejecuta por CLI; no se simula un lanzamiento asíncrono desde esta ruta.
 
 ## Concurrencia e idempotencia
 
@@ -136,11 +137,16 @@ produce la demo offline. Para el perfil local con Ollama en el host, usar
 TRAZIA_OLLAMA_URL=http://host.docker.internal:11434; GPU usa el servicio interno ollama.
 Sin Docker, las variables de .env se pueden cargar con `uv run --env-file .env --extra api ...`.
 
-**Validación disponible:** ambos YAML cumplen el esquema oficial Compose, con SHA-256
-`d549057ebc2925f39f62799eab0db7b9e2c18b35b6c00595199116da3ed10e64` consultado el 26/10/2026.
-Docker no está instalado en el equipo de desarrollo de esta fase. No se han construido ni arrancado
-las imágenes ni se ha medido GPU/Redis/Postgres en contenedores. Hay que ejecutar esos comandos
-antes de presentar el perfil de escala como probado.
+**Validación 27/10/2026:** imágenes Linux construidas y perfiles local, escala y GPU
+arrancados en Docker 29.6.2 / Compose 5.3.1 dentro de Ubuntu/WSL. API, trabajo B, SSE, IFC,
+idempotencia, HTTP de Next y persistencia tras reinicio pasan en los tres perfiles. Escala
+usa Redis/arq/Postgres; NVIDIA visible desde el contenedor Ollama: RTX 5070 Laptop, 8151 MiB.
+No se ha medido inferencia dentro del contenedor GPU ni un lote de 400 equipos.
+
+Repetir después de construir las imágenes con
+`uv run python scripts/check_compose.py --wsl Ubuntu --profiles local escala gpu` desde
+PowerShell, o sin `--wsl Ubuntu` donde Docker esté en PATH. El chequeo crea y elimina solo su
+proyecto temporal, sin publicar puertos. [Evidencias de Fase 1](FASE1.md).
 
 
 ## Web conectada y tipos
