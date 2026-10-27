@@ -1,5 +1,6 @@
 "use client";
 
+import { BenchStudy } from "@/features/study/bench-study";
 import { Database, Terminal } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -79,6 +80,15 @@ const CRITERIA: Criterion[] = [
 ];
 
 export function BenchWorkspace() {
+  const [source, setSource] = useState<"study" | "legacy">("study");
+  return <div className="space-y-5">
+    <Segmented label="Fuente de resultados" value={source} onChange={setSource}
+      options={[{ value: "study", label: "Estudio actual" }, { value: "legacy", label: "Bench de referencia v1" }]} />
+    {source === "study" ? <BenchStudy /> : <LegacyBenchWorkspace />}
+  </div>;
+}
+
+function LegacyBenchWorkspace() {
   const [extractor, setExtractor] = useState<BenchExtractor>("combinado");
   const [style, setStyle] = useState<BenchStyleId>("plano");
   const { data: report, isPending } = useBench(extractor);

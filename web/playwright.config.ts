@@ -25,7 +25,7 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   projects: [
-    { name: "humo", testMatch: /(?:humo|api)\.spec\.ts/ },
+    { name: "humo", testMatch: /(?:humo|api|study)\.spec\.ts/ },
     { name: "capturas", testMatch: /capturas\.spec\.ts/ },
   ],
   webServer: [
@@ -35,7 +35,7 @@ export default defineConfig({
       env: { TRAZIA_DATA: `${root}/generated/e2e-api-${process.pid}`,
         TRAZIA_ROOT: root, TRAZIA_PORT: new URL(apiURL).port || "8000", TRAZIA_QUEUE: "process" },
     }] : []),
-    { command: `corepack pnpm@10.18.0 dev --port ${port}`,
+    { command: process.env.PW_USE_BUILD ? `corepack pnpm exec next start --port ${port}` : `corepack pnpm@10.18.0 dev --port ${port}`,
       url: `http://localhost:${port}/proyecto`, reuseExistingServer: false, timeout: 120_000 },
   ],
 });

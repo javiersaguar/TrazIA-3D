@@ -1,10 +1,11 @@
 "use client";
 
+import { studyScope } from "@/features/study/scope";
 import { CircleDashed, FlaskConical, Terminal } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Segmented } from "@/components/ui/controls";
 import { SyntheticNotice } from "@/components/ui/notice";
-import { Badge, Code, EmptyState, Panel, PanelHeader, Skeleton } from "@/components/ui/primitives";
+import { Badge, Button, Code, EmptyState, Panel, PanelHeader, Skeleton } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 import {
   isStudyEmpty,
@@ -37,10 +38,11 @@ function strategyFamily(id: string) {
 }
 
 export function EstudioWorkspace() {
-  const { data, isPending, isError } = useStudy();
+  const { data, isPending, isError, error, refetch } = useStudy();
 
   if (isPending) return <LoadingState />;
-  if (isError || !data || isStudyEmpty(data) || data.variants.length === 0) {
+  if (isError) return <Panel className="p-5"><p role="alert" className="text-warning">No se pudo cargar el estudio: {error.message}</p><Button className="mt-3" onClick={() => void refetch()}>Reintentar</Button></Panel>;
+  if (!data || isStudyEmpty(data) || data.variants.length === 0) {
     return (
       <Panel>
         <EmptyState icon={CircleDashed} title="Aún no hay resultados del estudio">
@@ -77,14 +79,15 @@ function StudyView({ study }: { study: StudyReport }) {
   const equipment = Object.entries(study.sets ?? {})
     .filter(([k]) => scored.includes(k))
     .reduce((n, [, v]) => n + v.cases, 0);
+  const scope = studyScope(study);
   const pending = (study.unmeasured ?? []).filter((u) => !u.id.startsWith("S-"));
   const total = study.variants.length + pending.length;
 
   return (
     <div className="space-y-5">
-      <SyntheticNotice>
-        {`Estudio sobre ${equipment} equipos de ocho proveedores ficticios (${scored.join(" + ")}), cada uno en tres niveles de degradación, con generador ${study.generator ?? "v2"} e intervalos bootstrap (semilla ${study.seed}). No es precisión sobre planos de TR.`}
-      </SyntheticNotice>
+      {study.synthetic === true ? <SyntheticNotice>
+        {`Estudio sobre ${equipment} equipos de ${scope.vendors} estilos medidos (${scored.join(" + ")}), en ${scope.degradations} degradaciones, con generador ${study.generator ?? "sin versión"} e intervalos bootstrap (semilla ${study.seed}).`}
+      </SyntheticNotice> : <Panel className="p-4 text-sm text-muted">Informe local. Comprueba su origen y alcance antes de interpretar las cifras.</Panel>}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <RecommendationCard label="Planos vectoriales" variant={study.recommendation.vectorial} study={study} />
@@ -120,7 +123,7 @@ function StudyView({ study }: { study: StudyReport }) {
       <Panel className="overflow-hidden">
         <PanelHeader
           title="Métricas por variante"
-          description="Sobre S-dev y S-reservado. La geometría vale 0 si la revisión no llega a IFC: sin modelo no se entrega geometría."
+          description={`Sobre ${scored.join(" + ") || study.datasets.join(" + ")}. La geometría vale 0 si la revisión no llega a IFC.`}
         />
         <MetricsTable variants={ranked} />
       </Panel>
