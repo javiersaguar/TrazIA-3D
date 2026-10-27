@@ -1,0 +1,3104 @@
+[
+  {
+    "workers": 1,
+    "deployment": {
+      "workers": 1,
+      "concurrency_per_worker": 1,
+      "image": "sha256:d25661b236b8c9c5beecc0a34e6670cfce6d78d2da1d25702dc5de3bf068d7f4",
+      "storage": "Postgres + SHA-256",
+      "queue": "Redis/arq"
+    },
+    "input_sha256": "7591771a4c31d665a1eef865cd0b6fb83c2c30e38cdf635891ecd9d250d8f215",
+    "complete": true,
+    "summary": {
+      "revisions": 336,
+      "equipment": 64,
+      "conditions": 168,
+      "statuses": {
+        "done": 20,
+        "error": 316
+      },
+      "seconds_batch": 221.424640137,
+      "seconds_upload": 6.043269673000001,
+      "throughput_terminal_per_second": 1.5174462959140855,
+      "seconds_turnaround_mean": 18.393872959809524,
+      "seconds_turnaround_p95": 23.77216668700001,
+      "cost_eur": null,
+      "jobs_without_cost": 336,
+      "external_calls_known": 0,
+      "jobs_with_incomplete_accounting": 0,
+      "projection_400x4": {
+        "measured": false,
+        "seconds_for_1600_terminal_jobs": 1054.4030482714286,
+        "seconds_for_1600_valid_ifc": null,
+        "cost_eur": null,
+        "limitation": "Extrapolación de este lote y estrategia. Las terminaciones incluyen errores; no prueban 1600 modelos válidos."
+      },
+      "per_equipment_condition": [
+        {
+          "dataset": "s-adversarial",
+          "tag": "C-901",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.596340521,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "C-903",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 46.81297002400001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "C-907",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 62.83336478299998,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "C-911",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 76.80428882500001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "D-904",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 52.76760452399998,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "D-909",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 69.89194351500001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "V-900",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 37.889441084,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "V-902",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 45.894546924,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "V-905",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 53.880411076,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "V-906",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 60.744482371000004,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "V-908",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 68.75043812500002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "V-910",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 75.98563351000001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-201",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 19.545680101000002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-201",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 21.572694587000004,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-201",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 17.561440523000005,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-202",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 25.30168891,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-202",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 27.335855993,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-202",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 23.622068658,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-203",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.317634258,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-203",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 33.296017784,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-203",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 29.497096301999996,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-204",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 37.214994229000006,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-204",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.184052381,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-204",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 35.42236307,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-208",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.303767977,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-208",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.66643500599999,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-208",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.651358084,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-209",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.387866695,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-209",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.57558471200001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-209",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.505750209999995,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-211",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 33.910711111,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-211",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.82663355400001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-211",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.57306394999999,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-213",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.734905064,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-213",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.905731262,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-213",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.77092961700001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-214",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.71071051599999,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-214",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.557590632,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-214",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.695410729,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-221",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.855818754,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-221",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.798275995,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-221",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.861961699000005,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-200",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 13.609832647000001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-200",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 15.913063274999995,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-200",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 9.487866681999993,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-205",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 33.730379827,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-205",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.594350571999996,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-205",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 41.199295491,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-206",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.323319272,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-206",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.334021971,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-206",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 37.919714565,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-207",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.252271621999995,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-207",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.525652879999996,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-207",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.627270845000005,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-215",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.61956625100001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-215",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.63261205299999,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-215",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.92986577800001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-216",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.74620918100001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-216",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.784830511999985,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-216",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.667188985999985,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-217",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 33.106205191,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-217",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.64978881899998,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-217",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.859235841,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-218",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.854810799999996,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-218",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.78738278,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-218",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 38.639213493,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-220",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.522100398999996,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-220",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.854415043,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-220",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.023812219999996,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-210",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.553428443,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-210",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.558314487000004,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-210",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.57415860500001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-212",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.432073611999996,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-212",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.744922366,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-212",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 38.280034572000005,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-219",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.700205018000005,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-219",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.72083281399999,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-219",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.82160432900001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-222",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.801625176,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-222",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.95782744599998,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-222",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 39.818721384,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-223",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 32.83240821199999,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-223",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.646236504,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-223",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 40.12142516399999,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-400B",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 44.52477336300001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-400B",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 45.38122187000002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-400B",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 45.057978539000004,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-401A",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 41.482503949000005,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-401A",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 41.60485699999998,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-401A",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 42.235670862999996,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-402B",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 41.73319372400002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-402B",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 41.556722020000024,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-402B",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 41.730833037,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-403A",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 41.283414058000005,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-403A",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 38.52781051500003,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-403A",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 41.62460727500002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-404A",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 32.71613646,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-404A",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 32.65590690100001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-404A",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 34.50160949899998,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-405B",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 32.61364533300002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-405B",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 32.815374056000024,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-405B",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 32.525682945,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-406A",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.546737124999993,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-406A",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.793076707999973,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-406A",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.64446670000001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-407B",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.524418198000035,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-407B",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.688384033000006,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-407B",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.867205864000027,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-408A",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.68141378499999,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-408A",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.66086432299997,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-408A",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.885523853000024,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-409B",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.700517462999983,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-409B",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.726179416999997,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-409B",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.790307651999996,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-410A",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.923972882000015,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-410A",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.607855946,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-410A",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.7023011,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-411A",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.697767545000005,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-411A",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.759331271999997,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-411A",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.709154474,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-701",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.595404881000007,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-701",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.751163050000002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-701",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 32.06724299700001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-704",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.503154105999997,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-704",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.853035211999995,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-704",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.681893710000026,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-706",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.468803759999986,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-706",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.780542745999995,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-706",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.771566243000024,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-707",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.906187352000018,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-707",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.816449043999995,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-707",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.851337091000005,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-708",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.646805908000005,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-708",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.77230518799999,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-708",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.624308471999996,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-713",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 35.951774857000004,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-713",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 35.88475115699998,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-713",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 35.810627829,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-700",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.718062829000004,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-700",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.893262851999992,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-700",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.687203517,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-703",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.53656667200002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-703",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.503689955,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-703",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.892798279999994,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-710",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.820613166000015,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-710",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.54624676299997,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-710",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.820131574999976,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-711",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 32.13833747000001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-711",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 35.59050127200001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-711",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.934841251999984,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-712",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 35.988206659999975,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-712",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 35.839321668999986,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-712",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 36.19667240300001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-714",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 38.757753963,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-714",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 42.97142370100002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-714",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 36.346017810999996,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-702",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.764023967,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-702",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.84033494400002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-702",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.750072433,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-705",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.818107100000006,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-705",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.791734290999997,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-705",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.87174550100002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-709",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.989542865000004,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-709",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 31.89937436400001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-709",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 32.067261156,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-715",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 44.838208045000044,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-715",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 44.81855416000002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-715",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 44.718277736999994,
+          "cost_eur": null
+        }
+      ]
+    }
+  },
+  {
+    "workers": 4,
+    "deployment": {
+      "workers": 4,
+      "concurrency_per_worker": 1,
+      "image": "sha256:d25661b236b8c9c5beecc0a34e6670cfce6d78d2da1d25702dc5de3bf068d7f4",
+      "storage": "Postgres + SHA-256",
+      "queue": "Redis/arq"
+    },
+    "input_sha256": "7591771a4c31d665a1eef865cd0b6fb83c2c30e38cdf635891ecd9d250d8f215",
+    "complete": true,
+    "summary": {
+      "revisions": 336,
+      "equipment": 64,
+      "conditions": 168,
+      "statuses": {
+        "error": 316,
+        "done": 20
+      },
+      "seconds_batch": 65.44470181400004,
+      "seconds_upload": 6.876807394000025,
+      "throughput_terminal_per_second": 5.134105446074816,
+      "seconds_turnaround_mean": 4.813249122898812,
+      "seconds_turnaround_p95": 8.348235264000039,
+      "cost_eur": null,
+      "jobs_without_cost": 336,
+      "external_calls_known": 0,
+      "jobs_with_incomplete_accounting": 0,
+      "projection_400x4": {
+        "measured": false,
+        "seconds_for_1600_terminal_jobs": 311.641437209524,
+        "seconds_for_1600_valid_ifc": null,
+        "cost_eur": null,
+        "limitation": "Extrapolación de este lote y estrategia. Las terminaciones incluyen errores; no prueban 1600 modelos válidos."
+      },
+      "per_equipment_condition": [
+        {
+          "dataset": "s-adversarial",
+          "tag": "C-901",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.742849950999982,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "C-903",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 11.442513202000043,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "C-907",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 15.813887301000022,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "C-911",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 20.423844266999993,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "D-904",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 16.89334542199998,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "D-909",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 16.690510393000068,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "V-900",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 12.411721316999945,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "V-902",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 13.145345710000015,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "V-905",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 12.274912290999964,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "V-906",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 17.864569615999983,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "V-908",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 21.402163511000026,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-adversarial",
+          "tag": "V-910",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 22.426699710000037,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-201",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 3.844678235999936,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-201",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 4.762072164000017,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-201",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 3.2907616159999975,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-202",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 6.755836593000026,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-202",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.685477980000087,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-202",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 5.862583345000019,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-203",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 8.736854126000026,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-203",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 9.429778032999991,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-203",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 8.397626880000018,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-204",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 10.280534554999917,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-204",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 10.442461121999997,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-204",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 9.77313840100004,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-208",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 10.990895969000007,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-208",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 11.535297249999985,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-208",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 10.733449713000027,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-209",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 12.05941162800002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-209",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 11.779097621999995,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-209",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 11.74750183399999,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-211",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 11.502307458999951,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-211",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 10.413209108999979,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-211",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 11.96906851,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-213",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 9.552720205999947,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-213",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 9.489071083000056,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-213",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 9.603772971000012,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-214",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 10.842578586999991,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-214",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 11.109315510000044,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-214",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 10.267662976000054,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-221",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 12.06693317600002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-221",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 12.221700022999983,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "C-221",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 10.870859708999944,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-200",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 1.7291596099999538,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-200",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 1.907577659000026,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-200",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 7.882533013999989,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-205",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 9.714744377000045,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-205",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 10.209743668999977,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-205",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 11.27074890900002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-206",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 9.32727925000006,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-206",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 9.565108470000041,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-206",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 17.86393926599999,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-207",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 9.950917584999956,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-207",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 9.958172697999998,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-207",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 9.638081002000035,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-215",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 13.345044703999974,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-215",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 13.459186428999999,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-215",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 13.32478140400002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-216",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 14.124571491999973,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-216",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 14.065964860000008,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-216",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 14.039584837999996,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-217",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 13.386045617999969,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-217",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 12.533549983,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-217",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 14.64112164800008,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-218",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 12.198734779999938,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-218",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 12.108491388999994,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-218",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 21.936026242000025,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-220",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 10.243410769999969,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-220",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 10.565506141000014,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "D-220",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 10.93693447999999,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-210",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 11.933941301000004,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-210",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 12.378291619000038,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-210",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 12.222863683000014,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-212",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 8.822128145000022,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-212",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 9.574635316999945,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-212",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 2,
+          "seconds_turnaround_sum": 22.635717563000014,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-219",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 11.785798350999983,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-219",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 11.764784163000002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-219",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 11.887409682999987,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-222",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 11.832980533000011,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-222",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 11.989439485000048,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-222",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 12.536371828999961,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-223",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 10.844347020999976,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-223",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 11.128953033000016,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-dev",
+          "tag": "V-223",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 12.25742167300001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-400B",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.607137669999986,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-400B",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.613598050000007,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-400B",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.753072148999934,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-401A",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.463625444999991,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-401A",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.660097424000071,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-401A",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.81050559800002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-402B",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.684027581000009,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-402B",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.681451251000055,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-402B",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.654761995999991,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-403A",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.703230908000023,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-403A",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.703519807000021,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-403A",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.705225782000014,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-404A",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.53537554799999,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-404A",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.517896144999952,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-404A",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.700507608000009,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-405B",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.500833878000037,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-405B",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.657668177999994,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-405B",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.692077811000047,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-406A",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.640946540000016,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-406A",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.798046463999924,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-406A",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.648046638000039,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-407B",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.76940889499997,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-407B",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.588922136000008,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-407B",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.788961524000001,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-408A",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.566823564999993,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-408A",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.554902385999981,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-408A",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.750671006000005,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-409B",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.545785283000043,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-409B",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.750218649999965,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-409B",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.722650655000052,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-410A",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.595512506999967,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-410A",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.758960713000022,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-410A",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.7357485730000235,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-411A",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.735065873000053,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-411A",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.666063812000004,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-mecanico",
+          "tag": "P-411A",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.753711937000048,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-701",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 8.264594866000039,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-701",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 8.167248675000053,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-701",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 8.17916685399996,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-704",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.558945162999976,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-704",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.771286067999938,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-704",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.638940636999962,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-706",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.61402883300002,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-706",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.584939740999971,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-706",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.804796346000046,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-707",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.1268487739999955,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-707",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 6.954926275000048,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-707",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.349639445000037,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-708",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.594936609999934,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-708",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.547699335999994,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-708",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.295325184000035,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-713",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.577331472000026,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-713",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.745219990999999,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "C-713",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.752008550000028,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-700",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 9.978560773000027,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-700",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 8.665493189000017,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-700",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 9.891023173000008,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-703",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 6.924217830000032,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-703",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.685173237000015,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-703",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.538710224999988,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-710",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.733804797000005,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-710",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.548631631999967,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-710",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.4403124819999675,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-711",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.6340933189999305,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-711",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.632430828999986,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-711",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.637430296000048,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-712",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.61766940900003,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-712",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.601222882999934,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-712",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.798673036000025,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-714",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.578871863000018,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-714",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.751939890000017,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "D-714",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.737943437000013,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-702",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.498483451000027,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-702",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.111768750999943,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-702",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.745694689999993,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-705",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.464123762999975,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-705",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.639099608000038,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-705",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.675935704999972,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-709",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.473514822000027,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-709",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.688972412999988,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-709",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.676979603999996,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-715",
+          "degradation": "escaneado_limpio",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.739986869999996,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-715",
+          "degradation": "escaneado_pobre",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.7634441160000165,
+          "cost_eur": null
+        },
+        {
+          "dataset": "s-reservado",
+          "tag": "V-715",
+          "degradation": "vectorial",
+          "revisions": 2,
+          "done": 0,
+          "seconds_turnaround_sum": 7.7634936320000065,
+          "cost_eur": null
+        }
+      ]
+    }
+  }
+]

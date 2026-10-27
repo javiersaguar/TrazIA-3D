@@ -225,3 +225,156 @@ Cierre: 119/119 pruebas Python, Ruff global correcto. Typecheck, lint (aviso Tan
 13 pruebas unitarias y build correctos. Playwright 10/10 conectado y 7/7 offline (3 exclusivas
 omitidas), incluido el laboratorio 3D. gen:api exporta ahora el esquema desde FastAPI con uv
 antes de generar tipos, para no dejar un JSON de OpenAPI desactualizado. Sin push.
+
+
+## Integración del 27/10/2026 y fase 9
+
+Merge diario de main, fast-forward hasta b9f943e. La pantalla Estudio ya está incorporada
+por 653412e; no se duplica su implementación. Se integra también el pipeline real de Lectura,
+los proveedores visuales, el generador v2 y su ejecutor de estudio. La siguiente tarea propia
+en el orden acordado es la fase 10, Copiloto (ROADMAP I.4.9 y DEC-26).
+
+## Fase 10 · Copiloto local con citas
+
+POST /copiloto sustituye el endpoint pendiente. Qwen3-VL-4B-Instruct con Ollama local usa
+cuatro herramientas: campos, evidencia, cambios y reglas. Se verifican originales por SHA-256
+antes de extraer texto de su región PDF o celda/rango Excel. Las revisiones son copias y las
+herramientas no reciben sesiones SQL, funciones de escritura ni rutas arbitrarias.
+Toda respuesta y propuesta lleva IDs de fuentes emitidos por estas lecturas; una referencia
+inventada o una salida inválida produce abstención. No se acepta/corrige ni aprueba nada.
+
+El panel conserva el lenguaje visual del shell: pregunta, sugerencias, espera/cancelación,
+respuesta, comprobaciones propuestas y fuentes desplegables con fragmento, página/celda,
+bbox y SHA. Las consultas no invalidan IFC como si fueran ediciones. Un 409 por revisión
+cambiada refresca las consultas; un error de Ollama se muestra sin sustituirlo por reglas.
+Offline conserva el panel de reglas y su identificación explícita.
+
+El plan usa herramientas nativas y la respuesta final JSON Schema. No se combina format
+con tools en la petición de planificación: el modelo instalado no emitía llamadas nativas
+al combinarlos. Se acotan contexto, herramientas, duración y concurrencia; detalles en API.md.
+Las pruebas reales detectaron que el modelo atribuía certeza al score y negaba incorrectamente
+la verificación del original. Se añade reformulación para el primer caso y rechazo conservador
+de contradicciones conocidas y declaraciones de escritura. No es un verificador semántico
+completo: una cita válida no garantiza que toda conclusión se deduzca de ella.
+
+Modelo instalado reutilizado: qwen3-vl:4b-instruct, ID 84f7ed8042fa, GGUF Q4_K_M, Ollama
+0.40.11. Sin descarga de pesos ni nuevas dependencias. Modelo Apache-2.0 documentado en
+THIRD_PARTY; configuración y tipos OpenAPI regenerados. Sin cambios en Lectura o en el visor.
+
+### Comprobaciones y cifras
+
+22 pruebas específicas del backend: llamadas nativas, citas de originales PDF/Excel y hashes,
+ninguna escritura en seis tablas SQL, herramientas prohibidas, referencias inventadas,
+salida inválida, modelo ausente/remoto, falta de calibración, contabilidad de reformulación,
+JSON de proveedor ilegible, original ausente y cambios concurrentes. Se rechazan afirmaciones
+de escritura y negaciones observadas de un hash verificado. No dependen de Ollama en CI.
+
+La espera de finalización de trabajos en test_api_queue pasa de 10 a 30 s: el pipeline real
+integrado y la validación EXPRESS superaban ocasionalmente diez segundos bajo carga. Se
+conservan las aserciones y los límites de producción; no se simula el trabajo.
+
+Web: typecheck, lint (aviso previo TanStack), 13 unitarias y build pasan con/sin API.
+Playwright conectado: 12 pasan, una exclusiva offline omitida. Offline: ocho pasan y cinco
+exclusivas API omitidas. Las pruebas de interfaz usan una respuesta explícitamente marcada
+como fixture, verifican citas/error 503 y que escribir preguntas no activa atajos de revisión.
+Comprobación adicional de navegador contra Ollama real y revisión visual en claro/oscuro
+1600×940 y móvil 390×844; panel contenido en los 366 px disponibles, con scroll propio.
+Capturas locales en generated/qa/copilot-{dark,light,mobile}.png.
+
+| Consulta real sobre la demo sintética | Tiempo pared | Tokens entrada/salida | Resultado |
+| --- | --- | --- | --- |
+| Fuente del diámetro | 4.997 s | 6596/366 | Respuesta con citas |
+| Significado del score | 5.137 s | 6561/396 | Respuesta con citas |
+| Cambio N3 A→B | 2.619 s | 4399/168 | Respuesta con citas |
+| Petición de aprobar | 3.669 s | 3891/270 | Abstención: contradicción del modelo rechazada |
+
+Las cuatro consultas reales conservaron sin cambios todas las tablas SQL comparadas.
+Las tres consultas de lectura responden: diámetro 2000 mm, score 0,75 sin calibración aportada
+y elevación N3 3500→3700 mm. Evidencia local y contabilidad en generated/copilot/; son pruebas
+funcionales sobre originales sintéticos, no precisión medida con el dataset de TR.
+Sin llamadas a proveedor externo ni tarifa facturada; no se mide energía ni segundos GPU.
+Los tokens incluyen planificación/respuesta/reformulación y se dejan null si falta contabilidad.
+
+### Límites y siguiente fase
+
+Sin OCR en esta herramienta, sin historial conversacional y sin comprobación semántica general.
+Cancelar aborta la espera web, sin garantizar que Ollama detenga una generación en marcha.
+Una lectura/hash correcto no certifica ingeniería. Revisión y aprobación siguen siendo humanas.
+No se necesita un cambio adicional de interfaz de Lectura para esta fase; futuros resultados
+de calibración necesitarán exponerse para explicar intervalos medidos.
+
+Propuesta para el responsable del ROADMAP: marcar DEC-26 / I.4.9 / tarea 3.6 como implementado
+con estos límites. El ROADMAP protegido permanece intacto. Próxima fase propia: 11, revisión
+humana (DEC-27), seguida de CI y cálculo de escala. La excepción para editar features/review
+sigue pendiente; no se ha usado ni interpretado como aprobada.
+
+
+Cierre de la fase: Ruff check y format globales correctos (90 archivos); batería Python
+169 pruebas correctas y una omitida. Avisos existentes: deprecación HTTPX de TestClient y
+TanStack Table en lint, sin fallos. Las verificaciones web de ambos modos y la inspección
+visual anterior completan la validación. Cambios preparados en commits separados de API
+y panel web, sin push ni PR.
+
+
+## Petición de completar y actualizar la Fase 1 · 27/10/2026
+
+El encargo actual autoriza actualizar ROADMAP y cerrar sus tareas de Fase 1. Se comprueban
+contrato/migración, API y motor compartido ya integrados; tipos regenerados sin diferencias.
+Se corrige la dependencia de ejecución pytest para la validación EXPRESS en la imagen API,
+se ubican cachés de visión bajo /data y se comprueban contenedores con el script aislado
+scripts/check_compose.py. Local, Redis/arq/Postgres y GPU pasan; la GPU es visible desde
+Ollama. El chequeo no descarga pesos ni mide inferencia dentro de ese contenedor.
+
+Dentro del alcance 1.9 se corrigen bloques Mistral, modo offline sin claves, identidad de
+caché y coherencia de variables Ollama con Compose. Registro/política aplican también a
+un Ollama remoto; se rechazan modelos cloud antes de transmitir una imagen. Se añade el
+comparador real de proveedores, una lectura real de Qwen versionada y pruebas de adaptadores.
+El comparador deja un informe parcial y código 2 cuando falta un proveedor.
+
+Dentro de 1.11, el bootstrap y la ablación pareada agrupan las degradaciones por equipo;
+una prueba con dos equipos/cuatro condiciones impide volver a contar condiciones como
+equipos independientes. El informe ya no atribuye medición a S-reservado si solo usa S-dev.
+La prueba API de estudio vacío se aísla de los informes locales y comprueba también carga real.
+
+Generados S-dev, S-reservado, S-mecánico y S-adversarial con sus semillas: 64 equipos,
+336 PDF y 162 Excel. B y ablación sin HDM medidos en 24 equipos de S-dev × tres condiciones
+× dos revisiones; resultados sintéticos completos en docs/evidencias/fase1. Sin ajuste con
+los estilos reservados ni afirmaciones sobre datos de TR.
+
+Cierre de comprobaciones: Ruff global y 177 pruebas Python pasan; no queda la omisión de
+visión offline. Web: typecheck/lint/13 unitarias/build pasan en ambos modos, Playwright
+12 conectado y ocho offline, con una/cinco omisiones por transporte respectivamente.
+Los tres perfiles Compose pasan API/trabajo/SSE/IFC/idempotencia/HTTP web/persistencia.
+Ningún archivo del visor 3D se modifica. No hay nuevas llamadas externas.
+
+ROADMAP actualizado a 10/11 tareas de Fase 1 cerradas, con enlaces a evidencias. 1.9 permanece
+parcial: Ollama real comprobado, Gemini y Mistral sin credenciales para la segunda lectura
+real exigida por el criterio de hecho. No se reemplaza esa prueba con un mock o con dos
+modelos del mismo proveedor. Plataforma IndesIA sigue sin servicio conocido, como prevé
+«cuando se sepa». Falta una clave configurada por el equipo para cerrar 1.9; se ha solicitado
+solo la ruta del archivo local, nunca que se publique la clave. Detalle y reproducción en
+[FASE1.md](../FASE1.md). Sin push ni PR.
+
+
+## Fase 3 · Bench y medición de escala, 27/10/2026
+
+Por petición del usuario se avanza en Fase 3 sin modificar el worktree/código de Lectura,
+actualmente ocupado por Fase 2. Se cierra 3.5 conectando Bench al mismo informe de Estudio,
+con selector de variante, rúbrica/IC/alcance y bench v1 separado. Se corrigen avisos de alcance
+y la diferencia entre error y estado vacío. No se modifican los archivos del visor.
+
+3.1 y 3.6 ya implementadas se registran como verificadas en ROADMAP. Para 3.7 se crean un
+cliente de lote y un orquestador Docker aislado. Se miden 336 revisiones, 64 equipos y 168
+condiciones con uno y cuatro workers Redis/arq/Postgres: 221,425 frente a 65,445 s (3,38×).
+Ambos obtienen 20 done y 316 errores. done acredita IFC estructural/EXPRESS, no verdad geométrica.
+Se conserva coste null y no se presenta el lote como capacidad de producir 1600 IFC válidos.
+3.7 queda parcial y se indican necesidades de Lectura para repetir con Fase 2 y contabilidad.
+No se altera memoria/calibración/fusión/aprendizaje activo en las carpetas del otro agente.
+
+180 pruebas Python, Ruff global, web types/lint/15 unitarias/build pasan. Playwright 15 con API
+(una omitida) y 11 offline (cinco omitidas). Inspección de Bench en ambos temas sobre API real.
+La configuración permite probar el build con servidor/API aislados sin parar localhost:3000.
+CI añade job web, sin eliminar pasos Python existentes. Evidencia y reproducción en
+[FASE3.md](../FASE3.md), con JSON de métricas por equipo/condición bajo docs/evidencias/fase3.
+No hay nuevas dependencias ni cambios de contrato con Lectura. Commit y push autorizados por
+el encargo actual, a feat/plataforma; no se fusiona su trabajo sin terminar ni se hace push forzado.

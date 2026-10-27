@@ -1,0 +1,125 @@
+{
+  "s-adversarial": {
+    "seed": 6666,
+    "cases": 12,
+    "degradations": [
+      "vectorial"
+    ],
+    "vendors": {
+      "atlas": {
+        "reserved": false,
+        "lang": "en",
+        "units": "mm"
+      },
+      "iberica": {
+        "reserved": false,
+        "lang": "es",
+        "units": "mm"
+      }
+    },
+    "expected_changes": 42,
+    "pdf_count": 24,
+    "xlsx_count": 0,
+    "truth_sha256": "f4827b23b39bbf831464d13efe203b7520f23ab21f998092d03e24956d5bffed"
+  },
+  "s-dev": {
+    "seed": 2026,
+    "cases": 24,
+    "degradations": [
+      "vectorial",
+      "escaneado_limpio",
+      "escaneado_pobre"
+    ],
+    "vendors": {
+      "atlas": {
+        "reserved": false,
+        "lang": "en",
+        "units": "mm"
+      },
+      "iberica": {
+        "reserved": false,
+        "lang": "es",
+        "units": "mm"
+      },
+      "gulf": {
+        "reserved": false,
+        "lang": "en",
+        "units": "in"
+      },
+      "prairie": {
+        "reserved": false,
+        "lang": "en",
+        "units": "ftin"
+      },
+      "nordic": {
+        "reserved": false,
+        "lang": "en",
+        "units": "mm"
+      },
+      "levante": {
+        "reserved": false,
+        "lang": "es",
+        "units": "mm"
+      }
+    },
+    "expected_changes": 94,
+    "pdf_count": 144,
+    "xlsx_count": 96,
+    "truth_sha256": "eb09eb07867a9dfaff59e93a70e47687eb82b8db342b4397fd1017f4075764b1"
+  },
+  "s-mecanico": {
+    "seed": 4242,
+    "cases": 12,
+    "degradations": [
+      "vectorial",
+      "escaneado_limpio",
+      "escaneado_pobre"
+    ],
+    "vendors": {
+      "atlas": {
+        "reserved": false,
+        "lang": "en",
+        "units": "mm"
+      },
+      "iberica": {
+        "reserved": false,
+        "lang": "es",
+        "units": "mm"
+      },
+      "gulf": {
+        "reserved": false,
+        "lang": "en",
+        "units": "in"
+      }
+    },
+    "expected_changes": 18,
+    "pdf_count": 72,
+    "xlsx_count": 0,
+    "truth_sha256": "15cb3126109ec39a661df9bf419ca3106061b65c26c15c6477c5f65dbb2417aa"
+  },
+  "s-reservado": {
+    "seed": 7919,
+    "cases": 16,
+    "degradations": [
+      "vectorial",
+      "escaneado_limpio",
+      "escaneado_pobre"
+    ],
+    "vendors": {
+      "meridian": {
+        "reserved": true,
+        "lang": "en",
+        "units": "mm"
+      },
+      "cantabrico": {
+        "reserved": true,
+        "lang": "es",
+        "units": "mm"
+      }
+    },
+    "expected_changes": 66,
+    "pdf_count": 96,
+    "xlsx_count": 66,
+    "truth_sha256": "2af0d4355333da41fdd15c3629496f9c7cf991147f3bd920419e9dbd19930d97"
+  }
+}

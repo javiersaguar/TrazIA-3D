@@ -8,12 +8,14 @@ biblioteca estándar: sin dependencias nuevas.
 """
 
 import base64
+import ipaddress
 import json
 import os
 import time
 import urllib.error
 import urllib.request
 from collections.abc import Callable
+from urllib.parse import urlsplit
 
 from . import cache, policy
 from .base import ProviderResult, VisionError, VisionUnavailable
@@ -28,7 +30,13 @@ def _post(url: str, payload: dict, headers: dict | None = None, timeout: float =
         method="POST",
     )
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
+
+        class NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self, req, fp, code, msg, headers, newurl):
+                return None
+
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+        with opener.open(request, timeout=timeout) as response:
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8", "replace")[:300]
@@ -67,7 +75,9 @@ class _Provider:
     def read(self, image_png: bytes, task: str, schema: dict | None = None, *, page_ref: str):
         spec = TASKS[task]
         schema = schema or spec.schema
-        key = cache.cache_key(image_png, spec.prompt, schema, self.name)
+        key = cache.cache_key(
+            image_png, spec.prompt_sha256, schema, getattr(self, "cache_identity", self.name)
+        )
         hit = cache.load(key)
         if hit is not None:
             return hit
@@ -110,13 +120,41 @@ class OllamaProvider(_Provider):
         self, model: str = "qwen3-vl:4b-instruct", *, dataset: str = "synthetic", host=None
     ):
         super().__init__(dataset=dataset)
-        self.model = model
-        self.name = f"ollama:{model}"
-        self.host = (host or os.environ.get("OLLAMA_HOST", "http://localhost:11434")).rstrip("/")
+        self.model = model or os.environ.get("TRAZIA_OLLAMA_MODEL", "qwen3-vl:4b-instruct")
+        self.name = f"ollama:{self.model}"
+        self.host = (
+            host
+            or os.environ.get("TRAZIA_OLLAMA_URL")
+            or os.environ.get("OLLAMA_HOST", "http://localhost:11434")
+        ).rstrip("/")
         if not self.host.startswith("http"):
             self.host = f"http://{self.host}"
+        url = urlsplit(self.host)
+        if (
+            url.scheme not in ("http", "https")
+            or not url.hostname
+            or url.username
+            or url.password
+            or url.query
+            or url.fragment
+            or url.path not in ("", "/")
+        ):
+            raise VisionUnavailable("Ollama: URL de servicio inválida")
+        try:
+            local = ipaddress.ip_address(url.hostname).is_loopback
+        except ValueError:
+            local = url.hostname in ("localhost", "ollama", "host.docker.internal")
+        self.external = not local
+        self.cache_identity = f"{self.name}@{self.host}"
 
     def _call(self, image_png, prompt, schema):
+        details = _post(f"{self.host}/api/show", {"model": self.model})
+        if details.get("remote_host") or details.get("remote_model"):
+            raise VisionUnavailable("Ollama: se requieren pesos locales, sin modelo cloud")
+        if details.get("details", {}).get("format") != "gguf" or "vision" not in details.get(
+            "capabilities", []
+        ):
+            raise VisionUnavailable("Ollama: no se pudo verificar un modelo visual local")
         payload = {
             "model": self.model,
             "messages": [
@@ -163,10 +201,12 @@ class GeminiProvider(_Provider):
         self.model = model or os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
         self.name = f"gemini:{self.model}"
         self.key = os.environ.get("GEMINI_API_KEY")
-        if not self.key:
+        if not self.key and not cache.offline():
             raise VisionUnavailable("Gemini: falta GEMINI_API_KEY en .env")
 
     def _call(self, image_png, prompt, schema):
+        if not self.key:
+            raise VisionUnavailable("Gemini: falta GEMINI_API_KEY")
         url = (
             f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
         )
@@ -228,7 +268,7 @@ class MistralOCRProvider(_Provider):
         self.model = model or os.environ.get("MISTRAL_OCR_MODEL", "mistral-ocr-latest")
         self.name = f"mistral-ocr:{self.model}"
         self.key = os.environ.get("MISTRAL_API_KEY")
-        if not self.key:
+        if not self.key and not cache.offline():
             raise VisionUnavailable("Mistral: falta MISTRAL_API_KEY en .env")
 
     def read(self, image_png, task, schema=None, *, page_ref):
@@ -237,6 +277,8 @@ class MistralOCRProvider(_Provider):
         return super().read(image_png, task, schema, page_ref=page_ref)
 
     def _call(self, image_png, prompt, schema):
+        if not self.key:
+            raise VisionUnavailable("Mistral: falta MISTRAL_API_KEY")
         payload = {
             "model": self.model,
             "document": {
@@ -244,6 +286,7 @@ class MistralOCRProvider(_Provider):
                 "image_url": "data:image/png;base64," + base64.b64encode(image_png).decode(),
             },
             "include_image_base64": False,
+            "include_blocks": True,
         }
         response = _post(
             "https://api.mistral.ai/v1/ocr", payload, {"Authorization": f"Bearer {self.key}"}
@@ -251,15 +294,24 @@ class MistralOCRProvider(_Provider):
         items = []
         for page in response.get("pages", []):
             dims = page.get("dimensions") or {}
-            width, height = dims.get("width") or 1, dims.get("height") or 1
+            width, height = dims.get("width"), dims.get("height")
+            if not isinstance(width, (int, float)) or not isinstance(height, (int, float)):
+                raise VisionError("Mistral: página sin dimensiones para normalizar cajas")
+            if width <= 0 or height <= 0:
+                raise VisionError("Mistral: dimensiones de página inválidas")
             for block in page.get("blocks", []) or []:
-                box = block.get("bbox") or block.get("bounding_box")
+                keys = ("top_left_x", "top_left_y", "bottom_right_x", "bottom_right_y")
+                box = (
+                    [block[k] for k in keys]
+                    if all(k in block for k in keys)
+                    else block.get("bbox") or block.get("bounding_box")
+                )
                 if not box or len(box) != 4:
                     continue
                 x0, y0, x1, y1 = box
                 items.append(
                     {
-                        "text": block.get("text", ""),
+                        "text": block.get("content", block.get("text", "")),
                         "bbox": [
                             x0 / width * 1000,
                             y0 / height * 1000,

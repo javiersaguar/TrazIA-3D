@@ -136,12 +136,156 @@ def test_read_page_keeps_going_when_a_tile_fails(isolated):
     assert reading.items and all(0 <= v <= 1 for v in reading.items[0]["bbox"])
 
 
-@pytest.mark.skipif(not FIXTURES.exists(), reason="sin respuestas versionadas")
-def test_versioned_qwen_answer_reads_the_nozzle_table(monkeypatch):
+def test_versioned_qwen_answer_reads_the_synthetic_ga(monkeypatch):
     monkeypatch.setenv("TRAZIA_VISION_CACHE", str(FIXTURES))
     monkeypatch.setenv("TRAZIA_VISION_OFFLINE", "1")
-    image = (FIXTURES / "tabla_boquillas.png").read_bytes()
+    image = (FIXTURES / "ga_v101.png").read_bytes()
     result = OllamaProvider("qwen3-vl:4b-instruct").read(image, "lineas", page_ref="fixture#p1/t0")
     texts = [item["text"] for item in result.data["items"]]
-    assert "NOZZLE SCHEDULE" in texts and "12350" in texts
+    assert "DIAMETER = 2000 mm" in texts
+    assert any("NOZZLE SCHEDULE" in text for text in texts)
     assert all(0 <= v <= 1 for item in result.data["items"] for v in item["bbox"])
+
+
+@pytest.mark.parametrize("family", ["gemini", "mistral"])
+def test_real_adapters_share_schema_and_replay_without_credentials(isolated, monkeypatch, family):
+    from trazia.vision import providers
+
+    monkeypatch.setenv("GEMINI_API_KEY", "test-only")
+    monkeypatch.setenv("MISTRAL_API_KEY", "test-only")
+    requests = []
+
+    def post(url, payload, headers=None):
+        requests.append((url, payload))
+        if "googleapis" in url:
+            return {
+                "candidates": [
+                    {
+                        "content": {
+                            "parts": [
+                                {
+                                    "text": json.dumps(
+                                        {
+                                            "items": [
+                                                {"text": "ID 2000", "bbox": [100, 200, 300, 260]}
+                                            ]
+                                        }
+                                    )
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "usageMetadata": {"promptTokenCount": 20, "candidatesTokenCount": 10},
+            }
+        assert payload["include_blocks"] is True
+        return {
+            "pages": [
+                {
+                    "dimensions": {"width": 2000, "height": 1000},
+                    "blocks": [
+                        {
+                            "type": "text",
+                            "content": "ID 2000",
+                            "top_left_x": 200,
+                            "top_left_y": 200,
+                            "bottom_right_x": 600,
+                            "bottom_right_y": 260,
+                        }
+                    ],
+                }
+            ]
+        }
+
+    monkeypatch.setattr(providers, "_post", post)
+    provider = providers.get_provider(family)
+    answer = provider.read(b"synthetic", "lineas", page_ref="doc#p1")
+    assert answer.data == {"items": [{"text": "ID 2000", "bbox": [0.1, 0.2, 0.3, 0.26]}]}
+    assert len(requests) == 1 and len(_log(isolated)) == 1
+    monkeypatch.setenv("TRAZIA_VISION_OFFLINE", "1")
+    monkeypatch.delenv("GEMINI_API_KEY")
+    monkeypatch.delenv("MISTRAL_API_KEY")
+    replay = providers.get_provider(family).read(b"synthetic", "lineas", page_ref="doc#p1")
+    assert replay.cached and replay.data == answer.data
+    assert len(requests) == 1 and len(_log(isolated)) == 1
+
+
+def test_mistral_missing_dimensions_does_not_invent_page_boxes(isolated, monkeypatch):
+    from trazia.vision import providers
+
+    monkeypatch.setenv("MISTRAL_API_KEY", "test-only")
+    monkeypatch.setattr(providers, "_post", lambda *a: {"pages": [{"markdown": "ID 2000"}]})
+    with pytest.raises(VisionError, match="dimensiones"):
+        providers.get_provider("mistral").read(b"synthetic", "lineas", page_ref="doc#p1")
+
+
+def test_ollama_remote_is_external_and_cloud_cannot_receive_an_image(isolated, monkeypatch):
+    from trazia.vision import providers
+
+    calls = []
+
+    def post(url, payload, headers=None):
+        calls.append(payload)
+        return {"remote_host": "https://example.invalid", "remote_model": "cloud"}
+
+    monkeypatch.setattr(providers, "_post", post)
+    remote = providers.OllamaProvider(host="http://192.0.2.1:11434", dataset="real")
+    assert remote.external
+    with pytest.raises(PolicyError):
+        remote.read(b"private", "lineas", page_ref="doc#p1")
+    assert not calls
+    local = providers.OllamaProvider(host="http://localhost:11434")
+    with pytest.raises(VisionUnavailable, match="cloud"):
+        local.read(b"synthetic", "lineas", page_ref="doc#p1")
+    assert calls == [{"model": "qwen3-vl:4b-instruct"}]
+
+
+def test_ollama_default_and_compose_environment_are_consistent(isolated, monkeypatch):
+    from trazia.vision.providers import get_provider
+
+    monkeypatch.setenv("TRAZIA_OLLAMA_URL", "http://ollama:11434")
+    monkeypatch.setenv("TRAZIA_OLLAMA_MODEL", "qwen3-vl:4b-instruct")
+    provider = get_provider("ollama")
+    assert provider.model == "qwen3-vl:4b-instruct" and provider.host == "http://ollama:11434"
+    assert not provider.external
+
+
+def test_comparison_requires_distinct_families_and_reports_missing_provider(isolated, monkeypatch):
+    from trazia.vision import comparar
+
+    image = isolated / "page.png"
+    Image.new("RGB", (100, 100), "white").save(image)
+
+    def provider(spec, **kwargs):
+        if spec == "missing":
+            raise VisionUnavailable("falta credencial de prueba")
+        value = FakeProvider(external=False)
+        value.name = spec
+        return value
+
+    monkeypatch.setattr(comparar, "get_provider", provider)
+    output = isolated / "comparison.json"
+    assert (
+        comparar.main(
+            [
+                str(image),
+                "--proveedores",
+                "ollama:a",
+                "ollama:b",
+                "missing",
+                "--salida",
+                str(output),
+            ]
+        )
+        == 2
+    )
+    data = json.loads(output.read_text(encoding="utf8"))
+    assert not data["complete"] and data["distinct_providers"] == 1
+    assert data["results"][0]["offline_replay"] and not data["results"][2]["success"]
+    assert (
+        comparar.main(
+            [str(image), "--proveedores", "ollama:a", "gemini:b", "--salida", str(output)]
+        )
+        == 0
+    )
+    assert json.loads(output.read_text(encoding="utf8"))["distinct_providers"] == 2

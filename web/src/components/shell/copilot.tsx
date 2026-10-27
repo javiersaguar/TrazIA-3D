@@ -3,6 +3,8 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { MessageSquareText, MousePointerClick, X } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { CopilotConversation } from "@/features/copilot/conversation";
+import { apiEnabled } from "@/lib/api/config";
 import { ConfidenceBar } from "@/components/ui/data";
 import { Badge, EmptyState, Icon, Kbd } from "@/components/ui/primitives";
 import { formatValue } from "@/lib/format";
@@ -54,7 +56,7 @@ export function CopilotPanel() {
       <Dialog.Portal>
         <Dialog.Content
           onInteractOutside={(e) => e.preventDefault()}
-          className="sheet-content fixed top-[calc(var(--topbar-height)+12px)] right-3 bottom-3 z-40 flex w-[380px] flex-col rounded-[var(--radius-panel)] border border-border bg-surface-raised shadow-[var(--shadow-pop)]"
+          className="sheet-content fixed top-[calc(var(--topbar-height)+12px)] right-3 bottom-3 z-40 flex w-[380px] max-w-[calc(100vw_-_24px)] flex-col rounded-[var(--radius-panel)] border border-border bg-surface-raised shadow-[var(--shadow-pop)]"
         >
           <header className="flex items-start gap-3 border-b border-border px-5 py-4">
             <span className="inline-flex size-9 items-center justify-center rounded-[var(--radius-control)] bg-violet-soft text-violet">
@@ -62,7 +64,7 @@ export function CopilotPanel() {
             </span>
             <div className="min-w-0 flex-1">
               <Dialog.Title className="text-[15px] font-semibold text-strong">Copiloto de revisión</Dialog.Title>
-              <Dialog.Description className="text-xs text-muted">Reglas sobre el JSON extraído · sin modelo de lenguaje todavía</Dialog.Description>
+              <Dialog.Description className="text-xs text-muted">{apiEnabled ? "Modelo local · herramientas de lectura y citas" : "Reglas sobre el JSON extraído · modo offline"}</Dialog.Description>
             </div>
             <Dialog.Close className="rounded-[6px] p-1 text-muted hover:bg-surface-sunken hover:text-text" aria-label="Cerrar copiloto">
               <Icon icon={X} />
@@ -70,7 +72,7 @@ export function CopilotPanel() {
           </header>
 
           <div className="flex-1 overflow-y-auto px-5 py-4">
-            {field ? <Explanation field={field} /> : (
+            {apiEnabled ? <CopilotConversation key={`${revision}:${field?.path ?? "equipment"}`} revision={revision} field={field} /> : field ? <Explanation field={field} /> : (
               <EmptyState icon={MousePointerClick} title="Selecciona un campo">
                 Elige un valor en la cola de revisión, una región del plano o un elemento del modelo para ver de dónde
                 sale, qué confianza tiene y qué pasa si está mal.
@@ -79,7 +81,7 @@ export function CopilotPanel() {
           </div>
 
           <footer className="border-t border-border px-5 py-3 text-xs text-faint">
-            El copiloto con modelo de lenguaje llegará con el extractor de visión y citará siempre la región del plano.
+            {apiEnabled ? "El copiloto propone. Las acciones de revisión siguen en tus manos." : "Reglas de la demo offline. Conecta la API local para consultar Ollama con citas."}
           </footer>
         </Dialog.Content>
       </Dialog.Portal>

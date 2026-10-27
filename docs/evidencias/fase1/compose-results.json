@@ -1,0 +1,72 @@
+{
+  "project": "trazia-check-43d4ea266d",
+  "profiles": {
+    "local": {
+      "passed": true,
+      "schema": "0.3",
+      "job": "196e6df7-9347-4dd1-95f6-1126f6d68637",
+      "status": "done",
+      "run": {
+        "strategy": "b_reglas",
+        "providers": [],
+        "seconds": 3.0500300740000057,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": null,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "sse": true,
+      "ifc": true,
+      "idempotency": true,
+      "web_http": 200,
+      "persisted_after_restart": true
+    },
+    "escala": {
+      "passed": true,
+      "schema": "0.3",
+      "job": "6e990b3e-0588-4d17-b0b1-1adf8104a0cf",
+      "status": "done",
+      "run": {
+        "strategy": "b_reglas",
+        "providers": [],
+        "seconds": 3.3317970119999814,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": null,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "sse": true,
+      "ifc": true,
+      "idempotency": true,
+      "web_http": 200,
+      "persisted_after_restart": true
+    },
+    "gpu": {
+      "passed": true,
+      "schema": "0.3",
+      "job": "086f7a11-d836-4bfa-bcfd-96ce2a102fdb",
+      "status": "done",
+      "run": {
+        "strategy": "b_reglas",
+        "providers": [],
+        "seconds": 2.9574937490000366,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": null,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "sse": true,
+      "ifc": true,
+      "idempotency": true,
+      "web_http": 200,
+      "persisted_after_restart": true,
+      "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU, 8151 MiB"
+    }
+  }
+}

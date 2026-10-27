@@ -1,0 +1,318 @@
+{
+  "generated_at": "2026-10-27T10:16:33.123539+00:00",
+  "document_sha256": "468bb29a7c64e8a9e391e648250328f6e20ab7b44c004e10db4ebb9f2fa0a1b1",
+  "image_sha256": "b5b616537860534d55dcdaf703de1af7c279a8c658f166d65ac742cedb651970",
+  "dataset": "synthetic",
+  "page": 1,
+  "crop": null,
+  "dpi": 100,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string"
+            },
+            "bbox": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "text",
+            "bbox"
+          ]
+        }
+      }
+    },
+    "required": [
+      "items"
+    ]
+  },
+  "results": [
+    {
+      "requested": "ollama:qwen3-vl:4b-instruct",
+      "success": true,
+      "offline_replay": true,
+      "data": {
+        "items": [
+          {
+            "text": "TrazIA / V-101 / REV A",
+            "bbox": [
+              0.033,
+              0.035,
+              0.262,
+              0.064
+            ]
+          },
+          {
+            "text": "SYNTHETIC FIXTURE - Not a vendor document - All lengths in mm",
+            "bbox": [
+              0.033,
+              0.077,
+              0.312,
+              0.092
+            ]
+          },
+          {
+            "text": "SIMPLIFIED ELEVATION / not to scale",
+            "bbox": [
+              0.082,
+              0.217,
+              0.23,
+              0.23
+            ]
+          },
+          {
+            "text": "Z = 0 / ground",
+            "bbox": [
+              0.078,
+              0.885,
+              0.128,
+              0.899
+            ]
+          },
+          {
+            "text": "V-101",
+            "bbox": [
+              0.168,
+              0.543,
+              0.19,
+              0.557
+            ]
+          },
+          {
+            "text": "N2 (90 deg)",
+            "bbox": [
+              0.212,
+              0.433,
+              0.262,
+              0.447
+            ]
+          },
+          {
+            "text": "N3",
+            "bbox": [
+              0.08,
+              0.59,
+              0.094,
+              0.604
+            ]
+          },
+          {
+            "text": "N1",
+            "bbox": [
+              0.312,
+              0.666,
+              0.325,
+              0.68
+            ]
+          },
+          {
+            "text": "EXPLICIT PARAMETERS / EXTRACTION BASELINE",
+            "bbox": [
+              0.428,
+              0.136,
+              0.737,
+              0.154
+            ]
+          },
+          {
+            "text": "TAG = V-101",
+            "bbox": [
+              0.428,
+              0.177,
+              0.49,
+              0.191
+            ]
+          },
+          {
+            "text": "DIAMETER = 2000 mm",
+            "bbox": [
+              0.428,
+              0.214,
+              0.535,
+              0.229
+            ]
+          },
+          {
+            "text": "HEIGHT = 6000 mm",
+            "bbox": [
+              0.428,
+              0.246,
+              0.523,
+              0.261
+            ]
+          },
+          {
+            "text": "HEAD_DEPTH = 500 mm",
+            "bbox": [
+              0.428,
+              0.278,
+              0.547,
+              0.293
+            ]
+          },
+          {
+            "text": "SKIRT_HEIGHT = 1200 mm",
+            "bbox": [
+              0.428,
+              0.31,
+              0.557,
+              0.325
+            ]
+          },
+          {
+            "text": "SKIRT_THICKNESS = 20 mm",
+            "bbox": [
+              0.428,
+              0.342,
+              0.565,
+              0.357
+            ]
+          },
+          {
+            "text": "NOZZLE SCHEDULE / RADIAL CONNECTIONS",
+            "bbox": [
+              0.428,
+              0.42,
+              0.707,
+              0.438
+            ]
+          },
+          {
+            "text": "NOZZLE N1: DIAMETER=200 mm; PROJECTION=400 mm; ELEVATION=2500 mm; AZIMUTH=0 deg",
+            "bbox": [
+              0.428,
+              0.462,
+              0.775,
+              0.477
+            ]
+          },
+          {
+            "text": "NOZZLE N2: DIAMETER=100 mm; PROJECTION=300 mm; ELEVATION=5500 mm; AZIMUTH=90 deg",
+            "bbox": [
+              0.428,
+              0.494,
+              0.775,
+              0.51
+            ]
+          },
+          {
+            "text": "NOZZLE N3: DIAMETER=150 mm; PROJECTION=350 mm; ELEVATION=3500 mm; AZIMUTH=180 deg",
+            "bbox": [
+              0.428,
+              0.536,
+              0.783,
+              0.551
+            ]
+          },
+          {
+            "text": "DATUMS / CONVENTIONS",
+            "bbox": [
+              0.428,
+              0.684,
+              0.544,
+              0.699
+            ]
+          },
+          {
+            "text": "HEIGHT: straight shell length between tangent lines.",
+            "bbox": [
+              0.428,
+              0.716,
+              0.647,
+              0.731
+            ]
+          },
+          {
+            "text": "SKIRT_HEIGHT: ground to lower tangent line.",
+            "bbox": [
+              0.428,
+              0.748,
+              0.629,
+              0.763
+            ]
+          },
+          {
+            "text": "HEAD_DEPTH: equal semi-ellipsoidal heads, upper and lower.",
+            "bbox": [
+              0.428,
+              0.78,
+              0.694,
+              0.795
+            ]
+          },
+          {
+            "text": "ELEVATION: nozzle axis above ground. PROJECTION: from shell surface.",
+            "bbox": [
+              0.428,
+              0.812,
+              0.737,
+              0.827
+            ]
+          },
+          {
+            "text": "AZIMUTH: counter-clockwise from +X toward +Y.",
+            "bbox": [
+              0.428,
+              0.844,
+              0.67,
+              0.859
+            ]
+          },
+          {
+            "text": "Document for software tests; no pressure design or fabrication validity.",
+            "bbox": [
+              0.428,
+              0.876,
+              0.715,
+              0.891
+            ]
+          },
+          {
+            "text": "TRAZIA-3D | GA2MODEL | SYNTHETIC ENGINEERING DATA",
+            "bbox": [
+              0.033,
+              0.933,
+              0.273,
+              0.947
+            ]
+          }
+        ]
+      },
+      "provider": "ollama:qwen3-vl:4b-instruct",
+      "model": "qwen3-vl:4b-instruct",
+      "prompt_sha256": "3d12d523b1d8041f507a8248a3173a70272e08b19a397ce02ae6030f4e9b28b1",
+      "seconds": 34.265812,
+      "tokens_in": 2059,
+      "tokens_out": 1263,
+      "cost_eur": 0.0,
+      "external": false,
+      "cached": false,
+      "seconds_wall": 38.7668096999987
+    },
+    {
+      "requested": "gemini",
+      "success": false,
+      "error": "Gemini: falta GEMINI_API_KEY en .env",
+      "seconds_wall": 0.0006319000021903776
+    },
+    {
+      "requested": "mistral",
+      "success": false,
+      "error": "Mistral: falta MISTRAL_API_KEY en .env",
+      "seconds_wall": 0.00010339999425923452
+    }
+  ],
+  "distinct_providers": 1,
+  "complete": false
+}

@@ -37,8 +37,9 @@ Las credenciales se configuran por entorno y no se guardan en Git.
 | GET /estudio | Archivo de Lectura o estado vacío explícito |
 
 El id completo de revisión es `proyecto:equipo:revisión`; A/B son alias de la demo V-101.
-BCF y exportación multiesquema responden 501 hasta su fase. POST /estudio y POST /copiloto
-responden 503 mientras falten sus ejecutores. No devuelven resultados simulados.
+BCF y exportación multiesquema están implementados (ver secciones posteriores).
+POST /copiloto usa Ollama local y herramientas de lectura. POST /estudio sigue respondiendo
+503: el arnés se ejecuta por CLI; no se simula un lanzamiento asíncrono desde esta ruta.
 
 ## Concurrencia e idempotencia
 
@@ -118,7 +119,7 @@ Usar un perfil cada vez (local/gpu/escala comparten el puerto de API):
 ```bash
 docker compose --profile local up --build
 docker compose --profile gpu up --build
-docker compose --profile gpu exec ollama ollama pull qwen3:4b
+docker compose --profile gpu exec ollama ollama pull qwen3-vl:4b-instruct
 docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile escala up --build
 # Aumentar workers; todos comparten Postgres y el almacén de contenido:
 docker compose --profile escala up --scale worker=4
@@ -136,11 +137,16 @@ produce la demo offline. Para el perfil local con Ollama en el host, usar
 TRAZIA_OLLAMA_URL=http://host.docker.internal:11434; GPU usa el servicio interno ollama.
 Sin Docker, las variables de .env se pueden cargar con `uv run --env-file .env --extra api ...`.
 
-**Validación disponible:** ambos YAML cumplen el esquema oficial Compose, con SHA-256
-`d549057ebc2925f39f62799eab0db7b9e2c18b35b6c00595199116da3ed10e64` consultado el 26/10/2026.
-Docker no está instalado en el equipo de desarrollo de esta fase. No se han construido ni arrancado
-las imágenes ni se ha medido GPU/Redis/Postgres en contenedores. Hay que ejecutar esos comandos
-antes de presentar el perfil de escala como probado.
+**Validación 27/10/2026:** imágenes Linux construidas y perfiles local, escala y GPU
+arrancados en Docker 29.6.2 / Compose 5.3.1 dentro de Ubuntu/WSL. API, trabajo B, SSE, IFC,
+idempotencia, HTTP de Next y persistencia tras reinicio pasan en los tres perfiles. Escala
+usa Redis/arq/Postgres; NVIDIA visible desde el contenedor Ollama: RTX 5070 Laptop, 8151 MiB.
+No se ha medido inferencia dentro del contenedor GPU ni un lote de 400 equipos.
+
+Repetir después de construir las imágenes con
+`uv run python scripts/check_compose.py --wsl Ubuntu --profiles local escala gpu` desde
+PowerShell, o sin `--wsl Ubuntu` donde Docker esté en PATH. El chequeo crea y elimina solo su
+proyecto temporal, sin publicar puertos. [Evidencias de Fase 1](FASE1.md).
 
 
 ## Web conectada y tipos
@@ -240,3 +246,88 @@ El formato se ha contrastado con los XSD oficiales de la etiqueta v2.1 de buildi
 
 Fuentes: [BCF 2.1](https://github.com/buildingSMART/BCF-XML/releases/tag/v2.1),
 [ECC OpenCV](https://docs.opencv.org/4.x/dc/d6b/group__video__track.html).
+
+
+## Copiloto local con citas (DEC-26)
+
+`POST /copiloto` consulta Ollama en el equipo. El servidor solo dispone de herramientas
+`read_fields`, `read_evidence`, `read_changes` y `read_rules`; recibe copias de revisiones y
+la capacidad de leer originales por SHA-256, sin sesiones SQL ni funciones de escritura.
+No acepta/corrige campos, aprueba, crea trabajos ni registra tiempo de revisión humana.
+
+```powershell
+ollama pull qwen3-vl:4b-instruct
+$env:TRAZIA_OLLAMA_URL = "http://127.0.0.1:11434"
+$env:TRAZIA_OLLAMA_MODEL = "qwen3-vl:4b-instruct"
+uv run --extra api python -m trazia.api
+```
+
+El `pull` solo hace falta si no están instalados los pesos. Se reutiliza el servidor Ollama;
+los pesos no se incluyen en Git. La web necesita `NEXT_PUBLIC_API_URL` como se explica arriba.
+En modo offline conserva sus explicaciones por reglas, identificadas como tales.
+En modo API, una caída del modelo muestra el error y no se sustituye por reglas.
+
+```json
+{
+  "question": "¿Qué cambia respecto a la revisión A en esta cota?",
+  "revision_id": "B",
+  "previous_id": "A",
+  "path": "nozzles.N3.elevation"
+}
+```
+
+`path` y `previous_id` son opcionales; las revisiones deben corresponder al mismo proyecto y
+equipo. La respuesta contiene `statements`, `proposals` y `citations`; cada afirmación y
+comprobación propuesta remite a IDs emitidos por las herramientas. Las citas distinguen
+campo JSON, original, cambio y regla. Para originales incluyen documento/SHA, página y bbox
+PDF o hoja/celda Excel, más el fragmento efectivamente leído. `original_verified` significa
+que coincide el SHA-256, no que la interpretación técnica sea correcta.
+
+Se devuelve `read_only: true`, modelo, versión/huella de revisión, huella de instrucciones y
+herramientas, y `run` con tiempo de pared y tokens reportados por Ollama, incluidos reintentos.
+`external_calls=0` y `cost_eur=0` reflejan ausencia de proveedor facturado; no miden electricidad,
+amortización o coste total del equipo. `gpu_seconds` queda sin medir. Si falta contabilidad,
+los tokens son null y `accounting_complete=false`, sin inventar ceros.
+
+- 200 con `abstained=true`: evidencia insuficiente, contrato inválido o referencias rechazadas;
+  no hay afirmaciones, propuestas ni citas en una abstención.
+- 409: cambió una revisión durante la consulta; la web refresca sus datos.
+- 422: entrada inválida, campo inexistente o revisiones incompatibles; 404 para revisión ausente.
+- 503: Ollama/modelo no disponible, no local o sin capacidad de herramientas.
+
+Se comprueba `/api/show`: modelo GGUF con herramientas, sin metadatos remotos. Se permiten
+loopback, localhost y los nombres de servicio local `ollama`/`host.docker.internal`; sin proxies
+de entorno, redirecciones, credenciales ni modelos cloud. La persona que despliega debe
+configurar esos nombres para el servicio local. Los documentos y preguntas son datos, no
+instrucciones para ampliar capacidades.
+
+Límites: 200 rutas de contexto, seis campos por lectura, cuatro llamadas nativas de herramientas
+en el plan, diez lecturas como máximo; fragmentos PDF de hasta 1800 caracteres y rangos Excel
+de hasta 32 celdas. Contextos inicial/final acotados a 24k/48k caracteres, pregunta de hasta
+2000 caracteres, una consulta activa por proceso API. Timeout del modelo 90 s, total de ruta
+95 s. Cancelar en el navegador aborta la espera HTTP; no garantiza detener una generación ya
+iniciada en Ollama. No hay memoria de conversación entre consultas.
+
+El plan usa llamadas nativas; la salida final usa JSON Schema con las citas disponibles.
+Se rechazan referencias inventadas, declaraciones de escritura y determinadas negaciones
+de verificación contradictorias con el original leído. Se permite una reformulación si el score se presenta
+como certeza/probabilidad sin calibración. No se garantiza que toda conclusión del modelo
+se deduzca de sus citas: hay que comprobar los fragmentos. PDF escaneado o imagen sin texto
+legible no recibe una cita OCR inventada; esta herramienta no implementa OCR.
+
+Fuentes de integración: [Ollama chat](https://docs.ollama.com/api/chat),
+[herramientas](https://docs.ollama.com/capabilities/tool-calling) y
+[salida estructurada](https://docs.ollama.com/capabilities/structured-outputs).
+
+
+## Medición del lote con workers
+
+`scripts/run_scale.py --wsl Ubuntu --workers 1 4` levanta despliegues aislados Redis/arq/Postgres
+y llama al cliente `scripts/measure_scale.py` para procesar todo el corpus sintético. Requiere
+la imagen API construida y generated/synthetic_v2. Publica la API de prueba solo en localhost
+18000 dentro de WSL; no sustituye el servidor de desarrollo. Los almacenes son nuevos por prueba
+y se eliminan con sus contenedores al terminar. Se conserva el estado terminal de cada trabajo.
+
+El informe separa tiempos observados, costes no informados y extrapolación a 400×4. No supone
+que un trabajo fallido haya producido un IFC, ni que un IFC estructuralmente válido coincida
+con el plano. Resultados y límites de la primera medición: [FASE3.md](FASE3.md).
