@@ -395,13 +395,16 @@ comprobar un segundo proveedor real; no se cuentan mocks como mediciones.
 
 ### Fase 3 · Diferenciales (15 – 21 nov)
 
-- [ ] **3.1 (Plataforma)** Cambios en **tres capas** (diferencia visual, campos emparejados, geometría por GUID) + nubes Δ + BCF 2.1 (DEC-19, 20).
+**Avance Plataforma 27/10/2026:** [evidencias y límites](FASE3.md). Trabajo separado del
+agente de Fase 2; no se editan las estrategias ni sus carpetas.
+
+- [x] **3.1 (Plataforma)** Cambios en **tres capas** (diferencia visual, campos emparejados, geometría por GUID) + nubes Δ + BCF 2.1 (DEC-19, 20). *Verificado:* API, comparación y BCF en la batería Python; marcadores heurísticos y sin nuevas ediciones del visor.
 - [ ] **3.2 (Lectura)** **Memoria de revisión** en D: la rev1 aprobada guía la lectura de la rev2.
 - [ ] **3.3 (Lectura)** Calibración isotónica + **intervalos conformes** + curva riesgo-cobertura (DEC-12). *Hecho:* ECE < 0,05 y cobertura empírica ≥ nominal en S-reservado.
 - [ ] **3.4 (Lectura)** **Fusión aprendida y selector** por tipo de documento; **ablaciones** de D; estudio completo con S-reservado (H1–H6 de [ESTUDIO.md](ESTUDIO.md)).
-- [ ] **3.5 (Plataforma)** Pantalla **Estudio** en la web (DEC-28) y conexión de la pantalla Bench al estudio.
-- [ ] **3.6 (Plataforma)** **Copiloto con modelo local**, herramientas de solo lectura y citas (DEC-26).
-- [ ] **3.7 (Plataforma)** Escala: perfil Redis + workers, lote de todo el conjunto, coste y tiempo medidos por equipo (DEC-23, 25).
+- [x] **3.5 (Plataforma)** Pantalla **Estudio** en la web (DEC-28) y conexión de la pantalla Bench al estudio. *Hecho:* misma fuente/query, variante y rúbrica con IC; bench v1 separado, errores/vacío explícitos y pruebas en ambos transportes.
+- [x] **3.6 (Plataforma)** **Copiloto con modelo local**, herramientas de solo lectura y citas (DEC-26). *Verificado:* Ollama local, evidencia por hash, sin herramientas de escritura y pruebas de citas/concurrencia.
+- [ ] **3.7 (Plataforma)** Escala: perfil Redis + workers, lote de todo el conjunto, coste y tiempo medidos por equipo (DEC-23, 25). *Parcial:* corpus completo de 336 revisiones medido con 1/4 workers, 221,4/65,4 s; 20 done y 316 errores en ambos. Coste desconocido conservado como null. Falta cubrir el conjunto y medir el coste tras Fase 2. [Resultados](FASE3.md#37--medición-real-de-la-cola-parcial).
 - [ ] **3.8 (E)** Aprendizaje activo: las correcciones recalibran y se usan como few-shot (DEC-27).
 - [x] **3.9 (I)** Vista Cambios con morph 3D por GUID, fantasma rev1, marcadores Δ y grafo de impacto.
 - [x] **3.10 (I)** Momento firma «del plano al modelo» (`/lab/firma`).

@@ -354,3 +354,27 @@ modelos del mismo proveedor. Plataforma IndesIA sigue sin servicio conocido, com
 «cuando se sepa». Falta una clave configurada por el equipo para cerrar 1.9; se ha solicitado
 solo la ruta del archivo local, nunca que se publique la clave. Detalle y reproducción en
 [FASE1.md](../FASE1.md). Sin push ni PR.
+
+
+## Fase 3 · Bench y medición de escala, 27/10/2026
+
+Por petición del usuario se avanza en Fase 3 sin modificar el worktree/código de Lectura,
+actualmente ocupado por Fase 2. Se cierra 3.5 conectando Bench al mismo informe de Estudio,
+con selector de variante, rúbrica/IC/alcance y bench v1 separado. Se corrigen avisos de alcance
+y la diferencia entre error y estado vacío. No se modifican los archivos del visor.
+
+3.1 y 3.6 ya implementadas se registran como verificadas en ROADMAP. Para 3.7 se crean un
+cliente de lote y un orquestador Docker aislado. Se miden 336 revisiones, 64 equipos y 168
+condiciones con uno y cuatro workers Redis/arq/Postgres: 221,425 frente a 65,445 s (3,38×).
+Ambos obtienen 20 done y 316 errores. done acredita IFC estructural/EXPRESS, no verdad geométrica.
+Se conserva coste null y no se presenta el lote como capacidad de producir 1600 IFC válidos.
+3.7 queda parcial y se indican necesidades de Lectura para repetir con Fase 2 y contabilidad.
+No se altera memoria/calibración/fusión/aprendizaje activo en las carpetas del otro agente.
+
+180 pruebas Python, Ruff global, web types/lint/15 unitarias/build pasan. Playwright 15 con API
+(una omitida) y 11 offline (cinco omitidas). Inspección de Bench en ambos temas sobre API real.
+La configuración permite probar el build con servidor/API aislados sin parar localhost:3000.
+CI añade job web, sin eliminar pasos Python existentes. Evidencia y reproducción en
+[FASE3.md](../FASE3.md), con JSON de métricas por equipo/condición bajo docs/evidencias/fase3.
+No hay nuevas dependencias ni cambios de contrato con Lectura. Commit y push autorizados por
+el encargo actual, a feat/plataforma; no se fusiona su trabajo sin terminar ni se hace push forzado.

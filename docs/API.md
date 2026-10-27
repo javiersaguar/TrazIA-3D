@@ -318,3 +318,16 @@ legible no recibe una cita OCR inventada; esta herramienta no implementa OCR.
 Fuentes de integración: [Ollama chat](https://docs.ollama.com/api/chat),
 [herramientas](https://docs.ollama.com/capabilities/tool-calling) y
 [salida estructurada](https://docs.ollama.com/capabilities/structured-outputs).
+
+
+## Medición del lote con workers
+
+`scripts/run_scale.py --wsl Ubuntu --workers 1 4` levanta despliegues aislados Redis/arq/Postgres
+y llama al cliente `scripts/measure_scale.py` para procesar todo el corpus sintético. Requiere
+la imagen API construida y generated/synthetic_v2. Publica la API de prueba solo en localhost
+18000 dentro de WSL; no sustituye el servidor de desarrollo. Los almacenes son nuevos por prueba
+y se eliminan con sus contenedores al terminar. Se conserva el estado terminal de cada trabajo.
+
+El informe separa tiempos observados, costes no informados y extrapolación a 400×4. No supone
+que un trabajo fallido haya producido un IFC, ni que un IFC estructuralmente válido coincida
+con el plano. Resultados y límites de la primera medición: [FASE3.md](FASE3.md).
