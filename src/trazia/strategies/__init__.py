@@ -6,6 +6,7 @@ from .a_vision import VisionGeometryStrategy
 from .b_reglas import ReglasStrategy
 from .base import Cost, StageEvent, Strategy, StrategyContext, StrategyOutput
 from .c_rag import RagStrategy
+from .d_hibrido import HybridStrategy
 
 STRATEGIES: dict[str, Callable[[], Strategy]] = {
     "b_reglas": ReglasStrategy,
@@ -13,12 +14,19 @@ STRATEGIES: dict[str, Callable[[], Strategy]] = {
     "a_geometria": lambda: VisionGeometryStrategy(reader="texto", name="a_geometria"),
     "a_vision": lambda: VisionGeometryStrategy(reader="vision", name="a_vision"),
     "c_rag": RagStrategy,
+    "d_hibrido": HybridStrategy,
 }
 
 # Ablaciones del estudio: «<estrategia>-<canal quitado>». No se ofrecen en la API.
 ABLATIONS: dict[str, Callable[[], Strategy]] = {
     "b_reglas-tablas": lambda: ReglasStrategy(drawing=False, name="b_reglas-tablas"),
     "b_reglas-hdm": lambda: ReglasStrategy(hdm=False, name="b_reglas-hdm"),
+    **{
+        f"d_hibrido-{channel}": (
+            lambda channel=channel: HybridStrategy(without={channel}, name=f"d_hibrido-{channel}")
+        )
+        for channel in ("geometria", "memoria", "rag", "vision")
+    },
 }
 
 
