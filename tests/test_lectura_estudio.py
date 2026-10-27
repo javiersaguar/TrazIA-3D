@@ -131,7 +131,10 @@ def test_study_writes_interface_3(small_sets, tmp_path):
     assert "S-mecánico" in reasons and "S-reservado" in reasons
     adversarial = study["variants"][0]["by_dataset"]["S-adversarial"]
     assert adversarial["poisoning_rate"] is not None
-    assert "Datos sintéticos" in (out / "estudio.md").read_text(encoding="utf-8")
+    markdown = (out / "estudio.md").read_text(encoding="utf-8")
+    assert "Datos sintéticos" in markdown
+    assert "## Variantes medidas (S-dev)" in markdown
+    assert study["variants"][0]["details"]["bootstrap_equipment_units"] == 2
 
 
 def test_study_is_deterministic_apart_from_timing(small_sets):
@@ -148,3 +151,36 @@ def test_study_is_deterministic_apart_from_timing(small_sets):
     a = run_study(small_sets, ["s-dev"], ["b_reglas"], **kwargs)
     b = run_study(small_sets, ["s-dev"], ["b_reglas"], **kwargs)
     assert strip(a) == strip(b)
+
+
+def test_bootstrap_samples_whole_equipment_groups(monkeypatch, tmp_path):
+    from dataclasses import replace
+
+    import bench.estudio as study
+
+    generate_set("s-dev", tmp_path, cases=2, degradations=("vectorial",))
+    manifest_path = tmp_path / "s-dev/manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf8"))
+    manifest["styles"] = ["vectorial", "repeat"]
+    manifest_path.write_text(json.dumps(manifest), encoding="utf8")
+    original_case = study.run_case
+
+    def repeated(variant, root, dataset, degradation, tag):
+        case = original_case(variant, root, dataset, "vectorial", tag)
+        return replace(case, degradation=degradation)
+
+    observed = []
+    original_bootstrap = study.bootstrap_ci
+
+    def inspect(units, statistic, **kwargs):
+        assert len(units) == 2  # Dos equipos, aunque haya cuatro condiciones.
+        assert all(len(group) == 2 for group in units)
+        assert all(len({(c.dataset, c.tag) for c in group}) == 1 for group in units)
+        observed.append(len(units))
+        return original_bootstrap(units, statistic, **kwargs)
+
+    monkeypatch.setattr(study, "run_case", repeated)
+    monkeypatch.setattr(study, "bootstrap_ci", inspect)
+    result = study.run_study(tmp_path, ["s-dev"], ["b_reglas"], resamples=10, log=lambda *_: None)
+    assert observed == [2, 2, 2, 2]
+    assert result["variants"][0]["details"]["bootstrap_equipment_units"] == 2

@@ -1,3 +1,4 @@
+import json
 import time
 from pathlib import Path
 from uuid import uuid4
@@ -217,8 +218,15 @@ def test_adapter_refuses_unimplemented_strategy(client):
     assert client.get("/equipment/V-101/revisions/C").status_code == 404
 
 
-def test_empty_study_and_actual_diff(client):
-    assert client.get("/estudio").json()["status"] == "empty"
+def test_empty_study_and_actual_diff(client, tmp_path):
+    # Los resultados locales no deben cambiar lo que comprueba el caso de estado vacío.
+    with TestClient(create_app(root=tmp_path, data_root=tmp_path / "data", seed=False)) as isolated:
+        assert isolated.get("/estudio").json()["status"] == "empty"
+        report = tmp_path / "generated/estudio/estudio.json"
+        report.parent.mkdir(parents=True)
+        measured = {"synthetic": True, "variants": [{"id": "b_reglas", "measured": True}]}
+        report.write_text(json.dumps(measured), encoding="utf8")
+        assert isolated.get("/estudio").json() == measured
     assert client.get("/diff?from=A&to=B").json()["summary"]["changes"] == 8
     assert client.get("/plant").json()["layout"] is None
     assert client.post("/estudio", headers=headers()).status_code == 503

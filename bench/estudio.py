@@ -381,7 +381,8 @@ def run_study(
                 plan.append((root, label, degradation, case["tag"]))
     results: dict[str, list[CaseResult]] = {}
     for v in measured:
-        log(f"· {v.id}: {len(plan)} equipos × 2 revisiones")
+        equipment_count = len({(item[1], item[3]) for item in plan})
+        log(f"· {v.id}: {equipment_count} equipos · {len(plan)} condiciones × 2 revisiones")
         results[v.id] = [run_case(v, *item) for item in plan]
 
     def scored(cases):
@@ -391,7 +392,8 @@ def run_study(
     for v in measured:
         cases = results[v.id]
         main = metrics(scored(cases)) or metrics(cases)
-        units = scored(cases) or cases
+        # Las degradaciones son observaciones correlacionadas del mismo equipo.
+        units = list(_group(scored(cases) or cases, lambda c: (c.dataset, c.tag)).values())
         entry = {
             "id": v.id,
             "strategy": v.strategy,
@@ -401,7 +403,7 @@ def run_study(
             "ci95": {
                 k: bootstrap_ci(
                     units,
-                    lambda s, k=k: (metrics(list(s)) or {}).get(k),
+                    lambda s, k=k: (metrics([c for group in s for c in group]) or {}).get(k),
                     resamples=resamples,
                     seed=seed,
                 )
@@ -420,7 +422,7 @@ def run_study(
                 d: _public(metrics(cs))
                 for d, cs in _group(scored(cases), lambda c: c.degradation).items()
             },
-            "details": main["_details"],
+            "details": {**main["_details"], "bootstrap_equipment_units": len(units)},
             "eligible": eligible(main),
         }
         variants_out.append(entry)
@@ -432,10 +434,13 @@ def run_study(
             full = {c.key: c for c in scored(results[v.ablation_of])}
             mine = {c.key: c for c in scored(results[v.id])}
             keys = sorted(full.keys() & mine.keys())
+            clusters = defaultdict(list)
+            for key in keys:
+                clusters[(key[0], key[2])].append(key)
             delta = paired_bootstrap_delta(
-                keys,
-                lambda s, mine=mine: _score_of(mine[k] for k in s),
-                lambda s, full=full: _score_of(full[k] for k in s),
+                list(clusters.values()),
+                lambda s, mine=mine: _score_of(mine[k] for group in s for k in group),
+                lambda s, full=full: _score_of(full[k] for group in s for k in group),
                 resamples=resamples,
                 seed=seed,
             )
@@ -554,7 +559,7 @@ def to_markdown(study: dict) -> str:
             f"{k} (semilla {v['seed']}, {v['cases']} equipos)" for k, v in study["sets"].items()
         ),
         "",
-        "## Variantes medidas (S-dev + S-reservado)",
+        "## Variantes medidas (" + " + ".join(d for d in study["datasets"] if d in SCORED) + ")",
         "",
         "| Variante | Puntuación | IC 95 % | Geometría | Atributos | ECE | F1 cambios "
         "| Alucinación | Cita | s/rev | €/equipo | Elegible |",
