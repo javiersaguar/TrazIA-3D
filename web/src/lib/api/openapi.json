@@ -1012,7 +1012,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CopilotAnswer"
+                }
               }
             }
           },
@@ -1275,6 +1277,137 @@
         ],
         "title": "Body_upload_documents_post"
       },
+      "Citation": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "field",
+              "evidence",
+              "change",
+              "rule"
+            ],
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "excerpt": {
+            "type": "string",
+            "title": "Excerpt"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "filename": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filename"
+          },
+          "sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sha256"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "bbox": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bbox"
+          },
+          "sheet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sheet"
+          },
+          "cell": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cell"
+          },
+          "original_verified": {
+            "type": "boolean",
+            "title": "Original Verified",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "excerpt"
+        ],
+        "title": "Citation"
+      },
       "ColumnParameters": {
         "properties": {
           "sections": {
@@ -1327,6 +1460,98 @@
         ],
         "title": "ColumnSection"
       },
+      "CopilotAnswer": {
+        "properties": {
+          "abstained": {
+            "type": "boolean",
+            "title": "Abstained"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "statements": {
+            "items": {
+              "$ref": "#/components/schemas/Statement"
+            },
+            "type": "array",
+            "title": "Statements"
+          },
+          "proposals": {
+            "items": {
+              "$ref": "#/components/schemas/Statement"
+            },
+            "type": "array",
+            "title": "Proposals"
+          },
+          "citations": {
+            "items": {
+              "$ref": "#/components/schemas/Citation"
+            },
+            "type": "array",
+            "title": "Citations"
+          },
+          "read_only": {
+            "type": "boolean",
+            "const": true,
+            "title": "Read Only",
+            "default": true
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "revision_id": {
+            "type": "string",
+            "title": "Revision Id"
+          },
+          "revision_version": {
+            "type": "integer",
+            "title": "Revision Version"
+          },
+          "input_sha256": {
+            "type": "string",
+            "title": "Input Sha256"
+          },
+          "prompt_sha256": {
+            "type": "string",
+            "title": "Prompt Sha256"
+          },
+          "tools_used": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tools Used"
+          },
+          "run": {
+            "$ref": "#/components/schemas/RunInfo"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "abstained",
+          "statements",
+          "proposals",
+          "citations",
+          "model",
+          "revision_id",
+          "revision_version",
+          "input_sha256",
+          "prompt_sha256",
+          "tools_used",
+          "run"
+        ],
+        "title": "CopilotAnswer"
+      },
       "CopilotInput": {
         "properties": {
           "question": {
@@ -1337,19 +1562,34 @@
           },
           "revision_id": {
             "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
             "title": "Revision Id",
             "default": "A"
           },
           "path": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 300
               },
               {
                 "type": "null"
               }
             ],
             "title": "Path"
+          },
+          "previous_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Id"
           }
         },
         "additionalProperties": false,
@@ -2712,6 +2952,32 @@
           "confidence"
         ],
         "title": "Source"
+      },
+      "Statement": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 3000,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "citations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 6,
+            "minItems": 1,
+            "title": "Citations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "citations"
+        ],
+        "title": "Statement"
       },
       "Tag": {
         "properties": {

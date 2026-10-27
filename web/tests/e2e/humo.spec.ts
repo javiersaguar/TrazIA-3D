@@ -88,3 +88,15 @@ test("el laboratorio 3D sigue leyendo los siete productos del IFC", async ({ pag
   await expect(page.locator('[data-testid="ifc-viewer"]').first()).toHaveAttribute("data-products", "7");
   expect(errors, errors.join("\n")).toEqual([]);
 });
+
+
+test("el panel del copiloto conserva las reglas en modo offline", async ({ page }) => {
+  test.skip(connected, "El modo API tiene pruebas de respuesta y error propias");
+  await page.goto("/revision");
+  await expect(page.getByRole("listbox", { name: "Campos por revisar" }).getByRole("option").first()).toBeVisible();
+  await page.keyboard.press("j");
+  await page.getByRole("button", { name: "Copiloto", exact: true }).click();
+  await expect(page.getByText("Reglas sobre el JSON extraído · modo offline")).toBeVisible();
+  await expect(page.getByText("Qué pasa si está mal", { exact: true })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Tu pregunta" })).toHaveCount(0);
+});

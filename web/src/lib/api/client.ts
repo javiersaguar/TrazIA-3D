@@ -101,3 +101,13 @@ export function subscribeJob(identity: string, onStage: (event: StageEvent) => v
   stream.onerror = () => { if (!closed) onError(); }; // EventSource reanuda con Last-Event-ID; no se sustituyen eventos por mocks.
   return () => { closed = true; stream.close(); };
 }
+
+
+export type CopilotAnswer = components["schemas"]["CopilotAnswer"];
+export async function askCopilot(rev: RevisionId, question: string, path?: string, signal?: AbortSignal): Promise<CopilotAnswer> {
+  const identity = revisionVersion(rev)?.identity ?? rev;
+  const body: components["schemas"]["CopilotInput"] = { question, revision_id: identity,
+    ...(path ? { path } : {}), ...(rev === "B" ? { previous_id: revisionVersion("A")?.identity ?? "A" } : {}) };
+  return (await checked(await fetch(apiURL("/copiloto"), { method: "POST", signal,
+    headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }))).json() as Promise<CopilotAnswer>;
+}

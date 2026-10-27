@@ -225,3 +225,92 @@ Cierre: 119/119 pruebas Python, Ruff global correcto. Typecheck, lint (aviso Tan
 13 pruebas unitarias y build correctos. Playwright 10/10 conectado y 7/7 offline (3 exclusivas
 omitidas), incluido el laboratorio 3D. gen:api exporta ahora el esquema desde FastAPI con uv
 antes de generar tipos, para no dejar un JSON de OpenAPI desactualizado. Sin push.
+
+
+## Integración del 27/10/2026 y fase 9
+
+Merge diario de main, fast-forward hasta b9f943e. La pantalla Estudio ya está incorporada
+por 653412e; no se duplica su implementación. Se integra también el pipeline real de Lectura,
+los proveedores visuales, el generador v2 y su ejecutor de estudio. La siguiente tarea propia
+en el orden acordado es la fase 10, Copiloto (ROADMAP I.4.9 y DEC-26).
+
+## Fase 10 · Copiloto local con citas
+
+POST /copiloto sustituye el endpoint pendiente. Qwen3-VL-4B-Instruct con Ollama local usa
+cuatro herramientas: campos, evidencia, cambios y reglas. Se verifican originales por SHA-256
+antes de extraer texto de su región PDF o celda/rango Excel. Las revisiones son copias y las
+herramientas no reciben sesiones SQL, funciones de escritura ni rutas arbitrarias.
+Toda respuesta y propuesta lleva IDs de fuentes emitidos por estas lecturas; una referencia
+inventada o una salida inválida produce abstención. No se acepta/corrige ni aprueba nada.
+
+El panel conserva el lenguaje visual del shell: pregunta, sugerencias, espera/cancelación,
+respuesta, comprobaciones propuestas y fuentes desplegables con fragmento, página/celda,
+bbox y SHA. Las consultas no invalidan IFC como si fueran ediciones. Un 409 por revisión
+cambiada refresca las consultas; un error de Ollama se muestra sin sustituirlo por reglas.
+Offline conserva el panel de reglas y su identificación explícita.
+
+El plan usa herramientas nativas y la respuesta final JSON Schema. No se combina format
+con tools en la petición de planificación: el modelo instalado no emitía llamadas nativas
+al combinarlos. Se acotan contexto, herramientas, duración y concurrencia; detalles en API.md.
+Las pruebas reales detectaron que el modelo atribuía certeza al score y negaba incorrectamente
+la verificación del original. Se añade reformulación para el primer caso y rechazo conservador
+de contradicciones conocidas y declaraciones de escritura. No es un verificador semántico
+completo: una cita válida no garantiza que toda conclusión se deduzca de ella.
+
+Modelo instalado reutilizado: qwen3-vl:4b-instruct, ID 84f7ed8042fa, GGUF Q4_K_M, Ollama
+0.40.11. Sin descarga de pesos ni nuevas dependencias. Modelo Apache-2.0 documentado en
+THIRD_PARTY; configuración y tipos OpenAPI regenerados. Sin cambios en Lectura o en el visor.
+
+### Comprobaciones y cifras
+
+22 pruebas específicas del backend: llamadas nativas, citas de originales PDF/Excel y hashes,
+ninguna escritura en seis tablas SQL, herramientas prohibidas, referencias inventadas,
+salida inválida, modelo ausente/remoto, falta de calibración, contabilidad de reformulación,
+JSON de proveedor ilegible, original ausente y cambios concurrentes. Se rechazan afirmaciones
+de escritura y negaciones observadas de un hash verificado. No dependen de Ollama en CI.
+
+La espera de finalización de trabajos en test_api_queue pasa de 10 a 30 s: el pipeline real
+integrado y la validación EXPRESS superaban ocasionalmente diez segundos bajo carga. Se
+conservan las aserciones y los límites de producción; no se simula el trabajo.
+
+Web: typecheck, lint (aviso previo TanStack), 13 unitarias y build pasan con/sin API.
+Playwright conectado: 12 pasan, una exclusiva offline omitida. Offline: ocho pasan y cinco
+exclusivas API omitidas. Las pruebas de interfaz usan una respuesta explícitamente marcada
+como fixture, verifican citas/error 503 y que escribir preguntas no activa atajos de revisión.
+Comprobación adicional de navegador contra Ollama real y revisión visual en claro/oscuro
+1600×940 y móvil 390×844; panel contenido en los 366 px disponibles, con scroll propio.
+Capturas locales en generated/qa/copilot-{dark,light,mobile}.png.
+
+| Consulta real sobre la demo sintética | Tiempo pared | Tokens entrada/salida | Resultado |
+| --- | --- | --- | --- |
+| Fuente del diámetro | 4.997 s | 6596/366 | Respuesta con citas |
+| Significado del score | 5.137 s | 6561/396 | Respuesta con citas |
+| Cambio N3 A→B | 2.619 s | 4399/168 | Respuesta con citas |
+| Petición de aprobar | 3.669 s | 3891/270 | Abstención: contradicción del modelo rechazada |
+
+Las cuatro consultas reales conservaron sin cambios todas las tablas SQL comparadas.
+Las tres consultas de lectura responden: diámetro 2000 mm, score 0,75 sin calibración aportada
+y elevación N3 3500→3700 mm. Evidencia local y contabilidad en generated/copilot/; son pruebas
+funcionales sobre originales sintéticos, no precisión medida con el dataset de TR.
+Sin llamadas a proveedor externo ni tarifa facturada; no se mide energía ni segundos GPU.
+Los tokens incluyen planificación/respuesta/reformulación y se dejan null si falta contabilidad.
+
+### Límites y siguiente fase
+
+Sin OCR en esta herramienta, sin historial conversacional y sin comprobación semántica general.
+Cancelar aborta la espera web, sin garantizar que Ollama detenga una generación en marcha.
+Una lectura/hash correcto no certifica ingeniería. Revisión y aprobación siguen siendo humanas.
+No se necesita un cambio adicional de interfaz de Lectura para esta fase; futuros resultados
+de calibración necesitarán exponerse para explicar intervalos medidos.
+
+Propuesta para el responsable del ROADMAP: marcar DEC-26 / I.4.9 / tarea 3.6 como implementado
+con estos límites. El ROADMAP protegido permanece intacto. Próxima fase propia: 11, revisión
+humana (DEC-27), seguida de CI y cálculo de escala. La excepción para editar features/review
+sigue pendiente; no se ha usado ni interpretado como aprobada.
+
+
+Cierre de la fase: Ruff check y format globales correctos (90 archivos); batería Python
+169 pruebas correctas y una omitida. Avisos existentes: deprecación HTTPX de TestClient y
+TanStack Table en lint, sin fallos. Las verificaciones web de ambos modos y la inspección
+visual anterior completan la validación. Cambios preparados en commits separados de API
+y panel web, sin push ni PR.

@@ -441,6 +441,41 @@ export interface components {
              */
             revision?: string;
         };
+        /** Citation */
+        Citation: {
+            /** Id */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "field" | "evidence" | "change" | "rule";
+            /** Title */
+            title: string;
+            /** Excerpt */
+            excerpt: string;
+            /** Path */
+            path?: string | null;
+            /** Document Id */
+            document_id?: string | null;
+            /** Filename */
+            filename?: string | null;
+            /** Sha256 */
+            sha256?: string | null;
+            /** Page */
+            page?: number | null;
+            /** Bbox */
+            bbox?: number[] | null;
+            /** Sheet */
+            sheet?: string | null;
+            /** Cell */
+            cell?: string | null;
+            /**
+             * Original Verified
+             * @default false
+             */
+            original_verified?: boolean;
+        };
         /** ColumnParameters */
         ColumnParameters: {
             /** Sections */
@@ -454,6 +489,38 @@ export interface components {
             top_diameter?: components["schemas"]["PositiveDimension"] | null;
             height: components["schemas"]["PositiveDimension"];
         };
+        /** CopilotAnswer */
+        CopilotAnswer: {
+            /** Abstained */
+            abstained: boolean;
+            /** Reason */
+            reason?: string | null;
+            /** Statements */
+            statements: components["schemas"]["Statement"][];
+            /** Proposals */
+            proposals: components["schemas"]["Statement"][];
+            /** Citations */
+            citations: components["schemas"]["Citation"][];
+            /**
+             * Read Only
+             * @default true
+             * @constant
+             */
+            read_only?: true;
+            /** Model */
+            model: string;
+            /** Revision Id */
+            revision_id: string;
+            /** Revision Version */
+            revision_version: number;
+            /** Input Sha256 */
+            input_sha256: string;
+            /** Prompt Sha256 */
+            prompt_sha256: string;
+            /** Tools Used */
+            tools_used: string[];
+            run: components["schemas"]["RunInfo"];
+        };
         /** CopilotInput */
         CopilotInput: {
             /** Question */
@@ -465,6 +532,8 @@ export interface components {
             revision_id?: string;
             /** Path */
             path?: string | null;
+            /** Previous Id */
+            previous_id?: string | null;
         };
         /** Dimension */
         Dimension: {
@@ -851,6 +920,13 @@ export interface components {
             text_original?: string | null;
             /** Unit Original */
             unit_original?: string | null;
+        };
+        /** Statement */
+        Statement: {
+            /** Text */
+            text: string;
+            /** Citations */
+            citations: string[];
         };
         /** Tag */
         Tag: {
@@ -1582,7 +1658,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["CopilotAnswer"];
                 };
             };
             /** @description Validation Error */
