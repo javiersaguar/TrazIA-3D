@@ -66,10 +66,18 @@ class VariantSpec:
     ablation_of: str | None = None
     description: str = ""
     needs_env: str | None = None
+    skip_by_default: str | None = None  # motivo para no medirla salvo que se pida explícitamente
 
 
 VARIANTS = (
-    VariantSpec("a_vision", "a_vision", ("ollama:qwen3-vl:4b",), None, "A con Qwen3-VL local"),
+    VariantSpec(
+        "a_vision",
+        "a_vision",
+        ("ollama:qwen3-vl:4b-instruct",),
+        None,
+        "A con Qwen3-VL local como lector",
+        skip_by_default="unos 4 min de GPU por página: se mide aparte en un subconjunto",
+    ),
     VariantSpec("a_vision@gemini", "a_vision", ("gemini",), None, "A con Gemini", "GEMINI_API_KEY"),
     VariantSpec(
         "a_vision@mistral", "a_vision", ("mistral",), None, "A con Mistral", "MISTRAL_API_KEY"
@@ -79,20 +87,30 @@ VARIANTS = (
     VariantSpec("b_reglas", "b_reglas", (), None, "B: texto, tablas, cotas, cajetín y HDM"),
     VariantSpec("b_reglas+ocr", "b_reglas+ocr", (), None, "B sobre líneas de OCR"),
     VariantSpec("c_rag", "c_rag", (), None, "C: recuperación y adaptación de plantilla"),
-    VariantSpec("d_hibrido", "d_hibrido", (), None, "D completo con selector"),
+    VariantSpec("d_hibrido", "d_hibrido", (), None, "D: cascada B, C, memoria y geometría"),
     VariantSpec("b_reglas-tablas", "b_reglas-tablas", (), "b_reglas", "B sin tablas ni cotas"),
     VariantSpec("b_reglas-hdm", "b_reglas-hdm", (), "b_reglas", "B sin hoja de datos"),
     *(
         VariantSpec(f"d_hibrido-{c}", f"d_hibrido-{c}", (), "d_hibrido", f"D sin {c}")
-        for c in ("geometria", "memoria", "rag", "vision", "detector")
+        for c in ("geometria", "memoria", "rag", "detector")
+    ),
+    VariantSpec(
+        "d_hibrido-vision",
+        "d_hibrido-vision",
+        (),
+        "d_hibrido",
+        "D sin modelo de visión",
+        skip_by_default="el estudio no da proveedor de visión a D: sería idéntica a d_hibrido",
     ),
 )
 
 
-def availability(variant: VariantSpec) -> str | None:
+def availability(variant: VariantSpec, explicit: bool = False) -> str | None:
     """None si se puede medir; si no, el motivo en español."""
     if variant.strategy not in STRATEGIES and variant.strategy not in ABLATIONS:
         return "estrategia aún no implementada"
+    if variant.skip_by_default and not explicit:
+        return variant.skip_by_default
     if variant.needs_env and not os.environ.get(variant.needs_env):
         return f"sin {variant.needs_env} en .env: sin medir"
     return None
@@ -374,7 +392,7 @@ def run_study(
     chosen = [v for v in VARIANTS if variant_ids is None or v.id in variant_ids]
     measured, unmeasured = [], []
     for v in chosen:
-        reason = availability(v)
+        reason = availability(v, explicit=variant_ids is not None and v.id in variant_ids)
         (unmeasured.append({"id": v.id, "reason": reason}) if reason else measured.append(v))
     set_info, plan = {}, []
     for name in sets:
@@ -391,6 +409,14 @@ def run_study(
         for case in manifest["cases"][:cases_limit]:
             for degradation in styles:
                 plan.append((root, label, degradation, case["tag"]))
+    needs_library = any(v.strategy.startswith(("c_rag", "d_hibrido")) for v in measured)
+    if needs_library and (data / "s-dev" / "manifest.json").exists():
+        from trazia.rag.library import build
+        from trazia.strategies.c_rag import library_path
+
+        if not library_path().exists():
+            log(f"· biblioteca de C desde {data / 's-dev'}")
+            build(data / "s-dev", library_path())
     results: dict[str, list[CaseResult]] = {}
     for v in measured:
         log(f"· {v.id}: {len(plan)} equipos × 2 revisiones")
