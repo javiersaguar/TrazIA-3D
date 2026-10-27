@@ -83,9 +83,12 @@ Prohibido todo lo AGPL: Ultralytics/YOLO y PyMuPDF no se usan (DEC-30).
 | pint | BSD-3-Clause | Unidades del estudio (pulgadas, ft-in, psig, °F) |
 | scipy | BSD-3-Clause | McNemar exacto y estadística del estudio |
 | scikit-learn | BSD-3-Clause | Calibración isotónica y fusión aprendida (próximas fases) |
+| rapidocr 3.10 (extra `ocr`) | Apache-2.0 | OCR de páginas escaneadas |
+| onnxruntime 1.31 (extra `ocr`) | MIT | Motor de inferencia de RapidOCR en CPU |
 
 ## Modelos (Lectura)
 
 | Modelo | Licencia | Uso |
 | --- | --- | --- |
 | Qwen3-VL 4B Instruct (vía Ollama, Q4_K_M) | Apache-2.0 | Lectura visual local por mosaicos (tarea «lineas»); los pesos no se incluyen |
+| PP-OCRv6 det/rec small y clasificador de orientación (incluidos en rapidocr) | Apache-2.0 | Detección y reconocimiento de texto |

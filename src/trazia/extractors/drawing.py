@@ -158,8 +158,14 @@ class DrawingExtractor:
                 if not cells:
                     continue
                 first = min(cells, key=lambda c: abs(c.source.bbox[0] - mark_x))
-                mark = first.text.strip().upper()
-                if not MARK.match(mark) or abs(first.source.bbox[0] - mark_x) > 0.02:
+                mark = first.text.strip().upper().replace(" ", "")
+                if not MARK.match(mark) and MARK.match(mark[::-1]):
+                    mark = mark[::-1]  # OCR: «4N» por «N4», mismo texto con el orden cambiado
+                aligned = abs(first.source.bbox[0] - mark_x) <= 0.02
+                if not (MARK.match(mark) and aligned):
+                    values = [c for c in cells if self._column_for(c, columns) is not None]
+                    if len(values) >= 2:
+                        continue  # fila de la tabla con la marca ilegible: no se inventa
                     break
                 bottom = max(bottom, *(c.source.bbox[3] for c in cells))
                 for cell in cells:

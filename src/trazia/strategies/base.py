@@ -49,6 +49,8 @@ class StrategyContext:
     previous: Revision | None = None
     providers: list[str] | None = None
     emit: Callable[[StageEvent], None] = lambda event: None
+    # Bytes originales por document_id: OCR, visión y geometría necesitan la página, no el texto.
+    raw: dict[str, bytes] = field(default_factory=dict)
 
 
 @dataclass
@@ -56,6 +58,9 @@ class StrategyOutput:
     candidates: list[Candidate]
     cost: Cost = field(default_factory=Cost)
     warnings: list[str] = field(default_factory=list)
+    # Evidencia generada por la estrategia (p. ej. líneas de OCR) por document_id: la comprobación
+    # de cita del pipeline la usa cuando el documento no tiene capa de texto.
+    evidence: dict[str, list] = field(default_factory=dict)
 
 
 class Strategy(Protocol):

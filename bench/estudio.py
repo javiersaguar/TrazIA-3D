@@ -143,9 +143,20 @@ class CaseResult:
 def _bundle(path: str, document_id: str, revision: str) -> Bundle | None:
     try:
         file = Path(path)
-        return ingest_bytes(file.read_bytes(), file.name, document_id, revision)
+        bundle = ingest_bytes(file.read_bytes(), file.name, document_id, revision)
     except Exception:  # noqa: BLE001 - un documento ilegible no se puede verificar
         return None
+    if bundle.media_type == "pdf" and not bundle.lines:
+        # Escaneado: se verifica contra el OCR de la página (misma caché que la estrategia).
+        try:
+            from trazia.ocr import ocr_pdf_lines
+
+            bundle = bundle.model_copy(
+                update={"lines": ocr_pdf_lines(Path(path).read_bytes(), document_id)}
+            )
+        except Exception:  # noqa: BLE001 - sin OCR, la cita queda «no verificable»
+            pass
+    return bundle
 
 
 @lru_cache(maxsize=1024)

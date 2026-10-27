@@ -29,6 +29,10 @@ api = [
 ]
 geo = ["trimesh>=4.6,<5", "scipy>=1.15,<2", "rtree>=1.4,<2", "pint>=0.24,<1", "opencv-python-headless>=4.11,<5"]
 dev = ["pytest>=8,<10", "ruff>=0.11,<1", "reportlab>=4,<5"]
+ocr = [
+    "onnxruntime>=1.20,<2",
+    "rapidocr>=3,<4",
+]
 
 [project.scripts]
 trazia = "trazia.cli:main"

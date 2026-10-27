@@ -5,7 +5,10 @@ from collections.abc import Callable
 from .b_reglas import ReglasStrategy
 from .base import Cost, StageEvent, Strategy, StrategyContext, StrategyOutput
 
-STRATEGIES: dict[str, Callable[[], Strategy]] = {"b_reglas": ReglasStrategy}
+STRATEGIES: dict[str, Callable[[], Strategy]] = {
+    "b_reglas": ReglasStrategy,
+    "b_reglas+ocr": lambda: ReglasStrategy(ocr=True, name="b_reglas+ocr"),
+}
 
 # Ablaciones del estudio: «<estrategia>-<canal quitado>». No se ofrecen en la API.
 ABLATIONS: dict[str, Callable[[], Strategy]] = {

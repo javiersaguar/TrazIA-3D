@@ -13,6 +13,7 @@ from .extraction import Candidate, assemble
 from .ingest import ingest_bytes
 from .model import Revision, RunInfo
 from .reconcile import resolve
+from .reconcile.grounding import is_grounded
 from .strategies import STRATEGIES, StageEvent, StrategyContext, get_strategy
 
 __all__ = ["InputDocument", "PipelineResult", "RunInfo", "StageEvent", "process"]
@@ -121,7 +122,12 @@ def process(
         return finish(None, [], "No se pudo leer ningún documento.")
 
     ctx = StrategyContext(
-        bundles=bundles, dataset=dataset, previous=previous, providers=providers, emit=emit
+        bundles=bundles,
+        dataset=dataset,
+        previous=previous,
+        providers=providers,
+        emit=emit,
+        raw={doc.document_id: doc.data for doc in documents},
     )
     try:
         output = engine.run(ctx)
@@ -134,7 +140,8 @@ def process(
     run.tokens_in, run.tokens_out = output.cost.tokens_in, output.cost.tokens_out
     run.cost_eur, run.external_calls = output.cost.cost_eur, output.cost.external_calls
 
-    resolution = resolve(output.candidates)
+    candidates = _ground(output.candidates, bundles, warnings, emit, equipment_id, output.evidence)
+    resolution = resolve(candidates)
     warnings += resolution.warnings
     emit(
         StageEvent(
@@ -180,3 +187,33 @@ def process(
         emit(StageEvent("ifc", "error", equipment_id, str(exc).splitlines()[0]))
         return finish(None, resolution.chosen, str(exc).splitlines()[0], resolution.conflicts)
     return finish(model, resolution.chosen, None, resolution.conflicts)
+
+
+# Canales cuyos valores salen de un modelo: si su cita no los respalda, no entran (DEC-10).
+MODEL_CHANNELS = {"vision", "detector", "rag"}
+
+
+def _ground(candidates, bundles, warnings, emit, equipment_id, evidence=None):
+    """Marca `grounded` en cada candidato y descarta los de modelo que su cita no respalda."""
+    lines = {b.document.id: b.lines or (evidence or {}).get(b.document.id, []) for b in bundles}
+    kept, dropped = [], []
+    for c in candidates:
+        if c.grounded is None and c.source.document_id in lines:
+            c = c.model_copy(update={"grounded": is_grounded(c, lines[c.source.document_id])})
+        if c.grounded is False and c.channel in MODEL_CHANNELS:
+            dropped.append(c)
+            continue
+        kept.append(c)
+    if dropped:
+        paths = ", ".join(sorted({c.path for c in dropped})[:5])
+        warnings.append(f"{len(dropped)} lecturas de modelo sin respaldo en su cita: {paths}")
+    emit(
+        StageEvent(
+            "validate",
+            "ok",
+            equipment_id,
+            f"Cita comprobada · {len(dropped)} valores de modelo descartados por no estar "
+            "en su región.",
+        )
+    )
+    return kept
