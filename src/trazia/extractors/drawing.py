@@ -49,8 +49,10 @@ DESIGN = (
     ("material", re.compile(r"\bMATERIAL\b")),
 )
 TANGENTS = {"T.L.", "TL", "L.T."}
-TAG_LABELS = {"EQUIPMENT", "EQUIPO", "ITEM NO.", "TAG"}
+TAG_LABELS = {"EQUIPMENT", "EQUIPO", "ITEMNO", "TAG"}  # comparadas sin espacios ni puntos
 DIAMETER = re.compile(r"^(?:I\.?D\.?|Ø|DIA\.?)\s*[:=]?\s*(.+)$", re.I)
+# El OCR lee «Ø3700» como «03700»: en un plano no se escriben ceros a la izquierda.
+OCR_DIAMETER = re.compile(r"^[0OΦφ⌀]\s?([1-9]\d{2,4})$")
 SKIRT = re.compile(r"^(?:SKIRT|FALD[OÓ]N)\s*(?:t|e)?\s*=?\s*(.+?)\s*(?:THK\.?|mm)?$", re.I)
 SPANISH = re.compile(r"DISEÑO|NOTAS|COTAS|TOBERAS|CONEXIONES|FALDÓN|PLANO")
 BTL_NOTE = re.compile(r"TANGENCIA\s+INFERIOR|BOTTOM\s+TANGENT|L\.T\.I\.")
@@ -124,8 +126,13 @@ class DrawingExtractor:
                 table, region = self._nozzle_table(rows, ctx)
                 found += table
                 found += self._design_data(rows, ctx)
-                found += self._labels(page_lines, ctx)
-                found += self._vertical_dimensions(page_lines, ctx, region)
+                labels = self._labels(page_lines, ctx)
+                found += labels
+                diameter = next((c.value for c in labels if c.path == "diameter"), None)
+                two_to_one = any("2:1" in line.text for line in page_lines)
+                found += self._vertical_dimensions(
+                    page_lines, ctx, region, diameter if two_to_one else None
+                )
             result += self._apply_datum(found, ctx)
         return result
 
@@ -272,13 +279,24 @@ class DrawingExtractor:
                 out.append(
                     _candidate("diameter", round(mm, 3), "mm", line, 0.85, "Cota de diámetro")
                 )
+            elif line.source.locator.startswith("OCR") and (m := OCR_DIAMETER.match(text)):
+                out.append(
+                    _candidate(
+                        "diameter",
+                        float(m[1]),
+                        "mm",
+                        line,
+                        0.7,
+                        "Cota de diámetro (Ø leído como 0 por el OCR)",
+                    )
+                )
             elif (m := SKIRT.match(text)) and (mm := parse_length(m[1], decimal=ctx.decimal)):
                 out.append(
                     _candidate(
                         "skirt_thickness", round(mm, 3), "mm", line, 0.85, "Rótulo del faldón"
                     )
                 )
-            if text.upper() in TAG_LABELS:
+            if re.sub(r"[\s.]", "", text.upper()) in TAG_LABELS:
                 x0, _, _, y1 = line.source.bbox
                 below = [
                     other
@@ -295,7 +313,9 @@ class DrawingExtractor:
         return out
 
     # Cotas verticales del alzado ------------------------------------------------------------
-    def _vertical_dimensions(self, lines, ctx: DocContext, tables) -> list[Candidate]:
+    def _vertical_dimensions(
+        self, lines, ctx: DocContext, tables, diameter: float | None = None
+    ) -> list[Candidate]:
         def in_table(line):
             x0, y0, _, _ = line.source.bbox
             return any(a <= x0 <= c and b <= y0 <= d for a, b, c, d in tables)
@@ -330,6 +350,8 @@ class DrawingExtractor:
                 "skirt_height": [ordered[-1]],
                 "between": ordered[1:-1],
             }
+        if not roles["between"] and len(dims) == 3 and diameter:
+            return self._derive_head(dims, float(diameter))
         if not roles["between"]:
             return []
         chosen: dict[str, tuple[EvidenceLine, float]] = {}
@@ -366,6 +388,39 @@ class DrawingExtractor:
             )
             for key, (line, value) in chosen.items()
         ]
+
+    @staticmethod
+    def _derive_head(dims, diameter: float) -> list[Candidate]:
+        """Tres cotas legibles (faldón, virola y total) y un fondo 2:1 declarado en el plano.
+
+        La cota del fondo es la más pequeña y la que más falla en el OCR. Si total − faldón −
+        virola coincide con D/4 (±2 %), el fondo se deduce y se explica; si no, no se inventa.
+        """
+        skirt = max(dims, key=lambda item: _center_y(item[0]))  # la más baja del alzado
+        rest = [item for item in dims if item is not skirt]
+        for o_item, t_item in itertools.permutations(rest, 2):
+            for s, t, o in itertools.product(skirt[1], t_item[1], o_item[1]):
+                head = o - s - t
+                if head > 0 and t > s and abs(head - diameter / 4) <= 0.02 * diameter / 4:
+                    locator = "Cota vertical del alzado · cadena con fondo deducido"
+                    total = o_item[0]
+                    return [
+                        _candidate("skirt_height", round(s, 3), "mm", skirt[0], 0.8, locator),
+                        _candidate("height", round(t, 3), "mm", t_item[0], 0.8, locator),
+                        _candidate(
+                            "head_depth",
+                            round(head, 3),
+                            "mm",
+                            total,
+                            0.7,
+                            "Fondo deducido de la cadena de cotas",
+                            explanation=(
+                                f"Deducido: total {o:g} − faldón {s:g} − virola {t:g} = "
+                                f"{head:g} mm, igual a D/4 de un fondo 2:1 (D = {diameter:g} mm)."
+                            ),
+                        ),
+                    ]
+        return []
 
     # Origen de las cotas de boquilla --------------------------------------------------------
     @staticmethod

@@ -162,9 +162,10 @@ def process(
             equipment_id=equipment_id,
             revision=revision,
             dataset=dataset,
+            warnings=warnings,
         )
     except ValueError as exc:
-        reason = str(exc).splitlines()[0]
+        reason = _reason(exc)
         emit(StageEvent("family", "error", equipment_id, reason))
         return finish(None, resolution.chosen, reason, resolution.conflicts)
     emit(
@@ -187,6 +188,15 @@ def process(
         emit(StageEvent("ifc", "error", equipment_id, str(exc).splitlines()[0]))
         return finish(None, resolution.chosen, str(exc).splitlines()[0], resolution.conflicts)
     return finish(model, resolution.chosen, None, resolution.conflicts)
+
+
+def _reason(exc: Exception) -> str:
+    """Frase útil de un error: de una validación de Pydantic, la causa y no la cabecera."""
+    lines = [line.strip() for line in str(exc).splitlines() if line.strip()]
+    for line in lines:
+        if line.startswith("Value error,"):
+            return line.removeprefix("Value error,").split(" [type=")[0].strip()
+    return lines[0] if lines else type(exc).__name__
 
 
 # Canales cuyos valores salen de un modelo: si su cita no los respalda, no entran (DEC-10).
