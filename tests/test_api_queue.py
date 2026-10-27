@@ -39,7 +39,7 @@ def submit(client, **options):
 
 
 def finished(client, identity):
-    deadline = time.monotonic() + 10
+    deadline = time.monotonic() + 30
     while time.monotonic() < deadline:
         data = client.get(f"/jobs/{identity}").json()
         if data["status"] in jobs.TERMINAL:

@@ -15,6 +15,8 @@ from fastapi.responses import JSONResponse, Response, StreamingResponse
 from pydantic import Field, ValidationError
 from sqlmodel import Session, select
 
+from trazia.copilot import CopilotAnswer, CopilotUnavailable
+from trazia.copilot import ask as ask_copilot
 from trazia.ifc import build_ifc
 from trazia.model import FieldState, Identifier, Model, Revision, Source, fields
 from trazia.queue import ProcessQueue
@@ -70,8 +72,9 @@ class ApprovalInput(Model):
 
 class CopilotInput(Model):
     question: str = Field(min_length=1, max_length=2000)
-    revision_id: str = "A"
-    path: str | None = None
+    revision_id: str = Field(default="A", min_length=1, max_length=300)
+    path: str | None = Field(default=None, max_length=300)
+    previous_id: str | None = Field(default=None, max_length=300)
 
 
 def require_key(value: str | None) -> str:
@@ -99,6 +102,7 @@ def create_app(
     async def lifespan(app: FastAPI):
         store = Store(data, database_url or os.getenv("TRAZIA_DATABASE_URL"))
         app.state.store = store
+        app.state.copilot_limit = asyncio.Semaphore(1)
         if seed:
             seed_demo(store, repo)
         queue_mode = os.getenv("TRAZIA_QUEUE", "process")
@@ -591,8 +595,54 @@ def create_app(
             503, "Falta el ejecutor de estudio de Lectura; no se simulan resultados"
         )
 
-    @app.post("/copiloto")
-    def copilot(body: CopilotInput):
-        raise HTTPException(503, "El copiloto local estará disponible en su fase de integración")
+    @app.post("/copiloto", response_model=CopilotAnswer)
+    async def copilot(request: Request, body: CopilotInput):
+        if not body.question.strip():
+            raise HTTPException(422, "Escribe una pregunta")
+        store = request.app.state.store
+        with Session(store.engine) as session:
+            record = get_revision(session, body.revision_id)
+            revision = Revision.model_validate_json(record.payload)
+            identity, version = record.id, record.version
+            previous = None
+            previous_version = None
+            if body.previous_id:
+                previous_record = get_revision(session, body.previous_id)
+                previous = Revision.model_validate_json(previous_record.payload)
+                if (previous.project_id, previous.equipment.id) != (
+                    revision.project_id,
+                    revision.equipment.id,
+                ):
+                    raise HTTPException(422, "La comparación debe ser del mismo proyecto y equipo")
+                previous_version = (previous_record.id, previous_record.version)
+        try:
+            async with asyncio.timeout(95):
+                async with request.app.state.copilot_limit:
+                    result = await ask_copilot(
+                        revision,
+                        body.question.strip(),
+                        revision_id=identity,
+                        revision_version=version,
+                        path=body.path,
+                        previous=previous,
+                        read_document=store.read,
+                    )
+        except CopilotUnavailable as error:
+            raise HTTPException(503, str(error)) from error
+        except TimeoutError as error:
+            raise HTTPException(
+                503, "El copiloto local ha agotado el tiempo de consulta"
+            ) from error
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from error
+        with Session(store.engine) as session:
+            if get_revision(session, identity).version != version or (
+                previous_version
+                and get_revision(session, previous_version[0]).version != previous_version[1]
+            ):
+                raise HTTPException(
+                    409, "La revisión cambió durante la consulta; vuelve a preguntar"
+                )
+        return result
 
     return app

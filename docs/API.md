@@ -118,7 +118,7 @@ Usar un perfil cada vez (local/gpu/escala comparten el puerto de API):
 ```bash
 docker compose --profile local up --build
 docker compose --profile gpu up --build
-docker compose --profile gpu exec ollama ollama pull qwen3:4b
+docker compose --profile gpu exec ollama ollama pull qwen3-vl:4b-instruct
 docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile escala up --build
 # Aumentar workers; todos comparten Postgres y el almacén de contenido:
 docker compose --profile escala up --scale worker=4
@@ -240,3 +240,75 @@ El formato se ha contrastado con los XSD oficiales de la etiqueta v2.1 de buildi
 
 Fuentes: [BCF 2.1](https://github.com/buildingSMART/BCF-XML/releases/tag/v2.1),
 [ECC OpenCV](https://docs.opencv.org/4.x/dc/d6b/group__video__track.html).
+
+
+## Copiloto local con citas (DEC-26)
+
+`POST /copiloto` consulta Ollama en el equipo. El servidor solo dispone de herramientas
+`read_fields`, `read_evidence`, `read_changes` y `read_rules`; recibe copias de revisiones y
+la capacidad de leer originales por SHA-256, sin sesiones SQL ni funciones de escritura.
+No acepta/corrige campos, aprueba, crea trabajos ni registra tiempo de revisión humana.
+
+```powershell
+ollama pull qwen3-vl:4b-instruct
+$env:TRAZIA_OLLAMA_URL = "http://127.0.0.1:11434"
+$env:TRAZIA_OLLAMA_MODEL = "qwen3-vl:4b-instruct"
+uv run --extra api python -m trazia.api
+```
+
+El `pull` solo hace falta si no están instalados los pesos. Se reutiliza el servidor Ollama;
+los pesos no se incluyen en Git. La web necesita `NEXT_PUBLIC_API_URL` como se explica arriba.
+En modo offline conserva sus explicaciones por reglas, identificadas como tales.
+En modo API, una caída del modelo muestra el error y no se sustituye por reglas.
+
+```json
+{
+  "question": "¿Qué cambia respecto a la revisión A en esta cota?",
+  "revision_id": "B",
+  "previous_id": "A",
+  "path": "nozzles.N3.elevation"
+}
+```
+
+`path` y `previous_id` son opcionales; las revisiones deben corresponder al mismo proyecto y
+equipo. La respuesta contiene `statements`, `proposals` y `citations`; cada afirmación y
+comprobación propuesta remite a IDs emitidos por las herramientas. Las citas distinguen
+campo JSON, original, cambio y regla. Para originales incluyen documento/SHA, página y bbox
+PDF o hoja/celda Excel, más el fragmento efectivamente leído. `original_verified` significa
+que coincide el SHA-256, no que la interpretación técnica sea correcta.
+
+Se devuelve `read_only: true`, modelo, versión/huella de revisión, huella de instrucciones y
+herramientas, y `run` con tiempo de pared y tokens reportados por Ollama, incluidos reintentos.
+`external_calls=0` y `cost_eur=0` reflejan ausencia de proveedor facturado; no miden electricidad,
+amortización o coste total del equipo. `gpu_seconds` queda sin medir. Si falta contabilidad,
+los tokens son null y `accounting_complete=false`, sin inventar ceros.
+
+- 200 con `abstained=true`: evidencia insuficiente, contrato inválido o referencias rechazadas;
+  no hay afirmaciones, propuestas ni citas en una abstención.
+- 409: cambió una revisión durante la consulta; la web refresca sus datos.
+- 422: entrada inválida, campo inexistente o revisiones incompatibles; 404 para revisión ausente.
+- 503: Ollama/modelo no disponible, no local o sin capacidad de herramientas.
+
+Se comprueba `/api/show`: modelo GGUF con herramientas, sin metadatos remotos. Se permiten
+loopback, localhost y los nombres de servicio local `ollama`/`host.docker.internal`; sin proxies
+de entorno, redirecciones, credenciales ni modelos cloud. La persona que despliega debe
+configurar esos nombres para el servicio local. Los documentos y preguntas son datos, no
+instrucciones para ampliar capacidades.
+
+Límites: 200 rutas de contexto, seis campos por lectura, cuatro llamadas nativas de herramientas
+en el plan, diez lecturas como máximo; fragmentos PDF de hasta 1800 caracteres y rangos Excel
+de hasta 32 celdas. Contextos inicial/final acotados a 24k/48k caracteres, pregunta de hasta
+2000 caracteres, una consulta activa por proceso API. Timeout del modelo 90 s, total de ruta
+95 s. Cancelar en el navegador aborta la espera HTTP; no garantiza detener una generación ya
+iniciada en Ollama. No hay memoria de conversación entre consultas.
+
+El plan usa llamadas nativas; la salida final usa JSON Schema con las citas disponibles.
+Se rechazan referencias inventadas, declaraciones de escritura y determinadas negaciones
+de verificación contradictorias con el original leído. Se permite una reformulación si el score se presenta
+como certeza/probabilidad sin calibración. No se garantiza que toda conclusión del modelo
+se deduzca de sus citas: hay que comprobar los fragmentos. PDF escaneado o imagen sin texto
+legible no recibe una cita OCR inventada; esta herramienta no implementa OCR.
+
+Fuentes de integración: [Ollama chat](https://docs.ollama.com/api/chat),
+[herramientas](https://docs.ollama.com/capabilities/tool-calling) y
+[salida estructurada](https://docs.ollama.com/capabilities/structured-outputs).

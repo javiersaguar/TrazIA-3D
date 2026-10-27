@@ -89,3 +89,15 @@ Prohibido todo lo AGPL: Ultralytics/YOLO y PyMuPDF no se usan (DEC-30).
 | Modelo | Licencia | Uso |
 | --- | --- | --- |
 | Qwen3-VL 4B Instruct (vía Ollama, Q4_K_M) | Apache-2.0 | Lectura visual local por mosaicos (tarea «lineas»); los pesos no se incluyen |
+
+
+## Modelo del Copiloto (Plataforma)
+
+Qwen3-VL-4B-Instruct, Apache-2.0, ejecutado con Ollama mediante la etiqueta
+`qwen3-vl:4b-instruct` (GGUF Q4_K_M). Se reutiliza el modelo local instalado; los pesos
+no se incluyen ni se redistribuyen en este repositorio. Sirve para planificar lecturas y
+responder con citas, sin capacidad de escritura. Comprobado el 27/10/2026 con Ollama 0.40.11,
+modelo instalado `84f7ed8042fa`. No se añaden dependencias Python/JavaScript para esta fase.
+
+[Modelo y licencia oficial](https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct),
+[distribución Ollama](https://ollama.com/library/qwen3-vl:4b-instruct).
