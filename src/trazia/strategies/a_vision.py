@@ -63,30 +63,52 @@ class VisionGeometryStrategy:
     def _read_drawing(self, bundle, data: bytes, ctx: StrategyContext):
         name = bundle.document.filename
         with pdfplumber.open(io.BytesIO(data)) as pdf:
-            for number, page in enumerate(pdf.pages, start=1):
+            pages = [
+                (n, page, float(page.width), float(page.height))
+                for n, page in enumerate(pdf.pages, 1)
+            ]
+            for number, page, w, h in pages:
                 elevation = find_elevation(page)
                 if elevation is None:
                     continue
                 plan = find_plan(page, elevation.shell)
-                size = (float(page.width), float(page.height))
-                lines = self._reader_lines(bundle, data, number, ctx)
-                ctx.emit(
-                    StageEvent(
-                        "geometry2d",
-                        "ok",
-                        name,
-                        f"Alzado con {len(elevation.stubs)} boquillas"
-                        + (
-                            f" · planta con {len(plan.stubs)} muñones."
-                            if plan
-                            else " · sin planta."
-                        ),
-                    )
+                return self._finish(bundle, data, ctx, number, (w, h), elevation, plan, "vectorial")
+        # Sin trazos vectoriales (escaneado): geometría por imagen.
+        for number, _, w, h in pages:
+            measured = _raster_geometry(data, number)
+            if measured is None:
+                continue
+            elevation, plan = measured
+            return self._finish(bundle, data, ctx, number, (w, h), elevation, plan, "escaneado")
+        ctx.emit(StageEvent("geometry2d", "omitido", name, "Sin alzado reconocible."))
+        return [], [], [f"{name}: sin geometría reconocible"]
+
+    def _finish(self, bundle, data, ctx, number, size, elevation, plan, kind):
+        lines = self._reader_lines(bundle, data, number, ctx)
+        ctx.emit(
+            StageEvent(
+                "geometry2d",
+                "ok",
+                bundle.document.filename,
+                f"Alzado {kind} con {len(elevation.stubs)} boquillas"
+                + (f" · planta con {len(plan.stubs)} muñones." if plan else " · sin planta."),
+            )
+        )
+        found = self._measure(bundle.document.id, number, size, elevation, plan, lines)
+        if kind == "escaneado":  # medida sobre imagen: menos precisa que sobre trazos
+            found = [
+                c
+                if c.text_original
+                else c.model_copy(
+                    update={
+                        "source": c.source.model_copy(
+                            update={"confidence": c.source.confidence * 0.7}
+                        )
+                    }
                 )
-                found = self._measure(bundle.document.id, number, size, elevation, plan, lines)
-                return tag_candidates(found, channel="geometria", strategy=self.name), lines, []
-        ctx.emit(StageEvent("geometry2d", "omitido", name, "Sin alzado vectorial reconocible."))
-        return [], [], [f"{name}: sin geometría vectorial (escaneado o dibujo no reconocido)"]
+                for c in found
+            ]
+        return tag_candidates(found, channel="geometria", strategy=self.name), lines, []
 
     def _reader_lines(self, bundle, data, page, ctx) -> list[EvidenceLine]:
         if self.reader == "vision":
@@ -332,6 +354,37 @@ class VisionGeometryStrategy:
                 ),
             ]
         return out
+
+
+RASTER_DPI = 200
+
+
+def _raster_geometry(data: bytes, page: int):
+    """Alzado y planta de una página escaneada, en puntos del marco original de la página."""
+    from dataclasses import replace
+
+    from ..geometry2d import raster
+    from ..vision.reader import render_page
+
+    try:
+        image = render_page(data, page, dpi=RASTER_DPI)
+        ink, angle = raster.binarize(image, with_angle=True)
+    except ImportError:
+        return None
+    k = RASTER_DPI / 72
+    elevation = raster.find_elevation(ink, k)
+    if elevation is None:
+        return None
+    plan = raster.find_plan(ink, k, (elevation.shell[0], elevation.shell[2]))
+
+    def back(point):  # puntos → marco sin enderezar, para casar con las cajas del lector
+        x, y = raster.unrotate((point[0] * k, point[1] * k), angle, ink.shape)
+        return (x / k, y / k)
+
+    elevation.stubs = [replace(s, end=back(s.end)) for s in elevation.stubs]
+    if plan is not None:
+        plan.stubs = [replace(s, end=back(s.end)) for s in plan.stubs]
+    return elevation, plan
 
 
 def _side_of(angle: float) -> int:
