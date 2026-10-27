@@ -5,12 +5,14 @@ from collections.abc import Callable
 from .a_vision import VisionGeometryStrategy
 from .b_reglas import ReglasStrategy
 from .base import Cost, StageEvent, Strategy, StrategyContext, StrategyOutput
+from .c_rag import RagStrategy
 
 STRATEGIES: dict[str, Callable[[], Strategy]] = {
     "b_reglas": ReglasStrategy,
     "b_reglas+ocr": lambda: ReglasStrategy(ocr=True, name="b_reglas+ocr"),
     "a_geometria": lambda: VisionGeometryStrategy(reader="texto", name="a_geometria"),
     "a_vision": lambda: VisionGeometryStrategy(reader="vision", name="a_vision"),
+    "c_rag": RagStrategy,
 }
 
 # Ablaciones del estudio: «<estrategia>-<canal quitado>». No se ofrecen en la API.

@@ -128,6 +128,7 @@ def process(
         providers=providers,
         emit=emit,
         raw={doc.document_id: doc.data for doc in documents},
+        equipment_id=equipment_id,
     )
     try:
         output = engine.run(ctx)

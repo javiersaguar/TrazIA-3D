@@ -51,6 +51,8 @@ class StrategyContext:
     emit: Callable[[StageEvent], None] = lambda event: None
     # Bytes originales por document_id: OCR, visión y geometría necesitan la página, no el texto.
     raw: dict[str, bytes] = field(default_factory=dict)
+    # Equipo que se procesa: C no se usa a sí mismo como plantilla (eso es memoria de revisión).
+    equipment_id: str | None = None
 
 
 @dataclass
