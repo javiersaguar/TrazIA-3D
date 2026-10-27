@@ -48,16 +48,18 @@ def ingest_bytes(data: bytes, filename: str, document_id: str, revision: str) ->
             document.page_count = len(pdf.pages)
             for page in pdf.pages:
                 clipped = dropped = 0
+                page_lines: list[EvidenceLine] = []
                 rows = page.extract_text_lines(return_chars=True)
                 if not rows:
                     bundle.warnings.append(
                         f"Página {page.page_number}: sin texto; necesita OCR/visión"
                     )
                 for row in rows:
-                    # Separar columnas muy alejadas que comparten una misma línea base.
+                    # Separar columnas que comparten una misma línea base: en un plano, un hueco de
+                    # más de 12 pt (unos cuatro espacios) es un cambio de celda o de bloque.
                     groups = [[]]
                     for char in sorted(row["chars"], key=lambda c: c["x0"]):
-                        if groups[-1] and char["x0"] - groups[-1][-1]["x1"] > 36:
+                        if groups[-1] and char["x0"] - groups[-1][-1]["x1"] > COLUMN_GAP_PT:
                             groups.append([])
                         groups[-1].append(char)
                     for group in groups:
@@ -80,7 +82,7 @@ def ingest_bytes(data: bytes, filename: str, document_id: str, revision: str) ->
                             dropped += 1
                             continue
                         clipped += bbox != raw
-                        bundle.lines.append(
+                        page_lines.append(
                             EvidenceLine(
                                 text=text,
                                 source=Source(
@@ -92,6 +94,7 @@ def ingest_bytes(data: bytes, filename: str, document_id: str, revision: str) ->
                                 ),
                             )
                         )
+                bundle.lines.extend(_merge_rotated(page_lines))
                 if dropped:
                     bundle.warnings.append(
                         f"Página {page.page_number}: {dropped} texto(s) fuera de la página, "
@@ -152,6 +155,42 @@ def ingest_bytes(data: bytes, filename: str, document_id: str, revision: str) ->
     else:
         raise ValueError("Formato admitido: PDF, XLSX, PNG o JPEG")
     return bundle
+
+
+COLUMN_GAP_PT = 12
+
+
+def _merge_rotated(lines: list[EvidenceLine]) -> list[EvidenceLine]:
+    """Une los trozos de un texto girado 90° que pdfplumber entrega apilados.
+
+    Una cota girada como «559 1/16"» llega en dos líneas estrechas, una encima de otra, separadas
+    por el espacio. Se unen de arriba abajo con un espacio: el resultado conserva el orden de
+    caracteres de pdfplumber (invertido), igual que una cota girada de un solo trozo.
+    """
+    if not lines:
+        return lines
+
+    def vertical(line: EvidenceLine) -> bool:
+        x0, y0, x1, y1 = line.source.bbox
+        return (y1 - y0) > 1.5 * (x1 - x0)
+
+    pending = sorted(lines, key=lambda line: (line.source.bbox[0], line.source.bbox[1]))
+    out: list[EvidenceLine] = []
+    for line in pending:
+        last = out[-1] if out else None
+        if last is not None:
+            a0, b0, a1, b1 = last.source.bbox
+            x0, y0, x1, y1 = line.source.bbox
+            same_column = abs(a0 - x0) < 0.003 and abs(a1 - x1) < 0.003 and (a1 - a0) < 0.015
+            if same_column and 0 <= y0 - b1 < 0.006 and (vertical(last) or vertical(line)):
+                bbox = (min(a0, x0), b0, max(a1, x1), max(b1, y1))
+                out[-1] = EvidenceLine(
+                    text=f"{last.text} {line.text}",
+                    source=last.source.model_copy(update={"bbox": bbox}),
+                )
+                continue
+        out.append(line)
+    return out
 
 
 def _clip_bbox(raw: tuple[float, float, float, float]) -> tuple | None:
