@@ -71,6 +71,8 @@ def is_grounded(candidate: Candidate, lines: list[EvidenceLine]) -> bool | None:
     source = candidate.source
     if not source.cell and (source.page is None or source.bbox is None):
         return False  # sin cita no hay respaldo posible
+    if candidate.channel == "geometria" and not candidate.text_original:
+        return None  # medida sobre los trazos: su respaldo es el dibujo, no un texto
     text = region_text(candidate, lines)
     if text is None:
         return None

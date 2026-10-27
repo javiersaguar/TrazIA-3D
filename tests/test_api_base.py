@@ -207,7 +207,7 @@ def test_job_pipeline_events_and_replay(client):
 
 def test_adapter_refuses_unimplemented_strategy(client):
     response = client.post(
-        "/equipment/V-101/jobs", json=job_body(client, strategy="a_vision"), headers=headers()
+        "/equipment/V-101/jobs", json=job_body(client, strategy="z_no_existe"), headers=headers()
     )
     job = wait_job(client, response.json()["job_id"])
     # Con el motor de Lectura una estrategia aún no implementada se rechaza por su nombre;

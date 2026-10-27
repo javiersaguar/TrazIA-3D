@@ -74,18 +74,25 @@ def test_dev_set_is_reproducible_and_labelled_synthetic(tmp_path):
         hdm = tmp_path / "a" / "s-dev" / "vectorial" / tag / f"HDM_{tag}_rev1.xlsx"
         assert hdm.exists() == truth["hdm"]
         assert truth["changes"], "rev2 siempre cambia algo"
-    # Índice 3 (prairie) llega en paquete: portada, índice, GA y placa.
-    package = first["cases"][3]
-    truth = json.loads(
-        (tmp_path / "a" / "s-dev" / "truth" / f"{package['tag']}.json").read_text(encoding="utf-8")
-    )
-    assert truth["package"] and truth["documents"]["1"] == {"pages": 4, "ga_pages": [3]}
     # levante: dos hojas
     levante = first["cases"][5]
     truth = json.loads(
         (tmp_path / "a" / "s-dev" / "truth" / f"{levante['tag']}.json").read_text(encoding="utf-8")
     )
     assert truth["documents"]["1"]["ga_pages"] == [1, 2]
+
+
+def test_packages_and_missing_datasheets_are_spread_over_every_vendor(tmp_path):
+    manifest = generate_set("s-dev", tmp_path, cases=24, degradations=("vectorial",))
+    cases = manifest["cases"]
+    assert sorted(c["vendor"] for c in cases if c["package"]) == sorted(PUBLIC)
+    assert sorted(c["vendor"] for c in cases if not c["hdm"]) == sorted(PUBLIC)
+    prairie = next(c for c in cases if c["package"] and c["vendor"] == "prairie")
+    truth = json.loads(
+        (tmp_path / "s-dev" / "truth" / f"{prairie['tag']}.json").read_text(encoding="utf-8")
+    )
+    # Paquete: portada, índice, GA y placa de características.
+    assert truth["documents"]["1"] == {"pages": 4, "ga_pages": [3]}
 
 
 def test_adversarial_traps_are_planted_and_never_equal_the_truth(tmp_path):

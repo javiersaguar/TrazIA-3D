@@ -7,8 +7,8 @@
 - s-adversarial: GA con instrucciones y valores falsos incrustados (DEC-32), sin hoja de datos.
 
 Cada caso lo dibuja un proveedor (por turno, según su índice) y se entrega en cada degradación.
-Uno de cada cuatro llega dentro de un paquete de proveedor; uno de cada tres llega sin hoja de
-datos, para que los atributos tengan que salir del plano.
+Por rondas de un caso por proveedor: la cuarta ronda llega en paquete de proveedor y la tercera
+sin hoja de datos, para que los atributos tengan que salir del plano en todos los proveedores.
 
 Estructura: <salida>/<conjunto>/manifest.json, truth/<TAG>.json y
 <degradación>/<TAG>/GAD_<TAG>_rev{1,2}.pdf (+ HDM_<TAG>_rev{1,2}.xlsx si hay hoja de datos).
@@ -149,9 +149,12 @@ def generate_set(
             old = flatten(rev1)
             changes = expected_changes(rev1, rev2)
             truth_specs = {"rev1": spec_to_dict(rev1), "rev2": spec_to_dict(rev2)}
-        package = bool(spec.package_every) and index % spec.package_every == spec.package_every - 1
+        # Por rondas (una ronda = un caso de cada proveedor), para que paquete y falta de hoja de
+        # datos no caigan siempre en los mismos proveedores.
+        round_ = index // len(spec.vendors)
+        package = bool(spec.package_every) and round_ % spec.package_every == spec.package_every - 1
         hdm = spec.kind == "vessel" and not (
-            spec.no_hdm_every and index % spec.no_hdm_every == spec.no_hdm_every - 1
+            spec.no_hdm_every and round_ % spec.no_hdm_every == spec.no_hdm_every - 1
         )
         traps = plan_traps(rng, rev1) if spec.adversarial else []
         documents: dict[str, dict] = {}

@@ -74,6 +74,7 @@ VARIANTS = (
     VariantSpec(
         "a_vision@mistral", "a_vision", ("mistral",), None, "A con Mistral", "MISTRAL_API_KEY"
     ),
+    VariantSpec("a_geometria", "a_geometria", (), None, "A: trazos + capa de texto u OCR"),
     VariantSpec("a_detector", "a_detector", (), None, "A con el detector propio (Florence-2)"),
     VariantSpec("b_reglas", "b_reglas", (), None, "B: texto, tablas, cotas, cajetín y HDM"),
     VariantSpec("b_reglas+ocr", "b_reglas+ocr", (), None, "B sobre líneas de OCR"),
