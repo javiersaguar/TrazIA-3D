@@ -101,3 +101,7 @@ modelo instalado `84f7ed8042fa`. No se añaden dependencias Python/JavaScript pa
 
 [Modelo y licencia oficial](https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct),
 [distribución Ollama](https://ollama.com/library/qwen3-vl:4b-instruct).
+
+
+Pytest (MIT) también es dependencia de ejecución del extra API: IfcOpenShell 0.8.x usa
+`_pytest.assertion` para ejecutar las reglas EXPRESS. Se conserva la validación en producción.
