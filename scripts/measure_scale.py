@@ -116,7 +116,7 @@ def summarise(rows, seconds, upload_seconds):
     }
 
 
-def run(api, data, sets, output, *, window=32, timeout=900):
+def run(api, data, sets, output, *, window=32, timeout=900, strategy: str = "d_hibrido"):
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
     def request(path, body=None, headers=None):
@@ -196,7 +196,7 @@ def run(api, data, sets, output, *, window=32, timeout=900):
                 "project_id": project,
                 "equipment_id": task["tag"],
                 "revision": task["revision"],
-                "strategy": "b_reglas",
+                "strategy": strategy,
                 "providers": [],
                 "dataset": "synthetic",
                 "timeout_seconds": 180,
@@ -222,7 +222,7 @@ def run(api, data, sets, output, *, window=32, timeout=900):
                     print(f"Terminados {len(rows)}/{len(plan)}", flush=True)
         report = {
             "synthetic": True,
-            "strategy": "b_reglas",
+            "strategy": strategy,
             "run_id": run_id,
             "input_sha256": source_hash.hexdigest(),
             "complete": len(rows) == len(plan),
@@ -257,8 +257,17 @@ def main():
         "--sets", nargs="+", default=["s-dev", "s-reservado", "s-mecanico", "s-adversarial"]
     )
     p.add_argument("--output", type=Path, required=True)
+    p.add_argument("--estrategia", default="d_hibrido", help="Estrategia de lectura del lote")
+    p.add_argument("--limite-segundos", type=int, default=7200, help="Tiempo máximo del lote")
     args = p.parse_args()
-    run(args.api.rstrip("/"), args.data, args.sets, args.output)
+    run(
+        args.api.rstrip("/"),
+        args.data,
+        args.sets,
+        args.output,
+        strategy=args.estrategia,
+        timeout=args.limite_segundos,
+    )
 
 
 if __name__ == "__main__":

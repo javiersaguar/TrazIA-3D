@@ -14,6 +14,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--wsl", help="Distribución con Docker y python3")
     p.add_argument("--workers", nargs="+", type=int, default=[1, 4])
+    p.add_argument("--estrategia", default="d_hibrido")
     args = p.parse_args()
     if any(n < 1 or n > 8 for n in args.workers):
         p.error("Usa entre uno y ocho workers")
@@ -82,7 +83,7 @@ def main():
             image = execute(
                 ["docker", "image", "inspect", "trazia-api:latest", "--format", "{{.Id}}"]
             )
-            target = f"generated/scale/workers-{count}.json"
+            target = f"generated/scale/workers-{count}-{args.estrategia}.json"
             command = (
                 prefix
                 + (["python3"] if args.wsl else [sys.executable])
@@ -92,6 +93,8 @@ def main():
                     "http://127.0.0.1:18000",
                     "--output",
                     target,
+                    "--estrategia",
+                    args.estrategia,
                 ]
             )
             process = subprocess.run(command, cwd=ROOT)
@@ -111,6 +114,7 @@ def main():
             results.append(
                 {
                     "workers": count,
+                    "strategy": args.estrategia,
                     "deployment": report["deployment"],
                     "input_sha256": report["input_sha256"],
                     "complete": report["complete"],
@@ -120,7 +124,7 @@ def main():
         finally:
             # Proyecto único creado por este script, sin datos ajenos.
             execute(compose + ["down", "--volumes", "--remove-orphans"])
-        (output / "comparison.json").write_text(
+        (output / f"comparison-{args.estrategia}.json").write_text(
             json.dumps(results, ensure_ascii=False, indent=2) + "\n", encoding="utf8"
         )
     return 0
