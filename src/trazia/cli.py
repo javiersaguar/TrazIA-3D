@@ -32,6 +32,9 @@ def main(argv=None) -> int:
     export.add_argument("--output", "-o", type=Path, required=True)
     export.add_argument("--draft", action="store_true")
     export.add_argument("--schema", choices=("IFC4", "IFC4X3", "IFC2X3"), default="IFC4")
+    table = commands.add_parser("fields", help="Exportar campos con evidencia a CSV o Excel")
+    table.add_argument("input", type=Path)
+    table.add_argument("--output", "-o", type=Path, required=True)
     geometry = commands.add_parser(
         "compare-ifc", help="Distancias de superficie por GUID (extra geo)"
     )
@@ -47,6 +50,7 @@ def main(argv=None) -> int:
     diff.add_argument("after", type=Path)
     diff.add_argument("--output", "-o", type=Path)
     diff.add_argument("--geometry", action="store_true")
+    diff.add_argument("--format", choices=("json", "markdown"), default=None)
     bcf = commands.add_parser("bcf", help="Exportar cambios como BCF 2.1 DRAFT")
     bcf.add_argument("before", type=Path)
     bcf.add_argument("after", type=Path)
@@ -93,6 +97,11 @@ def main(argv=None) -> int:
                 },
                 None,
             )
+        elif args.command == "fields":
+            from .review import export_fields
+
+            destination = export_fields(load_revision(args.input), args.output)
+            print(f"Tabla de campos: {destination}")
         elif args.command == "compare-ifc":
             from .families.metrics import compare_ifc
 
@@ -114,14 +123,22 @@ def main(argv=None) -> int:
             args.output.write_bytes(payload)
             print(f"BCF DRAFT: {args.output}")
         elif args.command == "diff":
-            write_json(
-                compare(
-                    load_revision(args.before),
-                    load_revision(args.after),
-                    include_geometry=args.geometry,
-                ),
-                args.output,
+            before, after = load_revision(args.before), load_revision(args.after)
+            result = compare(before, after, include_geometry=args.geometry)
+            markdown = args.format == "markdown" or (
+                args.format is None and args.output and args.output.suffix.lower() == ".md"
             )
+            if markdown:
+                from .revisions import markdown_report
+
+                content = markdown_report(before, after, result)
+                if args.output:
+                    args.output.parent.mkdir(parents=True, exist_ok=True)
+                    args.output.write_text(content, encoding="utf-8")
+                else:
+                    print(content, end="")
+            else:
+                write_json(result, args.output)
         elif args.command == "ingest":
             from .ingest import ingest_bytes
 

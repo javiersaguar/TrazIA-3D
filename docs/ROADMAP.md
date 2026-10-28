@@ -336,7 +336,7 @@ Resumen. El análisis completo, con las opciones descartadas y cómo se valida c
 
 ## 7. Calendario por fases
 
-Hoy: **lunes 26/10/2026**. Quedan 4 semanas hasta el evento. Las casillas marcadas ya están hechas.
+Inicio del plan: **lunes 26/10/2026**. Revisión de estado: **28/10/2026**. Las casillas se cierran por evidencia, no por fecha prevista. Las tareas parciales permanecen abiertas; detalle en [REVISION_ROADMAP_2026-10-28.md](REVISION_ROADMAP_2026-10-28.md).
 
 | Fase | Fechas | Objetivo | Hito de salida |
 | --- | --- | --- | --- |
@@ -381,14 +381,14 @@ comprobar un segundo proveedor real; no se cuentan mocks como mediciones.
 
 ### Fase 2 · Estrategias (5 – 14 nov)
 
-- [ ] **2.1 (Lectura)** **B completo**: tablas por cabecera con sinónimos es/en, cotas en cualquier orientación, cajetín, hoja de datos, VESOR; sobre texto vectorial o líneas de OCR.
-- [ ] **2.2 (Lectura)** **OCR** (RapidOCR, PaddleOCR-VL; Mistral solo sintéticos) y comprobación de cita (DEC-06, 10).
-- [ ] **2.3 (Lectura)** **A · visión + 3D**: segmentación de vistas, geometría desde trazos (`pdfplumber`/OpenCV), escala desde cotas leídas por el modelo de visión, cruce alzado ↔ planta (DEC-07).
-- [ ] **2.4 (Lectura)** **Detector propio**: Florence-2 ajustado con S-dev en la RTX 5070 (`training/`), aleatorización de dominio; medido en S-reservado (DEC-05).
-- [ ] **2.5 (Lectura)** **C · RAG**: biblioteca aprobada, recuperación visual ColQwen2/ColSmol + texto, adaptación de plantilla y parámetros (DEC-08).
-- [ ] **2.6 (Lectura)** **D v1**: cascada, verificación cruzada, reconciliación con restricciones (DEC-09, 11).
-- [ ] **2.7 (Plataforma)** Familias: vertical (mejorar), horizontal con silletas, columna por tramos, tanque, envolvente de reserva (nivel 1) para mecánicos (DEC-16).
-- [ ] **2.8 (Plataforma)** IFC rico: puertos, Psets de trazabilidad, `IfcDocumentReference`, `IfcApproval`, exportación IFC4X3 e IFC2X3, validación en CI (DEC-17, 18).
+- [ ] **2.1 (Lectura)** **B completo**: tablas por cabecera con sinónimos es/en, cotas en cualquier orientación, cajetín, hoja de datos, VESOR; sobre texto vectorial o líneas de OCR. *Parcial:* B y OCR están implementados y probados; falta verificar explícitamente el alcance VESOR antes de cerrar toda la tarea.
+- [ ] **2.2 (Lectura)** **OCR** (RapidOCR, PaddleOCR-VL; Mistral solo sintéticos) y comprobación de cita (DEC-06, 10). *Parcial:* RapidOCR en CPU y comprobación de cita implementados; PaddleOCR-VL sigue sin medir y la segunda familia real sigue pendiente en 1.9.
+- [x] **2.3 (Lectura)** **A · visión + 3D**: segmentación de vistas, geometría desde trazos (`pdfplumber`/OpenCV), escala desde cotas leídas por el modelo de visión, cruce alzado ↔ planta (DEC-07). *Verificado 28/10:* Implementación A con lector de texto/OCR o visión, trazos y cruce alzado/planta; pruebas CPU en `test_lectura_estrategia_a.py`. Su calidad en el banco no se da por garantizada.
+- [ ] **2.4 (Lectura)** **Detector propio**: Florence-2 ajustado con S-dev en la RTX 5070 (`training/`), aleatorización de dominio; medido en S-reservado (DEC-05). *Parcial:* herramientas de entrenamiento/etiquetado disponibles; no consta un ajuste y una medición final. Requiere GPU y queda fuera de esta tanda.
+- [ ] **2.5 (Lectura)** **C · RAG**: biblioteca aprobada, recuperación visual ColQwen2/ColSmol + texto, adaptación de plantilla y parámetros (DEC-08). *Parcial:* C v1 con huella visual ligera + vocabulario, exclusión del mismo equipo y lectura de la región actual; ColQwen2/ColSmol no está integrado.
+- [x] **2.6 (Lectura)** **D v1**: cascada, verificación cruzada, reconciliación con restricciones (DEC-09, 11). *Verificado 28/10:* D v1 implementado con B/OCR, C, memoria, geometría y fusión heurística; `test_lectura_estrategia_d.py`. No equivale a fusión aprendida ni al estudio completo de 3.4.
+- [x] **2.7 (Plataforma)** Familias: vertical (mejorar), horizontal con silletas, columna por tramos, tanque, envolvente de reserva (nivel 1) para mecánicos (DEC-16). *Verificado 28/10:* Familias paramétricas y envolventes LOD 1 verificadas en `test_plataforma_families.py`.
+- [x] **2.8 (Plataforma)** IFC rico: puertos, Psets de trazabilidad, `IfcDocumentReference`, `IfcApproval`, exportación IFC4X3 e IFC2X3, validación en CI (DEC-17, 18). *Verificado 28/10:* IFC4/IFC4X3/IFC2X3, puertos, trazabilidad, originales y aprobación; `test_plataforma_ifc.py` y validación EXPRESS en CI.
 - [x] **2.9 (E/I)** Espacio de revisión: PDF + 3D + campos enlazados, cola por riesgo, atajos, deshacer.
 - [x] **2.10 (I)** Visor 3D: selección, aislar, corte, explosionado, cotas 3D, rosa de orientación.
 - [ ] **2.11 (Lectura)** **Primer estudio A/B/C/D** en S-dev. *Hecho:* tabla con intervalos.
@@ -399,7 +399,7 @@ comprobar un segundo proveedor real; no se cuentan mocks como mediciones.
 agente de Fase 2; no se editan las estrategias ni sus carpetas.
 
 - [x] **3.1 (Plataforma)** Cambios en **tres capas** (diferencia visual, campos emparejados, geometría por GUID) + nubes Δ + BCF 2.1 (DEC-19, 20). *Verificado:* API, comparación y BCF en la batería Python; marcadores heurísticos y sin nuevas ediciones del visor.
-- [ ] **3.2 (Lectura)** **Memoria de revisión** en D: la rev1 aprobada guía la lectura de la rev2.
+- [ ] **3.2 (Lectura)** **Memoria de revisión** en D: la rev1 aprobada guía la lectura de la rev2. *Parcial:* el canal existe y tiene prueba de lectura rev1→rev2, pero todavía admite una revisión DRAFT; falta la condición de aprobación y la medición de su aporte.
 - [ ] **3.3 (Lectura)** Calibración isotónica + **intervalos conformes** + curva riesgo-cobertura (DEC-12). *Hecho:* ECE < 0,05 y cobertura empírica ≥ nominal en S-reservado.
 - [ ] **3.4 (Lectura)** **Fusión aprendida y selector** por tipo de documento; **ablaciones** de D; estudio completo con S-reservado (H1–H6 de [ESTUDIO.md](ESTUDIO.md)).
 - [x] **3.5 (Plataforma)** Pantalla **Estudio** en la web (DEC-28) y conexión de la pantalla Bench al estudio. *Hecho:* misma fuente/query, variante y rúbrica con IC; bench v1 separado, errores/vacío explícitos y pruebas en ambos transportes.
@@ -571,15 +571,15 @@ precios versionada, segundos de GPU y segundos totales. Objetivo para D: < 60 s 
   kg/cm², °C, °F, kg, t, lb. Separadores de miles y decimales en español e inglés (`2.000,5` / `2,000.5`)
   decididos por contexto del documento y marcados si son ambiguos.
 - [ ] **C.2** Unidad canónica por magnitud y **unidad original conservada** en la evidencia.
-- [ ] **C.3** Equivalencias en el delta: 10 bar = 1 MPa no es un cambio; 10 bar → 10 MPa sí.
+- [x] **C.3** Equivalencias en el delta: 10 bar = 1 MPa no es un cambio; 10 bar → 10 MPa sí. *Verificado 28/10:* Equivalencias con Pint y pruebas de cambios equivalentes/incompatibles en `test_plataforma_changes.py`.
 - [ ] **C.4** Sistema de referencia documentado: origen, eje Z vertical, azimut (Norte de planta =
   0°, sentido horario como en VESOR **o** el convenio que use TR — confirmar con el IFC de referencia).
-- [ ] **C.5** Versionado del esquema + migradores + ejemplos válidos en CI.
-- [ ] **C.6** JSON exportable "para humanos": también CSV/Excel de campos con evidencia para el ingeniero.
-- [ ] **C.7** **Contrato 0.3** cerrado de antemano (DEC-13, especificación en
+- [x] **C.5** Versionado del esquema + migradores + ejemplos válidos en CI. *Verificado 28/10:* Migración 0.2→0.3 y ejemplos validados en `test_plataforma_contract.py` y `test_pipeline.py`, ejecutados en CI.
+- [x] **C.6** JSON exportable "para humanos": también CSV/Excel de campos con evidencia para el ingeniero. *Hecho 28/10:* `trazia fields` exporta ambos formatos con SHA, página/celda, estado, alternativas e intervalos, sin modificar la revisión; [uso](EXPORTACION_CAMPOS.md).
+- [x] **C.7** **Contrato 0.3** cerrado de antemano (DEC-13, especificación en
   [COORDINACION-BACKEND.md](COORDINACION-BACKEND.md)): estado por campo, alternativas, intervalo
   conforme, unidad original, procedencia ampliada (estrategia, canal, modelo, prompt), `kind` y `lod`
-  por equipo y metadatos de ejecución por revisión.
+  por equipo y metadatos de ejecución por revisión. *Verificado 28/10:* Contrato 0.3 implementado y validado; coincide con 1.1.
 
 ### D. Geometría paramétrica e IFC (35 %)
 
@@ -637,7 +637,7 @@ dependa solo de la extracción, no de la familia.
   haría si estuviera mal (diámetro, elevaciones de boquillas) y menos seguro está.
 - [ ] **E.3** Acciones por campo: aceptar, corregir (con nueva evidencia opcional), marcar como
   supuesto, rechazar. Todo con **deshacer** y registro de auditoría (quién, cuándo, antes/después).
-- [ ] **E.4** Aprobación ligada a la huella (existe) + idempotencia + bloqueo si hay `conflict` sin resolver.
+- [x] **E.4** Aprobación ligada a la huella (existe) + idempotencia + bloqueo si hay `conflict` sin resolver. *Verificado 28/10:* Aprobación vinculada al fingerprint, bloqueo de conflictos y cambios que invalidan aprobación; `test_pipeline.py` y `test_api_base.py`.
 - [ ] **E.5** Medir **tiempo de revisión por equipo** con el propio log → cifra de impacto del pitch.
 - [ ] **E.6** Aprendizaje activo (DEC-27): corrección aprobada → ejemplo few-shot + recalibración + ajuste de prioridad de fuentes.
 - [ ] **E.7** Intervalo conforme visible por campo («2.000 mm ± 3 mm, 90 %») y umbral de revisión
@@ -645,23 +645,23 @@ dependa solo de la extracción, no de la familia.
 
 ### F. Revisiones y delta (20 %)
 
-- [ ] **F.1** Emparejamiento de entidades rev1↔rev2: boquillas por marca; si cambia la marca, por
-  servicio + DN + posición (algoritmo húngaro con coste combinado); detectar **renombrados**, altas y bajas.
-- [ ] **F.2** Tolerancias por magnitud (p. ej. ±1 mm, ±0,5°) para no reportar ruido de extracción como cambio;
-  distinguir "cambio de diseño" de "cambio de lectura" (misma cota, distinta evidencia/confianza).
-- [ ] **F.3** Clasificar: geométrico, atributo, documental (solo evidencia), de identidad (tag).
-- [ ] **F.4** **Impacto por disciplina** con reglas explicables (pág. 3 del reto): boquilla movida →
+- [x] **F.1** Emparejamiento de entidades rev1↔rev2: boquillas por marca; si cambia la marca, por
+  servicio + DN + posición (algoritmo húngaro con coste combinado); detectar **renombrados**, altas y bajas. *Verificado 28/10:* Emparejamiento húngaro, propuestas ambiguas y conservación de identidad en `test_plataforma_changes.py`.
+- [x] **F.2** Tolerancias por magnitud (p. ej. ±1 mm, ±0,5°) para no reportar ruido de extracción como cambio;
+  distinguir "cambio de diseño" de "cambio de lectura" (misma cota, distinta evidencia/confianza). *Verificado 28/10:* Tolerancias y equivalencias separan el cambio de valor del de procedencia; `test_plataforma_changes.py`.
+- [x] **F.3** Clasificar: geométrico, atributo, documental (solo evidencia), de identidad (tag). *Hecho 28/10:* categorías explícitas en cambios, procedencia y documentos; pruebas en `test_plataforma_changes.py`.
+- [x] **F.4** **Impacto por disciplina** con reglas explicables (pág. 3 del reto): boquilla movida →
   Piping; faldón/peso → Civil (cimentación) y Estructuras; nueva boquilla → Piping + I&C si es de
-  instrumento; cambio de presión/temperatura → Mecánica + Procesos. Severidad y acción sugerida.
+  instrumento; cambio de presión/temperatura → Mecánica + Procesos. Severidad y acción sugerida. *Hecho 28/10:* reglas explicadas en `revisions.change_impact`, con pruebas CPU de soporte, peso, conexiones/instrumentación y condiciones de diseño.
 - [ ] **F.5** Detectar **nubes de revisión y triángulos Δ** en el GA rev2 (muy comunes en planos reales):
   si la rev2 marca zonas revisadas, se usan como pista y para comprobar que no se nos escapa nada
   (un cambio detectado fuera de una nube, o una nube sin cambio detectado, se señala).
-- [ ] **F.6** Salidas: `changes.json`, informe legible (Markdown/PDF), **BCF 2.1/3.0** con un topic por
-  cambio (vista de cámara, GUID del elemento, descripción) → abre en herramientas BIM de coordinación.
-- [ ] **F.7** El IFC rev2 conserva GUID; la rev1 se conserva intacta (pág. 11: "conservación de la versión anterior").
-- [ ] **F.8** **Diferencia visual de páginas** (DEC-19): alinear rev1 y rev2 (ECC de OpenCV) y
+- [x] **F.6** Salidas: `changes.json`, informe legible (Markdown/PDF), **BCF 2.1/3.0** con un topic por
+  cambio (vista de cámara, GUID del elemento, descripción) → abre en herramientas BIM de coordinación. *Hecho 28/10:* JSON + Markdown (`trazia diff -o cambios.md`) y BCF 2.1, con pruebas CLI/BCF. La versión 3.0 no está implementada.
+- [x] **F.7** El IFC rev2 conserva GUID; la rev1 se conserva intacta (pág. 11: "conservación de la versión anterior"). *Verificado 28/10:* GUID estables y revisión anterior inmutable; `test_pipeline.py`, `test_plataforma_changes.py` y `test_api_base.py`.
+- [x] **F.8** **Diferencia visual de páginas** (DEC-19): alinear rev1 y rev2 (ECC de OpenCV) y
   localizar zonas cambiadas en píxeles o trazos. Se cruza con las nubes Δ y con la diferencia de
-  campos: un cambio visual sin cambio de campo, o al revés, se señala como sospechoso.
+  campos: un cambio visual sin cambio de campo, o al revés, se señala como sospechoso. *Verificado 28/10:* ECC y cruce de regiones visuales/campos, comprobación SHA y errores de alineación explícitos; pruebas CPU en `test_plataforma_changes.py`.
 - [ ] **F.9** **Memoria de revisión**: la rev1 aprobada guía la lectura de la rev2 (B.8). Se mide su
   aporte al F1 con la ablación correspondiente.
 
@@ -689,10 +689,10 @@ Es nuestra arma principal: **llegamos al jurado con su propia rúbrica ya medida
   error** sobre la malla (color por distancia a la referencia).
 - [ ] **G.5** Anti-sobreajuste: con 4 IFC de referencia, validación **dejando uno fuera**; sintéticos
   como conjunto grande; reportar siempre por separado sintético / real.
-- [ ] **G.6** El bench corre en CI sobre sintéticos (regresiones = PR rojo).
+- [x] **G.6** El bench corre en CI sobre sintéticos (regresiones = PR rojo). *Verificado 28/10:* CI ejecuta `test_bench.py`: genera sintéticos, corre el banco real y exige exactitud/IFC/F1 en los casos de referencia; una regresión falla pytest.
 - [x] **G.0** Bench v0 y generador v1 hechos ([BENCH.md](BENCH.md)).
-- [ ] **G.7** **Generador v2** (DEC-21): 8 o más estilos de proveedor (2 reservados), niveles de
-  degradación, multipágina, paquetes de proveedor, mecánicos y corpus adversarial.
+- [x] **G.7** **Generador v2** (DEC-21): 8 o más estilos de proveedor (2 reservados), niveles de
+  degradación, multipágina, paquetes de proveedor, mecánicos y corpus adversarial. *Verificado 28/10:* Coincide con 1.10: generador v2/v2.1 implementado; semillas, separación de proveedores reservados y degradaciones verificadas en `test_lectura_synthetic.py`.
 - [ ] **G.8** **Estudio comparativo** ([ESTUDIO.md](ESTUDIO.md)): variantes A/B/C/D y ablaciones,
   bootstrap del 95 %, McNemar, **Puntuación GA2MODEL** (DEC-22), frontera de Pareto coste-acierto y
   recomendación del selector.
@@ -711,16 +711,16 @@ Es nuestra arma principal: **llegamos al jurado con su propia rúbrica ya medida
   - `GET /diff?from=&to=`, `GET /diff/bcf`, `GET /bench`, `GET /plant`
   - `POST /estudio` (lanza el estudio como trabajo) y `GET /estudio` (resultados para la pantalla Estudio)
   - `POST /copiloto` (preguntas con herramientas de solo lectura y citas, DEC-26)
-- [ ] **H.2 Idempotency keys** en todo POST con efecto (subida, jobs, aprobación): repetir la petición
-  devuelve el mismo resultado, sin duplicar. Clave guardada 24 h con hash del cuerpo.
+- [x] **H.2 Idempotency keys** en todo POST con efecto (subida, jobs, aprobación): repetir la petición
+  devuelve el mismo resultado, sin duplicar. Clave guardada 24 h con hash del cuerpo. *Verificado 28/10:* Caducidad de 24 h, huella del cuerpo y respuesta/efecto transaccionales; `Store.perform` y `test_api_base.py`.
 - [ ] **H.3 Trabajos asíncronos** (DEC-23): interfaz de cola con **dos implementaciones**, en
   proceso (por defecto) y Redis con `arq` y workers (perfil `escala`); reintentos con backoff para los
   modelos, timeouts y cancelación. El estudio comparativo también se lanza como trabajo.
-- [ ] **H.4 Persistencia:** SQLModel sobre SQLite (local) con migraciones Alembic; Postgres en
-  `docker-compose.prod.yml` para el discurso de escala. Almacén de archivos direccionado por contenido.
-- [ ] **H.5 Observabilidad:** logs estructurados (JSON), traza por job, métricas de coste y latencia.
-- [ ] **H.6 Seguridad básica:** CORS restringido, límites de tamaño, sin claves en el repo (`.env.example`),
-  documentos tratados como datos.
+- [x] **H.4 Persistencia:** SQLModel sobre SQLite (local) con migraciones Alembic; Postgres en
+  `docker-compose.prod.yml` para el discurso de escala. Almacén de archivos direccionado por contenido. *Verificado 28/10:* SQLite/SQLModel/Alembic y Postgres con almacén SHA; pruebas API y los tres perfiles de Compose documentados en FASE1.md.
+- [x] **H.5 Observabilidad:** logs estructurados (JSON), traza por job, métricas de coste y latencia. *Verificado 28/10:* Eventos estructurados por trabajo y RunInfo con tiempos, intentos, llamadas y coste; `api/jobs.py` y `test_api_queue.py`. Coste desconocido no se convierte en cero.
+- [x] **H.6 Seguridad básica:** CORS restringido, límites de tamaño, sin claves en el repo (`.env.example`),
+  documentos tratados como datos. *Verificado 28/10:* CORS, límite de subida, hashes y separación documento/instrucción verificados en las pruebas API; no se afirma una auditoría de seguridad completa.
 - [ ] **H.7 Escala (para el pitch):** diagrama con cola, workers horizontales, caché por hash (una
   revisión que solo cambia una página solo reprocesa esa página), coste estimado de un proyecto de
   400 equipos × 4 revisiones.

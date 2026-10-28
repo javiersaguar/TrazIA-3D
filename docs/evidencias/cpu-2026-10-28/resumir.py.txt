@@ -1,0 +1,76 @@
+import json
+import re
+from collections import Counter, defaultdict
+from datetime import datetime
+from pathlib import Path
+from zoneinfo import ZoneInfo
+ROOT = Path(__file__).resolve().parents[2]
+out = ROOT / "generated/bench"
+read = lambda p: json.loads(p.read_text(encoding="utf-8"))
+meta=read(out/"entorno.json")
+records=read(out/"ejecuciones.json")
+def pct(x):
+    return "Sin medir" if x is None else f"{100*x:.2f} %"
+def num(x):
+    return "Sin medir" if x is None else f"{x:.4f}"
+def table(headers, rows):
+    return ["| " + " | ".join(headers) + " |", "| " + " | ".join("---" for _ in headers) + " |", *["| " + " | ".join(str(x).replace("|","/").replace("\n"," ") for x in row) + " |" for row in rows], ""]
+now=datetime.now(ZoneInfo("Europe/Madrid"))
+lines=["# Prueba de carga del banco y estudio sobre sintéticos", "", f"Fecha del informe: {now.isoformat(timespec='seconds')} (Europe/Madrid).", "", f"Código evaluado: `{meta['commit']}`; worktree `{ROOT.name}`. Sin commit ni push. La reanudación usa la rama `chore/roadmap-cpu`, con cambios locales de exportación y metadatos de impacto; estrategias, generador y fórmulas del banco permanecen iguales. Los artefactos de medición viven en `generated/`.", "", "## Alcance y método", "", "Datos exclusivamente sintéticos, generador v1, 40 equipos con semilla 2026, estilos rotulado/plano/escaneado y revisiones 1/2: 120 condiciones, 240 PDF y 240 HDM Excel. Hay 155 cambios verdaderos por conjunto de 40 equipos, repetidos en cada estilo. No se ha leído `data/private/`.", "", f"SHA-256 agregado de rutas y contenido del conjunto: `{meta['input_sha256']}`. Las fechas internas de PDF/Excel pueden cambiar sus bytes al regenerar.", "", "El arnés del estudio espera conjuntos v2. `estudio_v1.py` llama al mismo `run_study` con el conjunto v1 original y adapta en memoria solo la etiqueta/población puntuada (`synthetic-v1`) y el nombre del estilo escaneado. Usa 1.000 remuestreos bootstrap agrupados por equipo, semilla 2026. No transforma documentos, verdades, estrategias ni fórmulas. El informe corrige el indicador del generador a v1. No son S-dev ni S-reservado v2; no mide generalización a proveedores nuevos. La columna por proveedor carece de significado en v1 (vendor desconocido); se utiliza el desglose por estilo/degradación. La recomendación vectorial nativa puede quedar vacía porque el arnés busca el nombre v2 vectorial y este banco llama plano al estilo equivalente; no se presenta como un selector validado.", "", "La biblioteca de C se construye con campos verificados de rev1/plano de estos mismos 40 equipos, usando `build_entry`; C excluye el mismo equipo al recuperar plantillas. Es una evaluación de proveedores conocidos, sin biblioteca externa ni datos reales. Su preparación se cronometra por separado. D se mide sin proveedor de visión, como establece el estudio predeterminado.", "", "Se conserva la selección predeterminada del estudio por indicación del usuario: A con visión local se omite por su coste temporal; Gemini/Mistral requieren credenciales; detector y su ablación se omiten si no están implementados; D sin visión es redundante en esta configuración. Los motivos exactos figuran más abajo.", "", "Las etapas de medición se ejecutan secuencialmente. La sesión se interrumpió el 27/10 y se reanudó el 28/10, reutilizando condiciones completas. Durante la reanudación hubo comprobaciones dirigidas y edición local en el mismo equipo; no es una prueba de rendimiento aislada. Los tiempos de pared incluyen arranque del proceso y escritura; el tiempo interno por revisión del estudio mide el pipeline y excluye su evaluación geométrica/estadística. Los tiempos del banco promedian solo las revisiones ensambladas. No hay equivalencia directa entre ese promedio y el del estudio. B inicial puede crear caché OCR para verificar citas en escaneados; las variantes posteriores reutilizan esa caché. No es una comparación controlada de latencia en frío. No se ha parado el stack ni otros procesos del equipo.", "", "El IoU utilizado por este banco es de cajas envolventes de los componentes IFC, no IoU volumétrico de mallas ni Hausdorff. La geometría del estudio combina acierto de campos con ese IoU y penaliza las revisiones sin IFC; no equivale al acierto de campos del banco v1. Un IFC construido no implica que todos sus campos sean correctos. La elegibilidad solo comprueba respaldo verificable y cobertura de citas: no garantiza un IFC correcto. El F1 del estudio cuenta como no vistos los cambios de pares sin dos modelos. El campo equipment de los detalles del arnés cuenta condiciones (120), mientras que hay 40 equipos únicos. Innovación aporta un 10 % constante por convención, no por medición. Coste monetario local = 0 según RunInfo; no incluye electricidad, hardware ni coste amortizado.", "", "## Entorno", "", f"{meta['platform']}; Python {meta['python'].split()[0]}; CPU AMD Ryzen 9 8940HX, 16 núcleos/32 hilos. Extras instalados: dev, api (incluye geo) y ocr mediante `uv sync --frozen`. Sin límites de hilos impuestos por esta prueba.", "", ", ".join(f"{k} {v}" for k,v in meta['versions'].items())+".", "", "## Tiempos por etapa", ""]
+lines += table(["Etapa", "Comando", "Segundos de pared", "Salida"], [(e.get("stage","generación"), "`"+" ".join(e["command"])+"`", f"{e['seconds']:.2f}" if "seconds" in e else ("No recuperada: interrupción" if e.get("status")=="interrupted" else "En curso"), e.get("returncode", "Interrumpido" if e.get("status")=="interrupted" else "Pendiente")) for e in records])
+bench=out/"report.json"
+if bench.exists():
+    b=read(bench)
+    lines += ["## Banco: extractor de etiquetas", ""]
+    lines += table(["Estilo", "IFC/revisiones", "Geometría (campos)", "Atributos", "F1 cambios", "ECE", "s/rev con IFC", "IoU cajas"], [(s, f"{m['models_built']}/{m['revisions']}", pct(m['geometry']['field_accuracy']),pct(m['attributes']['accuracy_value_unit']),pct(m['delta']['f1']), num(m['attributes']['ece']), num(m['scale']['seconds_per_revision']),num(m['geometry']['ifc_mean_iou'])) for s,m in b['styles'].items()])
+    lines += ["El banco solo puntúa cambios en pares con dos IFC; un F1 ausente en plano/escaneado significa sin pares evaluables, no 0 ni 100 %. Los atributos provienen de los Excel presentes en todos los casos.", "", "Detalle y errores del banco: `report.json`, `report.md`, `cases.json` y `bench.log`.", ""]
+for folder,title in [("estudio_b","Estudio B inicial"),("estudio_variantes","Estudio comparativo predeterminado")]:
+    path=out/folder/"estudio.json"
+    if not path.exists():
+        lines += [f"## {title}", "", "Pendiente de terminar.", ""]
+        continue
+    study=read(path)
+    raw=[json.loads(line) for line in (out/folder/"casos.jsonl").read_text(encoding="utf-8").splitlines() if line]
+    groups=defaultdict(list)
+    for c in raw:
+        groups[c['variant']].append(c)
+    lines += [f"## {title}", ""]
+    rows=[]
+    for v in study['variants']:
+        m=v['metrics']; cases=groups[v['id']]; revs=[r for c in cases for r in c['revs']]
+        rows.append((v['id'],num(m['score']),str(v['ci95']['score']),pct(m['geometry']),pct(m['attributes']),pct(m['f1_delta']),num(m['ece']),pct(m['hallucination_rate']),pct(m['citation_coverage']), f"{sum(r['built'] for r in revs)}/{len(revs)}",sum(r['error'] is not None for r in revs),num(m['seconds_per_revision']), num(m['cost_eur_per_equipment']),"Sí" if v['eligible'] else "No"))
+    lines += table(["Variante","Puntuación","IC 95 %","Geometría ponderada","Atributos","F1 cambios","ECE","Sin respaldo verificable","Cobertura cita","IFC/rev","Rev. con error","s/rev interno","€/equipo","Elegible"],rows)
+    lines += ["### Tiempo de evaluación por variante", "", "Suma de pared de las condiciones (pipeline, comprobación de evidencias e IFC de referencia), antes del bootstrap y la comparación estadística. No es solo inferencia ni incluye el arranque del proceso.", ""]
+    lines += table(["Variante", "Condiciones", "Segundos", "Llamadas externas", "Campos no verificables"], [(v['id'],len(groups[v['id']]),f"{sum(c['wall_seconds'] for c in groups[v['id']]):.2f}", v['details']['external_calls'],v['details']['unverifiable_fields']) for v in study['variants']])
+    lines += ["### Por estilo", ""]
+    lines += table(["Variante","Estilo","Geometría","Atributos","F1 cambios","s/rev interno"],[(v['id'],style,pct(m['geometry']),pct(m['attributes']),pct(m['f1_delta']),num(m['seconds_per_revision'])) for v in study['variants'] for style,m in v['by_degradation'].items()])
+    lines += ["### Fallos observados", ""]
+    errors=[]
+    for name,cases in groups.items():
+        counter=Counter(r['error'].splitlines()[0][:240] for c in cases for r in c['revs'] if r['error'])
+        for error,count in counter.items():
+            errors.append((name,count,error))
+    lines += table(["Variante","Revisiones","Primer renglón del error"], errors) if errors else ["Ninguna revisión devolvió error.",""]
+    lines += ["### Sin medir", ""]
+    lines += [f"- `{u['id']}`: {u['reason']}." for u in study['unmeasured']] or ["Ninguna."]
+    lines += ["", f"Evidencias: `{folder}/estudio.json`, `{folder}/estudio.md` y `{folder}/casos.jsonl`. El detalle JSONL conserva los errores y tiempos de todas las condiciones, incluidas las fallidas.", ""]
+lines += ["## Tres pasadas consecutivas de pytest", ""]
+rows=[]
+for i in range(1,4):
+    entry=next((r for r in records if r.get('stage')==f'pytest_{i}'),None)
+    log=out/f'pytest_{i}.log'
+    text=log.read_text(encoding='utf-8',errors='replace') if log.exists() else ''
+    summaries=[s for s in text.splitlines() if re.search(r'\d+ (?:passed|failed|error|skipped)',s) and ' in ' in s]
+    rows.append((i,f"{entry['seconds']:.2f}" if entry and 'seconds' in entry else 'Pendiente',entry.get('returncode','Pendiente') if entry else 'Pendiente',summaries[-1] if summaries else 'Pendiente'))
+lines += table(["Pasada","Segundos de pared","Código de salida","Resumen pytest"],rows)
+for i in range(1,4):
+    path=out/f'pytest_{i}.log'
+    if path.exists():
+        failures=[s for s in path.read_text(encoding='utf-8',errors='replace').splitlines() if s.startswith(('FAILED ','ERROR '))]
+        if failures:
+            lines += [f"Fallos de la pasada {i}:",""]+[f"- `{s}`" for s in failures]+[""]
+complete=len([e for e in records if e.get('status')=='finished' and e.get('stage','').startswith('pytest_')])==3
+lines += [f"Tiempo de calendario desde el inicio de la generación hasta este informe (incluye interrupción nocturna, no es tiempo de proceso): {(now-datetime.fromisoformat(records[0]['started_at'])).total_seconds():.2f} s (incluye preparación y comprobaciones entre comandos). Suma de las etapas terminadas (excluye el tramo interrumpido): {sum(r.get('seconds',0) for r in records):.2f} s.", ""]
+lines += ["## Estado final", "", ("Todas las etapas solicitadas han terminado; véanse códigos de salida y fallos arriba." if complete else "Medición en curso; este informe se actualizará al terminar las tres pasadas."), "", "Sin commit ni push. Hay cambios locales de ROADMAP, documentación, exportaciones, impacto y CI en este worktree. No se han modificado estrategias, generador ni fórmulas del banco, ni datos de otros worktrees. La duración original del comparativo interrumpido no se inventa: solo se conservan los tiempos de sus condiciones y el tiempo medido de reanudación. Un intento dirigido previo fue bloqueado por Control de aplicaciones; las tres pasadas completas finales pudieron usar el comando exacto uv run pytest -q y terminaron sin fallos.",""]
+(out/'prueba_carga.md').write_text("\n".join(lines),encoding='utf-8')
+print(out/'prueba_carga.md')

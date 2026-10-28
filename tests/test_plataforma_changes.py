@@ -26,6 +26,60 @@ def revision():
 
 
 @pytest.mark.parametrize(
+    "path,disciplines,category",
+    [
+        ("attributes.design_pressure", ["Mecánica", "Procesos"], "attribute"),
+        ("attributes.design_temperature", ["Mecánica", "Procesos"], "attribute"),
+        ("attributes.operating_weight", ["Civil", "Estructuras"], "attribute"),
+        ("skirt_height", ["Civil", "Estructuras"], "geometry"),
+        ("height", ["Mecánica", "Piping"], "geometry"),
+        ("nozzles.N1.elevation", ["Piping"], "geometry"),
+    ],
+)
+def test_change_disciplines_have_reason_and_action(path, disciplines, category):
+    from trazia.model import fields
+
+    before = revision()
+    original = before.model_dump_json()
+    after = before.model_copy(deep=True)
+    fields(after.equipment)[path].value += 5
+    changes = compare(before, after)["changes"]
+    change = next(c for c in changes if c["path"] == path)
+    assert change["category"] == category
+    assert change["disciplines"] == disciplines
+    assert change["severity"] == "high"
+    assert change["impact_reasons"] and change["suggested_action"]
+    assert before.model_dump_json() == original
+
+
+def test_instrument_nozzle_change_involves_instrumentation_and_piping():
+    from trazia.model import Attribute
+
+    before = revision()
+    after = before.model_copy(deep=True)
+    nozzle = after.equipment.nozzles[0]
+    nozzle.service = Attribute(
+        value="Termopozo / thermowell", unit="1", source=nozzle.diameter.source
+    )
+    nozzle.elevation.value += 5
+    change = next(c for c in compare(before, after)["changes"] if c["path"].endswith(".elevation"))
+    assert change["disciplines"] == ["Piping", "I&C"]
+    assert "instrumentación" in change["suggested_action"]
+
+
+def test_tag_and_evidence_changes_are_not_labelled_geometric():
+    before = revision()
+    after = before.model_copy(deep=True)
+    after.equipment.tag.value = "V-102"
+    after.equipment.height.source.locator = "Otra región con la misma cota"
+    result = compare(before, after)
+    assert next(c for c in result["changes"] if c["path"] == "tag")["category"] == "identity"
+    provenance = next(c for c in result["provenance_changes"] if c["path"] == "height")
+    assert provenance["category"] == "documentary"
+    assert provenance["severity"] == "low" and provenance["disciplines"] == []
+
+
+@pytest.mark.parametrize(
     "path,value,unit", [("design_pressure", 1000.0, "kPa"), ("design_temperature", 572.0, "degF")]
 )
 def test_equivalent_units_are_provenance_changes(path, value, unit):

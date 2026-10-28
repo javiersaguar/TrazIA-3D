@@ -1,3 +1,5 @@
+import html
+
 from .families.change_detection import (
     crosscheck,
     equal_value,
@@ -6,6 +8,167 @@ from .families.change_detection import (
     visual_delta,
 )
 from .model import GEOMETRY_FIELDS, Revision, fields
+
+
+def markdown_report(before: Revision, after: Revision, report: dict) -> str:
+    """Salida legible del mismo delta JSON, con fuentes y huellas de ambas revisiones."""
+
+    def text(value):
+        return (
+            html.escape(str(value))
+            .replace("\\", "\\\\")
+            .replace("|", "\\|")
+            .replace("`", "\\`")
+            .replace("\r", " ")
+            .replace("\n", " ")
+        )
+
+    def value(item):
+        return "—" if item is None else text(f"{item['value']} {item['unit']}")
+
+    def evidence(source, revision):
+        if source is None:
+            return "Sin campo en esta revisión"
+        document = next(d for d in revision.documents if d.id == source["document_id"])
+        location = (
+            f"página {source['page']}"
+            if source.get("page")
+            else f"hoja {source.get('sheet')}, celda {source.get('cell')}"
+        )
+        return text(f"{document.filename} · {location} · {source['locator']}") + (
+            f" · SHA-256 `{document.sha256}`"
+        )
+
+    lines = [
+        "# Informe de cambios",
+        "",
+        f"Proyecto {text(after.project_id)} · equipo {text(after.equipment.id)}.",
+        "",
+        "**Datos sintéticos.**"
+        if before.dataset == after.dataset == "synthetic"
+        else "Datos reales.",
+        "",
+        f"Revisión {text(before.revision)} → {text(after.revision)}.",
+        f"Huella anterior: `{report['before_sha256']}`.",
+        f"Huella nueva: `{report['after_sha256']}`.",
+        "",
+        "Estado anterior: " + ("APPROVED" if before.approval else "DRAFT") + ".",
+        "Estado nuevo: " + ("APPROVED" if after.approval else "DRAFT") + ".",
+        "La comparación no concede aprobación de diseño.",
+        "",
+        f"Cambios de diseño: {report['summary']['changes']}; "
+        f"cambios de evidencia: {report['summary']['provenance_changes']}.",
+        "",
+        "| Campo | Operación | Antes | Después | Categoría | Disciplinas | Severidad | Acción |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for change in report["changes"]:
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    text(change["path"]),
+                    change["operation"],
+                    value(change["before"]),
+                    value(change["after"]),
+                    change["category"],
+                    text(", ".join(change["disciplines"])),
+                    change["severity"],
+                    text(change["suggested_action"]),
+                ]
+            )
+            + " |"
+        )
+    lines += ["", "## Evidencias de los campos", ""]
+    for change in [*report["changes"], *report["provenance_changes"]]:
+        lines += [
+            f"- **{text(change['path'])}**",
+            f"  - Antes: {evidence(change.get('before_source'), before)}.",
+            f"  - Después: {evidence(change.get('after_source'), after)}.",
+        ]
+    lines += ["", "## Documentos cambiados", ""]
+    for document in report["document_changes"]:
+        old, new = document["before"], document["after"]
+        lines.append(
+            f"- {text(document['id'])}: "
+            + (text(old["filename"]) + f" (`{old['sha256']}`)" if old else "Ausente")
+            + " → "
+            + (text(new["filename"]) + f" (`{new['sha256']}`)" if new else "Ausente")
+            + "."
+        )
+    if not report["document_changes"]:
+        lines.append("Sin cambios en los documentos del contrato.")
+    return "\n".join(lines) + "\n"
+
+
+def change_impact(change: dict, before: Revision, after: Revision) -> dict:
+    """Reglas de coordinación; no calculan esfuerzos ni conceden aprobación de diseño."""
+    path = change["path"]
+    category = (
+        "identity"
+        if path == "tag" or path.endswith(".id")
+        else "geometry"
+        if change["affects_geometry"]
+        else "attribute"
+    )
+    if path.startswith("nozzles."):
+        disciplines = ["Piping"]
+        reasons = ["Cambia una conexión o su identificación."]
+        marks = {path.split(".")[1]}
+        if change["operation"] == "renamed":
+            marks.add(change["before"]["value"])
+        instrument = any(
+            nozzle.service
+            and any(
+                token in str(nozzle.service.value).casefold()
+                for token in ("instrument", "termopozo", "thermowell", "transmitter", "transmisor")
+            )
+            for revision in (before, after)
+            for nozzle in revision.equipment.nozzles
+            if nozzle.id in marks
+        )
+        if instrument:
+            disciplines.append("I&C")
+            reasons.append("El servicio de la boquilla identifica instrumentación.")
+        if path.endswith(".rating"):
+            disciplines.append("Mecánica")
+            reasons.append("El rating afecta a la especificación de presión de la conexión.")
+        severity = "high" if change["affects_geometry"] or path.endswith(".rating") else "medium"
+        action = "Revisar conexión, isométricos y soportes de las líneas afectadas."
+        if instrument:
+            action += " Verificar también la conexión y documentación de instrumentación."
+    elif path.startswith("skirt_") or (
+        path.startswith("attributes.") and "weight" in path.rsplit(".", 1)[-1]
+    ):
+        disciplines = ["Civil", "Estructuras"]
+        reasons = ["El soporte o el peso puede modificar cargas y anclajes."]
+        severity = "high"
+        action = "Comprobar cargas, cimentación, anclajes y estructura de soporte."
+    elif path.startswith("attributes.") and any(
+        token in path for token in ("pressure", "temperature")
+    ):
+        disciplines = ["Mecánica", "Procesos"]
+        reasons = ["Cambia una condición de presión o temperatura del equipo."]
+        severity = "high"
+        action = "Revisar hoja de datos, condiciones de proceso y diseño mecánico."
+    elif change["affects_geometry"]:
+        disciplines = ["Mecánica", "Piping"]
+        reasons = ["Cambia la envolvente, la familia o un componente geométrico."]
+        severity = "high"
+        action = "Comprobar implantación, interferencias e interfaces del equipo."
+    else:
+        disciplines = ["Mecánica"]
+        reasons = ["Cambia una propiedad o la identificación del equipo."]
+        severity = "medium"
+        action = "Revisar la hoja de datos y actualizar las referencias del equipo."
+    return {
+        "category": category,
+        "disciplines": disciplines,
+        "severity": severity,
+        "impact_reasons": reasons,
+        "suggested_action": action,
+        "impact": action,
+    }
 
 
 def compare(
@@ -124,10 +287,24 @@ def compare(
     old_docs = {d.id: d.model_dump(mode="json") for d in before.documents}
     new_docs = {d.id: d.model_dump(mode="json") for d in after.documents}
     documents = [
-        {"id": key, "before": old_docs.get(key), "after": new_docs.get(key)}
+        {
+            "id": key,
+            "before": old_docs.get(key),
+            "after": new_docs.get(key),
+            "category": "documentary",
+        }
         for key in sorted(old_docs.keys() | new_docs.keys())
         if old_docs.get(key) != new_docs.get(key)
     ]
+    for change in changes:
+        change.update(change_impact(change, before, after))
+    for entry in provenance:
+        entry.update(
+            category="documentary",
+            disciplines=[],
+            severity="low",
+            suggested_action="Verificar la nueva evidencia; el valor de diseño es equivalente.",
+        )
     visual = (
         visual_delta(before, after, originals)
         if originals is not None

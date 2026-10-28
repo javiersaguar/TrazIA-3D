@@ -1,0 +1,41 @@
+{
+  "commit": "10f649d",
+  "python": "3.12.9 (tags/v3.12.9:fdb8142, Feb  4 2025, 15:27:58) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "logical_cpu": 32,
+  "versions": {
+    "pytest": "9.1.1",
+    "ifcopenshell": "0.8.5",
+    "rapidocr": "3.10.0",
+    "onnxruntime": "1.31.1",
+    "pydantic": "2.14.1",
+    "pdfplumber": "0.11.10",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1"
+  },
+  "cases": 40,
+  "styles": [
+    "rotulado",
+    "plano",
+    "escaneado"
+  ],
+  "seed": 2026,
+  "synthetic_files": {
+    ".pdf": 240,
+    ".xlsx": 240,
+    ".json": 41
+  },
+  "input_sha256": "1b5f432648c6aee99b913eb33abc3ae4325b0fc467d6ec5de86c958854fd9393",
+  "thread_environment": {},
+  "branch": "chore/roadmap-cpu",
+  "dirty_files": [
+    ".github/workflows/ci.yml",
+    "README.md",
+    "docs/ROADMAP.md",
+    "src/trazia/cli.py",
+    "src/trazia/review.py",
+    "src/trazia/revisions.py",
+    "tests/test_plataforma_changes.py"
+  ],
+  "resumed_conditions": 843
+}

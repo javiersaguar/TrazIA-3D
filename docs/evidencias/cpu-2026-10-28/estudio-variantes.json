@@ -1,0 +1,1836 @@
+{
+  "generated_at": "2026-10-28T11:54:34+00:00",
+  "seed": 2026,
+  "synthetic": true,
+  "generator": "v1",
+  "sets": {
+    "synthetic-v1": {
+      "seed": 2026,
+      "cases": 40
+    }
+  },
+  "datasets": [
+    "synthetic-v1"
+  ],
+  "variants": [
+    {
+      "id": "a_geometria",
+      "strategy": "a_geometria",
+      "providers": [],
+      "description": "A: trazos + capa de texto u OCR",
+      "metrics": {
+        "score": 0.398,
+        "geometry": 0.0,
+        "attributes": 1.0,
+        "ece": 0.2043,
+        "f1_delta": 0.0,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": null,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 1.1598
+      },
+      "ci95": {
+        "score": [
+          0.3941,
+          0.4018
+        ],
+        "geometry": [
+          0.0,
+          0.0
+        ],
+        "attributes": [
+          1.0,
+          1.0
+        ],
+        "f1_delta": [
+          0.0,
+          0.0
+        ]
+      },
+      "by_dataset": {
+        "synthetic-v1": {
+          "score": 0.398,
+          "geometry": 0.0,
+          "attributes": 1.0,
+          "ece": 0.2043,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.1598,
+          "equipment": 120,
+          "revisions": 240,
+          "models_built": 0.0,
+          "geometry_fields_unpenalized": 0.0918,
+          "scale": 0.9903,
+          "emitted_fields": 2501,
+          "unverifiable_fields": 859,
+          "spurious_fields": 106,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El recipiente vertical de nivel 2/3 necesita al menos tres boquillas",
+            "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness"
+          ]
+        }
+      },
+      "by_style": {
+        "?": {
+          "score": 0.398,
+          "geometry": 0.0,
+          "attributes": 1.0,
+          "ece": 0.2043,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.1598
+        }
+      },
+      "by_degradation": {
+        "rotulado": {
+          "score": 0.3875,
+          "geometry": 0.0,
+          "attributes": 1.0,
+          "ece": 0.25,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0484
+        },
+        "plano": {
+          "score": 0.4268,
+          "geometry": 0.0,
+          "attributes": 1.0,
+          "ece": 0.0926,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0798
+        },
+        "escaneado": {
+          "score": 0.3562,
+          "geometry": 0.0,
+          "attributes": 1.0,
+          "ece": 0.3641,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 3.3513
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.0,
+        "geometry_fields_unpenalized": 0.0918,
+        "scale": 0.9903,
+        "emitted_fields": 2501,
+        "unverifiable_fields": 859,
+        "spurious_fields": 106,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "El recipiente vertical de nivel 2/3 necesita al menos tres boquillas",
+          "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "b_reglas",
+      "strategy": "b_reglas",
+      "providers": [],
+      "description": "B: texto, tablas, cotas, cajetín y HDM",
+      "metrics": {
+        "score": 0.7982,
+        "geometry": 0.6667,
+        "attributes": 1.0,
+        "ece": 0.1804,
+        "f1_delta": 0.8,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": null,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 0.0501
+      },
+      "ci95": {
+        "score": [
+          0.7981,
+          0.7983
+        ],
+        "geometry": [
+          0.6667,
+          0.6667
+        ],
+        "attributes": [
+          1.0,
+          1.0
+        ],
+        "f1_delta": [
+          0.8,
+          0.8
+        ]
+      },
+      "by_dataset": {
+        "synthetic-v1": {
+          "score": 0.7982,
+          "geometry": 0.6667,
+          "attributes": 1.0,
+          "ece": 0.1804,
+          "f1_delta": 0.8,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0501,
+          "equipment": 120,
+          "revisions": 240,
+          "models_built": 0.6667,
+          "geometry_fields_unpenalized": 0.6667,
+          "scale": 0.9996,
+          "emitted_fields": 5216,
+          "unverifiable_fields": 0,
+          "spurious_fields": 0,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness"
+          ]
+        }
+      },
+      "by_style": {
+        "?": {
+          "score": 0.7982,
+          "geometry": 0.6667,
+          "attributes": 1.0,
+          "ece": 0.1804,
+          "f1_delta": 0.8,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0501
+        }
+      },
+      "by_degradation": {
+        "rotulado": {
+          "score": 0.9374,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.25,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0675
+        },
+        "plano": {
+          "score": 0.9745,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.1016,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.079
+        },
+        "escaneado": {
+          "score": 0.3875,
+          "geometry": 0.0,
+          "attributes": 1.0,
+          "ece": 0.25,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0038
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.6667,
+        "geometry_fields_unpenalized": 0.6667,
+        "scale": 0.9996,
+        "emitted_fields": 5216,
+        "unverifiable_fields": 0,
+        "spurious_fields": 0,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "b_reglas+ocr",
+      "strategy": "b_reglas+ocr",
+      "providers": [],
+      "description": "B sobre líneas de OCR",
+      "metrics": {
+        "score": 0.8047,
+        "geometry": 0.6849,
+        "attributes": 0.9885,
+        "ece": 0.1577,
+        "f1_delta": 0.7849,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": null,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 0.181
+      },
+      "ci95": {
+        "score": [
+          0.8004,
+          0.8091
+        ],
+        "geometry": [
+          0.671,
+          0.7022
+        ],
+        "attributes": [
+          0.9823,
+          0.9938
+        ],
+        "f1_delta": [
+          0.7514,
+          0.8
+        ]
+      },
+      "by_dataset": {
+        "synthetic-v1": {
+          "score": 0.8047,
+          "geometry": 0.6849,
+          "attributes": 0.9885,
+          "ece": 0.1577,
+          "f1_delta": 0.7849,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.181,
+          "equipment": 120,
+          "revisions": 240,
+          "models_built": 0.6958,
+          "geometry_fields_unpenalized": 0.8397,
+          "scale": 0.9985,
+          "emitted_fields": 6473,
+          "unverifiable_fields": 0,
+          "spurious_fields": 0,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Boquilla N1: debe quedar dentro de la virola",
+            "Boquilla N2: debe quedar dentro de la virola",
+            "Boquilla N3: debe quedar dentro de la virola",
+            "El fondo inferior debe quedar por encima del suelo",
+            "El recipiente vertical de nivel 2/3 necesita al menos tres boquillas"
+          ]
+        }
+      },
+      "by_style": {
+        "?": {
+          "score": 0.8047,
+          "geometry": 0.6849,
+          "attributes": 0.9885,
+          "ece": 0.1577,
+          "f1_delta": 0.7849,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.181
+        }
+      },
+      "by_degradation": {
+        "rotulado": {
+          "score": 0.9374,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.25,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1039
+        },
+        "plano": {
+          "score": 0.9745,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.1016,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1428
+        },
+        "escaneado": {
+          "score": 0.4403,
+          "geometry": 0.0546,
+          "attributes": 0.9656,
+          "ece": 0.1016,
+          "f1_delta": 0.0229,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.2962
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.6958,
+        "geometry_fields_unpenalized": 0.8397,
+        "scale": 0.9985,
+        "emitted_fields": 6473,
+        "unverifiable_fields": 0,
+        "spurious_fields": 0,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "Boquilla N1: debe quedar dentro de la virola",
+          "Boquilla N2: debe quedar dentro de la virola",
+          "Boquilla N3: debe quedar dentro de la virola",
+          "El fondo inferior debe quedar por encima del suelo",
+          "El recipiente vertical de nivel 2/3 necesita al menos tres boquillas"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "c_rag",
+      "strategy": "c_rag",
+      "providers": [],
+      "description": "C: recuperación y adaptación de plantilla",
+      "metrics": {
+        "score": 0.6261,
+        "geometry": 0.3502,
+        "attributes": 0.9875,
+        "ece": 0.1261,
+        "f1_delta": 0.4398,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": null,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 0.1793
+      },
+      "ci95": {
+        "score": [
+          0.6055,
+          0.6432
+        ],
+        "geometry": [
+          0.3208,
+          0.3779
+        ],
+        "attributes": [
+          0.9812,
+          0.9927
+        ],
+        "f1_delta": [
+          0.3822,
+          0.4879
+        ]
+      },
+      "by_dataset": {
+        "synthetic-v1": {
+          "score": 0.6261,
+          "geometry": 0.3502,
+          "attributes": 0.9875,
+          "ece": 0.1261,
+          "f1_delta": 0.4398,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1793,
+          "equipment": 120,
+          "revisions": 240,
+          "models_built": 0.3833,
+          "geometry_fields_unpenalized": 0.5803,
+          "scale": 0.9985,
+          "emitted_fields": 4836,
+          "unverifiable_fields": 0,
+          "spurious_fields": 0,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Boquilla N1: debe quedar dentro de la virola",
+            "Boquilla N2: debe quedar dentro de la virola",
+            "Boquilla N3: debe quedar dentro de la virola",
+            "Boquilla N5: debe quedar dentro de la virola",
+            "El fondo inferior debe quedar por encima del suelo"
+          ]
+        }
+      },
+      "by_style": {
+        "?": {
+          "score": 0.6261,
+          "geometry": 0.3502,
+          "attributes": 0.9875,
+          "ece": 0.1261,
+          "f1_delta": 0.4398,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1793
+        }
+      },
+      "by_degradation": {
+        "rotulado": {
+          "score": 0.3874,
+          "geometry": 0.0,
+          "attributes": 1.0,
+          "ece": 0.25,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0744
+        },
+        "plano": {
+          "score": 0.9158,
+          "geometry": 0.9219,
+          "attributes": 1.0,
+          "ece": 0.1473,
+          "f1_delta": 0.9003,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1539
+        },
+        "escaneado": {
+          "score": 0.4792,
+          "geometry": 0.1286,
+          "attributes": 0.9625,
+          "ece": 0.082,
+          "f1_delta": 0.0678,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.3096
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.3833,
+        "geometry_fields_unpenalized": 0.5803,
+        "scale": 0.9985,
+        "emitted_fields": 4836,
+        "unverifiable_fields": 0,
+        "spurious_fields": 0,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "Boquilla N1: debe quedar dentro de la virola",
+          "Boquilla N2: debe quedar dentro de la virola",
+          "Boquilla N3: debe quedar dentro de la virola",
+          "Boquilla N5: debe quedar dentro de la virola",
+          "El fondo inferior debe quedar por encima del suelo"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "d_hibrido",
+      "strategy": "d_hibrido",
+      "providers": [],
+      "description": "D: cascada B, C, memoria y geometría",
+      "metrics": {
+        "score": 0.7145,
+        "geometry": 0.4566,
+        "attributes": 0.9875,
+        "ece": 0.115,
+        "f1_delta": 0.6876,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": null,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 1.5288
+      },
+      "ci95": {
+        "score": [
+          0.7035,
+          0.7253
+        ],
+        "geometry": [
+          0.4329,
+          0.4812
+        ],
+        "attributes": [
+          0.9812,
+          0.9927
+        ],
+        "f1_delta": [
+          0.6515,
+          0.7232
+        ]
+      },
+      "by_dataset": {
+        "synthetic-v1": {
+          "score": 0.7145,
+          "geometry": 0.4566,
+          "attributes": 0.9875,
+          "ece": 0.115,
+          "f1_delta": 0.6876,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.5288,
+          "equipment": 120,
+          "revisions": 240,
+          "models_built": 0.725,
+          "geometry_fields_unpenalized": 0.8617,
+          "scale": 0.9873,
+          "emitted_fields": 7180,
+          "unverifiable_fields": 512,
+          "spurious_fields": 130,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Boquilla N1: debe quedar dentro de la virola",
+            "Boquilla N2: debe quedar dentro de la virola",
+            "Boquilla N3: debe quedar dentro de la virola",
+            "Boquilla N4: debe quedar dentro de la virola",
+            "Boquilla N5: debe quedar dentro de la virola"
+          ]
+        }
+      },
+      "by_style": {
+        "?": {
+          "score": 0.7145,
+          "geometry": 0.4566,
+          "attributes": 0.9875,
+          "ece": 0.115,
+          "f1_delta": 0.6876,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.5288
+        }
+      },
+      "by_degradation": {
+        "rotulado": {
+          "score": 0.9424,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.23,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1688
+        },
+        "plano": {
+          "score": 0.6606,
+          "geometry": 0.2785,
+          "attributes": 1.0,
+          "ece": 0.1223,
+          "f1_delta": 0.7193,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1973
+        },
+        "escaneado": {
+          "score": 0.4733,
+          "geometry": 0.0912,
+          "attributes": 0.9625,
+          "ece": 0.0559,
+          "f1_delta": 0.0884,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 4.2201
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.725,
+        "geometry_fields_unpenalized": 0.8617,
+        "scale": 0.9873,
+        "emitted_fields": 7180,
+        "unverifiable_fields": 512,
+        "spurious_fields": 130,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "Boquilla N1: debe quedar dentro de la virola",
+          "Boquilla N2: debe quedar dentro de la virola",
+          "Boquilla N3: debe quedar dentro de la virola",
+          "Boquilla N4: debe quedar dentro de la virola",
+          "Boquilla N5: debe quedar dentro de la virola"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "b_reglas-tablas",
+      "strategy": "b_reglas-tablas",
+      "providers": [],
+      "description": "B sin tablas ni cotas",
+      "metrics": {
+        "score": 0.6041,
+        "geometry": 0.3333,
+        "attributes": 1.0,
+        "ece": 0.25,
+        "f1_delta": 0.5,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": null,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 0.104
+      },
+      "ci95": {
+        "score": [
+          0.6041,
+          0.6041
+        ],
+        "geometry": [
+          0.3333,
+          0.3333
+        ],
+        "attributes": [
+          1.0,
+          1.0
+        ],
+        "f1_delta": [
+          0.5,
+          0.5
+        ]
+      },
+      "by_dataset": {
+        "synthetic-v1": {
+          "score": 0.6041,
+          "geometry": 0.3333,
+          "attributes": 1.0,
+          "ece": 0.25,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.104,
+          "equipment": 120,
+          "revisions": 240,
+          "models_built": 0.3333,
+          "geometry_fields_unpenalized": 0.3333,
+          "scale": 0.9991,
+          "emitted_fields": 3088,
+          "unverifiable_fields": 0,
+          "spurious_fields": 0,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness"
+          ]
+        }
+      },
+      "by_style": {
+        "?": {
+          "score": 0.6041,
+          "geometry": 0.3333,
+          "attributes": 1.0,
+          "ece": 0.25,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.104
+        }
+      },
+      "by_degradation": {
+        "rotulado": {
+          "score": 0.9373,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.25,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.2053
+        },
+        "plano": {
+          "score": 0.3874,
+          "geometry": 0.0,
+          "attributes": 1.0,
+          "ece": 0.25,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0942
+        },
+        "escaneado": {
+          "score": 0.3875,
+          "geometry": 0.0,
+          "attributes": 1.0,
+          "ece": 0.25,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0124
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.3333,
+        "geometry_fields_unpenalized": 0.3333,
+        "scale": 0.9991,
+        "emitted_fields": 3088,
+        "unverifiable_fields": 0,
+        "spurious_fields": 0,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "b_reglas-hdm",
+      "strategy": "b_reglas-hdm",
+      "providers": [],
+      "description": "B sin hoja de datos",
+      "metrics": {
+        "score": 0.6554,
+        "geometry": 0.6667,
+        "attributes": 0.3333,
+        "ece": 0.1706,
+        "f1_delta": 0.7649,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": null,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 0.0822
+      },
+      "ci95": {
+        "score": [
+          0.6523,
+          0.6578
+        ],
+        "geometry": [
+          0.6667,
+          0.6667
+        ],
+        "attributes": [
+          0.3333,
+          0.3333
+        ],
+        "f1_delta": [
+          0.7496,
+          0.7773
+        ]
+      },
+      "by_dataset": {
+        "synthetic-v1": {
+          "score": 0.6554,
+          "geometry": 0.6667,
+          "attributes": 0.3333,
+          "ece": 0.1706,
+          "f1_delta": 0.7649,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0822,
+          "equipment": 120,
+          "revisions": 240,
+          "models_built": 0.6667,
+          "geometry_fields_unpenalized": 0.6667,
+          "scale": 0.9993,
+          "emitted_fields": 4576,
+          "unverifiable_fields": 0,
+          "spurious_fields": 0,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness"
+          ]
+        }
+      },
+      "by_style": {
+        "?": {
+          "score": 0.6554,
+          "geometry": 0.6667,
+          "attributes": 0.3333,
+          "ece": 0.1706,
+          "f1_delta": 0.7649,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0822
+        }
+      },
+      "by_degradation": {
+        "rotulado": {
+          "score": 0.7346,
+          "geometry": 1.0,
+          "attributes": 0.0,
+          "ece": 0.25,
+          "f1_delta": 0.9236,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1079
+        },
+        "plano": {
+          "score": 0.9745,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.1016,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1325
+        },
+        "escaneado": {
+          "score": 0.2,
+          "geometry": 0.0,
+          "attributes": 0.0,
+          "ece": null,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0061
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.6667,
+        "geometry_fields_unpenalized": 0.6667,
+        "scale": 0.9993,
+        "emitted_fields": 4576,
+        "unverifiable_fields": 0,
+        "spurious_fields": 0,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "d_hibrido-geometria",
+      "strategy": "d_hibrido-geometria",
+      "providers": [],
+      "description": "D sin geometria",
+      "metrics": {
+        "score": 0.8123,
+        "geometry": 0.7188,
+        "attributes": 0.9875,
+        "ece": 0.1263,
+        "f1_delta": 0.7262,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": null,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 0.2126
+      },
+      "ci95": {
+        "score": [
+          0.8012,
+          0.8229
+        ],
+        "geometry": [
+          0.6965,
+          0.7414
+        ],
+        "attributes": [
+          0.9812,
+          0.9927
+        ],
+        "f1_delta": [
+          0.6795,
+          0.769
+        ]
+      },
+      "by_dataset": {
+        "synthetic-v1": {
+          "score": 0.8123,
+          "geometry": 0.7188,
+          "attributes": 0.9875,
+          "ece": 0.1263,
+          "f1_delta": 0.7262,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.2126,
+          "equipment": 120,
+          "revisions": 240,
+          "models_built": 0.7542,
+          "geometry_fields_unpenalized": 0.9208,
+          "scale": 0.9982,
+          "emitted_fields": 7025,
+          "unverifiable_fields": 0,
+          "spurious_fields": 27,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Boquilla N1: debe quedar dentro de la virola",
+            "Boquilla N2: debe quedar dentro de la virola",
+            "Boquilla N3: debe quedar dentro de la virola",
+            "Boquilla N5: debe quedar dentro de la virola",
+            "El fondo inferior debe quedar por encima del suelo"
+          ]
+        }
+      },
+      "by_style": {
+        "?": {
+          "score": 0.8123,
+          "geometry": 0.7188,
+          "attributes": 0.9875,
+          "ece": 0.1263,
+          "f1_delta": 0.7262,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.2126
+        }
+      },
+      "by_degradation": {
+        "rotulado": {
+          "score": 0.9424,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.23,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0915
+        },
+        "plano": {
+          "score": 0.9498,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.0898,
+          "f1_delta": 0.8618,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1079
+        },
+        "escaneado": {
+          "score": 0.4991,
+          "geometry": 0.1563,
+          "attributes": 0.9625,
+          "ece": 0.0727,
+          "f1_delta": 0.1078,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4385
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.7542,
+        "geometry_fields_unpenalized": 0.9208,
+        "scale": 0.9982,
+        "emitted_fields": 7025,
+        "unverifiable_fields": 0,
+        "spurious_fields": 27,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "Boquilla N1: debe quedar dentro de la virola",
+          "Boquilla N2: debe quedar dentro de la virola",
+          "Boquilla N3: debe quedar dentro de la virola",
+          "Boquilla N5: debe quedar dentro de la virola",
+          "El fondo inferior debe quedar por encima del suelo"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "d_hibrido-memoria",
+      "strategy": "d_hibrido-memoria",
+      "providers": [],
+      "description": "D sin memoria",
+      "metrics": {
+        "score": 0.7208,
+        "geometry": 0.4572,
+        "attributes": 0.9875,
+        "ece": 0.1224,
+        "f1_delta": 0.7246,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": null,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 0.9982
+      },
+      "ci95": {
+        "score": [
+          0.7108,
+          0.7305
+        ],
+        "geometry": [
+          0.4333,
+          0.4821
+        ],
+        "attributes": [
+          0.9812,
+          0.9927
+        ],
+        "f1_delta": [
+          0.6949,
+          0.7484
+        ]
+      },
+      "by_dataset": {
+        "synthetic-v1": {
+          "score": 0.7208,
+          "geometry": 0.4572,
+          "attributes": 0.9875,
+          "ece": 0.1224,
+          "f1_delta": 0.7246,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.9982,
+          "equipment": 120,
+          "revisions": 240,
+          "models_built": 0.7292,
+          "geometry_fields_unpenalized": 0.8592,
+          "scale": 0.9917,
+          "emitted_fields": 7136,
+          "unverifiable_fields": 512,
+          "spurious_fields": 106,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Boquilla N1: debe quedar dentro de la virola",
+            "Boquilla N2: debe quedar dentro de la virola",
+            "Boquilla N3: debe quedar dentro de la virola",
+            "Boquilla N4: debe quedar dentro de la virola",
+            "Boquilla N5: debe quedar dentro de la virola"
+          ]
+        }
+      },
+      "by_style": {
+        "?": {
+          "score": 0.7208,
+          "geometry": 0.4572,
+          "attributes": 0.9875,
+          "ece": 0.1224,
+          "f1_delta": 0.7246,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.9982
+        }
+      },
+      "by_degradation": {
+        "rotulado": {
+          "score": 0.9374,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.25,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.095
+        },
+        "plano": {
+          "score": 0.6804,
+          "geometry": 0.2829,
+          "attributes": 1.0,
+          "ece": 0.1223,
+          "f1_delta": 0.8105,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1332
+        },
+        "escaneado": {
+          "score": 0.473,
+          "geometry": 0.0888,
+          "attributes": 0.9625,
+          "ece": 0.0571,
+          "f1_delta": 0.0865,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.7664
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.7292,
+        "geometry_fields_unpenalized": 0.8592,
+        "scale": 0.9917,
+        "emitted_fields": 7136,
+        "unverifiable_fields": 512,
+        "spurious_fields": 106,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "Boquilla N1: debe quedar dentro de la virola",
+          "Boquilla N2: debe quedar dentro de la virola",
+          "Boquilla N3: debe quedar dentro de la virola",
+          "Boquilla N4: debe quedar dentro de la virola",
+          "Boquilla N5: debe quedar dentro de la virola"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "d_hibrido-rag",
+      "strategy": "d_hibrido-rag",
+      "providers": [],
+      "description": "D sin rag",
+      "metrics": {
+        "score": 0.71,
+        "geometry": 0.4402,
+        "attributes": 0.9885,
+        "ece": 0.1155,
+        "f1_delta": 0.6899,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": null,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 0.7187
+      },
+      "ci95": {
+        "score": [
+          0.6992,
+          0.7198
+        ],
+        "geometry": [
+          0.4211,
+          0.4612
+        ],
+        "attributes": [
+          0.9823,
+          0.9938
+        ],
+        "f1_delta": [
+          0.6542,
+          0.7237
+        ]
+      },
+      "by_dataset": {
+        "synthetic-v1": {
+          "score": 0.71,
+          "geometry": 0.4402,
+          "attributes": 0.9885,
+          "ece": 0.1155,
+          "f1_delta": 0.6899,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.7187,
+          "equipment": 120,
+          "revisions": 240,
+          "models_built": 0.6958,
+          "geometry_fields_unpenalized": 0.789,
+          "scale": 0.994,
+          "emitted_fields": 6760,
+          "unverifiable_fields": 556,
+          "spurious_fields": 127,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Boquilla N1: debe quedar dentro de la virola",
+            "Boquilla N2: debe quedar dentro de la virola",
+            "Boquilla N3: debe quedar dentro de la virola",
+            "Boquilla N4: debe quedar dentro de la virola",
+            "Boquilla N5: debe quedar dentro de la virola"
+          ]
+        }
+      },
+      "by_style": {
+        "?": {
+          "score": 0.71,
+          "geometry": 0.4402,
+          "attributes": 0.9885,
+          "ece": 0.1155,
+          "f1_delta": 0.6899,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.7187
+        }
+      },
+      "by_degradation": {
+        "rotulado": {
+          "score": 0.9424,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.23,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0657
+        },
+        "plano": {
+          "score": 0.6607,
+          "geometry": 0.2785,
+          "attributes": 1.0,
+          "ece": 0.1223,
+          "f1_delta": 0.7193,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0848
+        },
+        "escaneado": {
+          "score": 0.4402,
+          "geometry": 0.0421,
+          "attributes": 0.9656,
+          "ece": 0.0591,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": null,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.0056
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.6958,
+        "geometry_fields_unpenalized": 0.789,
+        "scale": 0.994,
+        "emitted_fields": 6760,
+        "unverifiable_fields": 556,
+        "spurious_fields": 127,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "Boquilla N1: debe quedar dentro de la virola",
+          "Boquilla N2: debe quedar dentro de la virola",
+          "Boquilla N3: debe quedar dentro de la virola",
+          "Boquilla N4: debe quedar dentro de la virola",
+          "Boquilla N5: debe quedar dentro de la virola"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    }
+  ],
+  "unmeasured": [
+    {
+      "id": "a_vision",
+      "reason": "unos 4 min de GPU por página: se mide aparte en un subconjunto"
+    },
+    {
+      "id": "a_vision@gemini",
+      "reason": "sin GEMINI_API_KEY en .env: sin medir"
+    },
+    {
+      "id": "a_vision@mistral",
+      "reason": "sin MISTRAL_API_KEY en .env: sin medir"
+    },
+    {
+      "id": "a_detector",
+      "reason": "estrategia aún no implementada"
+    },
+    {
+      "id": "d_hibrido-detector",
+      "reason": "estrategia aún no implementada"
+    },
+    {
+      "id": "d_hibrido-vision",
+      "reason": "el estudio no da proveedor de visión a D: sería idéntica a d_hibrido"
+    }
+  ],
+  "ablations": [
+    {
+      "id": "b_reglas-tablas",
+      "of": "b_reglas",
+      "delta_score": -0.1941,
+      "ci95": [
+        -0.1942,
+        -0.194
+      ]
+    },
+    {
+      "id": "b_reglas-hdm",
+      "of": "b_reglas",
+      "delta_score": -0.1428,
+      "ci95": [
+        -0.1461,
+        -0.1403
+      ]
+    },
+    {
+      "id": "d_hibrido-geometria",
+      "of": "d_hibrido",
+      "delta_score": 0.0978,
+      "ci95": [
+        0.0872,
+        0.1076
+      ]
+    },
+    {
+      "id": "d_hibrido-memoria",
+      "of": "d_hibrido",
+      "delta_score": 0.0063,
+      "ci95": [
+        -0.0003,
+        0.0133
+      ]
+    },
+    {
+      "id": "d_hibrido-rag",
+      "of": "d_hibrido",
+      "delta_score": -0.0045,
+      "ci95": [
+        -0.0096,
+        -0.0009
+      ]
+    }
+  ],
+  "pairwise": [
+    {
+      "a": "d_hibrido-geometria",
+      "b": "b_reglas+ocr",
+      "mcnemar_p": 4.411437393366137e-132,
+      "only_a": 509,
+      "only_b": 13,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-geometria",
+      "b": "b_reglas",
+      "mcnemar_p": 0.0,
+      "only_a": 1640,
+      "only_b": 12,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-geometria",
+      "b": "d_hibrido-memoria",
+      "mcnemar_p": 9.780210327809837e-104,
+      "only_a": 398,
+      "only_b": 10,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-geometria",
+      "b": "d_hibrido",
+      "mcnemar_p": 1.9655670186010858e-95,
+      "only_a": 386,
+      "only_b": 14,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-geometria",
+      "b": "d_hibrido-rag",
+      "mcnemar_p": 2.5613134905052703e-226,
+      "only_a": 826,
+      "only_b": 12,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-geometria",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 0.0,
+      "only_a": 2268,
+      "only_b": 0,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-geometria",
+      "b": "c_rag",
+      "mcnemar_p": 0.0,
+      "only_a": 2169,
+      "only_b": 0,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-geometria",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 3768,
+      "only_b": 12,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-geometria",
+      "b": "a_geometria",
+      "mcnemar_p": 0.0,
+      "only_a": 5205,
+      "only_b": 21,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas+ocr",
+      "b": "b_reglas",
+      "mcnemar_p": 0.0,
+      "only_a": 1143,
+      "only_b": 11,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas+ocr",
+      "b": "d_hibrido-memoria",
+      "mcnemar_p": 0.0001349707248272893,
+      "only_a": 340,
+      "only_b": 448,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas+ocr",
+      "b": "d_hibrido",
+      "mcnemar_p": 1.3526341973890441e-05,
+      "only_a": 339,
+      "only_b": 463,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas+ocr",
+      "b": "d_hibrido-rag",
+      "mcnemar_p": 2.1853953460112703e-76,
+      "only_a": 337,
+      "only_b": 19,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas+ocr",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 0.0,
+      "only_a": 1772,
+      "only_b": 0,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas+ocr",
+      "b": "c_rag",
+      "mcnemar_p": 3.558741441599526e-249,
+      "only_a": 2164,
+      "only_b": 491,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas+ocr",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 3271,
+      "only_b": 11,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas+ocr",
+      "b": "a_geometria",
+      "mcnemar_p": 0.0,
+      "only_a": 4717,
+      "only_b": 29,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas",
+      "b": "d_hibrido-memoria",
+      "mcnemar_p": 3.728744453207111e-213,
+      "only_a": 255,
+      "only_b": 1495,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas",
+      "b": "d_hibrido",
+      "mcnemar_p": 6.962632354914644e-217,
+      "only_a": 255,
+      "only_b": 1511,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas",
+      "b": "d_hibrido-rag",
+      "mcnemar_p": 6.72647576824868e-119,
+      "only_a": 254,
+      "only_b": 1068,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 4.383618698016806e-193,
+      "only_a": 640,
+      "only_b": 0,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas",
+      "b": "c_rag",
+      "mcnemar_p": 1.1415185346040264e-18,
+      "only_a": 2151,
+      "only_b": 1610,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 2128,
+      "only_b": 0,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas",
+      "b": "a_geometria",
+      "mcnemar_p": 0.0,
+      "only_a": 3756,
+      "only_b": 200,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "d_hibrido",
+      "mcnemar_p": 3.0517578125e-05,
+      "only_a": 0,
+      "only_b": 16,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "d_hibrido-rag",
+      "mcnemar_p": 1.4630247356821455e-120,
+      "only_a": 431,
+      "only_b": 5,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 0.0,
+      "only_a": 2123,
+      "only_b": 243,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "c_rag",
+      "mcnemar_p": 1.7611139574984757e-302,
+      "only_a": 2157,
+      "only_b": 376,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 3380,
+      "only_b": 12,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "a_geometria",
+      "mcnemar_p": 0.0,
+      "only_a": 4809,
+      "only_b": 13,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido",
+      "b": "d_hibrido-rag",
+      "mcnemar_p": 1.097156732771537e-129,
+      "only_a": 444,
+      "only_b": 2,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 0.0,
+      "only_a": 2139,
+      "only_b": 243,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido",
+      "b": "c_rag",
+      "mcnemar_p": 3.476561369314712e-306,
+      "only_a": 2173,
+      "only_b": 376,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 3396,
+      "only_b": 12,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido",
+      "b": "a_geometria",
+      "mcnemar_p": 0.0,
+      "only_a": 4825,
+      "only_b": 13,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-rag",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 4.675377713104805e-268,
+      "only_a": 1697,
+      "only_b": 243,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-rag",
+      "b": "c_rag",
+      "mcnemar_p": 2.1704186060006914e-141,
+      "only_a": 2162,
+      "only_b": 807,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-rag",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 2953,
+      "only_b": 11,
+      "fields": 7344
+    },
+    {
+      "a": "d_hibrido-rag",
+      "b": "a_geometria",
+      "mcnemar_p": 0.0,
+      "only_a": 4382,
+      "only_b": 12,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas-hdm",
+      "b": "c_rag",
+      "mcnemar_p": 0.13852242107219306,
+      "only_a": 2139,
+      "only_b": 2238,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas-hdm",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 3.139817092471962e-185,
+      "only_a": 2128,
+      "only_b": 640,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas-hdm",
+      "b": "a_geometria",
+      "mcnemar_p": 0.0,
+      "only_a": 3756,
+      "only_b": 840,
+      "fields": 7344
+    },
+    {
+      "a": "c_rag",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 2.077606179142956e-96,
+      "only_a": 3727,
+      "only_b": 2140,
+      "fields": 7344
+    },
+    {
+      "a": "c_rag",
+      "b": "a_geometria",
+      "mcnemar_p": 0.0,
+      "only_a": 3045,
+      "only_b": 30,
+      "fields": 7344
+    },
+    {
+      "a": "b_reglas-tablas",
+      "b": "a_geometria",
+      "mcnemar_p": 4.9285853167239096e-166,
+      "only_a": 2128,
+      "only_b": 700,
+      "fields": 7344
+    }
+  ],
+  "pareto": [
+    "d_hibrido-geometria",
+    "b_reglas+ocr",
+    "b_reglas"
+  ],
+  "recommendation": {
+    "vectorial": null,
+    "escaneado": "c_rag",
+    "rationale": "Elegida por mayor Puntuación GA2MODEL entre las variantes que cumplen alucinación < 1 % y cita = 100 %, sobre synthetic-v1 (sintéticos). escaneado: c_rag (puntuación 0,479, geometría 12,9 %, atributos 96,2 %)."
+  },
+  "resumed_conditions": 843,
+  "measurement_note": "Interrumpido el 27/10 y reanudado el 28/10 desde condiciones completas; tiempos de pared separados, cachés en memoria reiniciadas. Las revisiones de código posteriores solo añaden exportación de tablas y metadatos de impacto, sin cambios de estrategias/bench ni sus fórmulas.",
+  "input_manifest": "generated/synthetic/manifest.json",
+  "scope_note": "40 equipos v1, 3 estilos, 2 revisiones; no son S-dev ni S-reservado v2. Biblioteca C de rev1/plano, excluyendo el mismo TAG durante recuperación. Sin proveedor de visión en D."
+}

@@ -1,0 +1,87 @@
+import json
+import sys
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+from bench import estudio
+from trazia.rag.library import build_entry
+from synthetic.cases import flatten, spec_from_dict
+
+mode = sys.argv[1]
+data = ROOT / "generated" / "synthetic"
+if mode == "biblioteca":
+    manifest = json.loads((data / "manifest.json").read_text(encoding="utf-8"))
+    entries = []
+    for case in manifest["cases"]:
+        tag = case["tag"]
+        truth = json.loads((data / "truth" / f"{tag}.json").read_text(encoding="utf-8"))
+        entry = build_entry(tag, data / "plano" / tag, truth["rev1"], lambda t: flatten(spec_from_dict(t)))
+        if entry:
+            entries.append(entry)
+        print(f"Biblioteca: {len(entries)} plantillas / {len(manifest['cases'])} equipos", flush=True)
+    target = ROOT / "generated" / "rag" / "biblioteca.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps({"source": str(data), "source_style": "plano", "synthetic": True, "entries": entries}, ensure_ascii=False, indent=2), encoding="utf-8")
+else:
+    # Adaptación en memoria del arnés v2 al conjunto v1, sin modificar sus documentos ni el código del producto.
+    estudio.SCORED = ("synthetic-v1",)
+    estudio.DATASET_NAMES["synthetic"] = "synthetic-v1"
+    estudio.SCANS = ("escaneado",)
+    variants = ["b_reglas"] if mode == "b" else None
+    import dataclasses
+    import time
+    from collections import Counter
+    folder = ROOT / "generated" / "bench" / ("estudio_b" if mode == "b" else "estudio_variantes")
+    folder.mkdir(parents=True, exist_ok=True)
+    raw_file = folder / "casos.jsonl"
+    import shutil
+    cached_cases = {}
+    if raw_file.exists():
+        backup = folder / "casos_27oct.jsonl"
+        if not backup.exists():
+            shutil.copyfile(raw_file, backup)
+        for number, line in enumerate(raw_file.read_text(encoding="utf-8").splitlines(), 1):
+            if not line.strip():
+                continue
+            item = json.loads(line)
+            revs = []
+            for rev in item["revs"]:
+                rev = dict(rev)
+                rev["rows"] = [estudio.FieldRow(**row) for row in rev["rows"]]
+                revs.append(estudio.RevResult(**rev))
+            payload = {key: item[key] for key in ("dataset", "degradation", "tag", "vendor", "tp", "fp", "fn", "traps")}
+            payload["revs"] = revs
+            key = (item["variant"], item["dataset"], item["degradation"], item["tag"])
+            if key in cached_cases:
+                raise ValueError(f"Condición duplicada en checkpoint: {key}")
+            cached_cases[key] = estudio.CaseResult(**payload)
+        print(f"Checkpoint: {len(cached_cases)} condiciones ya medidas", flush=True)
+    counts = Counter(key[0] for key in cached_cases)
+    original_run_case = estudio.run_case
+    def measured_run_case(variant, *args):
+        key = (variant.id, args[1], args[2], args[3])
+        if key in cached_cases:
+            return cached_cases[key]
+        started = time.perf_counter()
+        result = original_run_case(variant, *args)
+        with raw_file.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps({"variant": variant.id, "wall_seconds": time.perf_counter()-started, **dataclasses.asdict(result)}, ensure_ascii=False) + "\n")
+        counts[variant.id] += 1
+        if counts[variant.id] % 10 == 0:
+            print(f"Progreso {variant.id}: {counts[variant.id]}/120 condiciones", flush=True)
+        return result
+    estudio.run_case = measured_run_case
+    report = estudio.run_study(ROOT / "generated", ["synthetic"], variants, resamples=1000, seed=2026, log=lambda s: print(s, flush=True))
+    report["resumed_conditions"] = len(cached_cases)
+    report["measurement_note"] = "Interrumpido el 27/10 y reanudado el 28/10 desde condiciones completas; tiempos de pared separados, cachés en memoria reiniciadas. Las revisiones de código posteriores solo añaden exportación de tablas y metadatos de impacto, sin cambios de estrategias/bench ni sus fórmulas."
+    report["recommendation"]["rationale"] = report["recommendation"]["rationale"].replace("sobre S-dev y S-reservado (sintéticos)", "sobre synthetic-v1 (sintéticos)")
+    report["generator"] = "v1"
+    report["input_manifest"] = "generated/synthetic/manifest.json"
+    report["scope_note"] = "40 equipos v1, 3 estilos, 2 revisiones; no son S-dev ni S-reservado v2. Biblioteca C de rev1/plano, excluyendo el mismo TAG durante recuperación. Sin proveedor de visión en D."
+    folder = ROOT / "generated" / "bench" / ("estudio_b" if mode == "b" else "estudio_variantes")
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / "estudio.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (folder / "estudio.md").write_text(estudio.to_markdown(report), encoding="utf-8")
+    for variant in report["variants"]:
+        print(variant["id"], json.dumps(variant["metrics"]), flush=True)
+    print("Sin medir:", json.dumps(report["unmeasured"], ensure_ascii=False), flush=True)

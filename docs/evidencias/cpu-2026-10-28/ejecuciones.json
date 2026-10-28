@@ -1,0 +1,134 @@
+[
+  {
+    "command": [
+      "uv",
+      "run",
+      "python",
+      "-m",
+      "synthetic",
+      "--casos",
+      "40",
+      "--semilla",
+      "2026"
+    ],
+    "started_at": "2026-10-27T20:10:06.732104+00:00",
+    "seconds": 18.85963240000001,
+    "returncode": 0
+  },
+  {
+    "stage": "bench",
+    "command": [
+      "uv",
+      "run",
+      "python",
+      "-m",
+      "bench",
+      "--detalle"
+    ],
+    "started_at": "2026-10-27T20:12:17.022917+00:00",
+    "status": "finished",
+    "seconds": 148.58619959999942,
+    "returncode": 0,
+    "finished_at": "2026-10-27T20:14:45.609252+00:00"
+  },
+  {
+    "stage": "estudio_b",
+    "command": [
+      "uv",
+      "run",
+      "python",
+      "generated/bench/estudio_v1.py",
+      "b"
+    ],
+    "started_at": "2026-10-27T20:14:45.610251+00:00",
+    "status": "finished",
+    "seconds": 543.1679294000005,
+    "returncode": 0,
+    "finished_at": "2026-10-27T20:23:48.778529+00:00"
+  },
+  {
+    "stage": "biblioteca",
+    "command": [
+      "uv",
+      "run",
+      "python",
+      "generated/bench/estudio_v1.py",
+      "biblioteca"
+    ],
+    "started_at": "2026-10-27T20:23:48.779528+00:00",
+    "status": "finished",
+    "seconds": 5.506358000000546,
+    "returncode": 0,
+    "finished_at": "2026-10-27T20:23:54.286443+00:00"
+  },
+  {
+    "stage": "estudio_variantes",
+    "command": [
+      "uv",
+      "run",
+      "python",
+      "generated/bench/estudio_v1.py",
+      "variantes"
+    ],
+    "started_at": "2026-10-27T20:23:54.286946+00:00",
+    "status": "interrupted",
+    "interruption_note": "Sesión interrumpida el 27/10; sin duración de pared final fiable. Reanudada el 28/10 a partir de checkpoints completos."
+  },
+  {
+    "stage": "estudio_variantes_reanudacion",
+    "command": [
+      "uv",
+      "run",
+      "python",
+      "generated/bench/estudio_v1.py",
+      "variantes"
+    ],
+    "started_at": "2026-10-28T11:33:14.545233+00:00",
+    "status": "finished",
+    "seconds": 1280.5179322999975,
+    "returncode": 0,
+    "finished_at": "2026-10-28T11:54:35.063912+00:00"
+  },
+  {
+    "stage": "pytest_1",
+    "command": [
+      "uv",
+      "run",
+      "pytest",
+      "-q"
+    ],
+    "started_at": "2026-10-28T11:54:35.063912+00:00",
+    "status": "finished",
+    "seconds": 195.33005379999668,
+    "returncode": 0,
+    "finished_at": "2026-10-28T11:57:50.394964+00:00"
+  },
+  {
+    "stage": "pytest_2",
+    "command": [
+      "uv",
+      "run",
+      "pytest",
+      "-q"
+    ],
+    "started_at": "2026-10-28T11:57:50.394964+00:00",
+    "status": "finished",
+    "seconds": 157.3960115000009,
+    "returncode": 0,
+    "finished_at": "2026-10-28T12:00:27.791953+00:00"
+  },
+  {
+    "stage": "pytest_3",
+    "command": [
+      "uv",
+      "run",
+      "pytest",
+      "-q"
+    ],
+    "started_at": "2026-10-28T12:00:27.791953+00:00",
+    "status": "finished",
+    "seconds": 155.00019220000104,
+    "returncode": 0,
+    "finished_at": "2026-10-28T12:03:02.793164+00:00"
+  }
+]
