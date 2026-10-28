@@ -16,10 +16,15 @@ jobs:
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run pytest -q
+      - name: Banco sintético con informes
+        run: |
+          uv run python -m synthetic --casos 2 --semilla 2026 --salida generated/ci/synthetic
+          uv run python -m bench --entrada generated/ci/synthetic --salida generated/ci/bench --detalle
       - run: uv run trazia export examples/vessel_rev_a.json --draft -o generated/rev_a.ifc
       - run: uv run trazia export examples/vessel_rev_b.json --draft -o generated/rev_b.ifc
       - run: uv run trazia diff examples/vessel_rev_a.json examples/vessel_rev_b.json -o generated/changes.json
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: demo-${{ matrix.os }}
           path: generated/

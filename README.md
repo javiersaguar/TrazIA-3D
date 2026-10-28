@@ -44,10 +44,11 @@ Después usar `python -m trazia` en lugar de `uv run trazia`.
 | Revisiones | Diferencias de valores/unidades, evidencias y documentos; GUID estables |
 | Calidad | Pruebas del recorrido, reglas EXPRESS IFC y CI para Windows/Linux |
 
-**Aún no interpreta planos arbitrarios con IA.** El extractor incluido reconoce parámetros
-rotulados explícitamente en un formato acotado. No reconcilia vistas, hace OCR, deduce cotas
-ni se ha evaluado con el dataset oficial. La interfaz `Extractor` permite incorporar un
-adaptador de visión manteniendo la geometría y las validaciones actuales.
+**Evaluado con sintéticos, todavía no con el dataset oficial.** B lee etiquetas, tablas y cotas;
+RapidOCR aporta texto en escaneados. A reconstruye desde vistas, C adapta plantillas y D combina
+canales. Hay adaptadores de visión locales y externos con caché. La precisión depende del tipo
+de plano y de la variante; implementación no equivale a validación sobre planos arbitrarios.
+El estado medido y lo pendiente figuran en [ROADMAP](docs/ROADMAP.md) y [ESTUDIO](docs/ESTUDIO.md).
 
 ## Demo reproducible
 
@@ -60,6 +61,7 @@ uv run trazia validate examples/vessel_rev_a.json
 uv run trazia export examples/vessel_rev_a.json --draft -o generated/rev_a.ifc
 uv run trazia export examples/vessel_rev_b.json --draft -o generated/rev_b.ifc
 uv run trazia diff examples/vessel_rev_a.json examples/vessel_rev_b.json -o generated/changes.json
+uv run trazia diff examples/vessel_rev_a.json examples/vessel_rev_b.json -o generated/changes.md
 uv run trazia schema -o generated/revision.schema.json
 ```
 
@@ -69,6 +71,16 @@ el peso de operación aumenta 800 kg; se añade N4. Resultado: **8 cambios de ca
 
 Para regenerar los documentos y sus JSON: `uv run python scripts/make_demo.py`.
 No usar esta demo para afirmar precisión sobre documentación de ingeniería real.
+
+## Campos para revisión en Excel o CSV
+
+```powershell
+uv run trazia fields examples/vessel_rev_a.json -o generated/campos.xlsx
+uv run trazia fields examples/vessel_rev_a.json -o generated/campos.csv
+```
+
+Conserva valor, unidad, estado y evidencia por campo; no modifica ni aprueba el JSON.
+[Formatos y columnas](docs/EXPORTACION_CAMPOS.md).
 
 ## Ingesta y aprobación por CLI
 

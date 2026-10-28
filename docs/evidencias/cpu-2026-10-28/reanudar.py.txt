@@ -1,0 +1,42 @@
+import json
+import os
+import shutil
+import subprocess
+import time
+from pathlib import Path
+from datetime import datetime, timezone
+ROOT=Path(__file__).resolve().parents[2]
+os.chdir(ROOT)
+os.environ.update(PYTHONUTF8="1",PYTHONIOENCODING="utf-8",TRAZIA_ROOT=str(ROOT),TRAZIA_RAG_LIBRARY=str(ROOT/"generated/rag/biblioteca.json"),CUDA_VISIBLE_DEVICES="-1")
+out=ROOT/"generated/bench"
+record_path=out/"ejecuciones.json"
+records=json.loads(record_path.read_text(encoding="utf-8"))
+def run(name,cmd):
+    entry={"stage":name,"command":cmd,"started_at":datetime.now(timezone.utc).isoformat(),"status":"running"}
+    records.append(entry)
+    record_path.write_text(json.dumps(records,ensure_ascii=False,indent=2),encoding="utf-8")
+    print("INICIO",name,entry["started_at"],flush=True)
+    started=time.perf_counter()
+    with (out/f"{name}.log").open("w",encoding="utf-8") as log:
+        result=subprocess.run(cmd,stdout=log,stderr=subprocess.STDOUT,env=os.environ.copy())
+    entry.update(seconds=time.perf_counter()-started,status="finished",returncode=result.returncode,finished_at=datetime.now(timezone.utc).isoformat())
+    record_path.write_text(json.dumps(records,ensure_ascii=False,indent=2),encoding="utf-8")
+    body=(out/f"{name}.log").read_text(encoding="utf-8",errors="replace")
+    print("FIN",name,result.returncode,f"{entry['seconds']:.2f} s",flush=True)
+    print(body[-1000:],flush=True)
+    return entry,body
+study,_=run("estudio_variantes_reanudacion",["uv","run","python","generated/bench/estudio_v1.py","variantes"])
+if study["returncode"]:
+    raise SystemExit(study["returncode"])
+launches=[]
+for i in range(1,4):
+    launches.append(run(f"pytest_launcher_{i}",["uv","run","pytest","-q"]))
+if any("Failed to spawn" in body for _,body in launches):
+    for i in range(1,4):
+        run(f"pytest_{i}",["uv","run","python","-m","pytest","-q"])
+else:
+    for i,(entry,_) in enumerate(launches,1):
+        shutil.copyfile(out/f"pytest_launcher_{i}.log",out/f"pytest_{i}.log")
+        entry["stage"]=f"pytest_{i}"
+    record_path.write_text(json.dumps(records,ensure_ascii=False,indent=2),encoding="utf-8")
+print("MEDICIÓN FINALIZADA",flush=True)
