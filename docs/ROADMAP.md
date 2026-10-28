@@ -359,7 +359,7 @@ Inicio del plan: **lunes 26/10/2026**. Revisión de estado: **28/10/2026**. Las 
 - [x] **0.7** `LICENSE` MIT con los 4 nombres; `CONTRIBUTING.md`.
 - [x] **0.8** Skills de frontend instaladas en el repo.
 - [ ] **0.9** Pedir al mentor de TR (si hay canal): formato real de los GA (¿vectorial o escaneado?), unidades habituales, si las boquillas vienen en tabla, qué consideran "dimensiones principales" y con qué tolerancia comparan, y **si autorizan procesar el dataset con APIs externas** (DEC-31). *Hecho:* respuestas o pregunta enviada.
-- [ ] **0.10** Medir en la RTX 5070 Laptop (8 GB) qué modelos de visión caben con imágenes A3 en mosaico: `qwen3-vl:4b`, `qwen3-vl:8b` cuantizado y PaddleOCR-VL. Anotar VRAM y segundos por página en `docs/PLATAFORMA.md`. *Hecho:* tabla medida.
+- [x] **0.10** Medir en la RTX 5070 Laptop (8 GB) qué modelos de visión caben con imágenes A3 en mosaico: `qwen3-vl:4b`, `qwen3-vl:8b` cuantizado y PaddleOCR-VL. Anotar VRAM y segundos por página en `docs/PLATAFORMA.md`. *Hecho:* tabla medida. *Medido:* 4B al 100 % en GPU (5,8 GB, 129 s/página); 8B no cabe (22 % CPU, 339 s/página); PaddleOCR-VL sin medir. [Tabla](PLATAFORMA.md).
 
 ### Fase 1 · Cimientos (29 oct – 4 nov)
 
