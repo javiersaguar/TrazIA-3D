@@ -416,3 +416,18 @@ Lectura ni se esperan funciones nuevas suyas.
 
 Cierre tarea 1: Ruff check y format globales correctos; 241 pruebas correctas y una
 omitida en 251,74 s. Seis pruebas específicas del estudio correctas.
+
+### 2 · 4.2: caché persistida de resultados de trabajos
+
+La API comprueba hashes de documentos + estrategia + proveedores y contexto documental.
+Con OFFLINE, el acierto restaura un DRAFT sin ejecutar el pipeline; el fallo responde
+409 en español antes de encolar. Se verifica la integridad del resultado y originales,
+se conserva idempotencia y se indican cache_hit y contabilidad marginal sin inferencia.
+La migración 0004 sirve en SQLite y Postgres. No se cachean fallos ni aprobaciones.
+Las pruebas no presuponen confianza o intervalos vacíos. No se cambia model.py, web
+ni vision/cache.py. Trece pruebas específicas de caché/cola correctas.
+
+Cierre tarea 2: Ruff y formato global correctos; 245 pruebas correctas y una omitida
+en 271,05 s. API HTTP 8020, mismo almacén tras reinicio: trabajo original 3,192 s y
+recuperación cacheada 0,022 s registrados por el job (no latencia HTTP total), con
+pipeline omitido y fallo explícito al cambiar la estrategia. Solo sintéticos.

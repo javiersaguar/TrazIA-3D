@@ -356,3 +356,26 @@ Se conservan SSE de inicio/salida resumida/fin, timeout, cancelación del proces
 idempotencia. Un proceso que termine sin `estudio.json` deja un error explícito; no
 publica resultados ni sustituye el estado vacío. Prueba real: un caso, variante B,
 vectorial, 20 remuestreos.
+
+
+## Caché de trabajos en la API · 4.2
+
+Los trabajos de lectura terminados y con IFC validado guardan su revisión DRAFT y avisos
+en el almacén SHA-256. La clave combina hashes de originales, metadatos documentales
+(identidad, nombre, revisión y orden), estrategia, proveedores, dataset y huella de la
+memoria anterior, cuando la haya. Los IDs SQL de subida no forman parte de la clave.
+No se cachean fallos, cancelaciones, timeouts ni aprobaciones humanas posteriores.
+
+Con `TRAZIA_OFFLINE=1`, POST de trabajo comprueba la entrada antes de encolar: un fallo
+devuelve HTTP 409 en español. También se verifican los originales y el blob cacheado.
+En un acierto el worker restaura el resultado sin llamar al pipeline, asigna los IDs
+del trabajo nuevo y mantiene approval=null. GET /jobs/{id} indica cache_hit=true y SSE
+explica la reutilización. La contabilidad de esa lectura de caché tiene cero tokens,
+inferencia GPU y llamadas externas nuevas; no suma el coste histórico del trabajo
+original ni mide energía. El modo online sigue ejecutando el pipeline y calentando
+la caché; esta es una instantánea preparada para la demo, no una evaluación de un
+modelo actualizado. Al cambiar modelos/reglas se prepara una caché nueva.
+
+Persistencia: Alembic 0004 añade job_cache y el indicador de acierto al trabajo. No cambia
+el contrato 0.3 ni se modifica vision/cache.py. Las cachés de visión/copiloto existentes
+se conservan, separadas de esta caché de resultados del pipeline.

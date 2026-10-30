@@ -1,0 +1,33 @@
+{
+  "warm_job_id": "6952e729-0c7b-4d81-8971-a000d17eb35a",
+  "body": {
+    "documents": [
+      "seed-a-GA-V101",
+      "seed-a-HDM-V101"
+    ],
+    "project_id": "CACHE-HTTP",
+    "equipment_id": "cache-http",
+    "revision": "OFFLINE",
+    "strategy": "b_reglas",
+    "providers": []
+  },
+  "warm_cache_hit": false,
+  "warm_seconds": 3.1918399000023783,
+  "offline_job_id": "3c151d8e-231a-41a7-a93a-c202b1bf8343",
+  "offline_cache_hit": true,
+  "offline_seconds": 0.021819899997353787,
+  "offline_run": {
+    "strategy": "b_reglas",
+    "providers": [],
+    "seconds": 0.021819899997353787,
+    "gpu_seconds": 0.0,
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "cost_eur": 0.0,
+    "external_calls": 0,
+    "accounting_complete": true
+  },
+  "miss_detail": "Modo offline: no hay un resultado cacheado para estos documentos y estrategia",
+  "restart_verified": true,
+  "synthetic": true
+}

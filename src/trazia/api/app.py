@@ -434,10 +434,22 @@ def create_app(
                     )
                 if not Revision.model_validate_json(previous.payload).approval:
                     raise HTTPException(409, "La revisión usada como memoria debe estar aprobada")
+            config = {**body.model_dump(mode="json"), "tag": tag}
+            if body.previous_id:
+                config["previous_id"] = previous.id
+            from trazia.runtime import offline
+
+            if offline():
+                from .job_cache import CacheMiss, load
+
+                try:
+                    load(request.app.state.store, session, config)
+                except CacheMiss as failure:
+                    raise HTTPException(409, str(failure)) from failure
             job = JobRecord(
                 id=str(uuid4()),
                 tag=tag,
-                request_json=json.dumps({**body.model_dump(mode="json"), "tag": tag}),
+                request_json=json.dumps(config),
             )
             session.add(job)
             return {"data": {"job_id": job.id, "status": "queued"}, "status": 202}

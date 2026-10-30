@@ -53,6 +53,14 @@ class JobRecord(SQLModel, table=True):
     kind: str = "pipeline"
     result_sha256: str | None = None
     elapsed_seconds: float | None = None
+    cache_hit: bool = False
+
+
+class JobCacheRecord(SQLModel, table=True):
+    __tablename__ = "job_cache"
+    key: str = Field(primary_key=True)
+    result_sha256: str
+    created_at: float = Field(default_factory=time.time)
 
 
 class EventRecord(SQLModel, table=True):
