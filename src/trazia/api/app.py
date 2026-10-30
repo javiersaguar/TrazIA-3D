@@ -637,6 +637,19 @@ def create_app(
             "detail": "Lectura todavía no ha publicado resultados del estudio",
         }
 
+    @app.get("/learning/corrections")
+    def learning_corrections(
+        request: Request, after: int = Query(0, ge=0), limit: int = Query(100, ge=1, le=1000)
+    ):
+        from .learning import approved_examples
+
+        try:
+            return approved_examples(request.app.state.store, after=after, limit=limit)
+        except (OSError, ValueError) as failure:
+            raise HTTPException(
+                409, "No se pueden verificar las correcciones y sus originales"
+            ) from failure
+
     @app.post("/estudio", status_code=202)
     async def launch_study(
         request: Request, body: StudyInput, idempotency_key: str | None = Header(None)
