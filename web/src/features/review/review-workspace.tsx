@@ -13,6 +13,7 @@ import { useReviewFields } from "@/lib/queries";
 import type { Annotation } from "@/features/viewer3d/types";
 import { useSelection } from "@/stores/selection";
 import { useUi } from "@/stores/ui";
+import { parentElementId } from "@/features/viewer3d/semantic";
 import { FieldQueue } from "./field-queue";
 import { ApprovalButton } from "./approval-button";
 
@@ -49,11 +50,11 @@ export function ReviewWorkspace() {
   // Al elegir un elemento en 3D se selecciona su campo de mayor riesgo.
   const onSelectElement = useCallback(
     (id: string) => {
-      const first = fields?.find((f) => f.elementId === id);
-      if (first) selectField(first);
+      const first = fields?.find((f) => f.elementId === parentElementId(id));
+      if (first) setSelected(id, first.path);
       else setSelected(id);
     },
-    [fields, selectField, setSelected],
+    [fields, setSelected],
   );
 
   const annotations = useMemo<Annotation[]>(
@@ -61,7 +62,8 @@ export function ReviewWorkspace() {
       (fields ?? [])
         .filter(
           (f) =>
-            f.elementId === (selectedId ?? "") && typeof f.value === "number",
+            f.elementId === parentElementId(selectedId ?? "") &&
+            typeof f.value === "number",
         )
         .map((f) => ({
           id: f.path,

@@ -10,6 +10,7 @@ from sqlmodel import Session, select
 from trazia.ifc import build_ifc, validate_ifc
 from trazia.model import Revision, RunInfo
 from trazia.queue.accounting import Accounting
+from trazia.runtime import offline
 from trazia.store import DocumentRecord, EventRecord, JobRecord, RevisionRecord, Store
 
 from .pipeline_adapter import InputDocument, process
@@ -119,6 +120,13 @@ def execute_pipeline(store: Store, job_id: str, request: dict):
 
 
 async def run_job(store: Store, job_id: str):
+    with Session(store.engine) as session:
+        job = session.get(JobRecord, job_id)
+        study = job is not None and job.kind == "study"
+    if study:
+        from .study_jobs import run_study_job
+
+        return await run_study_job(store, job_id)
     started = time.perf_counter()
     now = time.time()
     with Session(store.engine) as session:
@@ -162,6 +170,7 @@ async def run_job(store: Store, job_id: str):
             return 0.1
         session.commit()
     in_flight = False
+    cache_hit = False
     try:
         async with asyncio.timeout(request.get("timeout_seconds", 300)):
             for attempt in range(maximum - previous_attempts):
@@ -175,9 +184,15 @@ async def run_job(store: Store, job_id: str):
                         session.commit()
                 in_flight = True
                 try:
-                    result, revision = await asyncio.to_thread(
-                        execute_pipeline, store, job_id, request
-                    )
+                    if offline():
+                        from .job_cache import restore
+
+                        result, revision = await asyncio.to_thread(restore, store, job_id, request)
+                        cache_hit = True
+                    else:
+                        result, revision = await asyncio.to_thread(
+                            execute_pipeline, store, job_id, request
+                        )
                 except (ConnectionError, httpx.TransportError, TransientPipelineFailure) as error:
                     in_flight = False
                     accounting.add(
@@ -206,7 +221,12 @@ async def run_job(store: Store, job_id: str):
             job.run_json = accounting.finish(time.perf_counter() - started).model_dump_json()
             job.warnings_json = json.dumps(result.warnings, ensure_ascii=False)
             job.updated_at, job.lease_until = time.time(), None
+            job.cache_hit = cache_hit
             if revision:
+                if not cache_hit:
+                    from .job_cache import remember
+
+                    job.result_sha256 = remember(store, session, request, revision, result.warnings)
                 identity = revision_id(revision)
                 if session.get(RevisionRecord, identity):
                     raise ValueError("La revisión de destino ya existe; no se sobrescribe")

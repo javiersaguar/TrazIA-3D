@@ -24,7 +24,7 @@ test("el visor carga el IFC de la API y conserva sus productos", async ({ page }
   const download = page.waitForResponse(response => response.url().startsWith(base!) && response.url().includes("/ifc?"));
   await page.goto("/revision");
   expect((await download).status()).toBe(200);
-  await expect(page.locator('[data-testid="ifc-viewer"][data-phase="ready"]')).toHaveAttribute("data-products", "7");
+  await expect(page.locator('[data-testid="ifc-viewer"][data-phase="ready"]')).toHaveAttribute("data-products", "73");
   await expect(page.getByText("Datos sintéticos · API local")).toBeVisible();
 });
 

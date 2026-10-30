@@ -34,12 +34,14 @@ Las credenciales se configuran por entorno y no se guardan en Git.
 | GET /diff?from=A&to=B | Diferencias actuales de campos/evidencia/documentos |
 | GET /bench?extractor=etiquetas | Informe sintético existente, sin inventar mediciones |
 | GET /plant | Equipos; layout=null hasta disponer de posición real |
-| GET /estudio | Archivo de Lectura o estado vacío explícito |
+| GET /estudio | Último trabajo terminado, informe de Lectura o estado vacío explícito |
+| POST /estudio | StudyInput, Idempotency-Key, trabajo asíncrono 202 |
+| GET /learning/corrections | Correcciones sintéticas vigentes y aprobadas, con cursor |
 
 El id completo de revisión es `proyecto:equipo:revisión`; A/B son alias de la demo V-101.
 BCF y exportación multiesquema están implementados (ver secciones posteriores).
-POST /copiloto usa Ollama local y herramientas de lectura. POST /estudio sigue respondiendo
-503: el arnés se ejecuta por CLI; no se simula un lanzamiento asíncrono desde esta ruta.
+POST /copiloto usa Ollama local y herramientas de lectura, o una respuesta cacheada.
+POST /estudio ejecuta el arnés mediante la cola común y publica el resultado por trabajo.
 
 ## Concurrencia e idempotencia
 
@@ -331,3 +333,96 @@ y se eliminan con sus contenedores al terminar. Se conserva el estado terminal d
 El informe separa tiempos observados, costes no informados y extrapolación a 400×4. No supone
 que un trabajo fallido haya producido un IFC, ni que un IFC estructuralmente válido coincida
 con el plano. Resultados y límites de la primera medición: [FASE3.md](FASE3.md).
+
+
+## Estudio, modo offline y correcciones · 30/10/2026
+
+[Contrato, ejemplos, arquitectura y verificación](BACKEND_2026-10-30.md).
+`POST /estudio` exige un cuerpo StudyInput y `Idempotency-Key`. Devuelve 202 con `job_id`;
+se consulta y cancela mediante `/jobs/{id}`. `GET /estudio?job_id=…` selecciona su resultado.
+La ruta de conjuntos sintéticos la fija `TRAZIA_STUDY_DATA`, nunca el cliente.
+`GET /learning/corrections?after=0&limit=100` no entrena ni recalibra.
+Con `TRAZIA_OFFLINE=1`, visión y copiloto usan sus cachés; una consulta sin caché devuelve
+un error recuperable. Los tipos OpenAPI de la web reflejan el contrato actualizado.
+
+
+## Estudio mediante CLI estable · sesión Plataforma 30/10
+
+El trabajo lanza `python -u -m bench.estudio` como subproceso con los argumentos estables
+`--datos`, `--conjuntos`, `--variantes`, `--casos`, `--degradaciones`, `--remuestreos`,
+`--semilla` y `--salida`. No importa funciones internas de `bench`. El directorio de
+salida pertenece al trabajo; el JSON se guarda en el almacén SHA-256 al terminar.
+Se conservan SSE de inicio/salida resumida/fin, timeout, cancelación del proceso e
+idempotencia. Un proceso que termine sin `estudio.json` deja un error explícito; no
+publica resultados ni sustituye el estado vacío. Prueba real: un caso, variante B,
+vectorial, 20 remuestreos.
+
+
+## Caché de trabajos en la API · 4.2
+
+Los trabajos de lectura terminados y con IFC validado guardan su revisión DRAFT y avisos
+en el almacén SHA-256. La clave combina hashes de originales, metadatos documentales
+(identidad, nombre, revisión y orden), estrategia, proveedores, dataset y huella de la
+memoria anterior, cuando la haya. Los IDs SQL de subida no forman parte de la clave.
+No se cachean fallos, cancelaciones, timeouts ni aprobaciones humanas posteriores.
+
+Con `TRAZIA_OFFLINE=1`, POST de trabajo comprueba la entrada antes de encolar: un fallo
+devuelve HTTP 409 en español. También se verifican los originales y el blob cacheado.
+En un acierto el worker restaura el resultado sin llamar al pipeline, asigna los IDs
+del trabajo nuevo y mantiene approval=null. GET /jobs/{id} indica cache_hit=true y SSE
+explica la reutilización. La contabilidad de esa lectura de caché tiene cero tokens,
+inferencia GPU y llamadas externas nuevas; no suma el coste histórico del trabajo
+original ni mide energía. El modo online sigue ejecutando el pipeline y calentando
+la caché; esta es una instantánea preparada para la demo, no una evaluación de un
+modelo actualizado. Al cambiar modelos/reglas se prepara una caché nueva.
+
+Persistencia: Alembic 0004 añade job_cache y el indicador de acierto al trabajo. No cambia
+el contrato 0.3 ni se modifica vision/cache.py. Las cachés de visión/copiloto existentes
+se conservan, separadas de esta caché de resultados del pipeline.
+
+
+## CORS configurable · sesión Plataforma
+
+`TRAZIA_CORS_ORIGINS` acepta orígenes HTTP(S) separados por comas y sustituye la lista
+predeterminada. Se recortan espacios, se normalizan puertos estándar y se eliminan
+duplicados. Rutas, credenciales, comodines y puertos inválidos se rechazan al crear la API.
+Ausente o vacía conserva localhost y 127.0.0.1 en 3000, 3100, 3200, 3300, 3310 y 3311.
+Compose propaga la variable a API y workers. Para el frontend de esta sesión, PowerShell:
+
+```powershell
+$env:TRAZIA_CORS_ORIGINS="http://localhost:3120,http://127.0.0.1:3120"
+$env:TRAZIA_PORT="8020"
+uv run --extra api python -m trazia.api
+```
+
+Las cabeceras de idempotencia, If-Match y ETag y los métodos admitidos no cambian.
+
+
+## Registro de correcciones humanas · 3.8 (datos)
+
+Cada PATCH confirmado que cambia valor, unidad o estado registra una fila transaccional
+y añade una línea a `generated/correcciones/correcciones.jsonl`. La ruta estándar es
+relativa a la raíz del repo; `TRAZIA_CORRECTIONS_FILE` permite fijarla. Con data_root
+explícito en una aplicación embebida, la salida predeterminada queda dentro de ese
+almacén, para aislar datos y pruebas. Compose usa /data/correcciones/correcciones.jsonl.
+
+Formato de cada línea: revision_id, equipment_tag, revision, path, value_before,
+value_after, unit, state_before, state_after, confidence, confidence_raw, channel,
+strategy, document_id, page, bbox, actor, at y data_sha256. Los opcionales ausentes
+son null. La confianza, canal, estrategia y cita pertenecen a la predicción ANTERIOR
+a la intervención; unit y data_sha256 corresponden al resultado. at es ISO 8601 UTC.
+No se exige ni se supone que la confianza esté calibrada o que exista un intervalo.
+
+GET /correcciones?desde=2026-10-30T00:00:00Z devuelve {correcciones:[...],count:N},
+filtrado inclusivamente desde esa fecha. Se requiere zona horaria; no llama a modelos
+ni a calibración. Son intervenciones históricas, incluidas revisiones aún no aprobadas.
+La exportación previa /learning/corrections conserva su selección de ejemplos aprobados.
+
+Se conserva auditoría, ETag/If-Match e idempotencia. Una petición repetida no duplica
+líneas; una edición rechazada o sin cambios no crea una corrección. Alembic 0005 añade
+una bandeja de salida SQL y un cursor. El bloqueo de publicación funciona en SQLite
+y Postgres. Ante un fallo tras escribir, el reintento descarta solo la cola no confirmada
+y vuelve a publicar; el archivo perdido o truncado se reconstruye con las filas SQL.
+Usar un único almacén SQL por archivo configurado. Si falla la exportación, el PATCH
+informa 503: el campo está guardado y se reintenta con la misma Idempotency-Key. Las
+filas siguen accesibles por GET; al arrancar se intenta publicar lo pendiente.

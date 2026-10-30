@@ -1,4 +1,7 @@
 import json
+import subprocess
+import sys
+from pathlib import Path
 
 import pytest
 
@@ -65,3 +68,37 @@ def test_scale_only_accepts_synthetic_manifests_and_requires_originals(tmp_path)
     path.write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="Falta"):
         tasks(tmp_path, ["s-dev"])
+
+
+def test_probe_limits_keep_exact_cases_and_degradations(tmp_path):
+    root = tmp_path / "s-dev"
+    root.mkdir()
+    manifest = {
+        "synthetic": True,
+        "cases": [{"tag": "V-1"}, {"tag": "V-2"}],
+        "styles": ["vectorial", "escaneado_limpio"],
+    }
+    (root / "manifest.json").write_text(json.dumps(manifest))
+    for style in manifest["styles"]:
+        for case in manifest["cases"]:
+            folder = root / style / case["tag"]
+            folder.mkdir(parents=True)
+            for revision in (1, 2):
+                (folder / f"GAD_{case['tag']}_rev{revision}.pdf").write_bytes(b"synthetic fixture")
+    assert len(tasks(tmp_path, ["s-dev"])) == 8
+    probe = tasks(tmp_path, ["s-dev"], cases_limit=1, degradations=["vectorial"])
+    assert len(probe) == 2
+    assert {(row["tag"], row["degradation"]) for row in probe} == {("V-1", "vectorial")}
+
+
+@pytest.mark.parametrize("port", [8010, 8011, 3100, 3300, 3295])
+def test_scale_runner_rejects_other_teams_ports_before_docker(port):
+    result = subprocess.run(
+        [sys.executable, "scripts/run_scale.py", "--api-port", str(port)],
+        cwd=Path(__file__).resolve().parents[1],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert result.returncode == 2 and "Puerto no disponible" in result.stderr

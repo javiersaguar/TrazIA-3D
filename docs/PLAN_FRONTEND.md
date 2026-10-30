@@ -3,6 +3,27 @@
 Fecha: 30/10/2026. Entrega del reto: 27/11/2026 10:00.
 Destino en el repo: `docs/PLAN_FRONTEND.md` (copia de este plan) + dos encargos listos para pegar.
 
+## Estado de ejecución · 30/10/2026
+
+- [x] Paso 0: contratos, dependencias y paleta compartidos.
+- [x] 1.1–1.7: marca, portada, shell, gráficas, bocetos y adaptación, recibidos de feat/web-marca.
+- [x] 2.1: materiales físicos, entorno y calidad adaptativa.
+- [x] 2.2: cinco familias ilustrativas, partículas, selección y miniaturas.
+- [x] 2.3: holograma/materialización, recortes reales y página Modelo.
+- [x] 2.4: coreografía por elemento, seguimiento de cámara, cotas, scrub, A | B y presentación.
+- [x] 2.5: revisión multipanel, PDF multipágina, inspector, evidencia y aprobación API.
+- [x] 2.6: IFC enriquecido con procedencia y GUID; revisión A 73 productos, B 83.
+- [x] Integración de ambas ramas en feat/web-3d y comprobaciones de frontend/Python/IFC.
+- [x] Capturas claras/oscuras y revisión a 390, 1024 y 1600 px.
+- [x] Lighthouse escritorio 100, 3D enriquecido 239 fps y Three fuera de los scripts iniciales.
+
+El detalle visual se solicita con `build_ifc(..., details=True)` y se activa para los sintéticos
+de la API/demo. No añade campos extraídos ni cambia implícitamente el LOD del núcleo o del bench.
+Los patrones de brida cubren los tamaños documentados de clases 150/300; el Pset identifica
+supuestos visuales y alcance de la tabla. Ver [informe 3D](agentes/INFORME_FRONTEND_3D.md) y
+[verificación](agentes/verificacion_frontend.json). La fusión está preparada localmente: se conserva
+la restricción del encargo de no hacer push ni PR y no se cambia main.
+
 ## Contexto
 
 El frontend (`web/`, Next.js 16.4 + React 19 + Tailwind 4 + R3F + motion 14) funciona y tiene

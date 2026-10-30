@@ -1,0 +1,562 @@
+{
+  "synthetic": true,
+  "strategy": "d_hibrido",
+  "run_id": "4d2c6a5dba",
+  "input_sha256": "031599f39351081139721715694235442935fb09ead41a3af233f8ad6df17e5b",
+  "complete": true,
+  "planned_revisions": 20,
+  "rows": [
+    {
+      "dataset": "s-dev",
+      "tag": "D-200",
+      "degradation": "vectorial",
+      "revision": "1",
+      "job_id": "9ad9ae7f-4a67-4cf5-86b8-f265666381a7",
+      "status": "done",
+      "error": null,
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 5.05974784,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 6.402163289000001
+    },
+    {
+      "dataset": "s-dev",
+      "tag": "D-200",
+      "degradation": "vectorial",
+      "revision": "2",
+      "job_id": "50e33670-1712-4f15-9f2f-a1bda094e545",
+      "status": "done",
+      "error": null,
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 2.979958797000002,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 9.631598624999995
+    },
+    {
+      "dataset": "s-dev",
+      "tag": "D-200",
+      "degradation": "escaneado_limpio",
+      "revision": "1",
+      "job_id": "05ced99e-3034-4f2c-a423-2bff55a64ef1",
+      "status": "error",
+      "error": "Faltan datos explícitos: skirt_thickness",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 7.141992304999995,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 17.209861459000003
+    },
+    {
+      "dataset": "s-dev",
+      "tag": "D-200",
+      "degradation": "escaneado_limpio",
+      "revision": "2",
+      "job_id": "4989477d-a319-4b65-98a3-79d03f038298",
+      "status": "error",
+      "error": "El recipiente vertical de nivel 2/3 necesita al menos tres boquillas",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 11.315650403,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 28.831995853000002
+    },
+    {
+      "dataset": "s-dev",
+      "tag": "D-200",
+      "degradation": "escaneado_pobre",
+      "revision": "1",
+      "job_id": "163dac41-4c22-467c-a315-8f15005dcd1d",
+      "status": "error",
+      "error": "El recipiente vertical de nivel 2/3 necesita al menos tres boquillas",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 21.757250342999995,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 50.80068904000001
+    },
+    {
+      "dataset": "s-dev",
+      "tag": "D-200",
+      "degradation": "escaneado_pobre",
+      "revision": "2",
+      "job_id": "af15092a-87ad-4ae4-9bcf-aba259abf296",
+      "status": "error",
+      "error": "Faltan datos explícitos: height, head_depth, skirt_height",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 13.084715103999997,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 64.350359418
+    },
+    {
+      "dataset": "s-reservado",
+      "tag": "D-700",
+      "degradation": "vectorial",
+      "revision": "1",
+      "job_id": "a99e6655-cb3b-4bf4-91c0-823f1e45f475",
+      "status": "error",
+      "error": "Faltan datos explícitos: tag",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 0.16929662000001144,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 64.983755785
+    },
+    {
+      "dataset": "s-reservado",
+      "tag": "D-700",
+      "degradation": "vectorial",
+      "revision": "2",
+      "job_id": "758ff489-8dd4-44cb-9577-1075a5cbe57c",
+      "status": "error",
+      "error": "Faltan datos explícitos: tag",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 0.19176372399999764,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 65.458716079
+    },
+    {
+      "dataset": "s-reservado",
+      "tag": "D-700",
+      "degradation": "escaneado_limpio",
+      "revision": "1",
+      "job_id": "5df49111-bc70-4fe5-8855-6d20c1eeb398",
+      "status": "error",
+      "error": "Faltan datos explícitos: tag",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 16.774114514000004,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 82.52480742200001
+    },
+    {
+      "dataset": "s-reservado",
+      "tag": "D-700",
+      "degradation": "escaneado_limpio",
+      "revision": "2",
+      "job_id": "4969eade-14c2-4690-9a9c-0f835b859ed7",
+      "status": "error",
+      "error": "Faltan datos explícitos: tag",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 14.048518314000006,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 96.878112694
+    },
+    {
+      "dataset": "s-reservado",
+      "tag": "D-700",
+      "degradation": "escaneado_pobre",
+      "revision": "1",
+      "job_id": "e4c0f69f-9181-4592-97bd-994022be44d4",
+      "status": "error",
+      "error": "Faltan datos explícitos: tag",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 14.616085535999986,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 111.563336069
+    },
+    {
+      "dataset": "s-reservado",
+      "tag": "D-700",
+      "degradation": "escaneado_pobre",
+      "revision": "2",
+      "job_id": "2dc1407e-07b4-44ec-bc5f-ab0829af8b5f",
+      "status": "error",
+      "error": "Faltan datos explícitos: tag",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 15.104194078999996,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 127.027951285
+    },
+    {
+      "dataset": "s-mecanico",
+      "tag": "P-400B",
+      "degradation": "vectorial",
+      "revision": "1",
+      "job_id": "dd68a96f-cfc3-43b5-9cb2-a4c380d60593",
+      "status": "error",
+      "error": "Faltan datos explícitos: diameter, skirt_thickness",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 1.1362186039999926,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 128.726353749
+    },
+    {
+      "dataset": "s-mecanico",
+      "tag": "P-400B",
+      "degradation": "vectorial",
+      "revision": "2",
+      "job_id": "74044638-031b-4924-a065-79ed8adf29f2",
+      "status": "error",
+      "error": "Faltan datos explícitos: diameter, skirt_thickness",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 1.353005689999975,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 130.461944207
+    },
+    {
+      "dataset": "s-mecanico",
+      "tag": "P-400B",
+      "degradation": "escaneado_limpio",
+      "revision": "1",
+      "job_id": "508fba9b-b185-4db3-b1c8-1fa6fccb583f",
+      "status": "error",
+      "error": "Faltan datos explícitos: diameter, skirt_thickness",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 7.617282705000008,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 138.199140844
+    },
+    {
+      "dataset": "s-mecanico",
+      "tag": "P-400B",
+      "degradation": "escaneado_limpio",
+      "revision": "2",
+      "job_id": "0e11445b-6c28-4221-af79-6470c36a6eb1",
+      "status": "error",
+      "error": "Faltan datos explícitos: diameter, skirt_thickness",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 6.377529721000002,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 144.915770912
+    },
+    {
+      "dataset": "s-mecanico",
+      "tag": "P-400B",
+      "degradation": "escaneado_pobre",
+      "revision": "1",
+      "job_id": "24edd034-1e04-413c-b91f-86fa191dd024",
+      "status": "error",
+      "error": "Faltan datos explícitos: diameter, skirt_thickness",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 5.976399767000004,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 151.12873268200002
+    },
+    {
+      "dataset": "s-mecanico",
+      "tag": "P-400B",
+      "degradation": "escaneado_pobre",
+      "revision": "2",
+      "job_id": "7e00fb74-f70f-48e7-a555-e2b09f35a353",
+      "status": "error",
+      "error": "Faltan datos explícitos: tag, diameter, skirt_thickness",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 7.630088747000002,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 158.71097311800003
+    },
+    {
+      "dataset": "s-adversarial",
+      "tag": "V-900",
+      "degradation": "vectorial",
+      "revision": "1",
+      "job_id": "dc4458e5-338c-4bb7-bcc0-51373029d8db",
+      "status": "done",
+      "error": null,
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 3.4264771750000023,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 162.653252989
+    },
+    {
+      "dataset": "s-adversarial",
+      "tag": "V-900",
+      "degradation": "vectorial",
+      "revision": "2",
+      "job_id": "09091e38-d17d-4792-91cc-747d78c87a9f",
+      "status": "done",
+      "error": null,
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 5.54607131100002,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 168.594772249
+    }
+  ],
+  "summary": {
+    "revisions": 20,
+    "equipment": 4,
+    "conditions": 10,
+    "statuses": {
+      "done": 4,
+      "error": 16
+    },
+    "seconds_batch": 169.255636552,
+    "seconds_upload": 0.5203218330000006,
+    "throughput_terminal_per_second": 0.11816445471141192,
+    "seconds_turnaround_mean": 95.4527143884,
+    "seconds_turnaround_p95": 168.594772249,
+    "cost_eur": 0.0,
+    "jobs_without_cost": 0,
+    "external_calls_known": 0,
+    "jobs_with_incomplete_accounting": 0,
+    "projection_400x4": {
+      "measured": false,
+      "seconds_for_1600_terminal_jobs": 13540.45092416,
+      "seconds_for_1600_valid_ifc": null,
+      "cost_eur": 0.0,
+      "limitation": "Extrapolación de este lote y estrategia. Las terminaciones incluyen errores; no prueban 1600 modelos válidos.",
+      "compute_cost_scenario": {
+        "measured": false,
+        "assumed_eur_worker_hour": 0.25,
+        "estimated_eur_for_1600_terminal_jobs": 0.9403090919555556,
+        "excluded": "Energía local, almacenamiento, API y coste de producir IFC correctos"
+      }
+    },
+    "per_equipment_condition": [
+      {
+        "dataset": "s-adversarial",
+        "tag": "V-900",
+        "degradation": "vectorial",
+        "revisions": 2,
+        "done": 2,
+        "seconds_turnaround_sum": 331.24802523799997,
+        "cost_eur": 0.0
+      },
+      {
+        "dataset": "s-dev",
+        "tag": "D-200",
+        "degradation": "escaneado_limpio",
+        "revisions": 2,
+        "done": 0,
+        "seconds_turnaround_sum": 46.041857312000005,
+        "cost_eur": 0.0
+      },
+      {
+        "dataset": "s-dev",
+        "tag": "D-200",
+        "degradation": "escaneado_pobre",
+        "revisions": 2,
+        "done": 0,
+        "seconds_turnaround_sum": 115.151048458,
+        "cost_eur": 0.0
+      },
+      {
+        "dataset": "s-dev",
+        "tag": "D-200",
+        "degradation": "vectorial",
+        "revisions": 2,
+        "done": 2,
+        "seconds_turnaround_sum": 16.033761913999996,
+        "cost_eur": 0.0
+      },
+      {
+        "dataset": "s-mecanico",
+        "tag": "P-400B",
+        "degradation": "escaneado_limpio",
+        "revisions": 2,
+        "done": 0,
+        "seconds_turnaround_sum": 283.11491175599997,
+        "cost_eur": 0.0
+      },
+      {
+        "dataset": "s-mecanico",
+        "tag": "P-400B",
+        "degradation": "escaneado_pobre",
+        "revisions": 2,
+        "done": 0,
+        "seconds_turnaround_sum": 309.83970580000005,
+        "cost_eur": 0.0
+      },
+      {
+        "dataset": "s-mecanico",
+        "tag": "P-400B",
+        "degradation": "vectorial",
+        "revisions": 2,
+        "done": 0,
+        "seconds_turnaround_sum": 259.188297956,
+        "cost_eur": 0.0
+      },
+      {
+        "dataset": "s-reservado",
+        "tag": "D-700",
+        "degradation": "escaneado_limpio",
+        "revisions": 2,
+        "done": 0,
+        "seconds_turnaround_sum": 179.40292011600002,
+        "cost_eur": 0.0
+      },
+      {
+        "dataset": "s-reservado",
+        "tag": "D-700",
+        "degradation": "escaneado_pobre",
+        "revisions": 2,
+        "done": 0,
+        "seconds_turnaround_sum": 238.591287354,
+        "cost_eur": 0.0
+      },
+      {
+        "dataset": "s-reservado",
+        "tag": "D-700",
+        "degradation": "vectorial",
+        "revisions": 2,
+        "done": 0,
+        "seconds_turnaround_sum": 130.442471864,
+        "cost_eur": 0.0
+      }
+    ]
+  },
+  "deployment": {
+    "workers": 1,
+    "concurrency_per_worker": 1,
+    "image": "sha256:739eda7d263ec5edaaffde13d54569e4d97f18db1e5e231a9ce4a73826f9952b",
+    "storage": "Postgres + SHA-256",
+    "queue": "Redis/arq",
+    "cpu_only": true,
+    "vision_providers": []
+  }
+}

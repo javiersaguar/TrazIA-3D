@@ -101,6 +101,10 @@ async def ask(
     model=None,
     transport=None,
 ):
+    from trazia.runtime import offline
+
+    if offline():
+        raise CopilotUnavailable("Modo offline: usa una respuesta cacheada desde la API")
     host = local_host(host or os.environ.get("TRAZIA_OLLAMA_URL", "http://127.0.0.1:11434"))
     model = model or os.environ.get("TRAZIA_OLLAMA_MODEL", "qwen3-vl:4b-instruct")
     if "cloud" in model.casefold():

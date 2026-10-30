@@ -64,6 +64,17 @@ export function IfcInspector({
             {product.globalId}
           </code>
           <p className="mt-2 text-muted">Nombre: {product.name}</p>
+          {product.psets.Pset_TrazIA?.Origen ? (
+            <p
+              className="mt-3 rounded-md border border-warning/30 bg-warning/10 p-2 text-warning"
+              data-testid="derived-origin"
+            >
+              Detalle derivado · no leído del plano
+              {product.psets.Pset_TrazIA.ClaseOrigen === "supuesto_visual"
+                ? " · clase supuesta"
+                : ""}
+            </p>
+          ) : null}
           {traces.length ? (
             <details className="mt-3 border-t border-border pt-2" open>
               <summary className="cursor-pointer font-medium">

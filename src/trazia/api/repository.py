@@ -67,6 +67,9 @@ def save_revision(
             seconds=seconds,
         )
     )
+    from .corrections import record_change
+
+    record_change(session, record, Revision.model_validate_json(before), revision, path, actor)
     return {"data": revision.model_dump(mode="json"), "version": version + 1, "status": 200}
 
 

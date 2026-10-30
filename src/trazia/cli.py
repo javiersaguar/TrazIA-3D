@@ -18,6 +18,9 @@ def write_json(data: dict, path: Path | None):
 
 
 def main(argv=None) -> int:
+    from trazia.runtime import configure_offline
+
+    configure_offline()
     parser = argparse.ArgumentParser(
         description="TrazIA-3D: del plano al modelo, con cada cambio trazado"
     )

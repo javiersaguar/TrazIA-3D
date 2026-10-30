@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-30",
+  "branch": "feat/plataforma",
+  "python": {
+    "passed": 240,
+    "seconds": 168.65,
+    "warnings": [
+      "Starlette TestClient HTTPX deprecation"
+    ]
+  },
+  "ruff": {
+    "check": "passed",
+    "format_files": 131
+  },
+  "web": {
+    "typecheck": "passed",
+    "lint": "passed with existing TanStack warning",
+    "unit_passed": 32,
+    "build": "passed",
+    "e2e_connected_passed": 27,
+    "e2e_connected_skipped": 1,
+    "e2e_connected_duration": "1.2m"
+  },
+  "gpu_inference_executed": false,
+  "reading_source_modified": false,
+  "main_modified": false,
+  "push": false,
+  "demo": {
+    "web": "http://localhost:3300",
+    "api": "http://127.0.0.1:8011",
+    "offline": true,
+    "original_api_8010_preserved": true,
+    "synthetic_study_variants": [
+      "b_reglas"
+    ],
+    "synthetic_study_equipment": 1
+  }
+}

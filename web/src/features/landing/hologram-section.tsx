@@ -1,8 +1,14 @@
 "use client";
 
-import { motion, useMotionValueEvent, useScroll } from "motion/react";
+import {
+  motion,
+  useInView,
+  useMotionValueEvent,
+  useScroll,
+  useTransform,
+} from "motion/react";
 import dynamic from "next/dynamic";
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 
 import { cn } from "@/lib/cn";
 
@@ -11,15 +17,30 @@ import { cn } from "@/lib/cn";
   holograma → modelo real (componente del Agente 2, ilustrativo).
 */
 
-const HologramToReal = dynamic(() => import("@/features/hologram").then((m) => m.HologramToReal), {
-  ssr: false,
-  loading: () => null,
-});
+const HologramToReal = dynamic(
+  () => import("@/features/hologram").then((m) => m.HologramToReal),
+  {
+    ssr: false,
+    loading: () => null,
+  },
+);
 
 const PHASES = [
-  { at: 0, title: "Lo que se ha leído", text: "El holograma es la geometría que el sistema ha entendido del plano. Todavía es un borrador." },
-  { at: 0.38, title: "Lo que tiene evidencia", text: "Cada pieza se materializa cuando sus cotas tienen una cita en el plano." },
-  { at: 0.72, title: "Lo que se revisa", text: "El resultado es el modelo que una persona revisa y aprueba antes de exportarlo." },
+  {
+    at: 0,
+    title: "Lo que se ha leído",
+    text: "Este holograma ilustra la fase de lectura. El equipo de esta sección es paramétrico y no procede de un plano real.",
+  },
+  {
+    at: 0.38,
+    title: "Lo que tiene evidencia",
+    text: "El barrido explica el paso de borrador a modelo. La evidencia real de cada campo se consulta en Revisión.",
+  },
+  {
+    at: 0.72,
+    title: "Lo que se revisa",
+    text: "El IFC y sus fuentes se revisan antes de aprobar una exportación. Puedes explorarlos en Modelo 3D.",
+  },
 ];
 
 function phaseOf(p: number) {
@@ -30,34 +51,90 @@ function phaseOf(p: number) {
   return k;
 }
 
+const reducedSnapshot = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const subscribeReduced = (fn: () => void) => {
+  const q = window.matchMedia("(prefers-reduced-motion: reduce)");
+  q.addEventListener("change", fn);
+  return () => q.removeEventListener("change", fn);
+};
+
 export function HologramSection() {
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const [p, setP] = useState(0);
-  useMotionValueEvent(scrollYProgress, "change", (v) => setP(Math.round(v * 200) / 200));
-  const active = phaseOf(p);
+  const reduced = useSyncExternalStore(
+    subscribeReduced,
+    reducedSnapshot,
+    () => false,
+  );
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end end"],
+  });
+  const near = useInView(ref, { margin: "0px", amount: 0.05, once: true });
+  const [active, setActive] = useState(0);
+  const percentage = useRef<HTMLSpanElement>(null),
+    currentPhase = useRef(0);
+  useMotionValueEvent(scrollYProgress, "change", (value) => {
+    const next = phaseOf(value);
+    if (next !== currentPhase.current) {
+      currentPhase.current = next;
+      setActive(next);
+    }
+    if (percentage.current)
+      percentage.current.textContent = reduced
+        ? "100 %"
+        : `${Math.round(value * 100)} %`;
+  });
+  const firstFill = useTransform(scrollYProgress, [0, 0.38], [0, 1]);
+  const secondFill = useTransform(scrollYProgress, [0.38, 0.72], [0, 1]);
+  const thirdFill = useTransform(scrollYProgress, [0.72, 1], [0, 1]);
+  const fills = [firstFill, secondFill, thirdFill];
 
   return (
-    <section ref={ref} aria-labelledby="holograma-titulo" className="relative h-[240vh]">
+    <section
+      ref={ref}
+      aria-labelledby="holograma-titulo"
+      className="relative h-[240vh]"
+    >
       <div className="sticky top-0 flex min-h-dvh items-center py-16">
         <div className="mx-auto grid w-full max-w-[1240px] items-center gap-10 px-5 md:px-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-14">
           <div>
-            <h2 id="holograma-titulo" className="landing-display text-[clamp(32px,4.2vw,56px)] leading-[1] text-strong">
+            <h2
+              id="holograma-titulo"
+              className="landing-display text-[clamp(32px,4.2vw,56px)] leading-[1] text-strong"
+            >
               Del holograma al modelo
             </h2>
             <ol className="mt-8 space-y-6">
               {PHASES.map((ph, i) => {
-                const start = ph.at;
-                const end = PHASES[i + 1]?.at ?? 1;
-                const fill = Math.min(1, Math.max(0, (p - start) / (end - start)));
                 return (
-                  <li key={ph.title} className="grid grid-cols-[3px_minmax(0,1fr)] gap-4">
-                    <span className="relative overflow-hidden rounded-full bg-border" aria-hidden>
-                      <motion.span className="absolute inset-0 origin-top bg-accent" style={{ scaleY: fill }} />
+                  <li
+                    key={ph.title}
+                    className="grid grid-cols-[3px_minmax(0,1fr)] gap-4"
+                  >
+                    <span
+                      className="relative overflow-hidden rounded-full bg-border"
+                      aria-hidden
+                    >
+                      <motion.span
+                        className="absolute inset-0 origin-top bg-accent"
+                        style={{ scaleY: reduced ? 1 : fills[i] }}
+                      />
                     </span>
-                    <div className={cn("transition-opacity duration-300", i === active ? "opacity-100" : "opacity-45")}>
-                      <h3 className="text-[16px] font-semibold text-strong">{ph.title}</h3>
-                      <p className="mt-1 max-w-[44ch] text-[14.5px] leading-relaxed text-muted">{ph.text}</p>
+                    <div
+                      className={cn(
+                        "transition-opacity duration-300",
+                        i === (reduced ? PHASES.length - 1 : active)
+                          ? "opacity-100"
+                          : "opacity-45",
+                      )}
+                    >
+                      <h3 className="text-[16px] font-semibold text-strong">
+                        {ph.title}
+                      </h3>
+                      <p className="mt-1 max-w-[44ch] text-[14.5px] leading-relaxed text-muted">
+                        {ph.text}
+                      </p>
                     </div>
                   </li>
                 );
@@ -67,7 +144,16 @@ export function HologramSection() {
 
           <div className="relative h-[min(62vh,560px)] overflow-hidden rounded-[16px] border border-border bg-surface-sunken">
             {/* El aviso «Ilustrativo» y el avance ya los pinta HologramToReal (arriba y abajo) */}
-            <HologramToReal source="procedural" layout="side" progress={p} callouts className="h-full w-full" />
+            {near ? (
+              <HologramToReal
+                source="procedural"
+                layout="side"
+                progressValue={scrollYProgress}
+                controls={false}
+                callouts
+                className="h-full w-full"
+              />
+            ) : null}
           </div>
         </div>
       </div>

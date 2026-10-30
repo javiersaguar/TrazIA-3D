@@ -22,7 +22,7 @@ import {
   type ElementState,
 } from "./product-mesh";
 import { IfcInspector } from "./inspector";
-import { elementLabel } from "./semantic";
+import { elementLabel, parentElementId } from "./semantic";
 import { SectionCaps } from "./section";
 import {
   CameraRig,
@@ -194,7 +194,12 @@ export function IfcViewer({
                 product={product}
                 position={position}
                 selected={product.semanticId === activeId}
-                hovered={product.semanticId === activeHover}
+                hovered={
+                  product.semanticId === activeHover ||
+                  parentElementId(product.semanticId) === activeHover ||
+                  (parentElementId(product.semanticId) === activeId &&
+                    product.semanticId !== activeId)
+                }
                 state={status}
                 mode={activeMode}
                 planes={planes}

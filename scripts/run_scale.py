@@ -15,15 +15,41 @@ def main():
     p.add_argument("--wsl", help="Distribución con Docker y python3")
     p.add_argument("--workers", nargs="+", type=int, default=[1, 4])
     p.add_argument("--estrategia", default="d_hibrido")
+    p.add_argument("--image", default="trazia-api:latest")
+    p.add_argument("--data", type=Path, default=Path("generated/synthetic_v2"))
+    p.add_argument("--output", type=Path, default=Path("generated/scale"))
+    p.add_argument("--api-port", type=int, default=8020)
+    p.add_argument(
+        "--sets", nargs="+", default=["s-dev", "s-reservado", "s-mecanico", "s-adversarial"]
+    )
+    p.add_argument("--casos", type=int, default=None)
+    p.add_argument("--degradaciones", nargs="+", default=None)
+    p.add_argument(
+        "--eur-worker-hora", type=float, default=None, help="Tarifa hipotética, no coste medido"
+    )
     args = p.parse_args()
     if any(n < 1 or n > 8 for n in args.workers):
         p.error("Usa entre uno y ocho workers")
-    output = ROOT / "generated/scale"
+    if (
+        not 1 <= args.api_port <= 65535
+        or args.api_port in (8010, 8011, 3100, 3300)
+        or 3290 <= args.api_port <= 3299
+    ):
+        p.error("Puerto no disponible para el agente Plataforma")
+    if args.casos is not None and args.casos < 1:
+        p.error("casos debe ser positivo")
+    if args.eur_worker_hora is not None and args.eur_worker_hora < 0:
+        p.error("La tarifa hipotética no puede ser negativa")
+    output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     prefix = []
     if args.wsl:
         linux = "/mnt/" + ROOT.drive[0].lower() + ROOT.as_posix()[2:]
         prefix = ["wsl", "-d", args.wsl, "--cd", linux, "--exec"]
+
+    def native_path(path):
+        path = path.resolve()
+        return "/mnt/" + path.drive[0].lower() + path.as_posix()[2:] if args.wsl else str(path)
 
     def execute(command, **kwargs):
         result = subprocess.run(
@@ -44,10 +70,14 @@ def main():
         project = "trazia-scale-" + uuid.uuid4().hex[:10]
         override = output / (project + ".yml")
         override.write_text(
-            "services:\n  api-scale:\n    image: trazia-api:latest\n"
-            "    ports: !override [127.0.0.1:18000:8000]\n"
-            "  worker:\n    image: trazia-api:latest\n    environment:\n"
+            f"services:\n  api-scale:\n    image: {json.dumps(args.image)}\n"
+            f"    ports: !override [127.0.0.1:{args.api_port}:8000]\n"
+            "    environment:\n      TRAZIA_OFFLINE: '0'\n      TRAZIA_VISION_OFFLINE: '1'\n"
+            "      CUDA_VISIBLE_DEVICES: '-1'\n"
+            f"  worker:\n    image: {json.dumps(args.image)}\n    environment:\n"
             "      TRAZIA_WORKER_CONCURRENCY: '1'\n"
+            "      TRAZIA_OFFLINE: '0'\n      TRAZIA_VISION_OFFLINE: '1'\n"
+            "      CUDA_VISIBLE_DEVICES: '-1'\n      TRAZIA_OCR_CACHE: /data/cache/ocr\n"
             "      OMP_NUM_THREADS: '1'\n      OPENBLAS_NUM_THREADS: '1'\n",
             encoding="utf8",
         )
@@ -59,7 +89,7 @@ def main():
             "-f",
             "docker-compose.yml",
             "-f",
-            "generated/scale/" + override.name,
+            native_path(override),
             "--profile",
             "escala",
         ]
@@ -80,35 +110,56 @@ def main():
                     "worker",
                 ]
             )
-            image = execute(
-                ["docker", "image", "inspect", "trazia-api:latest", "--format", "{{.Id}}"]
-            )
-            target = f"generated/scale/workers-{count}-{args.estrategia}.json"
+            image = execute(["docker", "image", "inspect", args.image, "--format", "{{.Id}}"])
+            target = output / f"workers-{count}-{args.estrategia}.json"
             command = (
                 prefix
                 + (["python3"] if args.wsl else [sys.executable])
                 + [
                     "scripts/measure_scale.py",
                     "--api",
-                    "http://127.0.0.1:18000",
+                    f"http://127.0.0.1:{args.api_port}",
                     "--output",
-                    target,
+                    native_path(target),
                     "--estrategia",
                     args.estrategia,
+                    "--data",
+                    native_path(args.data),
+                    "--sets",
+                    *args.sets,
                 ]
             )
+            if args.casos:
+                command += ["--casos", str(args.casos)]
+            if args.degradaciones:
+                command += ["--degradaciones", *args.degradaciones]
             process = subprocess.run(command, cwd=ROOT)
             if process.returncode:
                 raise RuntimeError("El lote no terminó; conserva el resultado parcial")
-            report = json.loads((ROOT / target).read_text(encoding="utf8"))
+            report = json.loads(target.read_text(encoding="utf8"))
             report["deployment"] = {
                 "workers": count,
                 "concurrency_per_worker": 1,
                 "image": image,
                 "storage": "Postgres + SHA-256",
                 "queue": "Redis/arq",
+                "cpu_only": True,
+                "vision_providers": [],
             }
-            (ROOT / target).write_text(
+            projection = report["summary"]["projection_400x4"]
+            seconds = projection["seconds_for_1600_terminal_jobs"]
+            projection["compute_cost_scenario"] = {
+                "measured": False,
+                "assumed_eur_worker_hour": args.eur_worker_hora,
+                "estimated_eur_for_1600_terminal_jobs": seconds
+                * count
+                / 3600
+                * args.eur_worker_hora
+                if seconds is not None and args.eur_worker_hora is not None
+                else None,
+                "excluded": "Energía local, almacenamiento, API y coste de producir IFC correctos",
+            }
+            target.write_text(
                 json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf8"
             )
             results.append(

@@ -229,7 +229,8 @@ def test_empty_study_and_actual_diff(client, tmp_path):
         assert isolated.get("/estudio").json() == measured
     assert client.get("/diff?from=A&to=B").json()["summary"]["changes"] == 8
     assert client.get("/plant").json()["layout"] is None
-    assert client.post("/estudio", headers=headers()).status_code == 503
+    # El endpoint ya ejecuta estudios; ahora exige el cuerpo StudyInput.
+    assert client.post("/estudio", headers=headers()).status_code == 422
 
 
 def test_blob_integrity_and_no_path_traversal(client):

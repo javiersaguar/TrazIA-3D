@@ -1,0 +1,30 @@
+{
+  "synthetic": true,
+  "row": {
+    "revision_id": "DEMO-PLANT:vessel-001:A",
+    "equipment_tag": "V-101",
+    "revision": "A",
+    "path": "diameter",
+    "value_before": 2000.0,
+    "value_after": 2000.0,
+    "unit": "mm",
+    "state_before": "candidate",
+    "state_after": "accepted",
+    "confidence": 0.75,
+    "confidence_raw": 0.75,
+    "channel": null,
+    "strategy": null,
+    "document_id": "GA-V101",
+    "page": 1,
+    "bbox": [
+      0.42837308103558774,
+      0.2166243135384228,
+      0.5339544463025944,
+      0.23087796051217163
+    ],
+    "actor": "Prueba sint?tica",
+    "at": "2026-10-30T20:37:27.026876Z",
+    "data_sha256": "e4eec6ae1c06155c5cb6386e10cca245f3bd6cbdaa24a723b8b8fba6700377f9"
+  },
+  "jsonl_matches_api": true
+}

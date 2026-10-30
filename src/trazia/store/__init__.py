@@ -50,6 +50,17 @@ class JobRecord(SQLModel, table=True):
     revision_id: str | None = None
     lease_until: float | None = None
     warnings_json: str = "[]"
+    kind: str = "pipeline"
+    result_sha256: str | None = None
+    elapsed_seconds: float | None = None
+    cache_hit: bool = False
+
+
+class JobCacheRecord(SQLModel, table=True):
+    __tablename__ = "job_cache"
+    key: str = Field(primary_key=True)
+    result_sha256: str
+    created_at: float = Field(default_factory=time.time)
 
 
 class EventRecord(SQLModel, table=True):
@@ -81,6 +92,20 @@ class AuditRecord(SQLModel, table=True):
     after_json: str
     seconds: float | None = None
     created_at: float = Field(default_factory=time.time)
+
+
+class CorrectionRecord(SQLModel, table=True):
+    __tablename__ = "corrections"
+    id: int | None = Field(default=None, primary_key=True)
+    at: str = Field(index=True)
+    payload_json: str
+    exported: bool = Field(default=False, index=True)
+
+
+class CorrectionCursorRecord(SQLModel, table=True):
+    __tablename__ = "correction_cursors"
+    key: str = Field(primary_key=True)
+    byte_offset: int = 0
 
 
 class IdempotencyConflict(ValueError):

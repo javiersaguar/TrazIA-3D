@@ -116,3 +116,123 @@ unitarias y build, conservando todos los pasos y la matriz Python Windows/Linux 
 3.2–3.4, 3.8 y 3.11 no se marcan como terminadas. Memoria, calibración, fusión y aprendizaje
 activo necesitan el trabajo de Lectura. El pitch comparativo se completará con esos resultados.
 Los commits y push se realizan por petición expresa del usuario en feat/plataforma.
+
+
+## Sesión 30/10 · 3.7/H.7: escala en CPU con la base de main
+
+Se reutilizan measure_scale.py y run_scale.py. El runner permite fijar imagen, entrada,
+salida, puerto 8020 y una sonda por casos/degradaciones. Rechaza los puertos reservados
+a otros equipos. Cada despliegue tiene proyecto y volúmenes nuevos, Postgres, Redis/arq
+y uno o cuatro workers de concurrencia uno. Se bloquea visión, no se exponen dispositivos
+GPU y se limita OMP/BLAS a un hilo. TRAZIA_OFFLINE=0 permite medir el pipeline real; la
+caché de resultados de trabajos no se usa para saltarse ejecuciones en este ensayo.
+
+Base de Lectura: main a75e8ef, sin traer feat/lectura. Backend sobre feat/web-3d más las
+tareas de esta sesión; model.py permanece intacto. Imagen trazia-plataforma:20261030,
+con Python 3.12, IfcOpenShell 0.8.5 y el extra OCR que ya existe en el Dockerfile.
+No se entrenan modelos ni se esperan funciones nuevas del otro agente.
+
+```mermaid
+flowchart LR
+  L[Cliente de lote sintético] -->|HTTP 8020 + Idempotency-Key| A[API FastAPI]
+  A --> Q[Redis / arq]
+  Q --> W1[Worker CPU 1]
+  Q --> WN[Worker CPU 2 a 4]
+  W1 --> P[Pipeline de main / b_reglas]
+  WN --> P
+  A <--> DB[(Postgres: trabajos, leases y auditoría)]
+  P --> DB
+  P --> S[(Almacén SHA-256: originales, IFC y resultados)]
+  P <--> C[Cachés de página existentes: OCR y visión]
+  DB --> E[Eventos SSE y métricas por trabajo]
+  S --> O[Reutilización de resultados en modo offline]
+```
+
+La caché de página es distinta de la de resultados completos: OCR/visión ya identifican
+una página por contenido, mientras que cambiar un documento invalida la entrada del
+trabajo completo. No se ha medido una prueba multipágina incremental en este lote.
+
+Se parte de los cuatro conjuntos sintéticos existentes: 64 equipos, 168 condiciones
+y 336 revisiones con sus GA/HDM. No se filtran errores ni equipos sin cobertura. Primero
+se ejecuta una sonda de D, con un equipo por conjunto y todas sus degradaciones: cuatro
+equipos, diez condiciones, veinte revisiones. Resultado: 4 done y 16 error en 169,256 s;
+faltan tags, dimensiones o al menos tres boquillas en varias salidas. Por eso el lote
+completo usa B. La sonda no es una comparación estadística ni una medida de precisión.
+
+Reproducción: construir la imagen en Ubuntu/WSL desde la raíz del checkout:
+
+```sh
+docker build -t trazia-plataforma:20261030 -f Dockerfile.api .
+```
+
+El corpus v2 se regenera con `uv run python -m synthetic --conjunto todos` en esta base.
+Las semillas/casos por conjunto y hashes de manifiesto se registran en resumen.json.
+Después, desde la misma raíz en PowerShell (con generated/synthetic_v2 ya preparado):
+
+```powershell
+uv run python scripts/run_scale.py --wsl Ubuntu --workers 1 --estrategia d_hibrido --image trazia-plataforma:20261030 --output generated/scale-probe-d --casos 1 --api-port 8020
+uv run python scripts/run_scale.py --wsl Ubuntu --workers 1 4 --estrategia b_reglas --image trazia-plataforma:20261030 --output generated/scale-b-completo --api-port 8020 --eur-worker-hora 0.25
+```
+
+Con Docker nativo omitir --wsl y ejecutar todos los comandos en el mismo entorno. Los tiempos del lote incluyen subidas, HTTP, cola,
+pipeline, validación y sondeo del cliente; excluyen construir/arrancar los contenedores.
+No hubo pruebas propias ejecutándose durante el lote completo B. Lectura sí trabajaba
+en paralelo: la CPU del portátil no estuvo dedicada exclusivamente a este ensayo.
+
+La proyección para 400 equipos × 4 revisiones usa 1600 / throughput observado. Es una
+EXTRAPOLACIÓN de terminaciones, incluidos errores; si no se completa todo el lote con
+IFC estructuralmente válidos, no se calcula un tiempo para 1600 IFC válidos. El coste
+de proveedores se conserva como lo declara RunInfo; null permanece desconocido. Un cero
+no incluye energía ni trabajo humano. El escenario de cómputo usa una tarifa HIPOTÉTICA
+de 0,25 EUR por worker-hora, aplicada al tiempo extrapolado y al número de workers;
+no es precio contratado ni coste medido. Excluye API, almacenamiento y energía local.
+
+### Resultados medidos del lote completo B
+
+| Workers CPU | Revisiones | done | error | Tiempo total (s) | Media respuesta (s) | p95 respuesta (s) | Terminaciones/s | Coste proveedores declarado (EUR) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 336 | 72 | 264 | 352.475 | 28.703 | 47.561 | 0.953 | 0.00 |
+| 4 | 336 | 72 | 264 | 97.285 | 7.366 | 12.380 | 3.454 | 0.00 |
+
+Mejora observada de tiempo con cuatro workers: **3.62×**. Misma imagen y SHA de
+entrada, y el mismo estado terminal para cada una de las 336 revisiones. Cero llamadas
+externas declaradas en ambos lotes. Cada despliegue parte de volúmenes nuevos; son ensayos
+de pipeline en frío, sin reutilizar resultados de trabajos anteriores.
+
+| Conjunto | done | error |
+| --- | --- | --- |
+| s-dev | 48 | 96 |
+| s-reservado | 0 | 96 |
+| s-mecanico | 0 | 72 |
+| s-adversarial | 24 | 0 |
+
+### Extrapolación a 400 equipos × 4 revisiones
+
+| Workers | Tiempo de 1600 terminaciones (min, extrapolado) | Tiempo de 1600 IFC válidos | Coste proveedores (EUR, extrapolado) | Escenario de cómputo a 0,25 EUR/worker-h (EUR, hipotético) |
+| --- | --- | --- | --- | --- |
+| 1 | 27.974 | No calculable con esta cobertura | 0.00 | 0.1166 |
+| 4 | 7.721 | No calculable con esta cobertura | 0.00 | 0.1287 |
+
+El cero corresponde exclusivamente a proveedores locales declarados por RunInfo; no
+es coste operativo total medido. La tabla de cómputo es una hipótesis separada. `done`
+acredita generación y validación estructural/EXPRESS, no fidelidad frente a verdad de
+referencia. Los 264 errores se conservan, principalmente por tags o campos obligatorios
+ausentes o boquillas insuficientes. No se declara cobertura del corpus ni exactitud de TR.
+
+El ensayo solicitado está ejecutado sobre la base disponible: no queda esperando una
+función nueva de Lectura. El hito amplio 3.7/H.7 de producir todo el corpus y defender
+1600 IFC válidos sigue sin acreditarse con esta cobertura. No se modifica el ROADMAP
+protegido en esta sesión; esta es la propuesta de estado para su responsable.
+
+Evidencia reproducible: [resumen y entorno](evidencias/fase3/30oct/resumen.json),
+[sonda D](evidencias/fase3/30oct/sonda-d.json),
+[B con un worker](evidencias/fase3/30oct/b-workers-1.json) y
+[B con cuatro workers](evidencias/fase3/30oct/b-workers-4.json). Incluyen cada trabajo,
+su error/contabilidad y los tiempos por equipo/condición. Equipo: Ryzen 9 8940HX,
+32 hilos del host; Docker ve 24 CPU y unos 43 GiB. Imagen y hash de entrada registrados.
+
+Verificación de cierre: Ruff check y format globales correctos, **264 pruebas Python
+correctas y una omitida en 327,83 s**. La instalación requerida no incorpora el extra
+OCR local; la omisión correspondiente permanece explícita. Nueve pruebas de los scripts
+verifican límites de sonda, preservación de errores/coste desconocido y rechazo de
+puertos reservados antes de llamar a Docker. No se modifica web ni el contrato 0.3.

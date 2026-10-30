@@ -1,6 +1,6 @@
 import { test } from "@playwright/test";
 
-const SCREENS = ["portada", "proyecto", "pipeline", "revision", "cambios", "bench", "impacto", "proyectos", "familias", "lote", "ajustes"];
+const SCREENS = ["portada", "proyecto", "pipeline", "revision", "cambios", "modelo", "bench", "impacto", "proyectos", "familias", "lote", "ajustes"];
 const THEMES = ["oscuro", "claro"] as const;
 
 for (const theme of THEMES) {
@@ -16,22 +16,15 @@ for (const theme of THEMES) {
       // La portada sin la intro del logo, en su estado final
       if (screen === "portada") await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto(screen === "portada" ? "/" : `/${screen}`);
-      const thumbs = screen === "proyectos" || screen === "familias";
-      if (screen === "portada" || thumbs) {
-        // Las secciones y las miniaturas 3D aparecen al entrar en pantalla: se recorre la página antes de la captura completa
-        await page.evaluate(async (step) => {
+      if (screen === "portada" || screen === "modelo" || screen === "proyectos" || screen === "familias") {
+        // Las secciones y escenas diferidas aparecen al entrar en pantalla: se recorre la página antes de la captura completa
+        await page.evaluate(async () => {
           for (let y = 0; y < document.body.scrollHeight; y += 400) {
             window.scrollTo(0, y);
-            await new Promise((r) => setTimeout(r, step));
+            await new Promise((r) => setTimeout(r, 350));
           }
           window.scrollTo(0, 0);
-        }, thumbs ? 600 : 80);
-      }
-      if (thumbs) {
-        // Las miniaturas se dibujan de una en una; sin WebGL la captura sale igual, sin ellas
-        await page
-          .waitForFunction(() => [...document.querySelectorAll("main figure")].every((f) => f.querySelector("img")), null, { timeout: 30_000 })
-          .catch(() => {});
+        });
       }
       await page.waitForLoadState("networkidle");
       if (screen === "pipeline") await page.getByText("Pipeline: último trabajo").waitFor({ timeout: 15_000 });
@@ -42,6 +35,8 @@ for (const theme of THEMES) {
       if (screen === "cambios") {
         await page.getByText("Longitud entre tangentes").first().click();
       }
+      if(screen==="revision")await page.locator('[data-testid="ifc-viewer"][data-phase="ready"]').waitFor();
+      if(screen==="cambios")await page.locator('[data-testid="revision-morph"][data-phase="ready"]').waitFor();
       await page.waitForTimeout(2500);
       await page.screenshot({ path: `docs/capturas/${screen}-${theme}.png`, fullPage: true });
     });

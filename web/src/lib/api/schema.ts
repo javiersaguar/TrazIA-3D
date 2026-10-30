@@ -341,6 +341,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/learning/corrections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Learning Corrections */
+        get: operations["learning_corrections_learning_corrections_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/copiloto": {
         parameters: {
             query?: never;
@@ -491,6 +508,11 @@ export interface components {
         };
         /** CopilotAnswer */
         CopilotAnswer: {
+            /**
+             * Cached
+             * @default false
+             */
+            cached?: boolean;
             /** Abstained */
             abstained: boolean;
             /** Reason */
@@ -927,6 +949,32 @@ export interface components {
             text: string;
             /** Citations */
             citations: string[];
+        };
+        /** StudyInput */
+        StudyInput: {
+            /** Conjuntos */
+            conjuntos?: ("s-dev" | "s-reservado" | "s-adversarial" | "s-mecanico")[];
+            /** Variantes */
+            variantes?: string[];
+            /** Casos */
+            casos?: number | null;
+            /** Degradaciones */
+            degradaciones?: string[] | null;
+            /**
+             * Remuestreos
+             * @default 1000
+             */
+            remuestreos?: number;
+            /**
+             * Semilla
+             * @default 2026
+             */
+            semilla?: number;
+            /**
+             * Timeout Seconds
+             * @default 3600
+             */
+            timeout_seconds?: number;
         };
         /** Tag */
         Tag: {
@@ -1590,7 +1638,9 @@ export interface operations {
     };
     study_estudio_get: {
         parameters: {
-            query?: never;
+            query?: {
+                job_id?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1606,6 +1656,15 @@ export interface operations {
                     "application/json": unknown;
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
     launch_study_estudio_post: {
@@ -1614,6 +1673,42 @@ export interface operations {
             header?: {
                 "idempotency-key"?: string | null;
             };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StudyInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    learning_corrections_learning_corrections_get: {
+        parameters: {
+            query?: {
+                after?: number;
+                limit?: number;
+            };
+            header?: never;
             path?: never;
             cookie?: never;
         };

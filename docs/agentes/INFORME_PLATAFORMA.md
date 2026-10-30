@@ -378,3 +378,119 @@ CI añade job web, sin eliminar pasos Python existentes. Evidencia y reproducci�
 [FASE3.md](../FASE3.md), con JSON de métricas por equipo/condición bajo docs/evidencias/fase3.
 No hay nuevas dependencias ni cambios de contrato con Lectura. Commit y push autorizados por
 el encargo actual, a feat/plataforma; no se fusiona su trabajo sin terminar ni se hace push forzado.
+
+
+## Sesión 30/10/2026 · estudio en cola, offline y correcciones
+
+Trabajo en el worktree `TrazIA-3D-plataforma`, rama `feat/plataforma`, desde el frontend
+integrado de `feat/web-3d`. Se respeta SESION_LECTURA.md; no se modifican sus carpetas
+ni se ocupa la GPU. Sin push, PR, cambios en main o datos privados.
+
+H.1/H.3: POST /estudio usa la cola común con subproceso cancelable y resultados por SHA-256.
+La prueba Redis/arq/Postgres real acredita idempotencia, SSE, timeout, cancelación y
+persistencia tras reinicio: 6,134 s para un equipo sintético y dos revisiones vectoriales.
+4.2: modo offline de visión y caché del copiloto, invalidada por datos/modelo/código y
+con originales comprobados de nuevo. 3.8: exportación de correcciones aprobadas; la
+recalibración y uso few-shot esperan la interfaz pública de Lectura y siguen abiertos.
+
+[Informe, reproducción, límites y evidencia](../BACKEND_2026-10-30.md). El ROADMAP marca
+H.1/H.3/4.2 con sus comprobaciones y mantiene 3.7/H.7 y 3.8 parciales.
+
+
+## Sesión 30/10 · backend independiente y publicación de feat/plataforma
+
+Encargo actual: cinco tareas, sin editar Lectura, web ni el contrato model.py.
+Se reutiliza el worktree ya existente, se fusiona main `a75e8ef` y se instala con
+`uv sync --frozen --extra dev --extra api --extra geo`. Base verde: Ruff y
+239 pruebas Python correctas, una omitida, 166,42 s. La omisión corresponde al extra
+OCR opcional no incluido en la instalación requerida. No se usa la GPU.
+
+### 1 · H.1/H.3: CLI estable del estudio
+
+Sustituido el adaptador que importaba run_study por la invocación de la CLI estable
+como subproceso. Se mantienen cola, idempotencia, leases, SSE, timeout, cancelación
+y resultado por SHA-256. Se elimina study_worker.py. Las pruebas comprueban el
+argv sin shell, un estudio real de un caso y 20 remuestreos, ausencia de informe,
+error, timeout, cancelación, persistencia y replay. No cambia ninguna interfaz de
+Lectura ni se esperan funciones nuevas suyas.
+
+Cierre tarea 1: Ruff check y format globales correctos; 241 pruebas correctas y una
+omitida en 251,74 s. Seis pruebas específicas del estudio correctas.
+
+### 2 · 4.2: caché persistida de resultados de trabajos
+
+La API comprueba hashes de documentos + estrategia + proveedores y contexto documental.
+Con OFFLINE, el acierto restaura un DRAFT sin ejecutar el pipeline; el fallo responde
+409 en español antes de encolar. Se verifica la integridad del resultado y originales,
+se conserva idempotencia y se indican cache_hit y contabilidad marginal sin inferencia.
+La migración 0004 sirve en SQLite y Postgres. No se cachean fallos ni aprobaciones.
+Las pruebas no presuponen confianza o intervalos vacíos. No se cambia model.py, web
+ni vision/cache.py. Trece pruebas específicas de caché/cola correctas.
+
+Cierre tarea 2: Ruff y formato global correctos; 245 pruebas correctas y una omitida
+en 271,05 s. API HTTP 8020, mismo almacén tras reinicio: trabajo original 3,192 s y
+recuperación cacheada 0,022 s registrados por el job (no latencia HTTP total), con
+pipeline omitido y fallo explícito al cambiar la estrategia. Solo sintéticos.
+
+### 3 · CORS configurable
+
+TRAZIA_CORS_ORIGINS sustituye la lista por orígenes explícitos separados por comas.
+Vacío conserva exactamente los puertos actuales; configuración para 3120 documentada
+en .env.example y API.md y propagada por Compose. Nueve comprobaciones específicas
+pasan: defaults, reemplazo, normalización, rechazo de otros sitios y configuración
+inválida. No se cambia web ni se usan los puertos de otros equipos.
+
+Cierre tarea 3: Ruff y formato globales correctos; 253 pruebas correctas y una omitida
+en 301,02 s. API real 8020: preflight desde localhost:3120 devuelve 200 con el origen
+permitido; un origen ajeno devuelve 400 sin cabecera de autorización CORS.
+
+### 4 · 3.8 (datos): JSONL y GET /correcciones
+
+Registro de cada cambio de valor/unidad/estado, con el formato solicitado y los
+metadatos de la predicción antes de intervenir. Fecha UTC y huella de los datos
+resultantes; null para ausentes. GET /correcciones filtra desde ISO inclusivo.
+El JSONL se publica desde una bandeja transaccional, con cursor bloqueado y recuperación
+tras fallo de escritura, reintento idempotente o archivo truncado. Las ediciones
+rechazadas y peticiones sin cambios no añaden líneas. La migración 0005 no modifica
+model.py. No se llama a calibración ni se escribe en carpetas de Lectura.
+Siete pruebas específicas correctas: con/sin calibración, idempotencia, estado, rechazo,
+fallo tras escribir, concurrencia, filtro de fecha, recuperación y aprobación existente.
+
+Cierre tarea 4: Ruff y formato globales correctos; 258 pruebas correctas y una omitida
+en 290,06 s. Prueba HTTP 8020: la fila devuelta por GET coincide exactamente con la
+última línea UTF-8 del JSONL. Evidencia sintética en evidencias/fase3/correccion-api-30oct.json.
+
+### 5 · 3.7/H.7: escala en CPU
+
+Sonda D completa: 4 done y 16 errores en 20 revisiones, 169,256 s. Se elige el fallback
+B indicado en el encargo. Lote completo: 64 equipos, 168 condiciones y 336 revisiones;
+72 done y 264 errores con uno y con cuatro workers Redis/arq/Postgres. Tiempos medidos:
+352,475 y 97,285 s, mejora observada 3.62×. Mismo hash de entrada, imagen y estado
+para cada revisión. Visión bloqueada, providers vacío y sin dispositivos GPU. Se usan
+solo las estrategias presentes en main a75e8ef y la base 3D autorizada.
+
+Diagrama, latencias, resultados completos, desglose por conjunto y extrapolación de
+400×4 en [FASE3.md](../FASE3.md), con evidencia bajo evidencias/fase3/30oct. El coste de
+proveedores declarado es 0 EUR y no incluye energía ni revisión humana. La estimación
+de cómputo usa 0,25 EUR/worker-h como hipótesis explícita. Con 264 errores no se calcula
+un tiempo defendible para 1600 IFC válidos; done tampoco acredita fidelidad geométrica.
+Los ensayos se hacen mientras Lectura trabaja en paralelo, sin CPU dedicada.
+
+Cierre tarea 5: Ruff y formato globales correctos, 264 pruebas correctas y una omitida
+en 327,83 s. No hubo pruebas propias activas durante los lotes completos B. Todos los
+contenedores y volúmenes exclusivos del ensayo se eliminan al terminar; no se para
+ningún stack ajeno. Se preservan costes desconocidos como null cuando aparezcan.
+
+### Estado final del encargo
+
+Las cinco tareas están implementadas y medidas en su alcance: CLI estable del estudio,
+caché de trabajos offline, CORS configurable, registro JSONL/GET de correcciones y lote
+CPU con proyección explícita. No se llama a calibración, no se integran cambios de
+feat/lectura y no se editan sus carpetas, model.py, web ni ROADMAP. No hay dependencias
+nuevas ni cambios de uv.lock. Interfaces nuevas: GET /correcciones?desde, cache_hit en
+GET /jobs, y configuración CORS/ruta JSONL. No se regeneran tipos web por la separación
+de esta sesión. Los datos generados siguen en el worktree de Plataforma.
+
+Publicación autorizada exclusivamente de feat/plataforma, sin fusión a main ni PR.
+El hito amplio de cobertura/IFC correctos y la recalibración automática de 3.8 no se
+declaran terminados; no forman parte de la porción de datos/medición cerrada aquí.

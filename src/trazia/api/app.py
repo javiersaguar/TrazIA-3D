@@ -1,9 +1,11 @@
 import asyncio
 import hashlib
 import json
+import logging
 import os
 import time
 from contextlib import asynccontextmanager
+from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Literal
 from urllib.parse import quote
@@ -13,10 +15,12 @@ from fastapi import FastAPI, File, Form, Header, HTTPException, Query, Request, 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from pydantic import Field, ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session, select
 
 from trazia.copilot import CopilotAnswer, CopilotUnavailable
 from trazia.copilot import ask as ask_copilot
+from trazia.copilot.cache import answer_cached
 from trazia.ifc import build_ifc
 from trazia.model import FieldState, Identifier, Model, Revision, Source, fields
 from trazia.queue import ProcessQueue
@@ -33,6 +37,8 @@ from trazia.store import (
     Store,
 )
 
+from . import corrections
+from .cors import origins
 from .jobs import TERMINAL, recover_jobs, run_job
 from .repository import check_match, get_revision, read_report, save_revision, seed_demo
 from .security import UploadLimit
@@ -54,6 +60,18 @@ class JobInput(Model):
     timeout_seconds: float = Field(default=300, gt=0, le=3600)
     max_attempts: int = Field(default=3, ge=1, le=5)
     retry_backoff_seconds: float = Field(default=1, ge=0, le=30)
+
+
+class StudyInput(Model):
+    conjuntos: list[Literal["s-dev", "s-reservado", "s-adversarial", "s-mecanico"]] = Field(
+        default_factory=lambda: ["s-dev"], min_length=1, max_length=4
+    )
+    variantes: list[str] = Field(default_factory=lambda: ["b_reglas"], min_length=1, max_length=20)
+    casos: int | None = Field(default=None, ge=1, le=1000)
+    degradaciones: list[str] | None = Field(default=None, max_length=20)
+    remuestreos: int = Field(default=1000, ge=1, le=10000)
+    semilla: int = Field(default=2026, ge=0, le=2**32 - 1)
+    timeout_seconds: float = Field(default=3600, gt=0, le=7200)
 
 
 class FieldInput(Model):
@@ -95,13 +113,28 @@ def create_app(
     database_url: str | None = None,
     seed: bool = True,
 ) -> FastAPI:
+    from trazia.runtime import configure_offline
+
+    configure_offline()
     repo = (root or Path(os.getenv("TRAZIA_ROOT", "."))).resolve()
     data = data_root or Path(os.getenv("TRAZIA_DATA", "data"))
+    corrections_file = Path(
+        os.getenv("TRAZIA_CORRECTIONS_FILE")
+        or (
+            (data_root if data_root is not None else repo)
+            / "generated/correcciones/correcciones.jsonl"
+        )
+    ).resolve()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         store = Store(data, database_url or os.getenv("TRAZIA_DATABASE_URL"))
         app.state.store = store
+        app.state.corrections_file = corrections_file
+        try:
+            corrections.flush(store, corrections_file)
+        except (OSError, SQLAlchemyError):
+            logging.getLogger("trazia.api").warning("Correcciones pendientes de exportar a JSONL")
         app.state.copilot_limit = asyncio.Semaphore(1)
         if seed:
             seed_demo(store, repo)
@@ -126,11 +159,7 @@ def create_app(
     app.add_middleware(UploadLimit, limit=MAX_UPLOAD + 1024 * 1024)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[
-            f"http://{host}:{port}"
-            for host in ("localhost", "127.0.0.1")
-            for port in (3000, 3100, 3200)
-        ],
+        allow_origins=origins(),
         allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
         allow_headers=["Content-Type", "Idempotency-Key", "If-Match", "Last-Event-ID"],
         expose_headers=["ETag"],
@@ -146,10 +175,13 @@ def create_app(
 
     @app.get("/health")
     def health():
+        from trazia.runtime import offline
+
         return {
             "status": "ok",
             "schema_version": "0.3",
             "queue": os.getenv("TRAZIA_QUEUE", "process"),
+            "offline": offline(),
         }
 
     @app.post("/documents", status_code=201)
@@ -302,7 +334,23 @@ def create_app(
         result = request.app.state.store.perform(
             f"PATCH {identity}/{path}", require_key(idempotency_key), fingerprint, action
         )
+        try:
+            corrections.flush(request.app.state.store, request.app.state.corrections_file)
+        except (OSError, SQLAlchemyError) as failure:
+            raise HTTPException(
+                503,
+                "Campo guardado; falta exportar el JSONL. Reintente con la misma Idempotency-Key",
+            ) from failure
         return reply(result)
+
+    @app.get("/correcciones")
+    def correction_log(request: Request, desde: datetime | None = None):
+        if desde is not None and desde.tzinfo is None:
+            raise HTTPException(
+                422, "desde requiere fecha ISO 8601 con zona horaria, por ejemplo Z"
+            )
+        rows = corrections.read(request.app.state.store, desde)
+        return {"correcciones": rows, "count": len(rows)}
 
     @app.post("/revisions/{identity}/approve", response_model=Revision)
     def approve_revision(
@@ -357,7 +405,11 @@ def create_app(
             row = get_revision(session, identity)
             model = Revision.model_validate_json(row.payload)
         try:
-            content = build_ifc(model, draft=draft, schema=schema).to_string().encode()
+            content = (
+                build_ifc(model, draft=draft, schema=schema, details=model.dataset == "synthetic")
+                .to_string()
+                .encode()
+            )
         except ValueError as error:
             raise HTTPException(409, str(error)) from error
         filename = quote(f"{model.equipment.tag.value}_{model.revision}", safe="")
@@ -411,10 +463,22 @@ def create_app(
                     )
                 if not Revision.model_validate_json(previous.payload).approval:
                     raise HTTPException(409, "La revisión usada como memoria debe estar aprobada")
+            config = {**body.model_dump(mode="json"), "tag": tag}
+            if body.previous_id:
+                config["previous_id"] = previous.id
+            from trazia.runtime import offline
+
+            if offline():
+                from .job_cache import CacheMiss, load
+
+                try:
+                    load(request.app.state.store, session, config)
+                except CacheMiss as failure:
+                    raise HTTPException(409, str(failure)) from failure
             job = JobRecord(
                 id=str(uuid4()),
                 tag=tag,
-                request_json=json.dumps({**body.model_dump(mode="json"), "tag": tag}),
+                request_json=json.dumps(config),
             )
             session.add(job)
             return {"data": {"job_id": job.id, "status": "queued"}, "status": 202}
@@ -580,7 +644,33 @@ def create_app(
         }
 
     @app.get("/estudio")
-    def study():
+    def study(request: Request, job_id: str | None = None):
+        store = request.app.state.store
+        with Session(store.engine) as session:
+            if job_id:
+                record = session.get(JobRecord, job_id)
+                if not record or record.kind != "study":
+                    raise HTTPException(404, "No existe ese estudio")
+                if record.status != "done":
+                    return JSONResponse(
+                        {"job_id": job_id, "status": record.status, "detail": record.error},
+                        status_code=202,
+                    )
+            else:
+                record = session.exec(
+                    select(JobRecord)
+                    .where(JobRecord.kind == "study", JobRecord.status == "done")
+                    .order_by(JobRecord.updated_at.desc(), JobRecord.id)
+                ).first()
+            if record:
+                if not record.result_sha256:
+                    raise HTTPException(409, "El estudio terminado no tiene resultado persistido")
+                try:
+                    return json.loads(store.read(record.result_sha256))
+                except (OSError, ValueError) as failure:
+                    raise HTTPException(
+                        409, "No se puede verificar el resultado del estudio"
+                    ) from failure
         result = read_report(repo / "generated/estudio/estudio.json")
         return result or {
             "status": "empty",
@@ -588,12 +678,50 @@ def create_app(
             "detail": "Lectura todavía no ha publicado resultados del estudio",
         }
 
-    @app.post("/estudio")
-    def launch_study(idempotency_key: str | None = Header(None)):
-        require_key(idempotency_key)
-        raise HTTPException(
-            503, "Falta el ejecutor de estudio de Lectura; no se simulan resultados"
-        )
+    @app.get("/learning/corrections")
+    def learning_corrections(
+        request: Request, after: int = Query(0, ge=0), limit: int = Query(100, ge=1, le=1000)
+    ):
+        from .learning import approved_examples
+
+        try:
+            return approved_examples(request.app.state.store, after=after, limit=limit)
+        except (OSError, ValueError) as failure:
+            raise HTTPException(
+                409, "No se pueden verificar las correcciones y sus originales"
+            ) from failure
+
+    @app.post("/estudio", status_code=202)
+    async def launch_study(
+        request: Request, body: StudyInput, idempotency_key: str | None = Header(None)
+    ):
+        key = require_key(idempotency_key)
+        data = Path(os.getenv("TRAZIA_STUDY_DATA", str(repo / "generated/synthetic_v2"))).resolve()
+        # Solo datos sintéticos administrados localmente; la petición no acepta rutas.
+        if any(part.casefold() == "private" for part in data.parts):
+            raise HTTPException(422, "El estudio de la API solo admite el conjunto sintético")
+        for name in body.conjuntos:
+            if not (data / name).resolve().is_relative_to(data):
+                raise HTTPException(422, "El conjunto debe permanecer en la carpeta sintética")
+            try:
+                manifest = json.loads((data / name / "manifest.json").read_text(encoding="utf-8"))
+            except (OSError, ValueError) as failure:
+                raise HTTPException(422, f"No existe un manifiesto válido para {name}") from failure
+            if manifest.get("synthetic") is not True:
+                raise HTTPException(422, "El manifiesto debe identificar datos sintéticos")
+
+        config = {**body.model_dump(mode="json"), "datos": str(data)}
+
+        def action(session):
+            record = JobRecord(
+                id=str(uuid4()), tag="estudio", kind="study", request_json=json.dumps(config)
+            )
+            session.add(record)
+            return {"data": {"job_id": record.id, "status": "queued"}, "status": 202}
+
+        result = request.app.state.store.perform("POST /estudio", key, config, action)
+        await request.app.state.queue.enqueue(result["data"]["job_id"])
+        return reply(result)
 
     @app.post("/copiloto", response_model=CopilotAnswer)
     async def copilot(request: Request, body: CopilotInput):
@@ -618,9 +746,11 @@ def create_app(
         try:
             async with asyncio.timeout(95):
                 async with request.app.state.copilot_limit:
-                    result = await ask_copilot(
+                    result = await answer_cached(
                         revision,
                         body.question.strip(),
+                        cache_root=store.root / "cache/copilot",
+                        call=ask_copilot,
                         revision_id=identity,
                         revision_version=version,
                         path=body.path,

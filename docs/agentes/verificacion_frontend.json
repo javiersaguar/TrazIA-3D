@@ -1,0 +1,153 @@
+{
+  "date": "2026-10-30",
+  "branch": "feat/web-3d",
+  "merged_brand_commit": "06a3628",
+  "ifc": {
+    "A_products": 73,
+    "B_products": 83,
+    "schemas": [
+      "IFC4",
+      "IFC4X3",
+      "IFC2X3"
+    ],
+    "validation": "EXPRESS y mallas correctas",
+    "detail_opt_in": true
+  },
+  "checks": {
+    "python_passed": 231,
+    "python_skipped": 1,
+    "python_seconds": 185.68,
+    "unit_passed": 32,
+    "offline_e2e_passed": 22,
+    "offline_e2e_skipped": 6,
+    "offline_e2e_seconds": 52.0,
+    "api_e2e_passed": 27,
+    "api_e2e_skipped": 1,
+    "capture_tests_passed": 24
+  },
+  "lighthouse": {
+    "version": "13.0.1",
+    "preset": "desktop",
+    "score": 100,
+    "FCP_ms": 247.0251,
+    "LCP_ms": 777.5627500000004,
+    "TBT_ms": 0,
+    "CLS": 0
+  },
+  "fps_ifc": {
+    "fps": 239.20385284077753,
+    "p95Ms": 4.699999999254942,
+    "frames": 1197,
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5070 Laptop GPU (0x00002D18) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "drawCalls": 944,
+    "triangles": 296162,
+    "dpr": 0.5919127692729679
+  },
+  "responsive": {
+    "results": [
+      {
+        "width": 390,
+        "route": "/",
+        "viewport": 390,
+        "document": 390,
+        "body": 390,
+        "overflow": false
+      },
+      {
+        "width": 390,
+        "route": "/revision",
+        "viewport": 390,
+        "document": 390,
+        "body": 390,
+        "overflow": false
+      },
+      {
+        "width": 390,
+        "route": "/cambios",
+        "viewport": 390,
+        "document": 390,
+        "body": 390,
+        "overflow": false
+      },
+      {
+        "width": 390,
+        "route": "/modelo",
+        "viewport": 390,
+        "document": 390,
+        "body": 390,
+        "overflow": false
+      },
+      {
+        "width": 1024,
+        "route": "/",
+        "viewport": 1024,
+        "document": 1024,
+        "body": 1024,
+        "overflow": false
+      },
+      {
+        "width": 1024,
+        "route": "/revision",
+        "viewport": 1024,
+        "document": 1024,
+        "body": 1024,
+        "overflow": false
+      },
+      {
+        "width": 1024,
+        "route": "/cambios",
+        "viewport": 1024,
+        "document": 1024,
+        "body": 1024,
+        "overflow": false
+      },
+      {
+        "width": 1024,
+        "route": "/modelo",
+        "viewport": 1024,
+        "document": 1024,
+        "body": 1024,
+        "overflow": false
+      },
+      {
+        "width": 1600,
+        "route": "/",
+        "viewport": 1600,
+        "document": 1600,
+        "body": 1600,
+        "overflow": false
+      },
+      {
+        "width": 1600,
+        "route": "/revision",
+        "viewport": 1600,
+        "document": 1600,
+        "body": 1600,
+        "overflow": false
+      },
+      {
+        "width": 1600,
+        "route": "/cambios",
+        "viewport": 1600,
+        "document": 1600,
+        "body": 1600,
+        "overflow": false
+      },
+      {
+        "width": 1600,
+        "route": "/modelo",
+        "viewport": 1600,
+        "document": 1600,
+        "body": 1600,
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  "initial_chunks": {
+    "scripts": 19,
+    "bytes": 967133,
+    "threeInInitial": false,
+    "rendererChunksOutsideInitial": 1
+  }
+}

@@ -14,7 +14,7 @@ import {
 } from "three";
 import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
-import { Mesh, Vector3 } from "three";
+import { Mesh, Vector3, Quaternion } from "three";
 import { BRAND } from "@/lib/brand";
 import { createRevealSurface } from "../hologram/materials";
 import {
@@ -112,6 +112,7 @@ export function AnimatedPair({
   changed,
   selected,
   hovered,
+  showSweep = true,
   read,
   onSelect,
   onHover,
@@ -122,6 +123,7 @@ export function AnimatedPair({
   changed: boolean;
   selected: boolean;
   hovered: boolean;
+  showSweep?: boolean;
   read(): TimelineSnapshot;
   onSelect(id: string): void;
   onHover(id: string | null): void;
@@ -130,6 +132,18 @@ export function AnimatedPair({
     target = useRef<Group>(null),
     ring = useRef<Mesh>(null);
   const product = (pair.after ?? pair.before)!;
+  const nozzle = product.semanticId.startsWith("nozzle:");
+  const sweepAxis = useMemo(
+    () =>
+      nozzle
+        ? new Vector3(product.center[0], 0, product.center[2]).normalize()
+        : new Vector3(0, 1, 0),
+    [product, nozzle],
+  );
+  const sweepRotation = useMemo(
+    () => new Quaternion().setFromUnitVectors(new Vector3(0, 0, 1), sweepAxis),
+    [sweepAxis],
+  );
   const assets = useMemo(
     () => ({
       source: new MeshPhysicalMaterial({
@@ -195,9 +209,19 @@ export function AnimatedPair({
     resource.target.material.color.set(changed ? BRAND.revision : BRAND.steel);
     if (ring.current) {
       ring.current.visible = active && t > 0 && t < 1;
-      ring.current.position.y =
-        product.bounds.min[1] +
-        (product.bounds.max[1] - product.bounds.min[1]) * t;
+      if (nozzle) {
+        ring.current.position.set(...state.position);
+        ring.current.position.addScaledVector(
+          sweepAxis,
+          (t - 0.5) *
+            Math.max(
+              ...product.bounds.max.map((v, i) => v - product.bounds.min[i]!),
+            ),
+        );
+      } else
+        ring.current.position.y =
+          product.bounds.min[1] +
+          (product.bounds.max[1] - product.bounds.min[1]) * t;
     }
   });
   const click = () => onSelect(product.semanticId);
@@ -258,11 +282,11 @@ export function AnimatedPair({
           read={read}
         />
       ) : null}
-      {changed ? (
+      {changed && showSweep ? (
         <mesh
           ref={ring}
           position={[product.center[0], product.center[1], product.center[2]]}
-          rotation={[Math.PI / 2, 0, 0]}
+          quaternion={sweepRotation}
         >
           <torusGeometry args={[Math.max(0.1, radius), 0.013, 6, 64]} />
           <meshBasicMaterial

@@ -63,6 +63,7 @@ class Citation(Model):
 
 
 class CopilotAnswer(Model):
+    cached: bool = False
     abstained: bool
     reason: str | None = None
     statements: list[Statement]

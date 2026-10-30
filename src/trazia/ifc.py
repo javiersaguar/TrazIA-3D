@@ -15,6 +15,7 @@ import ifcopenshell.api.unit
 import ifcopenshell.guid
 
 from .families import Solid, parts
+from .families.detail import enrich_parts, flange_pattern
 from .families.geometry import head_mesh  # API histórica usada en pruebas geométricas.
 from .families.ifc_metadata import enrich, initialize_owner
 from .model import Revision, fields
@@ -31,6 +32,7 @@ def build_ifc(
     *,
     draft: bool = True,
     schema: Literal["IFC4", "IFC4X3", "IFC2X3"] = "IFC4",
+    details: bool = False,
 ) -> ifcopenshell.file:
     revision = Revision.model_validate_json(revision.model_dump_json())
     pending = revision.pending_review()
@@ -94,7 +96,29 @@ def build_ifc(
             Depth=depth,
         )
 
+    def circle(radius, center=(0.0, 0.0)):
+        return model.create_entity(
+            "IfcCircle",
+            Radius=radius,
+            Position=model.create_entity(
+                "IfcAxis2Placement2D",
+                Location=model.create_entity("IfcCartesianPoint", Coordinates=center),
+            ),
+        )
+
     def solid_item(solid: Solid):
+        if solid.kind == "drilled":
+            inner = (
+                [circle(solid.diameter / 2000 - solid.thickness / 1000)] if solid.thickness else []
+            )
+            inner += [circle(radius, (x, y)) for x, y, radius in solid.holes]
+            profile = model.create_entity(
+                "IfcArbitraryProfileDefWithVoids",
+                ProfileType="AREA",
+                OuterCurve=circle(solid.diameter / 2000),
+                InnerCurves=inner,
+            )
+            return swept(profile, solid.length / 1000), "SweptSolid"
         if solid.kind == "mesh":
             if schema == "IFC2X3":
                 points = [
@@ -129,7 +153,30 @@ def build_ifc(
             profile = model.create_entity(
                 "IfcCircleHollowProfileDef" if solid.thickness else "IfcCircleProfileDef", **args
             )
-            return swept(profile, solid.length / 1000), "SweptSolid"
+            item = swept(profile, solid.length / 1000)
+            for origin, size in solid.cutouts:
+                x, y, z = size
+                rectangle = model.create_entity(
+                    "IfcRectangleProfileDef",
+                    ProfileType="AREA",
+                    XDim=x,
+                    YDim=y,
+                    Position=model.create_entity(
+                        "IfcAxis2Placement2D",
+                        Location=model.create_entity(
+                            "IfcCartesianPoint", Coordinates=(x / 2, y / 2)
+                        ),
+                    ),
+                )
+                cutter = swept(rectangle, z)
+                cutter.Position = axis(origin)
+                item = model.create_entity(
+                    "IfcBooleanResult",
+                    Operator="DIFFERENCE",
+                    FirstOperand=item,
+                    SecondOperand=cutter,
+                )
+            return item, "CSG" if solid.cutouts else "SweptSolid"
         if solid.kind == "box":
             x, y, z = solid.size
             profile = model.create_entity(
@@ -232,7 +279,29 @@ def build_ifc(
         )
     products = []
     traced = fields(equipment)
-    for index, part in enumerate(parts(equipment)):
+    components = parts(equipment)
+    # El detalle visual requiere una petición explícita. El núcleo y el bench conservan
+    # su LOD y no incorporan por defecto piezas que no aparecen en los campos de entrada.
+    if details:
+        components = enrich_parts(equipment, components)
+        if equipment.kind == "vertical_vessel" and equipment.lod >= 2:
+            omitted = [
+                n.id
+                for n in equipment.nozzles
+                if not n.flange
+                and flange_pattern(n.diameter.value, n.rating.value if n.rating else 150) is None
+            ]
+            pset(
+                vessel,
+                "Pset_TrazIA",
+                {
+                    "PoliticaDetalle": "Detalle visual sintético; requiere verificación mecánica",
+                    "ClaseSinRating": "150, supuesto visual explícito en cada brida",
+                    "BridasSinTablaJSON": json.dumps(omitted),
+                    "VersionDetalle": "frontend-2.6-v1",
+                },
+            )
+    for index, part in enumerate(components):
         component_class = part.ifc_class
         if schema == "IFC2X3":
             component_class = {
@@ -258,8 +327,18 @@ def build_ifc(
             product.Tag = part.id
             product.ObjectType = part.object_type
         represent(product, part.solids)
-        pset(product, "TrazIA_Identity", {"ComponentId": part.id, "EquipmentId": equipment.id})
-        prefix = f"nozzles.{part.id}."
+        pset(
+            product,
+            "TrazIA_Identity",
+            {
+                "ComponentId": part.id,
+                "EquipmentId": equipment.id,
+                "ParentComponentId": part.parent_id or "",
+            },
+        )
+        if part.properties:
+            pset(product, "Pset_TrazIA", part.properties)
+        prefix = f"nozzles.{part.parent_id or part.id}."
         local_fields = (
             traced
             if index == 0

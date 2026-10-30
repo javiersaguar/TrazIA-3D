@@ -939,12 +939,40 @@
       "get": {
         "summary": "Study",
         "operationId": "study_estudio_get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Job Id"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -968,6 +996,67 @@
                 }
               ],
               "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StudyInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/learning/corrections": {
+      "get": {
+        "summary": "Learning Corrections",
+        "operationId": "learning_corrections_learning_corrections_get",
+        "parameters": [
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "After"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
             }
           }
         ],
@@ -1462,6 +1551,11 @@
       },
       "CopilotAnswer": {
         "properties": {
+          "cached": {
+            "type": "boolean",
+            "title": "Cached",
+            "default": false
+          },
           "abstained": {
             "type": "boolean",
             "title": "Abstained"
@@ -2978,6 +3072,86 @@
           "citations"
         ],
         "title": "Statement"
+      },
+      "StudyInput": {
+        "properties": {
+          "conjuntos": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "s-dev",
+                "s-reservado",
+                "s-adversarial",
+                "s-mecanico"
+              ]
+            },
+            "type": "array",
+            "maxItems": 4,
+            "minItems": 1,
+            "title": "Conjuntos"
+          },
+          "variantes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Variantes"
+          },
+          "casos": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1000,
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Casos"
+          },
+          "degradaciones": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "maxItems": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Degradaciones"
+          },
+          "remuestreos": {
+            "type": "integer",
+            "maximum": 10000,
+            "minimum": 1,
+            "title": "Remuestreos",
+            "default": 1000
+          },
+          "semilla": {
+            "type": "integer",
+            "maximum": 4294967295,
+            "minimum": 0,
+            "title": "Semilla",
+            "default": 2026
+          },
+          "timeout_seconds": {
+            "type": "number",
+            "maximum": 7200,
+            "exclusiveMinimum": 0,
+            "title": "Timeout Seconds",
+            "default": 3600
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "StudyInput"
       },
       "Tag": {
         "properties": {
