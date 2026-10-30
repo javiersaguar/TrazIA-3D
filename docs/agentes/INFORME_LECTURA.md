@@ -122,6 +122,11 @@ Ninguno rompe la firma de `pipeline.process`, el contrato ni la CLI del estudio.
   campo normal. Los tipos de la web ya lo conocen; ahora llega relleno de verdad, con el motivo en
   `explanation`.
 
+- **`test_success_without_report_is_an_explicit_error` depende del disco.** Falla en una copia
+  local con un `generated/estudio/estudio.json` válido (fuera de Git): `GET /estudio` devuelve ese
+  informe en vez de `empty`. En una copia limpia pasa. Basta con que la prueba apunte la raíz del
+  repositorio a `tmp_path`.
+
 ## Límites y pendientes
 
 - **Fusión aprendida (3.4):** la regresión logística por campo no está hecha. D sigue con la fusión
