@@ -9,6 +9,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Literal
 
+from .calibration import load_calibration
 from .extraction import Candidate, assemble
 from .ingest import ingest_bytes
 from .model import Revision, RunInfo
@@ -158,12 +159,13 @@ def process(
             f"{len(resolution.conflicts)} conflictos para revisión.",
         )
     )
-    emit(StageEvent("calibrate", "omitido", equipment_id, "Calibración aún no aplicada."))
+    scanned = frozenset(b.document.id for b in bundles if b.media_type == "pdf" and not b.lines)
+    chosen = _calibrate(resolution.chosen, strategy, scanned, warnings, emit, equipment_id)
 
     try:
         model = assemble(
             bundles,
-            resolution.chosen,
+            chosen,
             project_id=project_id,
             equipment_id=equipment_id,
             revision=revision,
@@ -173,7 +175,7 @@ def process(
     except ValueError as exc:
         reason = _reason(exc)
         emit(StageEvent("family", "error", equipment_id, reason))
-        return finish(None, resolution.chosen, reason, resolution.conflicts)
+        return finish(None, chosen, reason, resolution.conflicts)
     emit(
         StageEvent(
             "family",
@@ -192,8 +194,52 @@ def process(
         )
     except ValueError as exc:
         emit(StageEvent("ifc", "error", equipment_id, str(exc).splitlines()[0]))
-        return finish(None, resolution.chosen, str(exc).splitlines()[0], resolution.conflicts)
-    return finish(model, resolution.chosen, None, resolution.conflicts)
+        return finish(None, chosen, str(exc).splitlines()[0], resolution.conflicts)
+    return finish(model, chosen, None, resolution.conflicts)
+
+
+def _calibrate(
+    candidates: list[Candidate],
+    strategy: str,
+    scanned: frozenset[str],
+    warnings: list[str],
+    emit: Callable[[StageEvent], None],
+    equipment_id: str,
+) -> list[Candidate]:
+    """Etapa `calibrate` (tarea 3.3); sin parámetros ajustados queda omitida."""
+    try:
+        calibration = load_calibration()
+    except (OSError, ValueError, KeyError) as exc:
+        warnings.append(f"Calibración no aplicada: parámetros ilegibles ({exc}).")
+        emit(
+            StageEvent("calibrate", "omitido", equipment_id, "Parámetros de calibración ilegibles.")
+        )
+        return candidates
+    if calibration is None:
+        emit(
+            StageEvent(
+                "calibrate",
+                "omitido",
+                equipment_id,
+                "Sin parámetros: confianza sin calibrar (uv run python -m bench.calibrar).",
+            )
+        )
+        return candidates
+    calibrated, summary = calibration.apply(candidates, strategy, scanned)
+    if summary["abstained"]:
+        warnings.append(
+            f"{summary['abstained']} campos con confianza baja quedan en abstención para revisión."
+        )
+    emit(
+        StageEvent(
+            "calibrate",
+            "ok",
+            equipment_id,
+            f"Isotónica · {summary['intervals']} intervalos al {calibration.level:.0%} · "
+            f"{summary['abstained']} abstenciones.",
+        )
+    )
+    return calibrated
 
 
 def _reason(exc: Exception) -> str:

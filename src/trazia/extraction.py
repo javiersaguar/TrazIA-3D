@@ -2,12 +2,14 @@
 
 import json
 import re
-from typing import Literal, Protocol
+from typing import Literal, Protocol, get_args
 
 from pydantic import Field
 
 from .ingest import Bundle
-from .model import GEOMETRY_FIELDS, Model, Revision, Source
+from .model import GEOMETRY_FIELDS, Channel, FieldState, Model, Revision, Source
+
+CHANNELS = set(get_args(Channel))
 
 
 class Interval(Model):
@@ -45,6 +47,8 @@ class Candidate(Model):
     alternatives: list[Alternative] = Field(default_factory=list)
     interval: Interval | None = None
     explanation: str | None = None
+    # Solo la etapa `calibrate` lo fija ("abstained"); si no, el campo nace como "candidate".
+    state: FieldState | None = None
 
 
 class Extractor(Protocol):
@@ -141,6 +145,21 @@ class LabelExtractor:
         return result
 
 
+def _traced_source(source: Source, reading: "Candidate | Alternative") -> dict:
+    """Evidencia del contrato 0.3: completa la procedencia con lo que trae la lectura."""
+    data = source.model_dump(mode="json")
+    data["reviewed"] = False
+    if data.get("confidence_raw") is None:
+        data["confidence_raw"] = source.confidence
+    if data.get("channel") is None and reading.channel in CHANNELS:
+        data["channel"] = reading.channel
+    if isinstance(reading, Candidate):
+        for key in ("strategy", "model", "grounded", "text_original", "unit_original"):
+            if data.get(key) is None:
+                data[key] = getattr(reading, key)
+    return data
+
+
 def assemble(
     bundles: list[Bundle],
     candidates: list[Candidate],
@@ -166,9 +185,19 @@ def assemble(
         value = {
             "value": candidate.value,
             "unit": candidate.unit,
-            "source": candidate.source.model_dump(mode="json"),
+            "source": _traced_source(candidate.source, candidate),
+            "state": candidate.state or "candidate",
+            "interval": candidate.interval.model_dump(mode="json") if candidate.interval else None,
+            "alternatives": [
+                {
+                    "value": a.value,
+                    "unit": a.unit,
+                    "source": _traced_source(a.source, a),
+                }
+                for a in candidate.alternatives
+            ],
+            "explanation": candidate.explanation,
         }
-        value["source"]["reviewed"] = False
         if path.startswith("nozzles."):
             _, nozzle_id, key = path.split(".")
             nozzles.setdefault(nozzle_id, {"id": nozzle_id})[key] = value
@@ -186,7 +215,8 @@ def assemble(
         )
     equipment["nozzles"] = [data for n, data in nozzles.items() if n not in incomplete]
     content = {
-        "schema_version": "0.2",
+        "schema_version": "0.3",
+        "approval": None,
         "project_id": project_id,
         "revision": revision,
         "dataset": dataset,

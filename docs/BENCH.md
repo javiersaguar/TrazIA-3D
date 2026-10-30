@@ -157,6 +157,60 @@ En los escaneados, la geometría es 0 % en todos los proveedores: no hay capa de
 de datos. Este es el punto de partida del estudio: cualquier mejora de B sobre `s-dev` se medirá
 después en `s-reservado`, que B no ha visto.
 
+## Calibración, intervalos conformes y abstención (tarea 3.3, 30/10/2026)
+
+```bash
+uv run python -m bench.calibrar --datos generated/synthetic_v2   # → generated/calibration/
+uv run python -m bench.calibrar --reusar                         # reajusta sin volver a leer
+```
+
+- **Qué hace.** Pasa B, C y D por `trazia.pipeline.process` sin calibrar sobre S-dev y
+  S-reservado. Después ajusta en S-dev y mide en S-reservado, que tiene dos proveedores que S-dev no
+  tiene.
+  - Ajuste en dos mitades de S-dev, partidas por equipo: la primera para las curvas isotónicas
+    por (estrategia, canal, vectorial o escaneado); la segunda para los cuantiles conformes y el
+    umbral de abstención.
+  - En S-dev, C usa la biblioteca sin el proveedor del caso, para no aprender la ventaja de tener
+    una plantilla propia.
+- **En el producto.** La etapa `calibrate` lee `generated/calibration/calibracion.json`. Si no
+  existe, la etapa se omite y la confianza sale sin calibrar.
+  - Rellena `confidence` (calibrada), `confidence_raw`, `interval` (conforme al 90 %) y el estado
+    `abstained`. Un campo en abstención conserva su valor, pero hay que confirmarlo antes de aprobar.
+
+Resultado en **S-reservado** (sintético, no visto en el ajuste):
+
+| Estrategia | Campos | Acierto | ECE bruta | ECE calibrada | Cobertura del intervalo al 90 % | Abstención: se quedan · riesgo |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| B | 456 | 91,7 % | 0,191 | **0,035** | **100 %** | 85,5 % · 0,0 % |
+| C | 954 | 77,8 % | 0,023 | 0,210 | 77,0 % | 24,3 % · 0,0 % |
+| D | 1.963 | 76,7 % | 0,127 | 0,270 | **94,0 %** | 59,9 % · 10,9 % |
+
+- **Objetivo del ROADMAP (ECE < 0,05 y cobertura ≥ 90 %):** B lo cumple. D cumple la cobertura,
+  pero no la ECE. C no cumple ninguno de los dos.
+- **En S-dev** el ajuste sí cumple: la ECE de D baja de 0,048 a 0,006 y la cobertura es del 97,6 %.
+  El fallo en S-reservado es un cambio de reparto que S-dev no puede enseñar:
+  - En S-dev, B lee las tablas de los seis proveedores. La geometría solo rellena 37 campos
+    vectoriales sueltos y casi todos son errores (boquillas trampa). La curva aprende que
+    «geometría sola» acierta el 8 %.
+  - En S-reservado, B no entiende las tablas de los dos proveedores nuevos. La geometría rellena 593
+    campos vectoriales y acierta el 95 %, pero la curva los deja en 0,37.
+  - Lo mismo pasa con C: sin plantilla del mismo proveedor acierta menos, y de forma distinta.
+- **Curva riesgo-cobertura de D en S-reservado:**
+
+  | Umbral | Se quedan | Riesgo |
+  | --- | --- | --- |
+  | 0 | 100 % | 23,3 % |
+  | 0,4 | 51 % | 5,9 % |
+  | 0,8 | 38 % | 2,3 % |
+
+  La ordenación sirve aunque los valores absolutos no estén bien calibrados.
+- **Intervalos.** En las franjas de confianza baja el cuantil es enorme, del orden de ±70 veces el
+  valor. Eso equivale a decir que el valor puede ser cualquiera, y el campo queda en abstención.
+- **Límite de este método.** S-reservado se miró dos veces. Tras la primera se añadió el tipo de
+  documento a la curva y la biblioteca sin el proveedor. No se ha ajustado nada más contra él. La
+  próxima mejora necesita datos de otro reparto: el dataset real (R-ref), las correcciones humanas
+  (3.8) o la fusión aprendida con señales de acuerdo entre canales (3.4).
+
 ## Hallazgos para el núcleo
 
 1. **Un texto fuera de la página tumbaba la ingesta del PDF.** `ingest_bytes` limitaba la caja a

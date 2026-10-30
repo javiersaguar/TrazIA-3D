@@ -572,7 +572,21 @@ def run_study(
         "pairwise": pairwise,
         "pareto": front,
         "recommendation": recommendation,
+        "calibration": _calibration_info(),
     }
+
+
+def _calibration_info() -> dict | None:
+    """Qué calibración se aplicó (tarea 3.3): sin ella, la ECE es la de la confianza bruta."""
+    from trazia.calibration import load_calibration
+
+    try:
+        calibration = load_calibration()
+    except (OSError, ValueError, KeyError):
+        return None
+    if calibration is None:
+        return None
+    return {"fitted_on": calibration.fitted_on, "sha256": calibration.sha256}
 
 
 def _recommend(variants_out, results, by_id, scored) -> dict:
