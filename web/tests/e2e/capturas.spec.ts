@@ -1,6 +1,6 @@
 import { test } from "@playwright/test";
 
-const SCREENS = ["proyecto", "pipeline", "revision", "cambios", "bench", "impacto"];
+const SCREENS = ["portada", "proyecto", "pipeline", "revision", "cambios", "bench", "impacto", "proyectos", "familias", "lote", "ajustes"];
 const THEMES = ["oscuro", "claro"] as const;
 
 for (const theme of THEMES) {
@@ -13,7 +13,19 @@ for (const theme of THEMES) {
           /* sin almacenamiento */
         }
       }, theme);
-      await page.goto(`/${screen}`);
+      // La portada sin la intro del logo, en su estado final
+      if (screen === "portada") await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(screen === "portada" ? "/" : `/${screen}`);
+      if (screen === "portada") {
+        // Las secciones aparecen al entrar en pantalla: se recorre la página antes de la captura completa
+        await page.evaluate(async () => {
+          for (let y = 0; y < document.body.scrollHeight; y += 400) {
+            window.scrollTo(0, y);
+            await new Promise((r) => setTimeout(r, 80));
+          }
+          window.scrollTo(0, 0);
+        });
+      }
       await page.waitForLoadState("networkidle");
       if (screen === "pipeline") await page.getByText("Pipeline: último trabajo").waitFor({ timeout: 15_000 });
       if (screen === "revision") {
