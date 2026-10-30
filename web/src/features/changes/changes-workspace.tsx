@@ -28,6 +28,7 @@ import {
 import { cn } from "@/lib/cn";
 import { formatDelta, formatValue, shortHash } from "@/lib/format";
 import { DEMO } from "@/lib/mock/api";
+import { parentElementId } from "@/features/viewer3d/semantic";
 import { changeSteps } from "@/features/delta3d/morph";
 import { groupChanges, type ChangeGroup } from "@/lib/mock/impact";
 import { useChanges } from "@/lib/queries";
@@ -103,9 +104,9 @@ export function ChangesWorkspace() {
   const morphProgress = mode === "A" ? 0 : mode === "B" ? 1 : undefined;
   const chosen = groups.find((g) => g.id === activeId);
   const active =
-    chosen?.elementId === selectedId
+    chosen?.elementId === parentElementId(selectedId ?? "")
       ? chosen
-      : groups.find((g) => g.elementId === selectedId);
+      : groups.find((g) => g.elementId === parentElementId(selectedId ?? ""));
   const timelineTotal = useMemo(() => changeSteps(diff).length, [diff]);
   const step = playing
     ? timelineStep + 1
@@ -201,7 +202,7 @@ export function ChangesWorkspace() {
                     key={g.id}
                     group={g}
                     active={g.id === active?.id}
-                    related={g.elementId === hoveredId}
+                    related={g.elementId === parentElementId(hoveredId ?? "")}
                     onHover={(id) => setHovered(id)}
                     onSelect={() => {
                       setPlaying(false);
@@ -275,7 +276,7 @@ export function ChangesWorkspace() {
           </div>
 
           {/* Narración bajo el lienzo: dentro tapaba la leyenda y la barra de avance del visor */}
-          <div className="mx-2 mb-2 flex items-start gap-3 rounded-[var(--radius-card)] border border-border bg-surface-raised px-3.5 py-3">
+          <div className="mx-2 mb-2 flex min-h-[72px] items-start gap-3 rounded-[var(--radius-card)] border border-border bg-surface-raised px-3.5 py-3">
             <Tip
               content={playing ? "Pausar" : "Reproducir los cambios"}
               shortcut={["Espacio"]}

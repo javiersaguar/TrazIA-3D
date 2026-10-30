@@ -2,7 +2,7 @@
 
 import { Select } from "@react-three/postprocessing";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useReducedMotion } from "motion/react";
+import { useReducedMotion, type MotionValue } from "motion/react";
 import {
   useCallback,
   useEffect,
@@ -47,7 +47,9 @@ export type HologramToRealProps = {
   source: "procedural" | "ifc";
   layout?: "side" | "inplace";
   progress?: number;
+  progressValue?: MotionValue<number>;
   autoplay?: boolean;
+  controls?: boolean;
   callouts?: boolean;
   className?: string;
   kind?: EquipmentKind;
@@ -109,6 +111,7 @@ function TransitionScene({
   data,
   layout,
   progress,
+  progressValue,
   autoplay,
   showCallouts,
   reserveCallouts,
@@ -122,12 +125,13 @@ function TransitionScene({
   data: Source;
   layout: "side" | "inplace";
   progress?: number;
+  progressValue?: MotionValue<number>;
   autoplay: boolean;
   showCallouts: boolean;
   reserveCallouts: boolean;
   playback: Ref<Playback>;
   onProgress(value: number): void;
-  onComplete(): void;
+  onComplete(complete: boolean, value: number): void;
   onReady(): void;
   measureKey?: number;
   onMeasure?(sample: PerformanceSample): void;
@@ -181,8 +185,8 @@ function TransitionScene({
     [assets],
   );
   const state = useRef({
-    value: progress === undefined ? 0 : scanProgress(progress),
-    playing: autoplay && progress === undefined,
+    value: scanProgress(progressValue?.get() ?? progress ?? 0),
+    playing: autoplay && progress === undefined && progressValue === undefined,
     done: false,
     time: 0,
     reported: -1,
@@ -194,6 +198,16 @@ function TransitionScene({
       invalidate();
     }
   }, [progress, invalidate]);
+  useEffect(() => {
+    if (!progressValue) return;
+    const update = (value: number) => {
+      state.current.value = scanProgress(value);
+      state.current.playing = false;
+      invalidate();
+    };
+    update(progressValue.get());
+    return progressValue.on("change", update);
+  }, [progressValue, invalidate]);
   useImperativeHandle(
     playback,
     () => ({
@@ -247,11 +261,12 @@ function TransitionScene({
       onProgress(s.value);
       s.reported = s.value;
     }
-    if (s.value >= 1 && !s.done) {
-      s.done = true;
-      s.playing = false;
-      onComplete();
+    const complete = s.value >= 0.98;
+    if (complete !== s.done) {
+      s.done = complete;
+      onComplete(complete, s.value);
     }
+    if (s.value >= 1) s.playing = false;
     if (s.playing || moving) invalidate();
   });
   const viewBounds = useMemo<Bounds>(
@@ -317,7 +332,7 @@ function IfcSource({ children }: { children(data: Source): React.ReactNode }) {
       [
         products.find((p) => /flange|brida/i.test(p.name)) ??
           products.find((p) => p.semanticId.startsWith("nozzle:")),
-        "Conexión · IFC",
+        "Brida de boquilla · IFC",
       ],
       [products.find((p) => p.semanticId === "skirt"), "Faldón · IFC"],
       [
@@ -331,6 +346,11 @@ function IfcSource({ children }: { children(data: Source): React.ReactNode }) {
             {
               name,
               point: new Vector3(...product.center),
+              normal: /flange|brida/i.test(product.name)
+                ? (new Vector3(product.center[0], 0, product.center[2])
+                    .normalize()
+                    .toArray() as [number, number, number])
+                : ([0, 0, 1] as [number, number, number]),
               distance: Math.max(
                 0.8,
                 Math.min(
@@ -390,6 +410,8 @@ function HologramPlayer({
   source,
   layout = "side",
   progress,
+  progressValue,
+  controls = true,
   autoplay = true,
   callouts = true,
   className,
@@ -402,7 +424,9 @@ function HologramPlayer({
     output = useRef<HTMLOutputElement>(null);
   const reduce = useReducedMotion(),
     sliderId = useId();
-  const [playing, setPlaying] = useState(autoplay && progress === undefined),
+  const [playing, setPlaying] = useState(
+      autoplay && progress === undefined && progressValue === undefined,
+    ),
     [complete, setComplete] = useState(false);
   const [ready, setReady] = useState(false);
   const onReady = useCallback(() => setReady(true), []);
@@ -418,9 +442,11 @@ function HologramPlayer({
         data={data}
         layout={layout}
         progress={progress}
+        progressValue={progressValue}
         autoplay={autoplay}
         showCallouts={
-          callouts && (progress === undefined ? complete : progress >= 0.98)
+          callouts &&
+          (!!reduce || (progress === undefined ? complete : progress >= 0.98))
         }
         reserveCallouts={callouts}
         playback={playback}
@@ -429,9 +455,9 @@ function HologramPlayer({
           if (output.current)
             output.current.textContent = `${Math.round(value * 100)} %`;
         }}
-        onComplete={() => {
-          setPlaying(false);
-          setComplete(true);
+        onComplete={(complete, value) => {
+          if (value >= 0.98) setPlaying(false);
+          setComplete(complete);
         }}
         onReady={onReady}
         measureKey={measureKey}
@@ -460,42 +486,56 @@ function HologramPlayer({
         </span>
         <span>Holograma → acero</span>
       </div>
-      <div className={styles.controls}>
-        <button
-          disabled={!ready || progress !== undefined || !!reduce}
-          aria-label={
-            playing ? "Pausar materialización" : "Reproducir materialización"
-          }
-          onClick={() => {
-            if (playing) playback.current?.pause();
-            else {
-              setComplete(false);
-              playback.current?.play();
+      {controls ? (
+        <div className={styles.controls}>
+          <button
+            disabled={
+              !ready ||
+              progress !== undefined ||
+              progressValue !== undefined ||
+              !!reduce
             }
-            setPlaying(!playing);
-          }}
-        >
-          {playing && !reduce ? "Pausar" : "Reproducir"}
-        </button>
-        <label htmlFor={sliderId}>Materialización</label>
-        <input
-          ref={input}
-          id={sliderId}
-          type="range"
-          min={0}
-          max={100}
-          step={0.1}
-          defaultValue={(progress ?? 0) * 100}
-          aria-label="Progreso de materialización"
-          disabled={!ready || progress !== undefined || !!reduce}
-          onInput={(e) => {
-            setPlaying(false);
-            setComplete(false);
-            playback.current?.seek(Number(e.currentTarget.value) / 100);
-          }}
-        />
-        <output ref={output}>{Math.round((progress ?? 0) * 100)} %</output>
-      </div>
+            aria-label={
+              playing ? "Pausar materialización" : "Reproducir materialización"
+            }
+            onClick={() => {
+              if (playing) playback.current?.pause();
+              else {
+                setComplete(false);
+                playback.current?.play();
+              }
+              setPlaying(!playing);
+            }}
+          >
+            {playing && !reduce ? "Pausar" : "Reproducir"}
+          </button>
+          <label htmlFor={sliderId}>Materialización</label>
+          <input
+            ref={input}
+            id={sliderId}
+            type="range"
+            min={0}
+            max={100}
+            step={0.1}
+            defaultValue={(progressValue?.get() ?? progress ?? 0) * 100}
+            aria-label="Progreso de materialización"
+            disabled={
+              !ready ||
+              progress !== undefined ||
+              progressValue !== undefined ||
+              !!reduce
+            }
+            onInput={(e) => {
+              setPlaying(false);
+              setComplete(false);
+              playback.current?.seek(Number(e.currentTarget.value) / 100);
+            }}
+          />
+          <output ref={output}>
+            {Math.round((progressValue?.get() ?? progress ?? 0) * 100)} %
+          </output>
+        </div>
+      ) : null}
     </div>
   );
 }

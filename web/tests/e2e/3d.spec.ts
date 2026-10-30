@@ -231,3 +231,75 @@ test("la aprobación API recupera un conflicto y guarda la huella con If-Match",
     fullPage: true,
   });
 });
+
+test("una brida IFC conserva su GUID y selecciona la evidencia de su boquilla", async ({
+  page,
+}) => {
+  await page.goto("/revision");
+  await expect(page.getByTestId("ifc-viewer")).toHaveAttribute(
+    "data-products",
+    "73",
+    { timeout: 30000 },
+  );
+  await page.getByRole("button", { name: "Elementos", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Brida · Boquilla N1", exact: true })
+    .click();
+  await expect(
+    page
+      .getByRole("listbox", { name: "Campos por revisar" })
+      .getByRole("option", { selected: true }),
+  ).toContainText("N1");
+  await page
+    .getByRole("button", { name: "Inspector IFC", exact: true })
+    .click();
+  await expect(page.getByTestId("inspector-guid")).not.toBeEmpty();
+  await expect(page.getByTestId("derived-origin")).toContainText(
+    "no leído del plano",
+  );
+});
+
+test("la portada carga el 3D por separado y el clic cambia la familia", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("console", (m) => {
+    if (m.type() === "error") errors.push(m.text());
+  });
+  await page.addInitScript(() =>
+    sessionStorage.setItem("trazia.intro", "visto"),
+  );
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const vessel = page.locator("[data-equipment-kind]").first();
+  await expect(vessel).toBeVisible({ timeout: 30000 });
+  await expect(vessel.locator("canvas")).toBeVisible();
+  const kind = await vessel.getAttribute("data-equipment-kind");
+  await vessel.locator("canvas").click({ position: { x: 20, y: 200 } });
+  await expect(vessel).not.toHaveAttribute("data-equipment-kind", kind!);
+  expect(errors).toEqual([]);
+});
+
+test("el seguimiento de cambios conserva el acercamiento al cambiar la narración", async ({
+  page,
+}) => {
+  await page.goto("/cambios");
+  const viewer = page.getByTestId("revision-morph");
+  await expect(viewer).toHaveAttribute("data-phase", "ready", {
+    timeout: 30000,
+  });
+  const canvas = viewer.locator("canvas");
+  await expect
+    .poll(async () => Number(await canvas.getAttribute("data-camera-zoom")))
+    .toBeGreaterThan(0);
+  const initial = Number(await canvas.getAttribute("data-camera-zoom"));
+  await page
+    .getByRole("button", { name: "Reproducir los cambios", exact: true })
+    .click();
+  await expect
+    .poll(async () => Number(await canvas.getAttribute("data-camera-zoom")), {
+      timeout: 5000,
+    })
+    .toBeGreaterThan(initial * 2);
+});

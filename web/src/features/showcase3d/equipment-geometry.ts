@@ -159,7 +159,7 @@ export function buildVerticalVessel(spec: { radius?: number; height?: number; pl
   lugShape.absarc(0, .32, .16, 0, Math.PI, false); lugShape.closePath();
   const lug = subtract(new ExtrudeGeometry(lugShape, { depth: .08, bevelEnabled: false, curveSegments: 16 }),
     new CylinderGeometry(.075, .075, .2, 24).rotateX(Math.PI / 2).translate(0, .32, .04));
-  for (const side of [-1, 1]) b.add(lug.clone(), "steel", [radius * .68 * side, top - .02, 0]);
+  for (const side of [-1, 1]) b.add(lug.clone(), "steel", [radius * .9 * side, top - .02, 0]);
   lug.dispose();
   b.add(new BoxGeometry(.27, .17, .015), "machined", [.4, bottom + 2.2, radius]);
   if (spec.platform) {
@@ -175,7 +175,7 @@ export function buildVerticalVessel(spec: { radius?: number; height?: number; pl
     for (let y = bottom + .6; y < top - .3; y += 1) b.add(new CylinderGeometry(radius * .96, radius * .96, .025, 48), "machined", [0, y, 0]);
     b.ladder(.2, top, radius + .6);
   }
-  b.anchors = { flange: new Vector3(0, top - .9, radius + .4), skirt: new Vector3(0, .47, radius), lug: new Vector3(-radius * .68, top + .3, .04) };
+  b.anchors = { flange: new Vector3(0, top - .9, radius + .4), skirt: new Vector3(0, .47, radius), lug: new Vector3(-radius * .9, top + .3, .04) };
   return b.finish("vertical");
 }
 

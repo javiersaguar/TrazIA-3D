@@ -33,6 +33,7 @@ import {
   type CameraHandle,
 } from "../viewer3d/stage";
 import type { RevisionMorphProps } from "../viewer3d/types";
+import { parentElementId } from "../viewer3d/semantic";
 import { AnimatedPair, type TimelineSnapshot } from "./animated-pair";
 import {
   changeSteps,
@@ -166,6 +167,15 @@ function TimelineScene({
   const read = useCallback(() => state.current, []);
   const pairs = useMemo(() => pairByGlobalId(a, b), [a, b]);
   const count = Math.max(1, steps.length);
+  const focusProduct = useCallback((product: PreparedProduct) => {
+    const horizontal = Math.hypot(product.center[0], product.center[2]);
+    const normal = parentElementId(product.semanticId).startsWith("nozzle:")
+      ? ((horizontal > 0.01
+          ? [product.center[0] / horizontal, 0, product.center[2] / horizontal]
+          : [0, 1, 0]) as [number, number, number])
+      : undefined;
+    rig.current?.fit(product.bounds, normal);
+  }, []);
   useEffect(() => {
     state.current.speed = speed;
   }, [speed]);
@@ -187,9 +197,9 @@ function TimelineScene({
       const p =
         b.find((p) => p.semanticId === selectedId) ??
         a.find((p) => p.semanticId === selectedId);
-      if (p) rig.current?.fit(p.bounds);
+      if (p) focusProduct(p);
     }
-  }, [follow, selectedId, a, b]);
+  }, [follow, selectedId, a, b, focusProduct]);
   useImperativeHandle(
     playback,
     () => ({
@@ -214,7 +224,7 @@ function TimelineScene({
     camera,
     () => ({
       view: (v) => rig.current?.view(v),
-      fit: (v) => rig.current?.fit(v),
+      fit: (v, n) => rig.current?.fit(v, n),
       zoom: (v) => rig.current?.zoom(v),
       capture: () => rig.current?.capture(),
     }),
@@ -237,12 +247,12 @@ function TimelineScene({
     if (index !== last.current) {
       last.current = index;
       onStep(index);
-      if (follow) {
+      if (follow && (s.playing || s.value > 0)) {
         const step = steps[index],
           p =
             b.find((p) => p.semanticId === step?.elementId) ??
             a.find((p) => p.semanticId === step?.elementId);
-        if (p) rig.current?.fit(p.bounds);
+        if (p) focusProduct(p);
       }
     }
     if (report.current !== s.value) {
@@ -267,7 +277,9 @@ function TimelineScene({
     ) ||
     steps.some(
       (s) =>
-        s.geometry && s.elementId === (pair.after ?? pair.before)!.semanticId,
+        s.geometry &&
+        s.elementId ===
+          parentElementId((pair.after ?? pair.before)!.semanticId),
     );
   return (
     <>
@@ -313,7 +325,9 @@ function TimelineScene({
         .filter((pair) => !onlyChanged || changed(pair))
         .map((pair) => {
           const id = (pair.after ?? pair.before)!.semanticId;
-          let index = steps.findIndex((s) => s.elementId === id);
+          let index = steps.findIndex(
+            (s) => s.elementId === parentElementId(id),
+          );
           if (index < 0)
             index = Math.max(
               0,
@@ -326,8 +340,9 @@ function TimelineScene({
               index={index}
               count={count}
               changed={changed(pair)}
-              selected={selectedId === id}
-              hovered={hoveredId === id}
+              showSweep={!id.startsWith("detail:")}
+              selected={selectedId === id || selectedId === parentElementId(id)}
+              hovered={hoveredId === id || hoveredId === parentElementId(id)}
               read={read}
               onSelect={onSelect}
               onHover={onHover}
@@ -432,7 +447,8 @@ export function RevisionMorph({
               steps.some(
                 (s) =>
                   s.geometry &&
-                  s.elementId === (pair.after ?? pair.before)!.semanticId,
+                  s.elementId ===
+                    parentElementId((pair.after ?? pair.before)!.semanticId),
               ),
           )
           .map((pair) => (pair.after ?? pair.before)!.semanticId),
