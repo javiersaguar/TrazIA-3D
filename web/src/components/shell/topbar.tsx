@@ -1,10 +1,11 @@
 "use client";
 
-import { ChevronRight, Database, MessageSquareText, Search, TriangleAlert } from "lucide-react";
+import { ChevronRight, Database, TriangleAlert } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { CopilotMark } from "@/components/brand/copilot-mark";
 import { Tip } from "@/components/ui/controls";
-import { Icon, Kbd, LiveDot, Pill } from "@/components/ui/primitives";
+import { Icon, LiveDot, Pill } from "@/components/ui/primitives";
 import { apiEnabled } from "@/lib/api/config";
 import { useApiSync } from "@/lib/api/use-api-sync";
 import { useRevision } from "@/lib/queries";
@@ -19,17 +20,17 @@ export function Topbar() {
   const item = navItemFor(pathname);
   const revision = useUi((s) => s.revision);
   const active = useRevision(revision);
-  const setCommandOpen = useUi((s) => s.setCommandOpen);
   const setCopilotOpen = useUi((s) => s.setCopilotOpen);
 
   return (
     <header
       style={{ viewTransitionName: "app-topbar" }}
-      className="sticky top-0 z-30 flex h-[var(--topbar-height)] items-center gap-3 border-b border-border bg-surface-sunken/95 px-5 backdrop-blur-[2px]"
+      className="sticky top-0 z-30 flex h-[var(--topbar-height)] items-center gap-3 border-b border-border bg-bg/85 px-5 backdrop-blur-md"
     >
       <nav aria-label="Ruta" className="flex min-w-0 items-center gap-1.5 text-[13px] whitespace-nowrap">
-        <span className="text-muted">DEMO-PLANT</span>
+        <span className="font-mono text-[12px] text-faint">DEMO-PLANT</span>
         <Icon icon={ChevronRight} size={14} className="text-faint" />
+        {item ? <Icon icon={item.icon} size={15} className="text-muted" /> : null}
         <span className="truncate font-medium text-text">{item?.label ?? "Inicio"}</span>
       </nav>
 
@@ -49,18 +50,9 @@ export function Topbar() {
         <PipelinePill />
         <button type="button" onClick={() => setCopilotOpen(true)} className="rounded-full focus-visible:outline-offset-1">
           <Pill className="hover:text-text">
-            <Icon icon={MessageSquareText} size={14} />
+            <CopilotMark className="size-3.5" />
             Copiloto
           </Pill>
-        </button>
-        <button
-          type="button"
-          onClick={() => setCommandOpen(true)}
-          className="flex h-7 items-center gap-2 rounded-[var(--radius-control)] border border-border bg-surface pr-1 pl-2.5 text-xs text-muted hover:text-text"
-        >
-          <Icon icon={Search} size={14} />
-          Buscar
-          <Kbd>Ctrl K</Kbd>
         </button>
       </div>
     </header>

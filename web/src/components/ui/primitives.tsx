@@ -7,7 +7,7 @@ export function Panel({ className, ...props }: ComponentProps<"section">) {
   return (
     <section
       className={cn(
-        "rounded-[var(--radius-panel)] border border-border bg-surface shadow-[var(--shadow-1)]",
+        "surface-sheen rounded-[var(--radius-panel)] border border-border bg-surface shadow-[var(--shadow-1)]",
         className,
       )}
       {...props}

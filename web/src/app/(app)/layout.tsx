@@ -5,6 +5,7 @@ import { GlobalKeys } from "@/components/shell/global-keys";
 import { ShortcutsDialog } from "@/components/shell/shortcuts-dialog";
 import { Sidebar } from "@/components/shell/sidebar";
 import { Topbar } from "@/components/shell/topbar";
+import { GuidedTour } from "@/features/tour/guided-tour";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
@@ -19,6 +20,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <CopilotPanel />
       <CopilotLauncher />
       <GlobalKeys />
+      <GuidedTour />
     </div>
   );
 }
