@@ -1,7 +1,9 @@
 "use client";
 
 import { Clock, Timer } from "lucide-react";
-import { useId, useState } from "react";
+import { motion } from "motion/react";
+import { useId, useState, type ReactNode } from "react";
+import { CountUp } from "@/components/motion/count-up";
 import { Badge, Panel, PanelHeader } from "@/components/ui/primitives";
 import { formatNumber, formatPercent } from "@/lib/format";
 
@@ -61,8 +63,12 @@ export function RoiCalculator() {
           <Bar icon={Timer} label="Revisión asistida con TrazIA-3D" value={assisted} max={max} tone="bg-approved" />
 
           <div className="grid grid-cols-1 gap-4 border-t border-border pt-5 sm:grid-cols-3">
-            <Stat label="Horas manuales" value={`${formatNumber(manual)} h`} />
-            <Stat label="Horas ahorradas" value={saved != null ? `${formatNumber(Math.round(saved))} h` : "Sin medir"} muted={saved == null} />
+            <Stat label="Horas manuales" value={<CountUp value={manual} suffix=" h" duration={0.5} />} />
+            <Stat
+              label="Horas ahorradas"
+              value={saved != null ? <CountUp value={Math.round(saved)} suffix=" h" duration={0.5} /> : "Sin medir"}
+              muted={saved == null}
+            />
             <Stat label="Reducción" value={saved != null ? formatPercent(saved / manual) : "Sin medir"} muted={saved == null} />
           </div>
           <p className="text-xs text-faint">
@@ -130,23 +136,26 @@ function Bar({ icon: I, label, value, max, tone }: { icon: typeof Clock; label: 
           <I size={15} strokeWidth={1.5} aria-hidden className="text-muted" />
           {label}
         </span>
-        <span className="font-semibold text-strong">{value != null ? `${formatNumber(Math.round(value))} h` : "Sin medir"}</span>
+        <span className="font-semibold text-strong tabular-nums">{value != null ? <CountUp value={Math.round(value)} suffix=" h" duration={0.5} /> : "Sin medir"}</span>
       </div>
       <div className="h-3 overflow-hidden rounded-full bg-surface-sunken">
-        <div
-          className={`h-full origin-left rounded-full ${tone} transition-transform duration-[var(--dur-slow)] ease-[var(--ease-out)]`}
-          style={{ transform: `scaleX(${value != null ? Math.min(1, value / max) : 0})` }}
+        {/* Crece al montarse y sigue a los deslizadores con un muelle suave */}
+        <motion.div
+          className={`h-full origin-left rounded-full ${tone}`}
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: value != null ? Math.min(1, value / max) : 0 }}
+          transition={{ type: "spring", duration: 0.5, bounce: 0.12 }}
         />
       </div>
     </div>
   );
 }
 
-function Stat({ label, value, muted }: { label: string; value: string; muted?: boolean }) {
+function Stat({ label, value, muted }: { label: string; value: ReactNode; muted?: boolean }) {
   return (
     <div>
       <p className="text-xs text-muted">{label}</p>
-      <p className={`mt-0.5 text-[22px] font-semibold ${muted ? "text-faint" : "text-strong"}`}>{value}</p>
+      <p className={`mt-0.5 text-[22px] font-semibold tabular-nums ${muted ? "text-faint" : "text-strong"}`}>{value}</p>
     </div>
   );
 }

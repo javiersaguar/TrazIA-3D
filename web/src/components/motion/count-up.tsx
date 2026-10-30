@@ -28,7 +28,8 @@ export function CountUp({
   const reduced = useReducedMotion();
   const last = useRef(0);
   const format = (n: number) =>
-    prefix + n.toLocaleString("es-ES", { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) + suffix;
+    // Agrupación siempre, como lib/format: en es-ES 4800 se escribe 4.800
+    prefix + n.toLocaleString("es-ES", { minimumFractionDigits: decimals, maximumFractionDigits: decimals, useGrouping: "always" }) + suffix;
 
   useEffect(() => {
     const node = ref.current;

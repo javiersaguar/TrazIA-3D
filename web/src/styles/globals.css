@@ -333,6 +333,48 @@
   }
 }
 
+/* Pipeline: entrada de los nodos por columnas y respiración de la etapa activa */
+.pipeline-node {
+  animation: node-in 420ms var(--ease-out) both;
+}
+.pipeline-breathe {
+  animation: breathe 1.8s ease-in-out infinite;
+}
+@keyframes node-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pipeline-node,
+  .pipeline-breathe {
+    animation: none;
+  }
+}
+
+/* Tarjetas clicables: se elevan 1 px solo con ratón */
+@media (hover: hover) and (pointer: fine) {
+  .lift {
+    transition:
+      translate 180ms var(--ease-out),
+      border-color 180ms ease;
+  }
+  .lift:hover {
+    translate: 0 -1px;
+    border-color: var(--border-strong);
+  }
+}
+
 /* React Flow con los tokens del producto */
 .react-flow {
   --xy-background-color: transparent;

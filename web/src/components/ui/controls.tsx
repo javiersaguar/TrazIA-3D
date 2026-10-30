@@ -2,7 +2,8 @@
 
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import * as RTooltip from "@radix-ui/react-tooltip";
-import type { ReactNode } from "react";
+import { motion } from "motion/react";
+import { useId, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { Kbd } from "./primitives";
 
@@ -20,6 +21,8 @@ export function Segmented<T extends string>({
   label: string;
   className?: string;
 }) {
+  // El indicador se desliza entre opciones (layoutId propio de cada control)
+  const indicator = `seg${useId()}`;
   return (
     <ToggleGroup.Root
       type="single"
@@ -34,12 +37,19 @@ export function Segmented<T extends string>({
           value={o.value}
           title={o.title}
           className={cn(
-            "h-7 rounded-[6px] px-2.5 text-[13px] text-muted",
-            "transition-[background-color,color] duration-[var(--dur-fast)] ease-[var(--ease-out)]",
-            "hover:text-text data-[state=on]:bg-surface data-[state=on]:font-medium data-[state=on]:text-strong data-[state=on]:shadow-[var(--shadow-1)]",
+            "relative h-7 rounded-[6px] px-2.5 text-[13px] text-muted",
+            "transition-colors duration-[var(--dur-fast)] ease-[var(--ease-out)]",
+            "hover:text-text data-[state=on]:font-medium data-[state=on]:text-strong",
           )}
         >
-          {o.label}
+          {o.value === value ? (
+            <motion.span
+              layoutId={indicator}
+              className="absolute inset-0 rounded-[6px] border border-border bg-surface shadow-[var(--shadow-1)]"
+              transition={{ type: "spring", duration: 0.28, bounce: 0.1 }}
+            />
+          ) : null}
+          <span className="relative">{o.label}</span>
         </ToggleGroup.Item>
       ))}
     </ToggleGroup.Root>

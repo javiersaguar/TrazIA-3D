@@ -2,7 +2,10 @@
 
 import { studyScope } from "@/features/study/scope";
 import { CircleDashed, FlaskConical, Terminal } from "lucide-react";
+import { motion } from "motion/react";
 import { useMemo, useState } from "react";
+import { DrawPath } from "@/components/motion/draw-path";
+import { EASE_OUT } from "@/components/motion/reveal";
 import { Segmented } from "@/components/ui/controls";
 import { SyntheticNotice } from "@/components/ui/notice";
 import { Badge, Button, Code, EmptyState, Panel, PanelHeader, Skeleton } from "@/components/ui/primitives";
@@ -234,20 +237,31 @@ function ForestPlot({ variants }: { variants: StudyVariant[] }) {
                   title={`${v.id}: ${num(v.metrics.score)}${ci ? ` [${num(ci[0])}; ${num(ci[1])}]` : ""}`}
                 >
                   {ci ? (
-                    <div
+                    // Los bigotes crecen desde el estimador hacia los extremos del intervalo
+                    <motion.div
                       className={cn("absolute top-1/2 h-0.5 -translate-y-1/2 rounded-full", muted ? "bg-warning" : "bg-accent")}
-                      style={{ left: at(ci[0]), width: `calc(${at(ci[1])} - ${at(ci[0])})` }}
+                      style={{
+                        left: at(ci[0]),
+                        width: `calc(${at(ci[1])} - ${at(ci[0])})`,
+                        transformOrigin: `${ci[1] > ci[0] ? ((v.metrics.score - ci[0]) / (ci[1] - ci[0])) * 100 : 50}% 50%`,
+                      }}
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 0.55, delay: 0.15 + i * 0.06, ease: EASE_OUT }}
                     >
                       <span className={cn("absolute -top-1.5 left-0 h-3.5 w-0.5", muted ? "bg-warning" : "bg-accent")} />
                       <span className={cn("absolute -top-1.5 right-0 h-3.5 w-0.5", muted ? "bg-warning" : "bg-accent")} />
-                    </div>
+                    </motion.div>
                   ) : null}
-                  <span
+                  <motion.span
                     className={cn(
                       "absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 bg-surface",
                       muted ? "border-warning" : "border-accent",
                     )}
                     style={{ left: at(v.metrics.score) }}
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.3, delay: i * 0.06, ease: EASE_OUT }}
                   />
                 </div>
               </div>
@@ -360,14 +374,27 @@ function Ablations({ study }: { study: StudyReport }) {
             <div className="relative mt-1.5 h-3 rounded-full bg-surface-sunken" aria-hidden>
               <div className="absolute top-[-3px] bottom-[-3px] left-1/2 w-px bg-border-strong" />
               {a.ci95 ? (
-                <div
+                // La barra crece desde el cero (centro) hasta su intervalo
+                <motion.div
                   className={cn("absolute top-1/2 h-1 -translate-y-1/2 rounded-full", crosses ? "bg-muted" : "bg-revision")}
-                  style={{ left: `${x(a.ci95[0])}%`, width: `${x(a.ci95[1]) - x(a.ci95[0])}%` }}
+                  style={{
+                    left: `${x(a.ci95[0])}%`,
+                    width: `${x(a.ci95[1]) - x(a.ci95[0])}%`,
+                    transformOrigin: `${((50 - x(a.ci95[0])) / Math.max(0.001, x(a.ci95[1]) - x(a.ci95[0]))) * 100}% 50%`,
+                  }}
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.6, ease: EASE_OUT }}
                 />
               ) : null}
-              <div
+              <motion.div
                 className={cn("absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full", crosses ? "bg-muted" : "bg-revision")}
                 style={{ left: `${x(a.delta_score)}%` }}
+                initial={{ opacity: 0, scale: 0.5 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.3, delay: 0.35, ease: EASE_OUT }}
               />
             </div>
             <p className="mt-1 text-xs text-muted">
@@ -417,27 +444,35 @@ function ParetoChart({ variants, front }: { variants: StudyVariant[]; front: str
             </text>
           ))}
           {onFront.length > 1 ? (
-            <polyline
-              points={onFront.map((v) => `${x(v.metrics.seconds_per_revision)},${y(v.metrics.score)}`).join(" ")}
+            // La frontera se traza después de que aparezcan los puntos
+            <DrawPath
+              inView
+              d={onFront.map((v, k) => `${k ? "L" : "M"}${x(v.metrics.seconds_per_revision)},${y(v.metrics.score)}`).join(" ")}
               fill="none"
               stroke="var(--accent)"
               strokeDasharray="4 4"
+              delay={0.25 + labelled.length * 0.05}
+              duration={0.7}
             />
           ) : null}
-          {labelled.map(({ v, ly }) => {
+          {labelled.map(({ v, ly }, k) => {
             const isFront = front.includes(v.id);
             return (
               <g key={v.id}>
-                <circle
+                <motion.circle
                   cx={x(v.metrics.seconds_per_revision)}
                   cy={y(v.metrics.score)}
                   r={isFront ? 6 : 4.5}
                   fill={isFront ? "var(--accent)" : "var(--surface)"}
                   stroke={isFront ? "var(--accent)" : "var(--border-strong)"}
                   strokeWidth="1.5"
+                  initial={{ opacity: 0, scale: 0.4 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ type: "spring", duration: 0.4, bounce: 0.3, delay: 0.1 + k * 0.05 }}
                 >
                   <title>{`${v.id}: ${num(v.metrics.score)} · ${num(v.metrics.seconds_per_revision, 2)} s/rev · ${num(v.metrics.cost_eur_per_equipment, 2)} €`}</title>
-                </circle>
+                </motion.circle>
                 <text x={x(v.metrics.seconds_per_revision) + 9} y={ly + 3.5} fontSize="9.5" fill="currentColor">
                   {v.id}
                 </text>
