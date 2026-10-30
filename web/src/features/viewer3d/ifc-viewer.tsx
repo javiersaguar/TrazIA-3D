@@ -1,5 +1,7 @@
 "use client";
 
+import { BRAND } from "@/lib/brand";
+
 import { Grid } from "@react-three/drei";
 import { Crosshair, Eye, EyeOff, Layers, Scissors, TreePine } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
@@ -67,8 +69,8 @@ export function IfcViewer({ ifcUrl, selectedId, hoveredId, onSelect, onHover, an
     {model ? <SceneCanvas label="Modelo IFC sintético; usa el árbol para seleccionar componentes">
       <Studio />
       <CameraRig bounds={displayBounds ?? model.bounds} view={activeView} handle={camera} measureKey={measureKey} onMeasure={onMeasure} />
-      <Grid position={[0, -.015, 0]} args={[20, 20]} cellSize={.5} sectionSize={2} cellColor="#253345"
-        sectionColor="#3b4d63" fadeDistance={20} infiniteGrid />
+      <Grid position={[0, -.015, 0]} args={[20, 20]} cellSize={.5} sectionSize={2} cellColor={BRAND.surfaceRaised}
+        sectionColor={BRAND.border} fadeDistance={20} infiniteGrid />
       {visibleProducts.map(product => {
         const offset = explosionOffset(product, activeMode === "exploded" ? 1 : 0);
         const position = product.center.map((v, i) => v + offset[i]!) as Vec3;

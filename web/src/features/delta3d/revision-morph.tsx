@@ -1,5 +1,7 @@
 "use client";
 
+import { BRAND } from "@/lib/brand";
+
 import { Grid, Line } from "@react-three/drei";
 import { Eye, LocateFixed, Pause, Play, SkipForward } from "lucide-react";
 import { useReducedMotion } from "motion/react";
@@ -86,8 +88,8 @@ export function RevisionMorph({ fromUrl, toUrl, changes, progress: controlledPro
     {ready ? <SceneCanvas label="Comparación de IFC sintéticos A y B emparejados por GlobalId">
       <Studio />
       <CameraRig bounds={bounds} handle={camera} onUserControl={() => { setPlaying(false); setFollow(false); }} />
-      <Grid position={[0, -.02, 0]} args={[16, 16]} cellSize={.5} sectionSize={2} cellColor="#253345" sectionColor="#3c4e65" fadeDistance={18} />
-      {ghost ? a.map(product => <ProductMesh key={`ghost-${product.globalId}`} product={product} opacity={.12} color="#668fc7" wireframe immediate />) : null}
+      <Grid position={[0, -.02, 0]} args={[16, 16]} cellSize={.5} sectionSize={2} cellColor={BRAND.surfaceRaised} sectionColor={BRAND.border} fadeDistance={18} />
+      {ghost ? a.map(product => <ProductMesh key={`ghost-${product.globalId}`} product={product} opacity={.12} color={BRAND.skyDeep} wireframe immediate />) : null}
       {pairs.map(pair => {
         const state = morphState(pair, progress), changed = changedIds.has((pair.after ?? pair.before)!.semanticId);
         return <group key={pair.globalId}>
@@ -99,7 +101,7 @@ export function RevisionMorph({ fromUrl, toUrl, changes, progress: controlledPro
         </group>;
       })}
       {markers.map(({ change, product, position }) => <group key={change.id}>
-        <Line points={[product!.center, position]} color="#f5a35c" dashed dashSize={.07} gapSize={.05} lineWidth={.8} />
+        <Line points={[product!.center, position]} color={BRAND.revision} dashed dashSize={.07} gapSize={.05} lineWidth={.8} />
         <Html position={position} center zIndexRange={[8, 0]} style={{ pointerEvents: "none" }}>
           <div className={styles.delta}>Δ {change.label}</div>
         </Html>

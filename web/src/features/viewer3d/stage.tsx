@@ -1,13 +1,14 @@
 "use client";
 
-import { CameraControls, Environment, Html as DreiHtml, Lightformer } from "@react-three/drei";
+import { CameraControls, ContactShadows, Environment, Html as DreiHtml, Lightformer } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { EffectComposer, SSAO } from "@react-three/postprocessing";
+import { EffectComposer, Selection, SelectiveBloom, SMAA, SSAO, Vignette } from "@react-three/postprocessing";
 import { Camera, Maximize, Minus, Plus, RotateCcw } from "lucide-react";
 import { useReducedMotion } from "motion/react";
-import { useTheme } from "next-themes";
-import { Component, createContext, useContext, useEffect, useImperativeHandle, useRef, type ComponentProps, type ReactNode, type Ref, type RefObject } from "react";
-import { Box3, Matrix4, OrthographicCamera, Vector3 } from "three";
+import { Component, createContext, useContext, useEffect, useImperativeHandle, useRef, useMemo, useState, type ComponentProps, type ReactNode, type Ref, type RefObject } from "react";
+import { AgXToneMapping, Box3, Matrix4, OrthographicCamera, Vector3, type DirectionalLight } from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { BRAND } from "@/lib/brand";
 import type { Bounds, Vec3 } from "@/workers/ifc-protocol";
 import styles from "./viewer.module.css";
 
@@ -108,20 +109,28 @@ function AdaptiveResolution() {
 }
 
 export function Studio({ effects = true }: { effects?: boolean }) {
-  const { resolvedTheme } = useTheme();
+  const room = useMemo(() => new RoomEnvironment(), []);
+  const key = useRef<DirectionalLight>(null), rim = useRef<DirectionalLight>(null);
+  useEffect(() => () => room.dispose(), [room]);
   return <>
-    <color attach="background" args={[resolvedTheme === "light" ? "#edf2f8" : "#101720"]} />
-    <ambientLight intensity={.65} />
-    <directionalLight position={[5, 10, 7]} intensity={2.3} color="#f4f7ff" />
-    <directionalLight position={[-6, 4, -3]} intensity={1.4} color="#8daed7" />
-    <Environment resolution={64} frames={1}>
-      <Lightformer position={[4, 6, -4]} scale={[6, 10, 1]} intensity={3} />
-      <Lightformer position={[-5, 4, 4]} rotation={[0, Math.PI, 0]} scale={[5, 8, 1]} intensity={2} />
-      <Lightformer position={[0, 9, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[7, 7, 1]} intensity={2} />
+    <color attach="background" args={[BRAND.black]} />
+    <ambientLight intensity={.4} color={BRAND.text} />
+    <directionalLight ref={key} position={[5, 9, 7]} intensity={2} color={BRAND.text} />
+    <directionalLight ref={rim} position={[-6, 5, -3]} intensity={1} color={BRAND.skyPale} />
+    <Environment resolution={128} frames={1} environmentIntensity={.65}>
+      <primitive object={room} dispose={null} />
+      <Lightformer form="ring" position={[-4, 5, 3]} rotation={[0, .7, 0]} scale={4} intensity={2} color={BRAND.text} />
+      <Lightformer position={[4, 6, -4]} rotation={[0, -.6, 0]} scale={[3, 10, 1]} intensity={3} color={BRAND.text} />
+      <Lightformer position={[-5, 4, 4]} rotation={[0, Math.PI, 0]} scale={[2, 8, 1]} intensity={2} color={BRAND.skyPale} />
+      <Lightformer position={[0, 9, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[6, 6, 1]} intensity={2} color={BRAND.text} />
     </Environment>
+    <ContactShadows position={[0, -.025, 0]} opacity={.45} scale={24} blur={2.5} far={15} frames={1} resolution={256} color={BRAND.black} />
     <AdaptiveResolution />
     {effects ? <EffectComposer enableNormalPass multisampling={0} resolutionScale={.5}>
-      <SSAO resolutionScale={.5} depthAwareUpsampling samples={8} rings={3} intensity={1.1} radius={.1} luminanceInfluence={.7} />
+      <SSAO resolutionScale={.5} depthAwareUpsampling samples={8} rings={3} intensity={.8} radius={.12} luminanceInfluence={.7} />
+      <SelectiveBloom lights={[key, rim]} selectionLayer={11} intensity={.55} luminanceThreshold={1} mipmapBlur ignoreBackground />
+      <SMAA />
+      <Vignette offset={.3} darkness={.55} />
     </EffectComposer> : null}
   </>;
 }
@@ -135,13 +144,24 @@ class RenderBoundary extends Component<{ children: ReactNode }, { failed: boolea
 }
 
 export function SceneCanvas({ children, label }: { children: ReactNode; label: string }) {
-  const portal = useRef<HTMLDivElement>(null);
-  return <RenderBoundary><Canvas className={styles.canvas} orthographic frameloop="demand" dpr={[1, 1.6]}
-    camera={{ position: [12, 9, 12], zoom: 50, near: .01, far: 1000 }} performance={{ min: .65 }}
-    gl={{ antialias: true, alpha: false, localClippingEnabled: true }}
-    onCreated={({ gl }) => { gl.info.autoReset = false; }} aria-label={label}>
-    <OverlayContext.Provider value={portal}>{children}</OverlayContext.Provider>
-  </Canvas><div ref={portal} className={styles.labels} /></RenderBoundary>;
+  const portal = useRef<HTMLDivElement>(null), root = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(true);
+  useEffect(() => {
+    let visible = true;
+    const update = () => setActive(visible && !document.hidden);
+    const observer = new IntersectionObserver(entries => { visible = entries[0]?.isIntersecting ?? false; update(); });
+    if (root.current) observer.observe(root.current);
+    document.addEventListener("visibilitychange", update);
+    return () => { observer.disconnect(); document.removeEventListener("visibilitychange", update); };
+  }, []);
+  return <div ref={root} style={{ position: "relative", height: "100%", width: "100%" }}><RenderBoundary>
+    <Canvas className={styles.canvas} orthographic frameloop={active ? "demand" : "never"} dpr={[1, 1.6]}
+      camera={{ position: [12, 9, 12], zoom: 50, near: .01, far: 1000 }} performance={{ min: .65 }}
+      gl={{ antialias: false, alpha: false, localClippingEnabled: true }}
+      onCreated={({ gl }) => { gl.info.autoReset = false; gl.toneMapping = AgXToneMapping; gl.toneMappingExposure = 1.1; }} aria-label={label}>
+      <Selection><OverlayContext.Provider value={portal}>{children}</OverlayContext.Provider></Selection>
+    </Canvas><div ref={portal} className={styles.labels} />
+  </RenderBoundary></div>;
 }
 
 export function CameraTools({ handle, container, onReset }: { handle: RefObject<CameraHandle | null>; container: RefObject<HTMLDivElement | null>; onReset?(): void }) {

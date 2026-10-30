@@ -1,5 +1,7 @@
 "use client";
 
+import { BRAND } from "@/lib/brand";
+
 import { Grid } from "@react-three/drei";
 import type { ThreeEvent } from "@react-three/fiber";
 import { Eye, LocateFixed, Play } from "lucide-react";
@@ -27,7 +29,7 @@ function InstancePart({ product, part, items, selected, onSelect, onFocus }: {
     items.forEach((item, index) => {
       matrix.makeTranslation(item.position[0] + product.center[0], item.position[1] + product.center[1], item.position[2] + product.center[2]);
       mesh.current!.setMatrixAt(index, matrix);
-      const tint = selected === item.tag ? "#b6d3fa" : item.status === "review" ? "#86aee8" : STATE_COLORS[item.status];
+      const tint = selected === item.tag ? BRAND.skyPale : item.status === "review" ? BRAND.skyLight : STATE_COLORS[item.status];
       mesh.current!.setColorAt(index, color.set(tint));
     });
     mesh.current.instanceMatrix.needsUpdate = true;
@@ -102,8 +104,8 @@ export function PlantScene({ equipment, onSelect }: PlantSceneProps) {
       <Studio effects={false} />
       <CameraRig bounds={bounds} handle={camera} onUserControl={() => setFollow(false)} />
       {areas.map((area, index) => <group key={area} position={[(index - (areas.length - 1) / 2) * 12, -.16, 0]}>
-        <mesh position={[0, 0, 0]}><boxGeometry args={[10, .25, 10]} /><meshStandardMaterial color="#263343" roughness={.9} /></mesh>
-        <Grid position={[0, .14, 0]} args={[10, 10]} cellSize={1} sectionSize={5} cellColor="#425369" sectionColor="#60768e" fadeDistance={70} />
+        <mesh position={[0, 0, 0]}><boxGeometry args={[10, .25, 10]} /><meshStandardMaterial color={BRAND.surfaceRaised} roughness={.9} /></mesh>
+        <Grid position={[0, .14, 0]} args={[10, 10]} cellSize={1} sectionSize={5} cellColor={BRAND.border} sectionColor={BRAND.steelDark} fadeDistance={70} />
         <Html position={[0, .25, 6.3]} center zIndexRange={[5, 0]} style={{ pointerEvents: "none" }}><span className={styles.label}>{area}</span></Html>
       </group>)}
       {groups.map(group => <PlantInstances key={group.url} {...group} selected={selected} onSelect={select} onFocus={focus} onLoaded={loaded} />)}

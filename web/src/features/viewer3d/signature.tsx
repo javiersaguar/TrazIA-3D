@@ -1,5 +1,7 @@
 "use client";
 
+import { BRAND } from "@/lib/brand";
+
 import { useFrame, useThree } from "@react-three/fiber";
 import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
 import { cubicBezier, useReducedMotion } from "motion/react";
@@ -89,7 +91,7 @@ function LiftScene({ products, drawing, timeline, onPhase, onFinish, reduced, pl
   const height = 12 / drawing.aspect;
   const meshes = (wireframe: boolean) => products.flatMap(product => product.geometries.map((geometry, index) =>
     <mesh key={`${product.globalId}:${index}`} geometry={geometry} position={product.center} dispose={null}>
-      <SteelMaterial color={wireframe ? "#86aee8" : "#a1b4c4"} wireframe={wireframe} transparent
+      <SteelMaterial color={wireframe ? BRAND.skyLight : BRAND.steel} wireframe={wireframe} transparent
         opacity={wireframe ? .85 : 0} metalness={wireframe ? 0 : .6} roughness={.32} depthWrite={!wireframe} />
     </mesh>));
   return <>
@@ -100,7 +102,7 @@ function LiftScene({ products, drawing, timeline, onPhase, onFinish, reduced, pl
       const [x0, y0, x1, y1] = evidence.bbox;
       return <mesh key={index} rotation-x={-Math.PI / 2} position={[(x0 + x1 - 1) * 6, -.005, (y0 + y1 - 1) * height / 2]}>
         <planeGeometry args={[(x1 - x0) * 12 + .08, (y1 - y0) * height + .05]} />
-        <meshBasicMaterial color="#86aee8" transparent opacity={0} depthWrite={false} />
+        <meshBasicMaterial color={BRAND.skyLight} transparent opacity={0} depthWrite={false} />
       </mesh>;
     })}</group>
     <group ref={model}><group ref={wire}>{meshes(true)}</group><group ref={steel}>{meshes(false)}</group></group>

@@ -1,5 +1,7 @@
 "use client";
 
+import { BRAND } from "@/lib/brand";
+
 import { Line } from "@react-three/drei";
 import { useMemo } from "react";
 import { Vector3 } from "three";
@@ -14,7 +16,7 @@ function Dimension({ from, to, anchorFrom, anchorTo, annotation }: {
   from: Vec3; to: Vec3; anchorFrom: Vec3; anchorTo: Vec3; annotation: Annotation;
 }) {
   const midpoint = from.map((v, i) => (v + to[i]!) / 2) as Vec3;
-  const color = annotation.confidence >= .9 ? "#9dbce3" : annotation.confidence >= .6 ? "#e8c17b" : "#f07468";
+  const color = annotation.confidence >= .9 ? BRAND.skyPale : annotation.confidence >= .6 ? BRAND.warning : BRAND.danger;
   const vector = new Vector3(...to).sub(new Vector3(...from)).normalize().multiplyScalar(.1);
   const tick: Vec3 = Math.abs(vector.y) > .05 ? [.09, 0, .05] : [0, .09, .05];
   return <group>
@@ -84,21 +86,21 @@ export function AzimuthRing({ model }: { model: IfcModel }) {
     return [radius * Math.cos(angle), .03, -radius * Math.sin(angle)] as Vec3;
   }), [radius]);
   return <group position={[x, y - .03, z]}>
-    <Line points={ring} color="#536f91" lineWidth={1} />
+    <Line points={ring} color={BRAND.steelDark} lineWidth={1} />
     {Array.from({ length: 12 }, (_, i) => {
       const angle = i * Math.PI / 6;
       return <group key={i}>
         <Line points={[[radius * .96 * Math.cos(angle), .03, -radius * .96 * Math.sin(angle)],
-          [radius * Math.cos(angle), .03, -radius * Math.sin(angle)]]} color="#7894b6" lineWidth={1} />
+          [radius * Math.cos(angle), .03, -radius * Math.sin(angle)]]} color={BRAND.textMuted} lineWidth={1} />
         <Html position={[(radius + .16) * Math.cos(angle), .03, -(radius + .16) * Math.sin(angle)]} center
-          zIndexRange={[5, 0]} style={{ pointerEvents: "none", color: "#94adca", fontSize: 10 }}>{i * 30}°</Html>
+          zIndexRange={[5, 0]} style={{ pointerEvents: "none", color: BRAND.textMuted, fontSize: 10 }}>{i * 30}°</Html>
       </group>;
     })}
     {model.products.filter(p => p.semanticId.startsWith("nozzle:")).map(product => {
       const angle = Math.atan2(-(product.center[2] - z), product.center[0] - x);
       const point: Vec3 = [radius * Math.cos(angle), .04, -radius * Math.sin(angle)];
       return <group key={product.globalId}>
-        <Line points={[[0, .04, 0], point]} color="#86aee8" dashed dashSize={.08} gapSize={.07} lineWidth={.8} />
+        <Line points={[[0, .04, 0], point]} color={BRAND.skyLight} dashed dashSize={.08} gapSize={.07} lineWidth={.8} />
         <Html position={point} center zIndexRange={[6, 0]} style={{ pointerEvents: "none" }}>
           <span className={styles.label}>{product.semanticId.replace("nozzle:", "")} · {((angle * 180 / Math.PI + 360) % 360).toFixed(0)}°</span>
         </Html>

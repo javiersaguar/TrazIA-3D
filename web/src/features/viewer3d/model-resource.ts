@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { BufferAttribute, BufferGeometry } from "three";
 import { MeshBVH } from "three-mesh-bvh";
 import type { IfcModel, IfcProduct, WorkerReply } from "@/workers/ifc-protocol";
+import { addSurfaceUV } from "./surface-uv";
 
 export type PreparedProduct = IfcProduct & { geometries: BufferGeometry[] };
 type LoadState = { model: IfcModel | null; progress: number; error: string | null };
@@ -74,6 +75,7 @@ export function usePreparedModel(model: IfcModel | null): PreparedProduct[] {
       geometry.setAttribute("normal", new BufferAttribute(part.normals, 3));
       geometry.setIndex(new BufferAttribute(new Uint32Array(part.indices), 1));
       geometry.computeBoundingBox();
+      addSurfaceUV(geometry);
       geometry.computeBoundingSphere();
       return geometry;
     }),

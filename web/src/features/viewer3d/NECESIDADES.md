@@ -18,3 +18,11 @@
   reproductor interno, pero no puede detener el de la pantalla sin ampliar el contrato.
 - `Como el plano` ofrece un alzado ortográfico canónico. La alineación automática con un
   plano arbitrario requerirá la transformación del plano/calibración aportada por el núcleo.
+
+## Plan frontend · 30/10/2026
+
+- Paso 0 disponible en main (`976d8dd`) e incorporado por fast-forward al worktree de 3D.
+- La API 8010 rechaza CORS desde localhost:3300. También se necesitarán localhost/127.0.0.1
+  en 3310/3311 para la verificación indicada. Se solicita a Javier una excepción limitada a
+  api/app.py; no se modifica sin respuesta ni se reinicia la API 8010. El laboratorio 3D
+  puede probar geometría IFC local sin depender de este cambio.
