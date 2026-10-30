@@ -68,12 +68,11 @@ export function IconTile({
   );
 }
 
-export type Tone = "accent" | "live" | "violet" | "sky" | "revision" | "approved" | "danger" | "warning" | "neutral";
+export type Tone = "accent" | "live" | "sky" | "revision" | "approved" | "danger" | "warning" | "neutral";
 
 const TONE_SOFT: Record<Tone, string> = {
   accent: "bg-accent-soft text-accent-text",
   live: "bg-live-soft text-live",
-  violet: "bg-violet-soft text-violet",
   sky: "bg-sky-soft text-sky",
   revision: "bg-revision-soft text-revision",
   approved: "bg-approved-soft text-approved",

@@ -501,7 +501,7 @@ function Breakdown({ variants }: { variants: StudyVariant[] }) {
                 <td className="border-b border-border px-3 py-2.5 whitespace-nowrap">
                   <span className="font-medium text-text">{GROUP_NAMES[g] ?? g}</span>
                   {axis === "by_style" && RESERVED.has(g) ? (
-                    <Badge tone="violet" className="ml-2">
+                    <Badge tone="sky" className="ml-2">
                       reservado
                     </Badge>
                   ) : null}

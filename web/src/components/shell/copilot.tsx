@@ -59,7 +59,7 @@ export function CopilotPanel() {
           className="sheet-content fixed top-[calc(var(--topbar-height)+12px)] right-3 bottom-3 z-40 flex w-[380px] max-w-[calc(100vw_-_24px)] flex-col rounded-[var(--radius-panel)] border border-border bg-surface-raised shadow-[var(--shadow-pop)]"
         >
           <header className="flex items-start gap-3 border-b border-border px-5 py-4">
-            <span className="inline-flex size-9 items-center justify-center rounded-[var(--radius-control)] bg-violet-soft text-violet">
+            <span className="inline-flex size-9 items-center justify-center rounded-[var(--radius-control)] bg-accent-soft text-accent-text">
               <Icon icon={MessageSquareText} size={18} />
             </span>
             <div className="min-w-0 flex-1">

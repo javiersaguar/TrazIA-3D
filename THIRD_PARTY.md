@@ -108,3 +108,12 @@ modelo instalado `84f7ed8042fa`. No se añaden dependencias Python/JavaScript pa
 
 Pytest (MIT) también es dependencia de ejecución del extra API: IfcOpenShell 0.8.x usa
 `_pytest.assertion` para ejecutar las reglas EXPRESS. Se conserva la validación en producción.
+
+## Frontend (plan de frontend, 30/10/2026)
+
+Licencias comprobadas en los metadatos de npm el 30/10/2026.
+
+| Dependencia | Licencia | Uso |
+| --- | --- | --- |
+| react-resizable-panels 4.15.2 | MIT | Paneles redimensionables del espacio de Revisión |
+| three-bvh-csg 0.0.18 | MIT | Operaciones booleanas en los modelos 3D ilustrativos (aberturas, taladros) |

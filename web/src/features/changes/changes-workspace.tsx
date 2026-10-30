@@ -107,7 +107,7 @@ export function ChangesWorkspace() {
         <KpiCard icon={FileDiff} tone="sky" label="Documentos nuevos" loading={!diff} value={diff?.summary.document_changes ?? 0} context="GA y hoja de datos reemitidos" />
         <KpiCard
           icon={Fingerprint}
-          tone="violet"
+          tone="sky"
           label="Huella de datos"
           loading={!diff}
           value={<span className="font-mono text-[18px]">{diff ? `${shortHash(diff.before_sha256, 6)} → ${shortHash(diff.after_sha256, 6)}` : ""}</span>}

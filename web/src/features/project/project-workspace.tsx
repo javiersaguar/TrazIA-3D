@@ -68,7 +68,7 @@ export function ProjectWorkspace() {
         />
         <KpiCard
           icon={Coins}
-          tone="violet"
+          tone="sky"
           label="Coste de extracción"
           value={<span className="text-muted">Sin medir</span>}
           context="El extractor actual no llama a ningún modelo"

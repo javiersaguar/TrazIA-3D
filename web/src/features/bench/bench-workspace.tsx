@@ -179,7 +179,7 @@ function LegacyBenchWorkspace() {
           </div>
         </Panel>
         <Panel className="flex items-start gap-4 p-5">
-          <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-violet-soft text-violet">
+          <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-sky-soft text-sky">
             <Database size={18} strokeWidth={1.5} aria-hidden />
           </span>
           <div>

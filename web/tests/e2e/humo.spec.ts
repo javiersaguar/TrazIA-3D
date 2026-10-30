@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 const connected = Boolean(process.env.NEXT_PUBLIC_API_URL);
 const SCREENS = [
-  { path: "/proyecto", title: "Proyecto" },
+  { path: "/proyecto", title: "Resumen" },
   { path: "/pipeline", title: "Pipeline" },
   { path: "/revision", title: "Revisión" },
   { path: "/cambios", title: "Cambios" },
@@ -25,6 +25,26 @@ test("las 7 pantallas cargan sin errores y avisan de que los datos son sintétic
     await page.goto(s.path);
     await expect(page.getByRole("heading", { level: 1, name: s.title })).toBeVisible();
     await expect(page.getByText(connected ? "Datos sintéticos · API local" : "Datos sintéticos · sin backend")).toBeVisible();
+  }
+  expect(errors, errors.join("\n")).toEqual([]);
+});
+
+const SKETCHES = [
+  { path: "/proyectos", title: "Proyectos" },
+  { path: "/documentos", title: "Documentos" },
+  { path: "/modelo", title: "Modelo 3D" },
+  { path: "/familias", title: "Familias" },
+  { path: "/lote", title: "Lote" },
+  { path: "/informes", title: "Informes" },
+  { path: "/auditoria", title: "Auditoría" },
+  { path: "/ajustes", title: "Ajustes" },
+];
+
+test("las secciones en boceto cargan sin errores", async ({ page }) => {
+  const errors = trackErrors(page);
+  for (const s of SKETCHES) {
+    await page.goto(s.path);
+    await expect(page.getByRole("heading", { level: 1, name: s.title })).toBeVisible();
   }
   expect(errors, errors.join("\n")).toEqual([]);
 });

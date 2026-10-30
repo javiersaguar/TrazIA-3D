@@ -40,8 +40,10 @@
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "react-pdf": "11.0.0",
+    "react-resizable-panels": "4.15.2",
     "sonner": "2.0.8",
     "three": "0.186.1",
+    "three-bvh-csg": "0.0.18",
     "three-mesh-bvh": "0.9.16",
     "web-ifc": "0.0.78",
     "zustand": "5.0.16"

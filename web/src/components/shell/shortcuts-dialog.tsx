@@ -12,7 +12,11 @@ export const SHORTCUTS: { group: string; items: { keys: string[]; label: string 
       { keys: ["Ctrl", "K"], label: "Menú de comandos" },
       { keys: ["?"], label: "Ver estos atajos" },
       { keys: ["["], label: "Plegar o desplegar la barra lateral" },
-      { keys: ["G", "1–7"], label: "Ir a Proyecto, Pipeline, Revisión, Cambios, Bench, Impacto o Estudio" },
+      { keys: ["G", "1–7"], label: "Ir a Resumen, Pipeline, Revisión, Cambios, Bench, Impacto o Estudio" },
+      { keys: ["G", "P"], label: "Ir a Proyectos" },
+      { keys: ["G", "D"], label: "Ir a Documentos" },
+      { keys: ["G", "M"], label: "Ir a Modelo 3D" },
+      { keys: ["G", "F · L · I · A · S"], label: "Ir a Familias, Lote, Informes, Auditoría o Ajustes" },
     ],
   },
   {

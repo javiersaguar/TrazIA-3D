@@ -40,7 +40,7 @@ export function GlobalKeys() {
         return;
       }
       if (pendingG.current != null) {
-        const item = NAV_ITEMS.find((i) => i.shortcut === e.key);
+        const item = NAV_ITEMS.find((i) => i.shortcut === e.key.toLowerCase());
         window.clearTimeout(pendingG.current);
         pendingG.current = null;
         if (item) router.push(item.href);
