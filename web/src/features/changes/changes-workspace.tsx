@@ -1,26 +1,45 @@
 "use client";
 
-import { FileDiff, Fingerprint, GitCompareArrows, Pause, Play, Ruler } from "lucide-react";
+import {
+  FileDiff,
+  Fingerprint,
+  GitCompareArrows,
+  Pause,
+  Play,
+  Ruler,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { isTyping } from "@/components/shell/global-keys";
 import { RevisionMorph } from "@/components/three";
 import { Segmented, Tip } from "@/components/ui/controls";
 import { KpiCard } from "@/components/ui/data";
 import { SyntheticNotice } from "@/components/ui/notice";
-import { Badge, Code, Icon, Kbd, Panel, PanelHeader, Skeleton } from "@/components/ui/primitives";
+import {
+  Badge,
+  Code,
+  Icon,
+  Kbd,
+  Panel,
+  PanelHeader,
+  Skeleton,
+} from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 import { formatDelta, formatValue, shortHash } from "@/lib/format";
 import { DEMO } from "@/lib/mock/api";
+import { changeSteps } from "@/features/delta3d/morph";
 import { groupChanges, type ChangeGroup } from "@/lib/mock/impact";
 import { useChanges } from "@/lib/queries";
 import { useSelection } from "@/stores/selection";
 
-const ImpactGraph = dynamic(() => import("./impact-graph").then((m) => m.ImpactGraph), {
-  ssr: false,
-  loading: () => <Skeleton className="h-[420px] w-full" />,
-});
+const ImpactGraph = dynamic(
+  () => import("./impact-graph").then((m) => m.ImpactGraph),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-[420px] w-full" />,
+  },
+);
 
 type Mode = "A" | "B" | "delta" | "split";
 
@@ -33,14 +52,20 @@ const LEAF_LABEL: Record<string, string> = {
 
 export function ChangesWorkspace() {
   const { data: diff } = useChanges();
-  const groups = useMemo(() => (diff ? groupChanges(diff.changes) : []), [diff]);
+  const groups = useMemo(
+    () => (diff ? groupChanges(diff.changes) : []),
+    [diff],
+  );
   const setSelected = useSelection((s) => s.setSelected);
   const [mode, setMode] = useState<Mode>("delta");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [presentation, setPresentation] = useState(false);
   const [timelineStep, setTimelineStep] = useState(0);
-  const selectedId = useSelection(s => s.selectedId);
+  const selectedId = useSelection((s) => s.selectedId);
+  const hoveredId = useSelection((s) => s.hoveredId),
+    setHovered = useSelection((s) => s.setHovered);
+  const root = useRef<HTMLDivElement>(null);
 
   const focus = useCallback(
     (g: ChangeGroup) => {
@@ -62,7 +87,12 @@ export function ChangesWorkspace() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== " " || isTyping(e.target) || e.target instanceof HTMLButtonElement) return;
+      if (
+        e.key !== " " ||
+        isTyping(e.target) ||
+        e.target instanceof HTMLButtonElement
+      )
+        return;
       e.preventDefault();
       togglePlay();
     };
@@ -71,38 +101,114 @@ export function ChangesWorkspace() {
   }, [togglePlay]);
 
   const morphProgress = mode === "A" ? 0 : mode === "B" ? 1 : undefined;
-  const active = groups.find((g) => g.id === activeId) ?? groups.find(g => g.elementId === selectedId);
-  const step = playing ? timelineStep + 1 : active ? groups.indexOf(active) + 1 : 0;
+  const chosen = groups.find((g) => g.id === activeId);
+  const active =
+    chosen?.elementId === selectedId
+      ? chosen
+      : groups.find((g) => g.elementId === selectedId);
+  const timelineTotal = useMemo(() => changeSteps(diff).length, [diff]);
+  const step = playing
+    ? timelineStep + 1
+    : active
+      ? groups.indexOf(active) + 1
+      : 0;
   useEffect(() => {
-    const exit = (event: KeyboardEvent) => { if (event.key === "Escape") setPresentation(false); };
-    window.addEventListener("keydown", exit); return () => window.removeEventListener("keydown", exit);
+    const exit = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPresentation(false);
+    };
+    const fullscreen = () => {
+      if (!document.fullscreenElement) setPresentation(false);
+    };
+    window.addEventListener("keydown", exit);
+    document.addEventListener("fullscreenchange", fullscreen);
+    return () => {
+      window.removeEventListener("keydown", exit);
+      document.removeEventListener("fullscreenchange", fullscreen);
+    };
   }, []);
 
   return (
-    <div className={cn("space-y-5", presentation && "fixed inset-0 z-40 overflow-auto bg-bg p-5")}>
-      <SyntheticNotice>Las revisiones A y B se generaron para la demo con cambios conocidos.</SyntheticNotice>
+    <div
+      ref={root}
+      className={cn(
+        "space-y-5",
+        presentation && "fixed inset-0 z-40 overflow-auto bg-bg p-5",
+      )}
+    >
+      <SyntheticNotice>
+        Las revisiones A y B se generaron para la demo con cambios conocidos.
+      </SyntheticNotice>
 
-      <div className={cn("grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4", presentation && "hidden")}>
-        <KpiCard icon={GitCompareArrows} tone="revision" label="Cambios de campos" loading={!diff} value={diff?.summary.changes ?? 0} context={`${groups.length} cambios agrupados por elemento`} />
-        <KpiCard icon={Ruler} tone="accent" label="Afectan a la geometría" loading={!diff} value={diff?.summary.geometry_changes ?? 0} context="El IFC rev B conserva los GUID" />
-        <KpiCard icon={FileDiff} tone="sky" label="Documentos nuevos" loading={!diff} value={diff?.summary.document_changes ?? 0} context="GA y hoja de datos reemitidos" />
+      <div
+        className={cn(
+          "grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4",
+          presentation && "hidden",
+        )}
+      >
+        <KpiCard
+          icon={GitCompareArrows}
+          tone="revision"
+          label="Cambios de campos"
+          loading={!diff}
+          value={diff?.summary.changes ?? 0}
+          context={`${groups.length} cambios agrupados por elemento`}
+        />
+        <KpiCard
+          icon={Ruler}
+          tone="accent"
+          label="Afectan a la geometría"
+          loading={!diff}
+          value={diff?.summary.geometry_changes ?? 0}
+          context="El IFC rev B conserva los GUID"
+        />
+        <KpiCard
+          icon={FileDiff}
+          tone="sky"
+          label="Documentos nuevos"
+          loading={!diff}
+          value={diff?.summary.document_changes ?? 0}
+          context="GA y hoja de datos reemitidos"
+        />
         <KpiCard
           icon={Fingerprint}
           tone="sky"
           label="Huella de datos"
           loading={!diff}
-          value={<span className="font-mono text-[18px]">{diff ? `${shortHash(diff.before_sha256, 6)} → ${shortHash(diff.after_sha256, 6)}` : ""}</span>}
+          value={
+            <span className="font-mono text-[18px]">
+              {diff
+                ? `${shortHash(diff.before_sha256, 6)} → ${shortHash(diff.after_sha256, 6)}`
+                : ""}
+            </span>
+          }
           context="SHA-256 del JSON antes y después"
         />
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[400px_minmax(0,1fr)]">
         <Panel className="flex max-h-[640px] min-h-0 flex-col overflow-hidden">
-          <PanelHeader title="Cambios rev A → rev B" description="Ordenados por severidad. Selecciona uno para verlo en el modelo y en el grafo." />
+          <PanelHeader
+            title="Cambios rev A → rev B"
+            description="Ordenados por severidad. Selecciona uno para verlo en el modelo y en el grafo."
+          />
           <ol className="min-h-0 flex-1 space-y-1.5 overflow-y-auto px-3 pb-3">
             {!diff
-              ? Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-24 w-full" />)
-              : groups.map((g) => <ChangeItem key={g.id} group={g} active={g.id === active?.id} onSelect={() => { setPlaying(false); focus(g); }} />)}
+              ? Array.from({ length: 5 }, (_, i) => (
+                  <Skeleton key={i} className="h-24 w-full" />
+                ))
+              : groups.map((g) => (
+                  <ChangeItem
+                    key={g.id}
+                    group={g}
+                    active={g.id === active?.id}
+                    related={g.elementId === hoveredId}
+                    onHover={(id) => setHovered(id)}
+                    onSelect={() => {
+                      setPlaying(false);
+                      focus(g);
+                    }}
+                  />
+                ))}
           </ol>
         </Panel>
 
@@ -118,11 +224,38 @@ export function ChangesWorkspace() {
               options={[
                 { value: "A", label: "rev A" },
                 { value: "B", label: "rev B" },
-                { value: "delta", label: "Δ", title: "Coreografía por elemento" },
-                { value: "split", label: "A | B", title: "Cámaras sincronizadas" },
+                {
+                  value: "delta",
+                  label: "Δ",
+                  title: "Coreografía por elemento",
+                },
+                {
+                  value: "split",
+                  label: "A | B",
+                  title: "Cámaras sincronizadas",
+                },
               ]}
             />
-            <button type="button" className="ml-auto rounded-md border border-border px-3 py-1.5 text-xs text-muted" aria-pressed={presentation} onClick={() => setPresentation(v => !v)}>{presentation ? "Salir de presentación" : "Presentación"}</button>
+            <button
+              type="button"
+              className="ml-auto rounded-md border border-border px-3 py-1.5 text-xs text-muted"
+              aria-pressed={presentation}
+              onClick={() => {
+                if (presentation) {
+                  setPresentation(false);
+                  if (document.fullscreenElement)
+                    void document.exitFullscreen();
+                } else {
+                  setPresentation(true);
+                  setMode("delta");
+                  setPlaying(true);
+                  setActiveId(null);
+                  void root.current?.requestFullscreen().catch(() => {});
+                }
+              }}
+            >
+              {presentation ? "Salir de presentación" : "Presentación"}
+            </button>
           </div>
           <div className="min-h-0 flex-1 px-2 pb-2">
             <RevisionMorph
@@ -133,14 +266,20 @@ export function ChangesWorkspace() {
               playing={playing && mode === "delta"}
               onPlayingChange={setPlaying}
               split={mode === "split"}
-              onStep={(id, index) => { setTimelineStep(index); const group = groups.find(g => g.elementId === id); if (group && playing) setActiveId(group.id); }}
-
+              onStep={(id, index) => {
+                setTimelineStep(index);
+                const group = groups.find((g) => g.elementId === id);
+                if (group && playing) setActiveId(group.id);
+              }}
             />
           </div>
 
           {/* Narración bajo el lienzo: dentro tapaba la leyenda y la barra de avance del visor */}
           <div className="mx-2 mb-2 flex items-start gap-3 rounded-[var(--radius-card)] border border-border bg-surface-raised px-3.5 py-3">
-            <Tip content={playing ? "Pausar" : "Reproducir los cambios"} shortcut={["Espacio"]}>
+            <Tip
+              content={playing ? "Pausar" : "Reproducir los cambios"}
+              shortcut={["Espacio"]}
+            >
               <button
                 type="button"
                 onClick={togglePlay}
@@ -161,11 +300,19 @@ export function ChangesWorkspace() {
                   transition={{ duration: 0.18 }}
                   className="text-text"
                 >
-                  {active ? narration(active) : "Reproduce los cambios: la cámara acompaña cada paso y el modelo pasa de la rev A a la rev B."}
+                  {active
+                    ? narration(active)
+                    : "Reproduce los cambios: la cámara acompaña cada paso y el modelo pasa de la rev A a la rev B."}
                 </motion.p>
               </AnimatePresence>
               <p className="mt-1 text-xs text-muted">
-                {active ? `Paso ${step} de ${groups.length}` : <>Pulsa <Kbd>Espacio</Kbd> para empezar</>}
+                {active ? (
+                  `Paso ${step} de ${playing ? timelineTotal : groups.length}`
+                ) : (
+                  <>
+                    Pulsa <Kbd>Espacio</Kbd> para empezar
+                  </>
+                )}
               </p>
             </div>
           </div>
@@ -187,12 +334,26 @@ export function ChangesWorkspace() {
 
 function narration(g: ChangeGroup): string {
   const d = g.disciplines.map((x) => x.code).join(", ");
-  if (g.kind === "nuevo") return `${g.title}: aparece en la rev B con ${g.fields.length} datos. Revisan ${d}.`;
-  if (g.delta) return `${g.title}: ${formatDelta(g.delta.value, g.delta.unit)}. Revisan ${d}.`;
+  if (g.kind === "nuevo")
+    return `${g.title}: aparece en la rev B con ${g.fields.length} datos. Revisan ${d}.`;
+  if (g.delta)
+    return `${g.title}: ${formatDelta(g.delta.value, g.delta.unit)}. Revisan ${d}.`;
   return `${g.title} cambia. Revisan ${d}.`;
 }
 
-function ChangeItem({ group, active, onSelect }: { group: ChangeGroup; active: boolean; onSelect: () => void }) {
+function ChangeItem({
+  group,
+  active,
+  related,
+  onHover,
+  onSelect,
+}: {
+  group: ChangeGroup;
+  active: boolean;
+  related: boolean;
+  onHover(id: string | null): void;
+  onSelect: () => void;
+}) {
   const f = group.fields[0];
   const source = f?.after_source ?? f?.before_source;
   return (
@@ -200,28 +361,57 @@ function ChangeItem({ group, active, onSelect }: { group: ChangeGroup; active: b
       <button
         type="button"
         onClick={onSelect}
+        onMouseEnter={() => onHover(group.elementId)}
+        onMouseLeave={() => onHover(null)}
         aria-pressed={active}
         className={cn(
           "w-full rounded-[var(--radius-card)] border px-3.5 py-3 text-left",
           "transition-[background-color,border-color] duration-[var(--dur-fast)] ease-[var(--ease-out)]",
-          active ? "border-revision/60 bg-revision-soft" : "border-border hover:bg-surface-sunken",
+          active
+            ? "border-revision/60 bg-revision-soft"
+            : related
+              ? "border-revision/40 bg-surface-raised"
+              : "border-border hover:bg-surface-sunken",
         )}
       >
         <div className="flex items-start gap-2.5">
-          <svg viewBox="0 0 16 16" className="mt-0.5 size-4 shrink-0 text-revision" aria-hidden>
-            <path d="M8 2 14.5 13.5h-13Z" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+          <svg
+            viewBox="0 0 16 16"
+            className="mt-0.5 size-4 shrink-0 text-revision"
+            aria-hidden
+          >
+            <path
+              d="M8 2 14.5 13.5h-13Z"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinejoin="round"
+            />
           </svg>
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-2">
               <p className="truncate font-medium text-text">{group.title}</p>
-              <Badge tone={group.severity === "alta" ? "danger" : group.severity === "media" ? "warning" : "neutral"}>{group.severity}</Badge>
+              <Badge
+                tone={
+                  group.severity === "alta"
+                    ? "danger"
+                    : group.severity === "media"
+                      ? "warning"
+                      : "neutral"
+                }
+              >
+                {group.severity}
+              </Badge>
             </div>
             {group.delta && f ? (
               <p className="mt-1 text-[13px]">
-                <span className="font-semibold text-revision">{formatDelta(group.delta.value, group.delta.unit)}</span>
+                <span className="font-semibold text-revision">
+                  {formatDelta(group.delta.value, group.delta.unit)}
+                </span>
                 <span className="text-muted">
                   {" "}
-                  · {formatValue(f.before!.value, f.before!.unit)} → {formatValue(f.after!.value, f.after!.unit)}
+                  · {formatValue(f.before!.value, f.before!.unit)} →{" "}
+                  {formatValue(f.after!.value, f.after!.unit)}
                 </span>
               </p>
             ) : (
@@ -237,13 +427,19 @@ function ChangeItem({ group, active, onSelect }: { group: ChangeGroup; active: b
             <div className="mt-2 flex flex-wrap items-center gap-1">
               {group.disciplines.map((d) => (
                 <Tip key={d.code} content={d.reason}>
-                  <span className="rounded-full bg-accent-soft px-1.5 py-0.5 text-[11px] font-medium text-accent-text">{d.code}</span>
+                  <span className="rounded-full bg-accent-soft px-1.5 py-0.5 text-[11px] font-medium text-accent-text">
+                    {d.code}
+                  </span>
                 </Tip>
               ))}
               {source ? (
                 <span className="ml-auto text-[11px] text-faint">
                   <Code className="text-[11px]">{source.document_id}</Code>
-                  {source.page ? ` · pág. ${source.page}` : source.cell ? ` · ${source.cell}` : ""}
+                  {source.page
+                    ? ` · pág. ${source.page}`
+                    : source.cell
+                      ? ` · ${source.cell}`
+                      : ""}
                 </span>
               ) : null}
             </div>
