@@ -18,15 +18,17 @@ from pathlib import Path
 TERMINAL = {"done", "error", "cancelled", "timeout"}
 
 
-def tasks(data, sets):
+def tasks(data, sets, *, cases_limit=None, degradations=None):
     output = []
     for name in sets:
         root = data / name
         manifest = json.loads((root / "manifest.json").read_text(encoding="utf8"))
         if manifest.get("synthetic") is not True:
             raise ValueError("El lote de escala solo acepta manifiestos sintéticos")
-        for case in manifest["cases"]:
+        for case in manifest["cases"][:cases_limit]:
             for level in manifest["styles"]:
+                if degradations and level not in degradations:
+                    continue
                 for revision in ("1", "2"):
                     folder = root / level / case["tag"]
                     files = [(folder / f"GAD_{case['tag']}_rev{revision}.pdf", f"GA-{case['tag']}")]
@@ -116,7 +118,18 @@ def summarise(rows, seconds, upload_seconds):
     }
 
 
-def run(api, data, sets, output, *, window=32, timeout=900, strategy: str = "d_hibrido"):
+def run(
+    api,
+    data,
+    sets,
+    output,
+    *,
+    window=32,
+    timeout=900,
+    strategy: str = "d_hibrido",
+    cases_limit=None,
+    degradations=None,
+):
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
     def request(path, body=None, headers=None):
@@ -131,7 +144,7 @@ def run(api, data, sets, output, *, window=32, timeout=900, strategy: str = "d_h
             {"Content-Type": "application/json", "Idempotency-Key": str(uuid.uuid4())},
         )
 
-    plan = tasks(data, sets)
+    plan = tasks(data, sets, cases_limit=cases_limit, degradations=degradations)
     if not plan:
         raise ValueError("Lote vacío")
     run_id = uuid.uuid4().hex[:10]
@@ -258,8 +271,12 @@ def main():
     )
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--estrategia", default="d_hibrido", help="Estrategia de lectura del lote")
+    p.add_argument("--casos", type=int, default=None, help="Primeros N equipos por conjunto")
+    p.add_argument("--degradaciones", nargs="+", default=None)
     p.add_argument("--limite-segundos", type=int, default=7200, help="Tiempo máximo del lote")
     args = p.parse_args()
+    if args.casos is not None and args.casos < 1:
+        p.error("casos debe ser positivo")
     run(
         args.api.rstrip("/"),
         args.data,
@@ -267,6 +284,8 @@ def main():
         args.output,
         strategy=args.estrategia,
         timeout=args.limite_segundos,
+        cases_limit=args.casos,
+        degradations=args.degradaciones,
     )
 
 

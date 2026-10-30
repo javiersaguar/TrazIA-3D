@@ -459,3 +459,38 @@ fallo tras escribir, concurrencia, filtro de fecha, recuperación y aprobación 
 Cierre tarea 4: Ruff y formato globales correctos; 258 pruebas correctas y una omitida
 en 290,06 s. Prueba HTTP 8020: la fila devuelta por GET coincide exactamente con la
 última línea UTF-8 del JSONL. Evidencia sintética en evidencias/fase3/correccion-api-30oct.json.
+
+### 5 · 3.7/H.7: escala en CPU
+
+Sonda D completa: 4 done y 16 errores en 20 revisiones, 169,256 s. Se elige el fallback
+B indicado en el encargo. Lote completo: 64 equipos, 168 condiciones y 336 revisiones;
+72 done y 264 errores con uno y con cuatro workers Redis/arq/Postgres. Tiempos medidos:
+352,475 y 97,285 s, mejora observada 3.62×. Mismo hash de entrada, imagen y estado
+para cada revisión. Visión bloqueada, providers vacío y sin dispositivos GPU. Se usan
+solo las estrategias presentes en main a75e8ef y la base 3D autorizada.
+
+Diagrama, latencias, resultados completos, desglose por conjunto y extrapolación de
+400×4 en [FASE3.md](../FASE3.md), con evidencia bajo evidencias/fase3/30oct. El coste de
+proveedores declarado es 0 EUR y no incluye energía ni revisión humana. La estimación
+de cómputo usa 0,25 EUR/worker-h como hipótesis explícita. Con 264 errores no se calcula
+un tiempo defendible para 1600 IFC válidos; done tampoco acredita fidelidad geométrica.
+Los ensayos se hacen mientras Lectura trabaja en paralelo, sin CPU dedicada.
+
+Cierre tarea 5: Ruff y formato globales correctos, 264 pruebas correctas y una omitida
+en 327,83 s. No hubo pruebas propias activas durante los lotes completos B. Todos los
+contenedores y volúmenes exclusivos del ensayo se eliminan al terminar; no se para
+ningún stack ajeno. Se preservan costes desconocidos como null cuando aparezcan.
+
+### Estado final del encargo
+
+Las cinco tareas están implementadas y medidas en su alcance: CLI estable del estudio,
+caché de trabajos offline, CORS configurable, registro JSONL/GET de correcciones y lote
+CPU con proyección explícita. No se llama a calibración, no se integran cambios de
+feat/lectura y no se editan sus carpetas, model.py, web ni ROADMAP. No hay dependencias
+nuevas ni cambios de uv.lock. Interfaces nuevas: GET /correcciones?desde, cache_hit en
+GET /jobs, y configuración CORS/ruta JSONL. No se regeneran tipos web por la separación
+de esta sesión. Los datos generados siguen en el worktree de Plataforma.
+
+Publicación autorizada exclusivamente de feat/plataforma, sin fusión a main ni PR.
+El hito amplio de cobertura/IFC correctos y la recalibración automática de 3.8 no se
+declaran terminados; no forman parte de la porción de datos/medición cerrada aquí.
