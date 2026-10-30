@@ -23,9 +23,9 @@ export function SceneLabel(props: ComponentProps<typeof DreiHtml>) {
   return <DreiHtml {...props} portal={portal as RefObject<HTMLElement> | undefined} />;
 }
 
-export function CameraRig({ bounds, view = "iso", handle, onUserControl, measureKey, onMeasure }: {
+export function CameraRig({ bounds, view = "iso", handle, onUserControl, measureKey, onMeasure, interactive = true }: {
   bounds: Bounds; view?: View; handle: Ref<CameraHandle>; onUserControl?(): void;
-  measureKey?: number; onMeasure?(sample: PerformanceSample): void;
+  measureKey?: number; onMeasure?(sample: PerformanceSample): void; interactive?: boolean;
 }) {
   const controls = useRef<CameraControls>(null);
   const { camera, gl, scene, invalidate, size: viewport } = useThree();
@@ -92,7 +92,7 @@ export function CameraRig({ bounds, view = "iso", handle, onUserControl, measure
     }
   });
   useEffect(() => { if (measureKey) invalidate(); }, [measureKey, invalidate]);
-  return <CameraControls ref={controls} makeDefault smoothTime={reduce ? 0 : .4} draggingSmoothTime={.1}
+  return <CameraControls ref={controls} enabled={interactive} makeDefault smoothTime={reduce ? 0 : .4} draggingSmoothTime={.1}
     minZoom={5} maxZoom={650} maxPolarAngle={Math.PI * .98} regress
     onControlStart={() => { controls.current?.stop(); onUserControl?.(); }} />;
 }

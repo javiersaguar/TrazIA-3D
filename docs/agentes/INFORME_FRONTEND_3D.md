@@ -30,7 +30,33 @@ como verificación de Revisión conectada.
 
 ## 2.2 · Modelos ilustrativos
 
-Siguiente sección. Geometría procedural separada de PreparedProduct/IFC, con etiqueta visible.
+Cinco generadores: vertical con fondos 2:1, soldaduras, cuatro conexiones, boca de hombre ciega
+con pescante, orejetas taladradas por CSG, faldón hueco con cuatro aberturas CSG, anillo y anclajes;
+horizontal con silletas; columna con platos, plataformas y escalera; intercambiador abierto con
+haz de tubos y canal; tanque de techo cónico. Cuatro lotes de superficie por modelo y pernos en
+InstancedMesh. Esta geometría no se introduce en el visor de IFC.
+
+ShowcaseVessel implementa selección de familias y controles de cámara; modo particles con 18.000
+puntos muestreados sobre la superficie, nube inicial y morph interrumpible mediante uniforms/refs.
+Respeta movimiento reducido y pausa fuera de pantalla; no usa setState por frame. La familia se
+controla externamente con kind/onKindChange o internamente. HUD con orientación real de cámara.
+Etiqueta persistente «Ilustrativo · no procede del IFC». El modo hologram usa alambre por ahora;
+el shader completo corresponde a 2.3.
+
+EquipmentThumb renderiza una imagen 3D estática por familia, solo cuando entra en pantalla;
+serializa el trabajo y libera su contexto WebGL. Cinco miniaturas no mantienen cinco canvas activos.
+Recursos compartidos con referencia y limpieza. No se necesitan providers de la app.
+
+Comprobado: typecheck, lint, 25 unitarias y build; seis pruebas de geometría finita/bounds y un
+muestreo reproducible. Laboratorio independiente /lab/showcase: sin errores de navegador, cinco
+miniaturas reales, selección de intercambiador y transición de partículas. Capturas oscuras
+agente2-22-vertical/intercambiador/particulas.png. Giro: 239 fps, p95 4,3 ms, 1.196 frames,
+32 draw calls, 64.324 triángulos y DPR 1, RTX 5070 Laptop/ANGLE/D3D11. Pendiente repetir el
+presupuesto en la página final con holograma y callouts.
+
+Aviso de dependencia: three-bvh-csg 0.0.18 usa maxLeafSize, deprecado por three-mesh-bvh 0.9;
+no falla la geometría y no se modifica la dependencia del Agente 1. @types/three omite el método
+setRandomGenerator que sí tiene MeshSurfaceSampler 0.186; la anotación local cubre esa API real.
 
 ## 2.3–2.6
 
