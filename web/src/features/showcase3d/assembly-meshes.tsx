@@ -12,8 +12,8 @@ function FinishMaterial({ finish }: { finish: Finish }) {
   return <SteelMaterial />;
 }
 
-export function AssemblyMeshes({ model, material, groupRef }: {
-  model: EquipmentGeometry; material?: Material; groupRef?: Ref<Group>;
+export function AssemblyMeshes({ model, material, materials, groupRef }: {
+  model: EquipmentGeometry; material?: Material; materials?: Partial<Record<Finish, Material>>; groupRef?: Ref<Group>;
 }) {
   const bolts = useRef<InstancedMesh>(null);
   useLayoutEffect(() => {
@@ -24,11 +24,11 @@ export function AssemblyMeshes({ model, material, groupRef }: {
   }, [model]);
   useEffect(() => { const mesh = bolts.current; return () => mesh?.dispose(); }, [model]);
   return <group ref={groupRef} dispose={null}>
-    {model.batches.map(batch => <mesh key={batch.finish} geometry={batch.geometry} material={material} castShadow receiveShadow>
-      {!material ? <FinishMaterial finish={batch.finish} /> : null}
+    {model.batches.map(batch => <mesh key={batch.finish} geometry={batch.geometry} material={material ?? materials?.[batch.finish]} castShadow receiveShadow>
+      {!material && !materials?.[batch.finish] ? <FinishMaterial finish={batch.finish} /> : null}
     </mesh>)}
-    <instancedMesh ref={bolts} args={[model.boltGeometry, undefined, model.bolts.length]} material={material} castShadow>
-      {!material ? <BoltMaterial /> : null}
+    <instancedMesh ref={bolts} args={[model.boltGeometry, undefined, model.bolts.length]} material={material ?? materials?.bolts} castShadow>
+      {!material && !materials?.bolts ? <BoltMaterial /> : null}
     </instancedMesh>
   </group>;
 }

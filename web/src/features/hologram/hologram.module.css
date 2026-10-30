@@ -1,0 +1,10 @@
+.root { position: relative; height: 100%; width: 100%; overflow: hidden; border-radius: inherit; background: var(--bg); }
+.scene { position: absolute; inset: 0; }
+.caption { position: absolute; top: 18px; left: 18px; right: 18px; display: flex; justify-content: space-between; gap: 10px; font: 10px/1.5 var(--font-mono), monospace; color: var(--text-muted); pointer-events: none; }
+.controls { position: absolute; bottom: 16px; left: 16px; right: 16px; display: flex; gap: 12px; align-items: center; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); font: 11px/1.4 var(--font-mono), monospace; }
+.controls input { min-width: 60px; flex: 1; accent-color: var(--accent-strong); }
+.controls button { border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; color: var(--text); background: var(--surface-raised); cursor: pointer; }
+.controls button:disabled { opacity: .5; cursor: default; }
+.controls :focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 3px; }
+.notice { color: var(--text-muted); }
+@media (max-width: 600px) { .caption { inset: 12px 12px auto; font-size: 9px; } .controls { left: 8px; right: 8px; gap: 6px; } }

@@ -15,7 +15,7 @@ export type EquipmentGeometry = {
   boltGeometry: BufferGeometry;
   bolts: Matrix4[];
   bounds: Box3;
-  anchors: { flange: Vector3; skirt: Vector3; lug: Vector3 };
+  anchors: Partial<Record<"flange" | "skirt" | "lug", Vector3>>;
   dispose(): void;
 };
 const up = new Vector3(0, 1, 0);
@@ -57,7 +57,7 @@ function head(radius: number, top: boolean) {
 class Builder {
   parts: Record<Finish, BufferGeometry[]> = { steel: [], paint: [], machined: [], bolts: [] };
   bolts: Matrix4[] = [];
-  anchors = { flange: new Vector3(0, 4.7, 1.5), skirt: new Vector3(0, .45, 1.05), lug: new Vector3(-.8, 6.8, 0) };
+  anchors: EquipmentGeometry["anchors"] = {};
 
   add(geometry: BufferGeometry, finish: Finish = "steel", at: Point = [0, 0, 0], axis: Point = [0, 1, 0]) {
     geometry.applyMatrix4(transform(at, axis));
@@ -196,6 +196,7 @@ export function buildHorizontalDrum(): EquipmentGeometry {
   b.nozzle([-1.4, 2.75, 0], [0, 1, 0], .18);
   b.nozzle([1.3, 2.75, 0], [0, 1, 0]);
   b.nozzle([3.175, 1.8, 0], [1, 0, 0], .28, true);
+  b.anchors = { flange: new Vector3(-1.4, 3.1, 0), skirt: new Vector3(-1.62, .7, 0) };
   return b.finish("horizontal");
 }
 
@@ -222,6 +223,7 @@ export function buildHeatExchanger(): EquipmentGeometry {
   }
   b.nozzle([-1.4, y + radius, 0], [0, 1, 0], .17);
   b.nozzle([1.4, y - radius, 0], [0, -1, 0], .17);
+  b.anchors = { flange: new Vector3(2.4, y, 0), skirt: new Vector3(-1.4, .7, 0) };
   return b.finish("exchanger");
 }
 
@@ -240,6 +242,7 @@ export function buildTank(): EquipmentGeometry {
   b.nozzle([0, .65, r], [0, 0, 1], .2);
   b.nozzle([0, 1.3, r], [0, 0, 1], .32, true);
   b.ladder(.2, 3.8, -r - .2);
+  b.anchors = { flange: new Vector3(0, .65, r + .4), skirt: new Vector3(0, .1, r) };
   return b.finish("tank");
 }
 

@@ -1,15 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useReducedMotion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MeshBasicMaterial } from "three";
 import { cn } from "@/lib/cn";
-import { BRAND } from "@/lib/brand";
 import { CameraRig, SceneCanvas, Studio, type CameraHandle, type PerformanceSample } from "../viewer3d/stage";
 import { AssemblyMeshes } from "./assembly-meshes";
 import { equipmentGeometry, retainEquipment, type EquipmentKind } from "./equipment-geometry";
+import { createHologram } from "../hologram/materials";
 import { ParticleAssembly } from "./particle-assembly";
 import styles from "./showcase.module.css";
 
@@ -48,7 +47,15 @@ function EquipmentScene({ kind, mode, interactive, onBearing, measureKey, onMeas
   const reduce = useReducedMotion();
   const camera = useRef<CameraHandle>(null);
   const bounds = useMemo(() => ({ min: model.bounds.min.toArray() as [number,number,number], max: model.bounds.max.toArray() as [number,number,number] }), [model]);
-  const hologram = useMemo(() => new MeshBasicMaterial({ color: BRAND.hologram, wireframe: true, transparent: true, opacity: .5 }), []);
+  const hologram = useMemo(() => createHologram(model.bounds.min.y, model.bounds.max.y), [model]);
+  const shader = useRef<typeof hologram | null>(null), invalidate = useThree(s => s.invalidate);
+  useEffect(() => { shader.current = hologram; }, [hologram]);
+  useFrame((_, delta) => {
+    const material = shader.current;
+    if (mode !== "hologram" || !material) return;
+    material.uniforms.uTime!.value = reduce ? 0 : Number(material.uniforms.uTime!.value) + Math.min(delta, .05);
+    if (!reduce) invalidate();
+  });
   useEffect(() => () => hologram.dispose(), [hologram]);
   return <>
     <Studio />

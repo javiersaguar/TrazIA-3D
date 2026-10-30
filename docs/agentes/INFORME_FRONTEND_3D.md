@@ -58,7 +58,24 @@ Aviso de dependencia: three-bvh-csg 0.0.18 usa maxLeafSize, deprecado por three-
 no falla la geometría y no se modifica la dependencia del Agente 1. @types/three omite el método
 setRandomGenerator que sí tiene MeshSurfaceSampler 0.186; la anotación local cubre esa API real.
 
-## 2.3–2.6
+## 2.3 · Holograma → acero
+
+Shader fresnel celeste con rejilla y scanlines, flujo de partículas y barrido de material físico
+con borde emisivo. Disposiciones side/inplace, progress externo o autoplay con scrub. Los
+recortes circulares usan RenderTexture con otra cámara y las mismas mallas, sin sustituciones.
+Modo hologram de ShowcaseVessel actualizado al shader. Página /modelo con IFC B y selector
+separado de las cinco familias ilustrativas. Los controles esperan a que la fuente esté lista.
+
+source=ifc conserva la geometría y el posicionamiento de PreparedProduct. El IFC actual carece
+de orejetas/bridas detalladas: se muestran conexión y faldón existentes, sin inventar el tercer
+recorte. El modelo ilustrativo sí tiene los tres detalles, marcados como tales.
+
+Comprobado: typecheck, lint, 25 unitarias y build. Chrome sin errores de página en las dos
+fuentes, scrub al 50 % y movimiento reducido al 100 % con controles desactivados. Capturas
+agente2-23-procedural/ifc/barrido.png. Integración con portada pendiente del Agente 1;
+ambos componentes funcionan en laboratorios independientes sin providers propios de la app.
+
+## 2.4–2.6
 
 Pendientes. Antes de editar families/ o ifc.py se requiere la confirmación de Javier indicada
 en el encargo. No se han modificado esos archivos ni datos de data/private/.
