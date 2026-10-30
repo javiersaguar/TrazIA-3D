@@ -22,17 +22,19 @@ import { STAGE_EDGES, STAGES, type StageDef, type StageId } from "@/lib/mock/pip
 import { usePipeline, type StageRunState } from "@/stores/pipeline";
 import { STAGE_ICON } from "./stage-meta";
 
-type StageNodeData = { def: StageDef; run: StageRunState; active: boolean };
+type StageNodeData = { def: StageDef; run: StageRunState; active: boolean; column: number };
 type StageNode = Node<StageNodeData, "stage">;
 
 function StageNodeView({ data }: NodeProps<StageNode>) {
-  const { def, run, active } = data;
+  const { def, run, active, column } = data;
   const done = run.status === "done";
   const available = apiEnabled ? run.lastEventAt !== null : def.available;
   return (
     <div
+      // Los nodos entran por columnas, de izquierda a derecha, siguiendo el flujo
+      style={{ animationDelay: `${column * 60}ms` }}
       className={cn(
-        "relative w-[172px] rounded-[var(--radius-card)] border bg-surface px-3 py-2.5",
+        "pipeline-node relative w-[172px] rounded-[var(--radius-card)] border bg-surface px-3 py-2.5",
         "transition-[border-color,background-color,box-shadow] duration-[var(--dur-base)] ease-[var(--ease-out)]",
         !available && "border-dashed border-border-strong bg-transparent",
         available && !done && !active && "border-border",
@@ -40,6 +42,7 @@ function StageNodeView({ data }: NodeProps<StageNode>) {
         active && available && "border-accent shadow-[0_0_0_3px_var(--accent-soft)]",
       )}
     >
+      {active && available ? <span aria-hidden className="pipeline-breathe pointer-events-none absolute -inset-[4px] rounded-[14px] border border-accent" /> : null}
       <Handle type="target" position={Position.Left} className="!size-1.5 !border-0 !bg-border-strong" />
       <div className="flex items-center gap-2">
         <span
@@ -111,7 +114,7 @@ function Graph() {
         position: POSITIONS[def.id],
         draggable: false,
         selectable: false,
-        data: { def, run: stages[def.id], active: activeStage === def.id },
+        data: { def, run: stages[def.id], active: activeStage === def.id, column: Math.round(POSITIONS[def.id].x / 205) },
       })),
     [stages, activeStage],
   );

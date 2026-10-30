@@ -11,12 +11,13 @@ import {
 import { ArrowDown, ArrowUp, ArrowUpDown, Boxes, CheckCheck, CircleSlash, Coins } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { CountUp } from "@/components/motion/count-up";
+import { Stagger } from "@/components/motion/reveal";
 import { PlantScene } from "@/components/three";
 import { KpiCard } from "@/components/ui/data";
 import { Icon, Panel, PanelHeader, Skeleton } from "@/components/ui/primitives";
 import { EquipmentStatus, SyntheticBadge } from "@/components/ui/status";
 import { cn } from "@/lib/cn";
-import { formatPercent } from "@/lib/format";
 import type { EquipmentRow } from "@/lib/mock/api";
 import { useEquipment, useReviewFields } from "@/lib/queries";
 import { useReviewLog } from "@/stores/review-log";
@@ -40,7 +41,7 @@ export function ProjectWorkspace() {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <Stagger className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" itemClassName="[&>*]:h-full" step={0.05}>
         <KpiCard
           icon={Boxes}
           tone="sky"
@@ -54,7 +55,7 @@ export function ProjectWorkspace() {
           tone="live"
           label={`Campos revisados · rev ${revision}`}
           loading={fields.isPending}
-          value={total ? formatPercent(reviewed / total) : "—"}
+          value={total ? <CountUp value={Math.round((reviewed / total) * 100)} suffix=" %" /> : "—"}
           context={`${reviewed} de ${total} campos`}
           spark={spark && spark.length > 1 ? spark : undefined}
         />
@@ -73,7 +74,7 @@ export function ProjectWorkspace() {
           value={<span className="text-muted">Sin medir</span>}
           context="El extractor actual no llama a ningún modelo"
         />
-      </div>
+      </Stagger>
 
       <Panel className="overflow-hidden">
         <PanelHeader

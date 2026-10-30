@@ -1,10 +1,12 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { MessageSquareText, MousePointerClick, X } from "lucide-react";
+import { MousePointerClick, X } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { CopilotMark } from "@/components/brand/copilot-mark";
 import { CopilotConversation } from "@/features/copilot/conversation";
 import { apiEnabled } from "@/lib/api/config";
+import { Tip } from "@/components/ui/controls";
 import { ConfidenceBar } from "@/components/ui/data";
 import { Badge, EmptyState, Icon, Kbd } from "@/components/ui/primitives";
 import { formatValue } from "@/lib/format";
@@ -29,14 +31,16 @@ export function CopilotLauncher() {
   // allí se abre desde la píldora de la barra superior.
   if (pathname.startsWith("/revision") || pathname.startsWith("/cambios")) return null;
   return (
-    <button
-      type="button"
-      onClick={() => setOpen(true)}
-      className="fixed right-5 bottom-5 z-30 inline-flex h-10 items-center gap-2 rounded-full bg-assistant px-4 text-[13px] font-semibold text-white shadow-[var(--shadow-pop)] transition-transform duration-[var(--dur-fast)] ease-[var(--ease-out)] hover:-translate-y-px active:scale-[0.97]"
-    >
-      <Icon icon={MessageSquareText} />
-      Copiloto
-    </button>
+    <Tip content="Copiloto de revisión" side="left">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label="Abrir copiloto"
+        className="copilot-launcher fixed right-5 bottom-5 z-30 inline-flex size-[52px] items-center justify-center rounded-full border border-border-strong bg-surface-raised shadow-[var(--shadow-pop)]"
+      >
+        <CopilotMark className="size-[26px]" />
+      </button>
+    </Tip>
   );
 }
 
@@ -59,8 +63,8 @@ export function CopilotPanel() {
           className="sheet-content fixed top-[calc(var(--topbar-height)+12px)] right-3 bottom-3 z-40 flex w-[380px] max-w-[calc(100vw_-_24px)] flex-col rounded-[var(--radius-panel)] border border-border bg-surface-raised shadow-[var(--shadow-pop)]"
         >
           <header className="flex items-start gap-3 border-b border-border px-5 py-4">
-            <span className="inline-flex size-9 items-center justify-center rounded-[var(--radius-control)] bg-accent-soft text-accent-text">
-              <Icon icon={MessageSquareText} size={18} />
+            <span className="inline-flex size-9 items-center justify-center rounded-full border border-border-strong bg-surface">
+              <CopilotMark className="size-5" />
             </span>
             <div className="min-w-0 flex-1">
               <Dialog.Title className="text-[15px] font-semibold text-strong">Copiloto de revisión</Dialog.Title>

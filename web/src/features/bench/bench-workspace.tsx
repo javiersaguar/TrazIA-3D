@@ -2,8 +2,10 @@
 
 import { BenchStudy } from "@/features/study/bench-study";
 import { Database, Terminal } from "lucide-react";
+import { motion } from "motion/react";
 import Image from "next/image";
 import { useState } from "react";
+import { DrawPath } from "@/components/motion/draw-path";
 import { Segmented } from "@/components/ui/controls";
 import { SyntheticNotice } from "@/components/ui/notice";
 import { Badge, Code, Panel, PanelHeader, Skeleton } from "@/components/ui/primitives";
@@ -363,9 +365,16 @@ function ReliabilityChart({ points }: { points: ReliabilityPoint[] }) {
               </text>
             </g>
           ))}
-          <line x1={0} y1={H} x2={W} y2={0} stroke="var(--accent)" strokeDasharray="4 4" strokeWidth="1.2" />
-          {points.map((p) => (
-            <g key={p.bin[0]}>
+          {/* Primero la diagonal ideal; después, cada intervalo con su distancia a ella */}
+          <DrawPath inView d={`M0 ${H} L${W} 0`} stroke="var(--accent)" strokeDasharray="4 4" strokeWidth="1.2" fill="none" duration={0.7} />
+          {points.map((p, k) => (
+            <motion.g
+              key={p.bin[0]}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.35, delay: 0.55 + k * 0.06 }}
+            >
               <line x1={x(p.confidence)} x2={x(p.confidence)} y1={y(p.confidence)} y2={y(p.accuracy)} stroke="var(--revision)" strokeWidth="1.2" />
               <circle
                 cx={x(p.confidence)}
@@ -378,7 +387,7 @@ function ReliabilityChart({ points }: { points: ReliabilityPoint[] }) {
               >
                 <title>{`Confianza ${p.confidence.toFixed(2)} · acierto ${(p.accuracy * 100).toFixed(0)} % · ${p.n} valores`}</title>
               </circle>
-            </g>
+            </motion.g>
           ))}
           <text x={W / 2} y={H + 32} textAnchor="middle" fontSize="10.5" fill="currentColor">
             Confianza declarada

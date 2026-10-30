@@ -49,11 +49,56 @@ test("las secciones en boceto cargan sin errores", async ({ page }) => {
   expect(errors, errors.join("\n")).toEqual([]);
 });
 
+test("la portada pide acceso, «Iniciar» entra sin validar y «Salir» vuelve a la portada", async ({ page }) => {
+  const errors = trackErrors(page);
+  await page.emulateMedia({ reducedMotion: "reduce" }); // sin la intro del logo
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1, name: /Del plano al modelo 3D/ })).toBeVisible();
+  const form = page.getByRole("form", { name: "Entra en la demo" });
+  await expect(form.getByLabel("Usuario")).toBeVisible();
+  await expect(form.getByLabel("Contraseña", { exact: true })).toBeVisible();
+  await form.getByRole("button", { name: "Iniciar", exact: true }).click();
+  await expect(page).toHaveURL(/\/proyecto$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Resumen" })).toBeVisible();
+  await page.getByRole("button", { name: "Salir", exact: true }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole("form", { name: "Entra en la demo" })).toBeVisible();
+  expect(errors, errors.join("\n")).toEqual([]);
+});
+
+test("la intro del logo se puede saltar y el recorrido de la demo completa sus cinco etapas", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Saltar intro/ }).click();
+  await expect(page.getByRole("button", { name: /Saltar intro/ })).toHaveCount(0);
+  await page.getByRole("button", { name: "Ver el recorrido de la demo" }).click();
+  const dialog = page.getByRole("dialog", { name: "Del plano al modelo, paso a paso" });
+  await expect(dialog.getByText("Cambios de A a B")).toBeVisible();
+  await expect(dialog.getByText("hecho", { exact: true })).toHaveCount(5, { timeout: 10_000 });
+});
+
 test("la barra lateral navega entre pantallas", async ({ page }) => {
   await page.goto("/proyecto");
   await page.getByRole("navigation", { name: "Navegación principal" }).getByRole("link", { name: "Cambios" }).click();
   await expect(page).toHaveURL(/\/cambios$/);
   await expect(page.getByRole("heading", { level: 1, name: "Cambios" })).toBeVisible();
+});
+
+test("en móvil la navegación vive en un panel que se cierra al elegir pantalla", async ({ page }) => {
+  const errors = trackErrors(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/proyecto");
+  await expect(page.getByRole("heading", { level: 1, name: "Resumen" })).toBeVisible();
+  // La barra fija no se ve; la página no se desplaza en horizontal
+  await expect(page.getByRole("navigation", { name: "Navegación principal" })).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
+
+  await page.getByRole("button", { name: "Abrir navegación" }).click();
+  const sheet = page.getByRole("dialog", { name: "Navegación" });
+  await sheet.getByRole("link", { name: "Lote" }).click();
+  await expect(page).toHaveURL(/\/lote$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Lote" })).toBeVisible();
+  await expect(sheet).toBeHidden();
+  expect(errors, errors.join("\n")).toEqual([]);
 });
 
 test("revisión por teclado: J selecciona, A acepta y Ctrl+Z deshace", async ({ page, request }) => {

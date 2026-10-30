@@ -190,6 +190,42 @@
     }
   }
 
+  /* Superficies con brillo superior (estilo de la referencia bancaria) */
+  .surface-sheen {
+    background-image: var(--surface-sheen);
+  }
+
+  /* Ítem activo de la barra lateral: píldora elevada con borde */
+  .nav-pill {
+    background-color: var(--surface-raised);
+    background-image: var(--surface-sheen);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-pill);
+  }
+
+  /* Papel de plano de la portada: retícula fina cada 24 px y gruesa cada 120 px */
+  .landing-paper {
+    background-image:
+      linear-gradient(var(--grid-line-major) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line-major) 1px, transparent 1px),
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size:
+      120px 120px,
+      120px 120px,
+      24px 24px,
+      24px 24px;
+  }
+
+  /* Rotulación de la portada: Archivo estrecha, como la letra técnica de los planos */
+  .landing-display {
+    font-family: var(--font-display), var(--font-sans);
+    font-variation-settings: "wdth" 72;
+    font-weight: 600;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+  }
+
   /* Retícula de delineación para lienzos (plano / escena) */
   .drafting-grid {
     background-color: var(--surface-sunken);
@@ -218,6 +254,32 @@
 }
 .sheet-content[data-state="closed"] {
   animation: sheet-out var(--dur-base) var(--ease-out);
+}
+
+/* Navegación en móvil: entra desde su borde con curva de cajón y sale más rápido */
+.nav-sheet[data-state="open"] {
+  animation: nav-sheet-in var(--dur-slow) cubic-bezier(0.32, 0.72, 0, 1);
+}
+.nav-sheet[data-state="closed"] {
+  animation: nav-sheet-out var(--dur-base) var(--ease-out);
+}
+@keyframes nav-sheet-in {
+  from {
+    translate: -100% 0;
+  }
+}
+@keyframes nav-sheet-out {
+  to {
+    translate: -100% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-sheet[data-state] {
+    animation-name: fade-in;
+  }
+  .nav-sheet[data-state="closed"] {
+    animation-name: fade-out;
+  }
 }
 
 @keyframes fade-in {
@@ -266,6 +328,76 @@
   from {
     opacity: 0;
     transform: scale(0.97);
+  }
+}
+
+/* Trazos de plano derivados del color de texto del tema */
+:root {
+  --sheet-ink: color-mix(in oklab, var(--text) 80%, transparent);
+  --sheet-thin: color-mix(in oklab, var(--text) 38%, transparent);
+  --grid-line-major: color-mix(in oklab, var(--text) 7%, transparent);
+}
+
+/* Botón redondo del copiloto: responde al pulsar y se eleva solo con ratón */
+.copilot-launcher {
+  transition:
+    transform 160ms var(--ease-out),
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+.copilot-launcher:active {
+  transform: scale(0.96);
+}
+@media (hover: hover) and (pointer: fine) {
+  .copilot-launcher:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in oklab, var(--accent-strong) 55%, var(--border-strong));
+    box-shadow: var(--shadow-pop), 0 0 0 4px var(--accent-soft);
+  }
+  .copilot-launcher:hover:active {
+    transform: scale(0.96);
+  }
+}
+
+/* Pipeline: entrada de los nodos por columnas y respiración de la etapa activa */
+.pipeline-node {
+  animation: node-in 420ms var(--ease-out) both;
+}
+.pipeline-breathe {
+  animation: breathe 1.8s ease-in-out infinite;
+}
+@keyframes node-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pipeline-node,
+  .pipeline-breathe {
+    animation: none;
+  }
+}
+
+/* Tarjetas clicables: se elevan 1 px solo con ratón */
+@media (hover: hover) and (pointer: fine) {
+  .lift {
+    transition:
+      translate 180ms var(--ease-out),
+      border-color 180ms ease;
+  }
+  .lift:hover {
+    translate: 0 -1px;
+    border-color: var(--border-strong);
   }
 }
 

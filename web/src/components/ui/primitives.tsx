@@ -7,7 +7,7 @@ export function Panel({ className, ...props }: ComponentProps<"section">) {
   return (
     <section
       className={cn(
-        "rounded-[var(--radius-panel)] border border-border bg-surface shadow-[var(--shadow-1)]",
+        "surface-sheen rounded-[var(--radius-panel)] border border-border bg-surface shadow-[var(--shadow-1)]",
         className,
       )}
       {...props}
@@ -189,7 +189,7 @@ export function Button({
         "transition-[background-color,color,border-color,transform] duration-[var(--dur-fast)] ease-[var(--ease-out)]",
         "active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50",
         size === "md" ? "h-9 px-3.5 text-[13px]" : "h-7 px-2.5 text-xs",
-        variant === "primary" && "bg-accent-strong text-white hover:bg-accent-strong/90",
+        variant === "primary" && "bg-accent font-semibold text-accent-contrast hover:bg-accent/90",
         variant === "secondary" && "border border-border bg-surface text-text hover:bg-surface-sunken",
         variant === "ghost" && "text-muted hover:bg-surface-sunken hover:text-text",
         variant === "danger" && "bg-danger-soft text-danger hover:bg-danger-soft/80",

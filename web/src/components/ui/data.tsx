@@ -2,12 +2,19 @@
 
 import type { LucideIcon } from "lucide-react";
 import { motion } from "motion/react";
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
+import { CountUp } from "@/components/motion/count-up";
 import { cn } from "@/lib/cn";
 import { IconTile, Panel, Skeleton, type Tone } from "./primitives";
 
-/** Micrográfica de área, como en las tarjetas de PIDS. Solo con series reales. */
+const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+
+/**
+ * Micrográfica de área, como en las tarjetas de PIDS. Solo con series reales.
+ * Al montarse, la línea se dibuja, el área aparece detrás y el último punto se marca.
+ */
 export function Sparkline({ points, className }: { points: number[]; className?: string }) {
+  const uid = `sp${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   if (points.length < 2) return null;
   const w = 96;
   const h = 40;
@@ -17,16 +24,35 @@ export function Sparkline({ points, className }: { points: number[]; className?:
   const xy = points.map((p, i) => [(i / (points.length - 1)) * w, h - 4 - ((p - min) / span) * (h - 8)] as const);
   const line = xy.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
   const area = `${line} L${w},${h} L0,${h} Z`;
+  const [ex, ey] = xy[xy.length - 1]!;
   return (
     <svg viewBox={`0 0 ${w} ${h}`} className={cn("h-10 w-24 overflow-visible text-accent", className)} aria-hidden>
       <defs>
-        <linearGradient id="spark-fill" x1="0" x2="0" y1="0" y2="1">
+        <linearGradient id={uid} x1="0" x2="0" y1="0" y2="1">
           <stop offset="0" stopColor="currentColor" stopOpacity="0.28" />
           <stop offset="1" stopColor="currentColor" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <path d={area} fill="url(#spark-fill)" />
-      <path d={line} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <motion.path d={area} fill={`url(#${uid})`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.45 }} />
+      <motion.path
+        d={line}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 0.7, ease: [0.65, 0, 0.35, 1] }}
+      />
+      <motion.circle
+        cx={ex}
+        cy={ey}
+        r={2.4}
+        fill="currentColor"
+        initial={{ opacity: 0, scale: 0.6 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.25, delay: 0.7, ease: EASE_OUT }}
+      />
     </svg>
   );
 }
@@ -62,13 +88,13 @@ export function HealthRing({ value, size = 76 }: { value: number | null; size?: 
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={`${arc} ${Math.PI * 2 * r}`}
-          initial={false}
+          initial={{ strokeDashoffset: arc }}
           animate={{ strokeDashoffset: arc * (1 - pct) }}
           transition={{ type: "spring", stiffness: 140, damping: 22 }}
         />
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center pt-1 text-[15px] font-semibold text-strong">
-        {value == null ? "—" : `${Math.round(pct * 100)} %`}
+      <span className="absolute inset-0 flex items-center justify-center pt-1 text-[15px] font-semibold text-strong tabular-nums">
+        {value == null ? "—" : <CountUp value={Math.round(pct * 100)} suffix=" %" duration={0.8} />}
       </span>
     </div>
   );
@@ -80,7 +106,12 @@ export function ConfidenceBar({ value, className }: { value: number; className?:
   return (
     <div className={cn("flex items-center gap-2", className)} title={`Confianza ${value.toFixed(2)} · sin calibrar`}>
       <div className="h-1.5 w-16 overflow-hidden rounded-full bg-surface-sunken">
-        <div className={cn("h-full rounded-full", tone)} style={{ width: `${Math.round(value * 100)}%` }} />
+        <motion.div
+          className={cn("h-full rounded-full", tone)}
+          initial={{ width: "0%" }}
+          animate={{ width: `${Math.round(value * 100)}%` }}
+          transition={{ duration: 0.6, ease: EASE_OUT }}
+        />
       </div>
       <span className="w-8 text-xs text-muted">{value.toFixed(2).replace(".", ",")}</span>
     </div>
@@ -113,7 +144,9 @@ export function KpiCard({
         {loading ? (
           <Skeleton className="mt-2 h-7 w-24" />
         ) : (
-          <p className="mt-0.5 text-[26px] leading-tight font-semibold tracking-tight text-strong">{value}</p>
+          <p className="mt-0.5 text-[26px] leading-tight font-semibold tracking-tight text-strong tabular-nums">
+            {typeof value === "number" ? <CountUp value={value} /> : value}
+          </p>
         )}
         {context ? <div className="mt-1 text-xs text-muted">{context}</div> : null}
       </div>

@@ -36,12 +36,14 @@ type UiState = {
   commandOpen: boolean;
   shortcutsOpen: boolean;
   copilotOpen: boolean;
+  navOpen: boolean;
   toggleSidebar: () => void;
   hideDemoCard: (hidden: boolean) => void;
   setRevision: (rev: RevisionId) => void;
   setCommandOpen: (open: boolean) => void;
   setShortcutsOpen: (open: boolean) => void;
   setCopilotOpen: (open: boolean) => void;
+  setNavOpen: (open: boolean) => void;
 };
 
 export const useUi = create<UiState>()(
@@ -53,12 +55,14 @@ export const useUi = create<UiState>()(
       commandOpen: false,
       shortcutsOpen: false,
       copilotOpen: false,
+      navOpen: false,
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
       hideDemoCard: (hidden) => set({ demoCardHidden: hidden }),
       setRevision: (revision) => set({ revision }),
       setCommandOpen: (commandOpen) => set({ commandOpen }),
       setShortcutsOpen: (shortcutsOpen) => set({ shortcutsOpen }),
       setCopilotOpen: (copilotOpen) => set({ copilotOpen }),
+      setNavOpen: (navOpen) => set({ navOpen }),
     }),
     {
       name: "trazia-ui",
