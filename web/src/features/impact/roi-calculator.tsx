@@ -35,7 +35,7 @@ export function RoiCalculator() {
               Minutos de revisión asistida por revisión
               <Badge tone="warning">por medir</Badge>
             </label>
-            <div className="mt-2 flex h-9 items-center rounded-[var(--radius-control)] border border-border bg-surface focus-within:border-accent">
+            <div className="mt-2 flex h-9 items-center rounded-[var(--radius-control)] border border-border bg-surface transition-[border-color,box-shadow] duration-[var(--dur-fast)] focus-within:border-accent focus-within:shadow-[0_0_0_3px_var(--accent-soft)]">
               <input
                 value={reviewMinutes}
                 onChange={(e) => setReviewMinutes(e.target.value)}
@@ -62,7 +62,7 @@ export function RoiCalculator() {
           <Bar icon={Clock} label="Modelado manual" value={manual} max={max} tone="bg-border-strong" />
           <Bar icon={Timer} label="Revisión asistida con TrazIA-3D" value={assisted} max={max} tone="bg-approved" />
 
-          <div className="grid grid-cols-1 gap-4 border-t border-border pt-5 sm:grid-cols-3">
+          <div aria-live="polite" className="grid grid-cols-1 gap-4 border-t border-border pt-5 sm:grid-cols-3">
             <Stat label="Horas manuales" value={<CountUp value={manual} suffix=" h" duration={0.5} />} />
             <Stat
               label="Horas ahorradas"

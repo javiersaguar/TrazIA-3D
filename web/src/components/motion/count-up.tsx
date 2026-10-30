@@ -52,9 +52,13 @@ export function CountUp({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seen, value, reduced, duration, decimals, prefix, suffix]);
 
+  // El lector de pantalla solo oye el valor final, también dentro de una región aria-live
   return (
-    <span ref={ref} className={className} aria-label={format(value)}>
-      {format(0)}
+    <span className={className}>
+      <span ref={ref} aria-hidden>
+        {format(0)}
+      </span>
+      <span className="sr-only">{format(value)}</span>
     </span>
   );
 }

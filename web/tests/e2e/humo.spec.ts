@@ -83,6 +83,24 @@ test("la barra lateral navega entre pantallas", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1, name: "Cambios" })).toBeVisible();
 });
 
+test("en móvil la navegación vive en un panel que se cierra al elegir pantalla", async ({ page }) => {
+  const errors = trackErrors(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/proyecto");
+  await expect(page.getByRole("heading", { level: 1, name: "Resumen" })).toBeVisible();
+  // La barra fija no se ve; la página no se desplaza en horizontal
+  await expect(page.getByRole("navigation", { name: "Navegación principal" })).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
+
+  await page.getByRole("button", { name: "Abrir navegación" }).click();
+  const sheet = page.getByRole("dialog", { name: "Navegación" });
+  await sheet.getByRole("link", { name: "Lote" }).click();
+  await expect(page).toHaveURL(/\/lote$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Lote" })).toBeVisible();
+  await expect(sheet).toBeHidden();
+  expect(errors, errors.join("\n")).toEqual([]);
+});
+
 test("revisión por teclado: J selecciona, A acepta y Ctrl+Z deshace", async ({ page, request }) => {
   await page.goto("/revision");
   const queue = page.getByRole("listbox", { name: "Campos por revisar" });

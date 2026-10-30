@@ -29,12 +29,12 @@ export function BatchSketch() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div aria-live="polite" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Stat label="En cola" value={count("En cola")} />
         <Stat label="Procesando" value={count("Procesando")} />
         <Stat label="Hechos" value={count("Hecho")} />
         <Stat label="Coste">
-          0 € <span className="text-[13px] font-normal text-muted">todo en local</span>
+          0 € <span className="block text-[12px] font-normal text-muted sm:inline sm:text-[13px]">todo en local</span>
         </Stat>
       </div>
 

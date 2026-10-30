@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Database, TriangleAlert } from "lucide-react";
+import { ChevronRight, Database, Menu, TriangleAlert } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CopilotMark } from "@/components/brand/copilot-mark";
@@ -21,34 +21,59 @@ export function Topbar() {
   const revision = useUi((s) => s.revision);
   const active = useRevision(revision);
   const setCopilotOpen = useUi((s) => s.setCopilotOpen);
+  const setNavOpen = useUi((s) => s.setNavOpen);
+
+  // Fuente de los datos: siempre visible, también en móvil (en corto)
+  const source = apiEnabled
+    ? active.isError
+      ? { long: "API local · sin conexión", short: "Sin conexión" }
+      : active.data?.dataset === "real"
+        ? { long: "Datos reales · API local", short: "Reales" }
+        : { long: "Datos sintéticos · API local", short: "Sintéticos" }
+    : { long: "Datos sintéticos · sin backend", short: "Sintéticos" };
 
   return (
     <header
       style={{ viewTransitionName: "app-topbar" }}
-      className="sticky top-0 z-30 flex h-[var(--topbar-height)] items-center gap-3 border-b border-border bg-bg/85 px-5 backdrop-blur-md"
+      className="sticky top-0 z-30 flex h-[var(--topbar-height)] items-center gap-2 border-b border-border bg-bg/85 px-3 backdrop-blur-md sm:gap-3 sm:px-5"
     >
+      <button
+        type="button"
+        onClick={() => setNavOpen(true)}
+        aria-label="Abrir navegación"
+        className="-ml-1 flex size-9 shrink-0 items-center justify-center rounded-[var(--radius-control)] text-muted hover:bg-surface-raised hover:text-text lg:hidden"
+      >
+        <Icon icon={Menu} size={18} />
+      </button>
+
       <nav aria-label="Ruta" className="flex min-w-0 items-center gap-1.5 text-[13px] whitespace-nowrap">
-        <span className="font-mono text-[12px] text-faint">DEMO-PLANT</span>
-        <Icon icon={ChevronRight} size={14} className="text-faint" />
+        {/* El proyecto solo cuando sobra sitio: a 1024 px con barra lateral, la pantalla va antes */}
+        <span className="hidden font-mono text-[12px] text-faint xl:inline">DEMO-PLANT</span>
+        <Icon icon={ChevronRight} size={14} className="hidden text-faint xl:block" />
         {item ? <Icon icon={item.icon} size={15} className="text-muted" /> : null}
         <span className="truncate font-medium text-text">{item?.label ?? "Inicio"}</span>
       </nav>
 
       <div className="ml-auto flex items-center gap-2">
         <Tip content="Equipo y revisión activos">
-          <Pill>
-            <Icon icon={Database} size={14} />
-            V-101 · rev {revision}
-          </Pill>
+          <span className="hidden md:inline-flex">
+            <Pill>
+              <Icon icon={Database} size={14} />
+              V-101 · rev {revision}
+            </Pill>
+          </span>
         </Tip>
         <Tip content={apiEnabled ? "Datos y revisiones servidos por la API configurada; los equipos de la demo siguen siendo sintéticos" : "Archivos sintéticos de la demo offline"}>
-          <Pill tone="warning">
+          <Pill tone="warning" tabIndex={0}>
             <Icon icon={TriangleAlert} size={14} />
-            {apiEnabled ? active.isError ? "API local · sin conexión" : active.data?.dataset === "real" ? "Datos reales · API local" : "Datos sintéticos · API local" : "Datos sintéticos · sin backend"}
+            <span className="hidden sm:inline">{source.long}</span>
+            <span className="sm:hidden">{source.short}</span>
           </Pill>
         </Tip>
-        <PipelinePill />
-        <button type="button" onClick={() => setCopilotOpen(true)} className="rounded-full focus-visible:outline-offset-1">
+        <span className="hidden md:inline-flex">
+          <PipelinePill />
+        </span>
+        <button type="button" onClick={() => setCopilotOpen(true)} className="hidden rounded-full focus-visible:outline-offset-1 md:block">
           <Pill className="hover:text-text">
             <CopilotMark className="size-3.5" />
             Copiloto

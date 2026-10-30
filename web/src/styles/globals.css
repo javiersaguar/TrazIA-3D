@@ -256,6 +256,32 @@
   animation: sheet-out var(--dur-base) var(--ease-out);
 }
 
+/* Navegación en móvil: entra desde su borde con curva de cajón y sale más rápido */
+.nav-sheet[data-state="open"] {
+  animation: nav-sheet-in var(--dur-slow) cubic-bezier(0.32, 0.72, 0, 1);
+}
+.nav-sheet[data-state="closed"] {
+  animation: nav-sheet-out var(--dur-base) var(--ease-out);
+}
+@keyframes nav-sheet-in {
+  from {
+    translate: -100% 0;
+  }
+}
+@keyframes nav-sheet-out {
+  to {
+    translate: -100% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-sheet[data-state] {
+    animation-name: fade-in;
+  }
+  .nav-sheet[data-state="closed"] {
+    animation-name: fade-out;
+  }
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;

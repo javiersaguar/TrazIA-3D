@@ -25,7 +25,8 @@
   --text: #f4f4f5;
   --text-strong: #ffffff;
   --text-muted: #a1a1aa;
-  --text-faint: #6b6b74;
+  /* 4,9:1 sobre la superficie: AA también en los textos de 12 px */
+  --text-faint: #82828c;
 
   /* Celeste del logo */
   --accent: #5cc4ff;
@@ -85,9 +86,10 @@
   --text: #0b0b0d;
   --text-strong: #000000;
   --text-muted: #52525b;
-  --text-faint: #8a8a94;
+  --text-faint: #6a6a74;
 
-  --accent: #0a84d6;
+  /* Algo más oscuro que el celeste del logo para que el blanco encima pase AA (4,8:1) */
+  --accent: #0a76c2;
   --accent-text: #0870b8;
   --accent-strong: #0a84d6;
   --accent-soft: #e6f4fd;

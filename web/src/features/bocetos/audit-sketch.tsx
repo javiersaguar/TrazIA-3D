@@ -29,17 +29,20 @@ export function AuditSketch() {
         <p className="max-w-[60ch] text-[13px] text-muted">
           Cualquier cambio en los datos invalida la aprobación anterior. Aquí queda quién hizo qué, cuándo y sobre qué evidencia.
         </p>
-        <Segmented<Filter>
-          label="Filtrar eventos"
-          value={filter}
-          onChange={setFilter}
-          options={[
-            { value: "todo", label: "Todo" },
-            { value: "edición", label: "Ediciones" },
-            { value: "aprobación", label: "Aprobaciones" },
-            { value: "invalidación", label: "Invalidaciones" },
-          ]}
-        />
+        {/* En móvil las cuatro opciones no caben: el filtro se desplaza en horizontal */}
+        <div className="max-w-full overflow-x-auto">
+          <Segmented<Filter>
+            label="Filtrar eventos"
+            value={filter}
+            onChange={setFilter}
+            options={[
+              { value: "todo", label: "Todo" },
+              { value: "edición", label: "Ediciones" },
+              { value: "aprobación", label: "Aprobaciones" },
+              { value: "invalidación", label: "Invalidaciones" },
+            ]}
+          />
+        </div>
       </div>
 
       <ol className="relative mt-6">
