@@ -3,8 +3,9 @@
 Cascada, de lo barato y explicable a lo caro:
 1. B (texto, tablas, cotas, cajetín, hoja de datos; OCR si no hay capa de texto).
 2. C: plantilla de un equipo aprobado parecido.
-3. Memoria de revisión: con la revisión anterior aprobada, cada campo se lee donde estaba antes.
-   Nunca se copia el valor anterior: solo se hereda dónde mirar.
+3. Memoria de revisión: solo con la revisión anterior aprobada y sin cambios desde su aprobación,
+   cada campo se lee donde estaba antes. Nunca se copia el valor anterior: solo se hereda dónde
+   mirar. Un borrador no sirve de memoria.
 4. A: la geometría del dibujo. No vota: confirma o desmiente lo leído.
 5. Modelo de visión: solo si siguen faltando campos obligatorios.
 
@@ -19,7 +20,7 @@ from collections import defaultdict
 
 from ..extraction import Alternative, Candidate
 from ..extractors.units import DN_SERIES
-from ..model import GEOMETRY_FIELDS, fields
+from ..model import GEOMETRY_FIELDS, Revision, fields
 from .base import Cost, StageEvent, StrategyContext, StrategyOutput
 
 CHANNELS = ("reglas", "rag", "memoria", "geometria", "vision")
@@ -36,6 +37,25 @@ CHANNEL_NAMES = {
     "geometria": "geometría",
 }
 REQUIRED = ("tag", *GEOMETRY_FIELDS)
+
+
+def memory_blocker(previous: Revision) -> str | None:
+    """Motivo para no usar la revisión anterior como memoria, o None si se puede (tarea 3.2).
+
+    Solo guía la lectura una revisión aprobada por una persona y cuyos datos no han cambiado desde
+    la aprobación: un borrador podría propagar sus propios errores a la revisión siguiente.
+    """
+    if previous.approval is None:
+        return (
+            f"Memoria de revisión omitida: la revisión {previous.revision} es un borrador sin "
+            "aprobar."
+        )
+    if previous.approval.input_sha256 != previous.fingerprint():
+        return (
+            f"Memoria de revisión omitida: los datos de la revisión {previous.revision} cambiaron "
+            "después de aprobarse."
+        )
+    return None
 
 
 class HybridStrategy:
@@ -68,7 +88,12 @@ class HybridStrategy:
         if "rag" in self.channels:
             take(RagStrategy().run(ctx))
         if "memoria" in self.channels and ctx.previous is not None:
-            take(self._memory(ctx, evidence))
+            reason = memory_blocker(ctx.previous)
+            if reason is None:
+                take(self._memory(ctx, evidence))
+            else:
+                warnings.append(reason)
+                ctx.emit(StageEvent("memory", "omitido", "", reason))
         if "geometria" in self.channels:
             take(VisionGeometryStrategy(reader="texto", name=self.name).run(ctx))
         chosen, conflicts = fuse(pool)

@@ -1,9 +1,10 @@
-"""Estrategia D (tarea 2.6): fusión con verificación cruzada, restricciones y memoria."""
+"""Estrategia D (tareas 2.6 y 3.2): fusión, restricciones y memoria solo de revisiones aprobadas."""
 
 import json
 
 import pytest
 
+from bench.estudio import reviewed_by_oracle
 from synthetic.sets import generate_set
 from trazia.extraction import Candidate
 from trazia.model import Source
@@ -66,21 +67,18 @@ def dev_set(tmp_path_factory):
     return root / "s-dev"
 
 
-def test_hybrid_builds_both_revisions_and_uses_revision_memory(dev_set, monkeypatch, tmp_path):
-    monkeypatch.setenv("TRAZIA_RAG_LIBRARY", str(tmp_path / "sin-biblioteca.json"))
+def _run_case(dev_set, review_rev1):
+    """Procesa rev1 y rev2 de un equipo; `review_rev1` decide qué recibe la rev2 como memoria."""
     manifest = json.loads((dev_set / "manifest.json").read_text(encoding="utf-8"))
     tag = manifest["cases"][1]["tag"]
     folder = dev_set / "vectorial" / tag
-    previous, events = None, []
+    truth = json.loads((dev_set / "truth" / f"{tag}.json").read_text(encoding="utf-8"))
+    previous, events, result = None, [], None
     for rev in ("1", "2"):
-        docs = [
-            InputDocument(
-                p.name, p.read_bytes(), ("GA-" if p.name.startswith("GAD") else "HDM-") + tag
-            )
-            for p in sorted(folder.glob(f"*_rev{rev}.*"))
-        ]
+        paths = sorted(folder.glob(f"*_rev{rev}.*"))
+        ids = [("GA-" if p.name.startswith("GAD") else "HDM-") + tag for p in paths]
         result = process(
-            docs,
+            [InputDocument(p.name, p.read_bytes(), i) for p, i in zip(paths, ids)],
             project_id="P",
             equipment_id=tag.lower(),
             revision=rev,
@@ -89,6 +87,45 @@ def test_hybrid_builds_both_revisions_and_uses_revision_memory(dev_set, monkeypa
             on_event=events.append,
         )
         assert result.revision is not None, result.error
-        previous = result.revision
+        if rev == "1":
+            previous = review_rev1(result.revision, truth["rev1"], list(zip(paths, ids)))
+    return result, events
+
+
+def test_hybrid_uses_memory_of_an_approved_previous_revision(dev_set, monkeypatch, tmp_path):
+    monkeypatch.setenv("TRAZIA_RAG_LIBRARY", str(tmp_path / "sin-biblioteca.json"))
+    approved = []
+
+    def review(revision, truth, docs):
+        approved.append(reviewed_by_oracle(revision, truth, docs))
+        return approved[-1]
+
+    result, events = _run_case(dev_set, review)
+    assert approved[0] is not None and approved[0].approval is not None
     assert any(e.stage == "memory" and e.status == "ok" for e in events)
     assert all(c.explanation for c in result.candidates)
+
+
+def test_hybrid_ignores_a_draft_previous_revision(dev_set, monkeypatch, tmp_path):
+    monkeypatch.setenv("TRAZIA_RAG_LIBRARY", str(tmp_path / "sin-biblioteca.json"))
+    result, events = _run_case(dev_set, lambda revision, truth, docs: revision)
+    skipped = [e for e in events if e.stage == "memory"]
+    assert [e.status for e in skipped] == ["omitido"]
+    assert "borrador" in skipped[0].detail
+    assert not any(c.channel == "memoria_revision" for c in result.candidates)
+    assert any("Memoria de revisión omitida" in w for w in result.warnings)
+
+
+def test_memory_is_refused_when_data_changed_after_approval(dev_set, monkeypatch, tmp_path):
+    monkeypatch.setenv("TRAZIA_RAG_LIBRARY", str(tmp_path / "sin-biblioteca.json"))
+
+    def tampered(revision, truth, docs):
+        approved = reviewed_by_oracle(revision, truth, docs)
+        assert approved is not None
+        changed = approved.model_copy(deep=True)
+        changed.equipment.height.value += 100.0  # edición posterior sin volver a aprobar
+        return changed
+
+    _, events = _run_case(dev_set, tampered)
+    [memory] = [e for e in events if e.stage == "memory"]
+    assert memory.status == "omitido" and "cambiaron" in memory.detail

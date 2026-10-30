@@ -4,8 +4,9 @@
     uv run python -m bench.estudio
 
 Cada variante pasa por `trazia.pipeline.process`, el mismo camino que usa el producto; la rev2
-recibe la rev1 como `previous`. Se mide sobre los mismos documentos para todas las variantes, y
-la estadística se hace por equipo (bootstrap pareado) y por campo (McNemar).
+recibe como `previous` la rev1 ya revisada y aprobada por una persona simulada
+(`reviewed_by_oracle`), porque D solo usa como memoria revisiones aprobadas (tarea 3.2).
+Se mide sobre los mismos documentos para todas las variantes, y la estadística se hace por equipo (bootstrap pareado) y por campo (McNemar).
 
 Escribe `generated/estudio/estudio.json` (Interfaz 3 de COORDINACION-BACKEND.md) y `estudio.md`.
 
@@ -36,7 +37,9 @@ from statistics import fmean
 from synthetic.cases import flatten, spec_from_dict, spec_to_revision
 from trazia.ifc import build_ifc
 from trazia.ingest import Bundle, ingest_bytes
+from trazia.model import Revision, fields
 from trazia.pipeline import InputDocument, PipelineResult, process
+from trazia.review import approve
 from trazia.revisions import compare
 from trazia.strategies import ABLATIONS, STRATEGIES
 
@@ -241,6 +244,34 @@ def _score_revision(
     )
 
 
+def reviewed_by_oracle(
+    revision: Revision, truth: dict, docs: list[tuple[Path, str]]
+) -> Revision | None:
+    """Simula a la persona que revisa y aprueba la rev1 antes de que llegue la rev2 (tarea 3.2).
+
+    Acepta lo correcto y corrige con la verdad sintética lo que no lo es; después aprueba con la
+    misma función que el producto, que verifica los originales y fija la huella. Si queda un campo
+    sin verdad (espurio) en conflicto o abstenido, la aprobación no es posible y la rev2 se procesa
+    sin memoria, como pasaría en el producto. Solo se usa para medir: D nunca lee la verdad.
+    """
+    expected = flatten(spec_from_dict(truth))
+    draft = revision.model_copy(deep=True)
+    draft.approval = None
+    for path, traced in fields(draft.equipment).items():
+        if path not in expected:
+            continue
+        value, unit = expected[path]
+        if same(traced.value, traced.unit, value, unit):
+            traced.state = "accepted"
+        else:
+            traced.value, traced.unit, traced.state = value, unit, "corrected"
+    originals = {doc_id: path.read_bytes() for path, doc_id in docs}
+    try:
+        return approve(draft, "Revisión simulada del estudio", originals)
+    except ValueError:
+        return None
+
+
 def run_case(
     variant: VariantSpec, root: Path, dataset: str, degradation: str, tag: str
 ) -> CaseResult:
@@ -261,9 +292,10 @@ def run_case(
             providers=list(variant.providers) or None,
             dataset="synthetic",
         )
-        previous = result.revision
         results.append(result)
         revs.append(_score_revision(result, truth[f"rev{rev}"], rev, docs))
+        if rev == "1" and result.revision is not None:
+            previous = reviewed_by_oracle(result.revision, truth["rev1"], docs)
     expected = {(c["path"], c["operation"]) for c in truth["changes"]}
     if results[0].revision is not None and results[1].revision is not None:
         detected = compare(results[0].revision, results[1].revision)["changes"]
