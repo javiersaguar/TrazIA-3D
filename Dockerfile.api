@@ -7,6 +7,8 @@ COPY pyproject.toml uv.lock ./
 COPY src ./src
 RUN uv sync --frozen --extra api --extra geo --extra ocr --no-dev
 COPY examples ./examples
+COPY bench ./bench
+COPY synthetic ./synthetic
 COPY web/public/demo ./web/public/demo
 RUN useradd --uid 10001 --create-home trazia && mkdir /data && chown trazia:trazia /data
 USER trazia

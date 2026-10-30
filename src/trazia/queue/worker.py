@@ -11,6 +11,9 @@ from trazia.store import Store
 
 
 async def startup(context):
+    from trazia.runtime import configure_offline
+
+    configure_offline()
     context["store"] = Store(
         Path(os.getenv("TRAZIA_DATA", "data")), os.getenv("TRAZIA_DATABASE_URL")
     )

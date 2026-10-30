@@ -50,6 +50,9 @@ class JobRecord(SQLModel, table=True):
     revision_id: str | None = None
     lease_until: float | None = None
     warnings_json: str = "[]"
+    kind: str = "pipeline"
+    result_sha256: str | None = None
+    elapsed_seconds: float | None = None
 
 
 class EventRecord(SQLModel, table=True):

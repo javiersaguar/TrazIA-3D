@@ -119,6 +119,13 @@ def execute_pipeline(store: Store, job_id: str, request: dict):
 
 
 async def run_job(store: Store, job_id: str):
+    with Session(store.engine) as session:
+        job = session.get(JobRecord, job_id)
+        study = job is not None and job.kind == "study"
+    if study:
+        from .study_jobs import run_study_job
+
+        return await run_study_job(store, job_id)
     started = time.perf_counter()
     now = time.time()
     with Session(store.engine) as session:
