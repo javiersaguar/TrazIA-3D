@@ -25,7 +25,7 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   projects: [
-    { name: "humo", testMatch: /(?:humo|api|study)\.spec\.ts/ },
+    { name: "humo", testMatch: /(?:humo|api|study|3d)\.spec\.ts/ },
     { name: "capturas", testMatch: /capturas\.spec\.ts/ },
   ],
   webServer: [

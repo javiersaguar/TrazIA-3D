@@ -91,7 +91,54 @@ cotas. Chrome: reproducción, Paso 1, dos canvas en A | B, sin errores de págin
 agente2-24-cambios/comparacion.png. La primera pasada de humo detectó título de /modelo y reinicio
 del primer paso; corregidos, pendiente la pasada completa al terminar Revisión.
 
-## 2.5–2.6
+## 2.5 · Revisión
 
-Pendientes. Antes de editar families/ o ifc.py se requiere la confirmación de Javier indicada
-en el encargo. No se han modificado esos archivos ni datos de data/private/.
+Paneles de react-resizable-panels 4 con separadores accesibles por teclado, tamaños guardados
+al terminar la interacción y modos de foco. Layout cargado solo en cliente para evitar diferencias
+entre servidor y localStorage. La versión 4 interpreta los números como píxeles; las proporciones
+se declaran explícitamente en %. PDF multipágina, miniaturas laterales, selección de página y
+cajas de evidencia correspondientes a esa página. Fixture de dos páginas sintéticas en memoria.
+
+Inspector flotante: GUID, tipo, Psets y fuente/confianza de FieldsJSON leídos del IFC. La línea
+campo → caja PDF → elemento sigue los anclajes proyectados y oculta tramos sin evidencia visible;
+se actualiza por resize/scroll/cámara mediante observadores y refs. No dibuja evidencia inexistente.
+
+Aprobación real con nombre del revisor, progreso, ETag/If-Match e Idempotency-Key. No refresca
+silenciosamente una versión distinta para firmarla. Un 412 pide recargar/revisar; los fallos de red
+permiten reintento con la misma clave. En mock conserva el aviso y no guarda una aprobación falsa.
+No permite aprobar campos candidatos o supuestos ni mientras se guardan acciones.
+
+Comprobado: typecheck, lint (solo aviso TanStack previo), 31 unitarias y build. Chrome: tamaños
+por teclado, persistencia, foco, inspector/GUID y conexión de tres anclajes. Capturas oscuras
+agente2-25-revision.png, agente2-25-revision-api.png y agente2-modelo.png. Las pruebas E2E nuevas
+verifican también scrub/reduced motion, extremos exactos, comparación, presentación, PDF de dos
+páginas y aprobación con conflicto 412 seguido de guardado real de la huella.
+
+Correcciones finales de 2.4: hover en los dos sentidos, filtro Solo modificados y presentación
+con Fullscreen API y reproducción automática. Las miniaturas PDF se colocan lateralmente.
+
+## Rendimiento y verificación conjunta
+
+Holograma procedural con modelo físico y tres recortes: giro 5 s, 240 fps, p95 4,3 ms, 1.201
+frames, 68 draw calls, 197.564 triángulos, DPR adaptativo 0,592, Chrome/ANGLE/D3D11 sobre RTX 5070
+Laptop. Es una medición local con esa resolución adaptativa, no una garantía en otras máquinas.
+La portada final aún pertenece a A; falta medir sus escenas juntas y comprobar su chunk inicial.
+Los componentes 3D y /modelo se cargan con dynamic ssr:false.
+
+La API 8010 se mantiene intacta. Las pruebas conectadas usan API aislada 8011 y CORS añadido en
+memoria al arrancar (sin cambios Python), datos generated/e2e-3d-8011 y PW_EXTERNAL_API=1. Esta
+alternativa permite verificar el frontend sin la excepción a api/app.py consultada a Javier.
+Pasadas finales: PW_PORT=3310 test:e2e, 16 correctas y 6 omitidas por requerir API, 32,2 s.
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8011 PW_PORT=3311 PW_EXTERNAL_API=1 test:e2e,
+21 correctas y 1 omitida por ser exclusiva offline, 41,9 s. Sin errores de hidratación.
+La API aislada 8011 se detiene al terminar; la API original 8010 continúa en marcha.
+Para inspección queda la web 3300 en modo offline; conectar directamente a 8010 sigue requiriendo
+su ajuste CORS. No se modifica ni se fusiona la rama del Agente 1.
+
+## 2.6 · Pendiente de autorización
+
+Se ha solicitado a Javier la confirmación expresa que exige el encargo para editar las carpetas
+de Plataforma. Sin respuesta no se modifica families/, ifc.py ni los IFC públicos. No se han usado
+datos de data/private/. La ausencia de piezas en el IFC se mantiene visible, sin sustituirlas por
+geometría aproximada. Ver NECESIDADES.md para el ajuste de la prueba de siete productos que
+requeriría esa ampliación. No procede ejecutar validaciones Python sobre código que no se cambia.
