@@ -6,7 +6,8 @@
 Cada variante pasa por `trazia.pipeline.process`, el mismo camino que usa el producto; la rev2
 recibe como `previous` la rev1 ya revisada y aprobada por una persona simulada
 (`reviewed_by_oracle`), porque D solo usa como memoria revisiones aprobadas (tarea 3.2).
-Se mide sobre los mismos documentos para todas las variantes, y la estadística se hace por equipo (bootstrap pareado) y por campo (McNemar).
+Se mide sobre los mismos documentos para todas las variantes, y la estadística se hace por
+equipo (bootstrap pareado) y por campo (McNemar).
 
 Escribe `generated/estudio/estudio.json` (Interfaz 3 de COORDINACION-BACKEND.md) y `estudio.md`.
 
