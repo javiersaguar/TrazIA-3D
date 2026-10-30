@@ -34,6 +34,15 @@ ocr = [
     "onnxruntime>=1.20,<2",
     "rapidocr>=3,<4",
 ]
+# Detector propio (Florence-2) y medición de PaddleOCR-VL. Para GPU, instala torch con CUDA
+# desde download.pytorch.org (ver training/florence.py); el producto no lo necesita.
+train = [
+    "torch>=2.7",
+    "transformers>=5,<6",
+    "accelerate>=1",
+    "sentencepiece>=0.2",
+    "protobuf>=5",
+]
 
 [project.scripts]
 trazia = "trazia.cli:main"

@@ -117,3 +117,17 @@ Licencias comprobadas en los metadatos de npm el 30/10/2026.
 | --- | --- | --- |
 | react-resizable-panels 4.15.2 | MIT | Paneles redimensionables del espacio de Revisión |
 | three-bvh-csg 0.0.18 | MIT | Operaciones booleanas en los modelos 3D ilustrativos (aberturas, taladros) |
+
+## Lectura: extra `train` (30/10/2026)
+
+Solo para entrenar el detector propio y medir modelos en la GPU. El producto no los instala.
+
+| Dependencia | Licencia | Uso |
+| --- | --- | --- |
+| PyTorch 2.11 (cu128) | BSD-3-Clause | Entrenamiento e inferencia en GPU |
+| transformers 5.22 | Apache-2.0 | Florence-2 y PaddleOCR-VL nativos |
+| accelerate | Apache-2.0 | Carga de modelos |
+| sentencepiece | Apache-2.0 | Tokenizador de PaddleOCR-VL |
+| protobuf | BSD-3-Clause | Tokenizador de PaddleOCR-VL |
+| Pesos Florence-2-base (`florence-community/Florence-2-base`) | MIT | Base del detector propio |
+| Pesos PaddleOCR-VL (`PaddlePaddle/PaddleOCR-VL`) | Apache-2.0 | Solo medición (tarea 2.2) |

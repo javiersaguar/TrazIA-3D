@@ -1,7 +1,8 @@
 """Estrategia D · híbrido (DEC-09 y DEC-11).
 
 Cascada, de lo barato y explicable a lo caro:
-1. B (texto, tablas, cotas, cajetín, hoja de datos; OCR si no hay capa de texto).
+1. B (texto, tablas, cotas, cajetín, hoja de datos; OCR si no hay capa de texto). En páginas
+   sin capa de texto, el detector propio da una segunda lectura independiente (desde su caché).
 2. C: plantilla de un equipo aprobado parecido.
 3. Memoria de revisión: solo con la revisión anterior aprobada y sin cambios desde su aprobación,
    cada campo se lee donde estaba antes. Nunca se copia el valor anterior: solo se hereda dónde
@@ -23,7 +24,7 @@ from ..extractors.units import DN_SERIES
 from ..model import GEOMETRY_FIELDS, Revision, fields
 from .base import Cost, StageEvent, StrategyContext, StrategyOutput
 
-CHANNELS = ("reglas", "rag", "memoria", "geometria", "vision")
+CHANNELS = ("reglas", "detector", "rag", "memoria", "geometria", "vision")
 CHANNEL_NAMES = {
     "texto": "texto",
     "tabla": "tabla",
@@ -31,12 +32,15 @@ CHANNEL_NAMES = {
     "cajetin": "cajetín",
     "hoja_datos": "hoja de datos",
     "ocr": "OCR",
+    "detector": "detector propio",
     "rag": "plantilla (C)",
     "memoria_revision": "revisión anterior",
     "vision": "modelo de visión",
     "geometria": "geometría",
 }
 REQUIRED = ("tag", *GEOMETRY_FIELDS)
+# Lecturas de modelo: su cita se comprueba contra el texto de la página (pipeline._ground).
+MODEL_READERS = {"vision", "detector", "rag"}
 
 
 def memory_blocker(previous: Revision) -> str | None:
@@ -85,6 +89,8 @@ class HybridStrategy:
 
         if "reglas" in self.channels:
             take(ReglasStrategy(ocr=True, name=self.name).run(ctx))
+        if "detector" in self.channels:
+            take(self._detector(ctx))
         if "rag" in self.channels:
             take(RagStrategy().run(ctx))
         if "memoria" in self.channels and ctx.previous is not None:
@@ -115,6 +121,49 @@ class HybridStrategy:
         warnings += [f"Conflicto en {path}: {why}" for path, why in conflicts.items()]
         out = StrategyOutput(chosen, cost=cost, warnings=warnings, evidence=evidence)
         out.cost.seconds = time.perf_counter() - started
+        return out
+
+    # Detector propio -------------------------------------------------------------------------
+    def _detector(self, ctx: StrategyContext) -> StrategyOutput:
+        """Segunda lectura de las páginas escaneadas con el detector propio (tarea 2.4).
+
+        Solo lee la caché que deja `training.florence leer`; en planos vectoriales no aporta nada
+        que la capa de texto no tenga, así que solo actúa sin capa de texto.
+        """
+        from ..extraction import LabelExtractor
+        from ..extractors import DrawingExtractor
+        from ..ocr.detector import detector_pdf_lines
+        from .base import tag_candidates
+
+        out = StrategyOutput([])
+        for bundle in ctx.bundles:
+            name = bundle.document.filename
+            if bundle.media_type != "pdf" or bundle.lines:
+                continue
+            data = ctx.raw.get(bundle.document.id)
+            pages = bundle.document.page_count or 1
+            lines = None if data is None else detector_pdf_lines(data, bundle.document.id, pages)
+            if lines is None:
+                ctx.emit(
+                    StageEvent(
+                        "extract_detector",
+                        "omitido",
+                        name,
+                        "Sin lecturas del detector en caché (training.florence leer).",
+                    )
+                )
+                continue
+            page = bundle.model_copy(update={"lines": lines})
+            found = LabelExtractor().extract([page]) + DrawingExtractor().extract([page])
+            found = tag_candidates(found, channel="detector", strategy=self.name)
+            for c in found:
+                c.channel = "detector"
+            out.candidates += found
+            ctx.emit(
+                StageEvent(
+                    "extract_detector", "ok", name, f"{len(found)} valores leídos por el detector."
+                )
+            )
         return out
 
     # Memoria de revisión ---------------------------------------------------------------------
@@ -270,7 +319,17 @@ def fuse(pool: list[Candidate]) -> tuple[list[Candidate], dict[str, str]]:
                 per_evidence[key] = max(per_evidence.get(key, 0), c.source.confidence)
             score = _combine(list(per_evidence.values()))
             notes = []
-            rep = max(cluster, key=lambda c: (bool(c.text_original), c.source.confidence))
+            # La cita del campo es la de un canal verificable si alguno coincide: una lectura de
+            # modelo (detector, C, visión) cuya caja no cuadra con el texto de la página se descarta
+            # en la comprobación de cita, y se llevaría el campo entero aunque OCR diga lo mismo.
+            rep = max(
+                cluster,
+                key=lambda c: (
+                    c.channel not in MODEL_READERS,
+                    bool(c.text_original),
+                    c.source.confidence,
+                ),
+            )
             if measured and not isinstance(rep.value, str):
                 g = max(measured, key=lambda c: c.source.confidence)
                 rel = abs(float(rep.value) - float(g.value)) / max(1.0, abs(float(g.value)))

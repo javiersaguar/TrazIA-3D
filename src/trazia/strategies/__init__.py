@@ -25,7 +25,7 @@ ABLATIONS: dict[str, Callable[[], Strategy]] = {
         f"d_hibrido-{channel}": (
             lambda channel=channel: HybridStrategy(without={channel}, name=f"d_hibrido-{channel}")
         )
-        for channel in ("geometria", "memoria", "rag", "vision")
+        for channel in ("geometria", "memoria", "rag", "vision", "detector")
     },
 }
 
