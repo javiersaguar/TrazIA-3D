@@ -94,6 +94,20 @@ class AuditRecord(SQLModel, table=True):
     created_at: float = Field(default_factory=time.time)
 
 
+class CorrectionRecord(SQLModel, table=True):
+    __tablename__ = "corrections"
+    id: int | None = Field(default=None, primary_key=True)
+    at: str = Field(index=True)
+    payload_json: str
+    exported: bool = Field(default=False, index=True)
+
+
+class CorrectionCursorRecord(SQLModel, table=True):
+    __tablename__ = "correction_cursors"
+    key: str = Field(primary_key=True)
+    byte_offset: int = 0
+
+
 class IdempotencyConflict(ValueError):
     pass
 

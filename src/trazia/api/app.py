@@ -1,9 +1,11 @@
 import asyncio
 import hashlib
 import json
+import logging
 import os
 import time
 from contextlib import asynccontextmanager
+from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Literal
 from urllib.parse import quote
@@ -13,6 +15,7 @@ from fastapi import FastAPI, File, Form, Header, HTTPException, Query, Request, 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from pydantic import Field, ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session, select
 
 from trazia.copilot import CopilotAnswer, CopilotUnavailable
@@ -34,6 +37,7 @@ from trazia.store import (
     Store,
 )
 
+from . import corrections
 from .cors import origins
 from .jobs import TERMINAL, recover_jobs, run_job
 from .repository import check_match, get_revision, read_report, save_revision, seed_demo
@@ -114,11 +118,23 @@ def create_app(
     configure_offline()
     repo = (root or Path(os.getenv("TRAZIA_ROOT", "."))).resolve()
     data = data_root or Path(os.getenv("TRAZIA_DATA", "data"))
+    corrections_file = Path(
+        os.getenv("TRAZIA_CORRECTIONS_FILE")
+        or (
+            (data_root if data_root is not None else repo)
+            / "generated/correcciones/correcciones.jsonl"
+        )
+    ).resolve()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         store = Store(data, database_url or os.getenv("TRAZIA_DATABASE_URL"))
         app.state.store = store
+        app.state.corrections_file = corrections_file
+        try:
+            corrections.flush(store, corrections_file)
+        except (OSError, SQLAlchemyError):
+            logging.getLogger("trazia.api").warning("Correcciones pendientes de exportar a JSONL")
         app.state.copilot_limit = asyncio.Semaphore(1)
         if seed:
             seed_demo(store, repo)
@@ -318,7 +334,23 @@ def create_app(
         result = request.app.state.store.perform(
             f"PATCH {identity}/{path}", require_key(idempotency_key), fingerprint, action
         )
+        try:
+            corrections.flush(request.app.state.store, request.app.state.corrections_file)
+        except (OSError, SQLAlchemyError) as failure:
+            raise HTTPException(
+                503,
+                "Campo guardado; falta exportar el JSONL. Reintente con la misma Idempotency-Key",
+            ) from failure
         return reply(result)
+
+    @app.get("/correcciones")
+    def correction_log(request: Request, desde: datetime | None = None):
+        if desde is not None and desde.tzinfo is None:
+            raise HTTPException(
+                422, "desde requiere fecha ISO 8601 con zona horaria, por ejemplo Z"
+            )
+        rows = corrections.read(request.app.state.store, desde)
+        return {"correcciones": rows, "count": len(rows)}
 
     @app.post("/revisions/{identity}/approve", response_model=Revision)
     def approve_revision(

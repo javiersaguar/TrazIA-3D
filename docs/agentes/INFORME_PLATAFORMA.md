@@ -443,3 +443,19 @@ inválida. No se cambia web ni se usan los puertos de otros equipos.
 Cierre tarea 3: Ruff y formato globales correctos; 253 pruebas correctas y una omitida
 en 301,02 s. API real 8020: preflight desde localhost:3120 devuelve 200 con el origen
 permitido; un origen ajeno devuelve 400 sin cabecera de autorización CORS.
+
+### 4 · 3.8 (datos): JSONL y GET /correcciones
+
+Registro de cada cambio de valor/unidad/estado, con el formato solicitado y los
+metadatos de la predicción antes de intervenir. Fecha UTC y huella de los datos
+resultantes; null para ausentes. GET /correcciones filtra desde ISO inclusivo.
+El JSONL se publica desde una bandeja transaccional, con cursor bloqueado y recuperación
+tras fallo de escritura, reintento idempotente o archivo truncado. Las ediciones
+rechazadas y peticiones sin cambios no añaden líneas. La migración 0005 no modifica
+model.py. No se llama a calibración ni se escribe en carpetas de Lectura.
+Siete pruebas específicas correctas: con/sin calibración, idempotencia, estado, rechazo,
+fallo tras escribir, concurrencia, filtro de fecha, recuperación y aprobación existente.
+
+Cierre tarea 4: Ruff y formato globales correctos; 258 pruebas correctas y una omitida
+en 290,06 s. Prueba HTTP 8020: la fila devuelta por GET coincide exactamente con la
+última línea UTF-8 del JSONL. Evidencia sintética en evidencias/fase3/correccion-api-30oct.json.

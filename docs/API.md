@@ -396,3 +396,33 @@ uv run --extra api python -m trazia.api
 ```
 
 Las cabeceras de idempotencia, If-Match y ETag y los métodos admitidos no cambian.
+
+
+## Registro de correcciones humanas · 3.8 (datos)
+
+Cada PATCH confirmado que cambia valor, unidad o estado registra una fila transaccional
+y añade una línea a `generated/correcciones/correcciones.jsonl`. La ruta estándar es
+relativa a la raíz del repo; `TRAZIA_CORRECTIONS_FILE` permite fijarla. Con data_root
+explícito en una aplicación embebida, la salida predeterminada queda dentro de ese
+almacén, para aislar datos y pruebas. Compose usa /data/correcciones/correcciones.jsonl.
+
+Formato de cada línea: revision_id, equipment_tag, revision, path, value_before,
+value_after, unit, state_before, state_after, confidence, confidence_raw, channel,
+strategy, document_id, page, bbox, actor, at y data_sha256. Los opcionales ausentes
+son null. La confianza, canal, estrategia y cita pertenecen a la predicción ANTERIOR
+a la intervención; unit y data_sha256 corresponden al resultado. at es ISO 8601 UTC.
+No se exige ni se supone que la confianza esté calibrada o que exista un intervalo.
+
+GET /correcciones?desde=2026-10-30T00:00:00Z devuelve {correcciones:[...],count:N},
+filtrado inclusivamente desde esa fecha. Se requiere zona horaria; no llama a modelos
+ni a calibración. Son intervenciones históricas, incluidas revisiones aún no aprobadas.
+La exportación previa /learning/corrections conserva su selección de ejemplos aprobados.
+
+Se conserva auditoría, ETag/If-Match e idempotencia. Una petición repetida no duplica
+líneas; una edición rechazada o sin cambios no crea una corrección. Alembic 0005 añade
+una bandeja de salida SQL y un cursor. El bloqueo de publicación funciona en SQLite
+y Postgres. Ante un fallo tras escribir, el reintento descarta solo la cola no confirmada
+y vuelve a publicar; el archivo perdido o truncado se reconstruye con las filas SQL.
+Usar un único almacén SQL por archivo configurado. Si falla la exportación, el PATCH
+informa 503: el campo está guardado y se reintenta con la misma Idempotency-Key. Las
+filas siguen accesibles por GET; al arrancar se intenta publicar lo pendiente.
