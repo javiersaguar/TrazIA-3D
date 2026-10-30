@@ -50,46 +50,45 @@ con GPU sin avisar.
 - `docs/ROADMAP.md`, `docs/DECISIONES.md`, `AGENTS.md`, `CONTRIBUTING.md` y `tests/conftest.py`. Las
   propuestas de cambio irán en el informe.
 
-## Interfaces
+## Trabajo en paralelo, sin dependencias
 
-**Lo que Lectura entrega a Plataforma:**
+Ningún agente espera al otro. Las fronteras son las que **ya existen en `main`** y no cambian en esta
+sesión.
 
-- `bench.estudio.ejecutar(config, on_event)` se podrá llamar en proceso, para que `POST /estudio`
-  (hoy devuelve 503) lo lance como trabajo de la cola.
-  - `config`: datos, variantes, casos, degradaciones, remuestreos y semilla, con los mismos
-    nombres que la CLI.
-  - `on_event(StageEvent)` informa del progreso.
-  - Devuelve la ruta de `estudio.json`.
-  - La firma exacta se publicará en el informe en cuanto exista.
-- `estudio.json` sigue la Interfaz 3. `interval_coverage` y `ece` pasan a estar rellenos.
-- La revisión que devuelve `process` traerá `confidence` calibrada, `confidence_raw` e `interval`.
-  Son campos opcionales que el contrato 0.3 ya tiene. No cambia ningún nombre.
-- Etapas de `StageEvent` nuevas o activadas: `calibrate` y `extract_detector`. Ya están en el grafo
-  de la web.
+- **CLI del estudio, estable:** `python -m bench.estudio --datos --variantes --casos --degradaciones
+  --remuestreos --semilla --salida`. Escribe `<salida>/estudio.json` según la Interfaz 3.
+  - Lectura no renombra ni quita argumentos.
+  - Plataforma lanza el estudio como subproceso desde su trabajo `POST /estudio`. No importa
+    código nuevo de Lectura.
+- **`pipeline.process`, misma firma.**
+  - Lectura solo rellena campos opcionales que el contrato 0.3 ya tiene: `confidence` calibrada,
+    `confidence_raw`, `interval` y `state="abstained"`.
+  - Las pruebas de Plataforma no deben dar por hecho que esos campos vengan vacíos ni rellenos.
+- **Contrato (`model.py`):** nadie lo cambia en esta sesión.
+- **Correcciones humanas (3.8):** Plataforma las exporta a un JSONL con el formato del encargo de
+  Plataforma. Lectura lo leerá más adelante para recalibrar. Ninguno llama al código del otro.
+- **Etapas de `StageEvent`:** `calibrate` y `extract_detector` ya están en el grafo de la web. No se
+  añaden ids nuevos.
 
-**Lo que Lectura necesita de Plataforma:** nada que bloquee. Si la memoria de revisión (3.2) necesita
-una función pública para comprobar la huella de la aprobación, Lectura usará la que exista en
-`revisions.py` o `review.py`. Si no existe, la pedirá por escrito.
+Lectura no necesita nada de Plataforma. Para la memoria de revisión (3.2) usa las funciones que ya
+existen en `revisions.py` y `review.py`. Si faltara alguna, la escribe dentro de sus carpetas y no
+edita las de Plataforma.
 
-## Tareas que quedan libres para Plataforma
+## Tareas de Plataforma en esta sesión
 
-- **H.1 / H.3:** `POST /estudio` como trabajo, usando `bench.estudio.ejecutar`.
-- **3.7 / H.7:** escala con la cola Redis sobre una estrategia que cubra el conjunto, coste por
-  equipo y diagrama.
-- **3.8:** aprendizaje activo. Lectura expondrá cómo recalibrar desde correcciones humanas en
-  `calibration/`, y Plataforma lo conecta desde la API.
-- **4.2:** modo offline `TRAZIA_OFFLINE=1`. La caché de visión ya existe en `vision/cache.py`.
-- CORS de la API para otros puertos locales de la web (3300 y 33xx, según `NECESIDADES.md` del 3D).
-- Selector de revisión de la web para revisiones que no sean A/B.
+El detalle está en su encargo.
 
-## Aviso de solape
+- **H.1 / H.3:** `POST /estudio` como trabajo de la cola, lanzando la CLI del estudio.
+- **4.2:** modo offline con caché de resultados de trabajos en el almacén de la API.
+- **3.7 / H.7:** escala medida en CPU sobre lo que hay en `main`, y diagrama y coste de 400 × 4.
+- **3.8, parte de datos:** registro y exportación de correcciones humanas.
+- **CORS configurable** por variable de entorno.
 
-El 30/10 por la tarde, el agente 3D del frontend tenía trabajo **sin commit** en
-`../TrazIA-3D-web-3d` sobre carpetas de Plataforma:
+## Trabajo del agente 3D en carpetas de Plataforma
 
-- `src/trazia/families/detail.py` (nuevo), `families/__init__.py`, `ifc.py` y `api/app.py`;
-- los IFC públicos de `web/public/demo/ifc/`;
-- `tests/test_pipeline.py`, `tests/test_plataforma_ifc.py` y `tests/test_frontend_detail_ifc.py`.
+El agente 3D hizo commit de su tarea 2.6 (IFC con detalle trazado) en la rama local `feat/web-3d`
+(`6abac69`, sin subir). Esa rama toca `families/detail.py`, `families/__init__.py`, `ifc.py`,
+`api/app.py` (puertos CORS y `details=` en el IFC) y `tests/test_frontend_detail_ifc.py`.
 
-Es su tarea 2.6 (enriquecer el IFC). Antes de editar esos ficheros, Plataforma debe esperar a que se
-fusione o coordinarse con Javier.
+Plataforma crea su worktree **desde `feat/web-3d`** y así parte de esos cambios. Lectura no toca
+ninguno de esos ficheros.
