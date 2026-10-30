@@ -1,135 +1,126 @@
 "use client";
 
-import { BRAND } from "@/lib/brand";
-
 import { Grid, Line } from "@react-three/drei";
+import { useFrame, useThree } from "@react-three/fiber";
 import { Eye, LocateFixed, Pause, Play, SkipForward } from "lucide-react";
 import { useReducedMotion } from "motion/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type Ref } from "react";
 import type { Bounds } from "@/workers/ifc-protocol";
+import { BRAND } from "@/lib/brand";
 import { useSelection } from "@/stores/selection";
-import { useIfcModel, usePreparedModel } from "../viewer3d/model-resource";
+import { CameraLink } from "../viewer3d/camera-link";
+import { useIfcModel, usePreparedModel, type PreparedProduct } from "../viewer3d/model-resource";
 import { ProductMesh } from "../viewer3d/product-mesh";
-import { CameraRig, CameraTools, Legend, LoadingState, SceneCanvas, SceneLabel as Html, Studio, type CameraHandle } from "../viewer3d/stage";
+import { CameraRig, CameraTools, LoadingState, SceneCanvas, SceneLabel, Studio, type CameraHandle } from "../viewer3d/stage";
 import type { RevisionMorphProps } from "../viewer3d/types";
-import { changeSteps, clampProgress, morphState, pairByGlobalId } from "./morph";
+import { AnimatedPair, type TimelineSnapshot } from "./animated-pair";
+import { changeSteps, clampProgress, dimensionText, pairByGlobalId, segmentProgress, SEGMENT_SECONDS, timelineAt, type ChangeStep } from "./morph";
 import styles from "../viewer3d/viewer.module.css";
+import deltaStyles from "./timeline.module.css";
 
-export function RevisionMorph({ fromUrl, toUrl, changes, progress: controlledProgress, onProgress,
-  showNarration = controlledProgress === undefined }: RevisionMorphProps & { showNarration?: boolean }) {
-  const before = useIfcModel(fromUrl), after = useIfcModel(toUrl);
-  const a = usePreparedModel(before.model), b = usePreparedModel(after.model);
-  const [ownProgress, setOwnProgress] = useState(0), [playing, setPlaying] = useState(false);
-  const [follow, setFollow] = useState(false), [ghost, setGhost] = useState(true);
-  const container = useRef<HTMLDivElement>(null), camera = useRef<CameraHandle>(null);
-  const reduced = useReducedMotion(), callback = useRef(onProgress);
-  const selectedId = useSelection(s => s.selectedId);
-  const setSelected = useSelection(s => s.setSelected);
-  const current = useRef(0);
-  const progress = clampProgress(controlledProgress ?? ownProgress);
-  useEffect(() => { current.current = progress; callback.current = onProgress; }, [progress, onProgress]);
-  const setProgress = (value: number) => { setOwnProgress(value); onProgress?.(value); };
-  const pairs = useMemo(() => pairByGlobalId(a, b), [a, b]);
-  const steps = useMemo(() => changeSteps(changes), [changes]);
-  const stepIndex = Math.min(steps.length - 1, Math.floor(progress * steps.length));
-  const step = steps[stepIndex];
-  const bounds = useMemo<Bounds>(() => ({ min: [Math.min(before.model?.bounds.min[0] ?? 0, after.model?.bounds.min[0] ?? 0),
-    0, Math.min(before.model?.bounds.min[2] ?? 0, after.model?.bounds.min[2] ?? 0)],
-    max: [Math.max(before.model?.bounds.max[0] ?? 2, after.model?.bounds.max[0] ?? 2),
-      Math.max(before.model?.bounds.max[1] ?? 8, after.model?.bounds.max[1] ?? 8),
-      Math.max(before.model?.bounds.max[2] ?? 2, after.model?.bounds.max[2] ?? 2)] }), [before.model, after.model]);
-  useEffect(() => {
-    if (!playing || reduced) return;
-    let frame = 0, previous = 0;
-    const animate = (now: number) => {
-      if (!previous) previous = now;
-      const next = Math.min(1, current.current + Math.min(64, now - previous) / 9000);
-      previous = now; current.current = next;
-      setOwnProgress(next); callback.current?.(next);
-      if (next < 1) frame = requestAnimationFrame(animate); else setPlaying(false);
-    };
-    frame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frame);
-  }, [playing, reduced]);
-  useEffect(() => {
-    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const changed = () => {
-      if (preference.matches) { setPlaying(false); setFollow(false); setOwnProgress(1); callback.current?.(1); }
-    };
-    preference.addEventListener("change", changed);
-    return () => preference.removeEventListener("change", changed);
-  }, []);
-  useEffect(() => {
-    if (!follow || !step || reduced) return;
-    const product = b.find(p => p.semanticId === step.elementId) ?? a.find(p => p.semanticId === step.elementId);
-    if (product) camera.current?.fit(product.bounds);
-  }, [follow, step, a, b, reduced]);
-  useEffect(() => {
-    if (!follow || !selectedId || reduced) return;
-    const product = b.find(p => p.semanticId === selectedId) ?? a.find(p => p.semanticId === selectedId);
-    if (product) camera.current?.fit(product.bounds);
-  }, [follow, selectedId, a, b, reduced]);
-  const ready = before.model && after.model;
-  const changedIds = useMemo(() => {
-    const ids = new Set(steps.filter(s => s.geometry).map(s => s.elementId));
-    for (const pair of pairs) {
-      if (!pair.before || !pair.after || pair.before.bounds.min.some((v, i) => Math.abs(v - pair.after!.bounds.min[i]!) > 1e-6) ||
-          pair.before.bounds.max.some((v, i) => Math.abs(v - pair.after!.bounds.max[i]!) > 1e-6)) ids.add((pair.after ?? pair.before)!.semanticId);
-    }
-    return ids;
-  }, [steps, pairs]);
-  const markers = useMemo(() => steps.map(change => ({ change,
-    product: b.find(p => p.semanticId === change.elementId) ?? a.find(p => p.semanticId === change.elementId),
-  })).filter(entry => !!entry.product).sort((left, right) => right.product!.center[1] - left.product!.center[1])
-    .map((entry, index) => ({ ...entry,
-      position: [index % 2 ? bounds.min[0] - .8 : bounds.max[0] + .8, entry.product!.center[1], bounds.max[2] + .6] as [number, number, number],
-    })), [steps, a, b, bounds]);
-  return <div className={styles.frame} ref={container} data-testid="revision-morph" data-phase={ready ? "ready" : "loading"} data-progress={progress.toFixed(3)}>
-    {ready ? <SceneCanvas label="Comparación de IFC sintéticos A y B emparejados por GlobalId">
-      <Studio />
-      <CameraRig bounds={bounds} handle={camera} onUserControl={() => { setPlaying(false); setFollow(false); }} />
-      <Grid position={[0, -.02, 0]} args={[16, 16]} cellSize={.5} sectionSize={2} cellColor={BRAND.surfaceRaised} sectionColor={BRAND.border} fadeDistance={18} />
-      {ghost ? a.map(product => <ProductMesh key={`ghost-${product.globalId}`} product={product} opacity={.12} color={BRAND.skyDeep} wireframe immediate />) : null}
-      {pairs.map(pair => {
-        const state = morphState(pair, progress), changed = changedIds.has((pair.after ?? pair.before)!.semanticId);
-        return <group key={pair.globalId}>
-          {pair.before ? <ProductMesh product={pair.before} position={state.position} scale={state.scale}
-            opacity={state.sourceOpacity} state={changed ? "changed" : "draft"} selected={pair.before.semanticId === selectedId}
-            onSelect={id => setSelected(id)} immediate /> : null}
-          {pair.after ? <ProductMesh product={pair.after} opacity={state.targetOpacity} state={changed ? "changed" : "draft"}
-            selected={pair.after.semanticId === selectedId} onSelect={id => setSelected(id)} immediate /> : null}
-        </group>;
-      })}
-      {markers.map(({ change, product, position }) => <group key={change.id}>
-        <Line points={[product!.center, position]} color={BRAND.revision} dashed dashSize={.07} gapSize={.05} lineWidth={.8} />
-        <Html position={position} center zIndexRange={[8, 0]} style={{ pointerEvents: "none" }}>
-          <div className={styles.delta}>Δ {change.label}</div>
-        </Html>
-      </group>)}
-    </SceneCanvas> : <LoadingState error={before.error ?? after.error} />}
-    <CameraTools handle={camera} container={container} />
+type Playback = { seek(value: number): void; play(): void; pause(): void };
+type Props = RevisionMorphProps & { showNarration?: boolean; playing?: boolean; speed?: number; split?: boolean;
+  onStep?(id: string, index: number): void; onPlayingChange?(value: boolean): void };
+
+function Dimension({ step, product, read, index, count }: { step: ChangeStep; product: PreparedProduct;
+  read(): TimelineSnapshot; index: number; count: number }) {
+  const label = useRef<HTMLSpanElement>(null), group = useRef<import("three").Group>(null);
+  const position = [product.bounds.max[0]+.65,product.center[1],product.bounds.max[2]+.3] as [number,number,number];
+  useFrame(() => {
+    const value=read().value, active=timelineAt(value,count).index===index;
+    if(group.current)group.current.visible=active;
+    if(label.current){label.current.style.display=active?"block":"none";label.current.textContent=dimensionText(step,segmentProgress(value,index,count));}
+  });
+  return <group ref={group}><Line points={[product.center,position]} color={BRAND.revision} dashed dashSize={.07} gapSize={.05} />
+    <SceneLabel position={position} center zIndexRange={[8,0]} style={{pointerEvents:"none"}}>
+      <span ref={label} className={styles.delta}>Δ {step.label}</span>
+    </SceneLabel></group>;
+}
+
+function TimelineScene({ a,b,bounds,steps,progress,playing,speed,ghost,follow,selectedId,playback,camera,onTick,onStep,onStop,onSelect }: {
+  a: PreparedProduct[]; b: PreparedProduct[]; bounds: Bounds; steps: ChangeStep[]; progress?: number; playing: boolean;
+  speed: number; ghost: boolean; follow: boolean; selectedId: string | null; playback: Ref<Playback>;
+  camera: Ref<CameraHandle>; onTick(value:number):void; onStep(index:number):void; onStop():void; onSelect(id:string):void;
+}) {
+  const invalidate = useThree(s=>s.invalidate), reduced = useReducedMotion();
+  const rig = useRef<CameraHandle>(null);
+  const state = useRef<TimelineSnapshot>({value:progress ?? 0,playing,speed});
+  const last = useRef(-1), report = useRef(-1);
+  const read = useCallback(()=>state.current,[]);
+  const pairs = useMemo(()=>pairByGlobalId(a,b),[a,b]);
+  const count = Math.max(1,steps.length);
+  useEffect(()=>{ state.current.speed=speed; },[speed]);
+  useEffect(()=>{ state.current.playing=playing; if(playing)last.current=-1; if(playing && state.current.value>=1) state.current.value=0; invalidate(); },[playing,invalidate]);
+  useEffect(()=>{ if(progress!==undefined){state.current.value=clampProgress(progress);state.current.playing=false;invalidate();} },[progress,invalidate]);
+  useEffect(()=>{ if(follow && selectedId){const p=b.find(p=>p.semanticId===selectedId)??a.find(p=>p.semanticId===selectedId); if(p)rig.current?.fit(p.bounds);} },[follow,selectedId,a,b]);
+  useImperativeHandle(playback,()=>({
+    seek(value){state.current.value=clampProgress(value);state.current.playing=false;invalidate();},
+    play(){if(state.current.value>=1)state.current.value=0;state.current.playing=true;invalidate();},
+    pause(){state.current.playing=false;invalidate();},
+  }),[invalidate]);
+  useImperativeHandle(camera,()=>({view:v=>rig.current?.view(v),fit:v=>rig.current?.fit(v),zoom:v=>rig.current?.zoom(v),capture:()=>rig.current?.capture()}),[]);
+  useFrame((_,delta)=>{
+    const s=state.current;
+    if(reduced){s.value=1;if(s.playing){s.playing=false;onStop();}}
+    else if(s.playing)s.value=Math.min(1,s.value+Math.min(delta,.05)*s.speed/(SEGMENT_SECONDS*count));
+    const {index}=timelineAt(s.value,count);
+    if(index!==last.current){last.current=index;onStep(index);
+      if(follow){const step=steps[index],p=b.find(p=>p.semanticId===step?.elementId)??a.find(p=>p.semanticId===step?.elementId); if(p)rig.current?.fit(p.bounds);}}
+    if(report.current!==s.value){onTick(s.value);report.current=s.value;}
+    if(s.playing){if(s.value>=1){s.playing=false;onStop();}else invalidate();}
+  });
+  const changed=(pair:typeof pairs[number])=>!pair.before||!pair.after||pair.before.bounds.min.some((v,i)=>Math.abs(v-pair.after!.bounds.min[i]!)>1e-6)||pair.before.bounds.max.some((v,i)=>Math.abs(v-pair.after!.bounds.max[i]!)>1e-6)||steps.some(s=>s.geometry&&s.elementId===(pair.after??pair.before)!.semanticId);
+  return <><Studio/><CameraRig bounds={bounds} handle={rig} onUserControl={()=>{state.current.playing=false;onStop();}}/>
+    <Grid position={[0,-.02,0]} args={[16,16]} cellSize={.5} sectionSize={2} cellColor={BRAND.surfaceRaised} sectionColor={BRAND.border} fadeDistance={18}/>
+    {ghost?a.map(p=><ProductMesh key={`ghost-${p.globalId}`} product={p} opacity={.1} color={BRAND.skyDeep} wireframe immediate/>):null}
+    {pairs.map(pair=>{const id=(pair.after??pair.before)!.semanticId;let index=steps.findIndex(s=>s.elementId===id);
+      if(index<0)index=Math.max(0,steps.findIndex(s=>s.elementId==="shell"));
+      return <AnimatedPair key={pair.globalId} pair={pair} index={index} count={count} changed={changed(pair)} selected={selectedId===id} read={read} onSelect={onSelect}/>;})}
+    {steps.map((step,index)=>{const p=b.find(p=>p.semanticId===step.elementId)??a.find(p=>p.semanticId===step.elementId);
+      return p?<Dimension key={step.id} step={step} product={p} read={read} index={index} count={count}/>:null;})}
+  </>;
+}
+
+export function RevisionMorph({fromUrl,toUrl,changes,progress,playing:externalPlaying,speed=1,split=false,onProgress,onStep,onPlayingChange,showNarration=true}:Props){
+  const before=useIfcModel(fromUrl),after=useIfcModel(toUrl),a=usePreparedModel(before.model),b=usePreparedModel(after.model);
+  const [ownPlaying,setOwnPlaying]=useState(false),[follow,setFollow]=useState(true),[ghost,setGhost]=useState(true),[stepIndex,setStepIndex]=useState(0),[ownSpeed,setSpeed]=useState(speed);
+  const playing=externalPlaying??ownPlaying;
+  const root=useRef<HTMLDivElement>(null),camera=useRef<CameraHandle>(null),playback=useRef<Playback>(null),range=useRef<HTMLInputElement>(null),output=useRef<HTMLOutputElement>(null),badge=useRef<HTMLDivElement>(null);
+  const selectedId=useSelection(s=>s.selectedId),setSelected=useSelection(s=>s.setSelected);
+  const steps=useMemo(()=>changeSteps(changes),[changes]); const link=useMemo(()=>new CameraLink(),[]);
+  const bounds=useMemo<Bounds>(()=>({min:[Math.min(before.model?.bounds.min[0]??0,after.model?.bounds.min[0]??0),0,Math.min(before.model?.bounds.min[2]??0,after.model?.bounds.min[2]??0)],
+    max:[Math.max(before.model?.bounds.max[0]??2,after.model?.bounds.max[0]??2),Math.max(before.model?.bounds.max[1]??8,after.model?.bounds.max[1]??8),Math.max(before.model?.bounds.max[2]??2,after.model?.bounds.max[2]??2)]}),[before.model,after.model]);
+  const setPlaying=(v:boolean)=>{setOwnPlaying(v);onPlayingChange?.(v);};
+  const stop=()=>setPlaying(false);
+  const seek=(value:number)=>{stop();playback.current?.seek(value);onProgress?.(value);};
+  const ready=!!before.model&&!!after.model;
+  const tick=(value:number)=>{
+    if(range.current)range.current.value=String(value);if(output.current)output.current.textContent=`${Math.round(value*100)} %`;
+    root.current?.setAttribute("data-progress",value.toFixed(3));
+    if(badge.current)badge.current.textContent=`${value===1?"IFC B exacto":value===0?"IFC A exacto":"Interpolación ilustrativa"} · sintético`;
+  };
+  const step=steps[stepIndex];
+  return <div ref={root} className={styles.frame} data-testid="revision-morph" data-phase={ready?"ready":"loading"} data-progress="0">
+    {ready?split?<div className={deltaStyles.split}>{[a,b].map((products,i)=><div key={i} className={deltaStyles.half}><span className={deltaStyles.revision}>rev {i?"B":"A"} · IFC exacto</span><SceneCanvas label={`IFC ${i?"B":"A"} sintético, cámaras sincronizadas`}><Studio/><CameraRig bounds={bounds} handle={i?null:camera} link={link}/>{products.map(p=><ProductMesh key={p.globalId} product={p} selected={p.semanticId===selectedId} onSelect={id=>setSelected(id)}/>)}</SceneCanvas></div>)}</div>:<SceneCanvas label="Comparación de IFC sintéticos A y B emparejados por GlobalId">
+      <TimelineScene a={a} b={b} bounds={bounds} steps={steps} progress={progress} playing={playing} speed={ownSpeed} ghost={ghost} follow={follow} selectedId={selectedId} playback={playback} camera={camera} onTick={tick}
+        onStep={i=>{setStepIndex(i);const s=steps[i];if(s){onStep?.(s.elementId,i);if(playing)setSelected(s.elementId);}}} onStop={stop} onSelect={id=>{stop();setSelected(id);}}/>
+    </SceneCanvas>:<LoadingState error={before.error??after.error}/>}
+    <CameraTools handle={camera} container={root}/>
     <div className={styles.selectors} role="group" aria-label="Cámara de revisiones">
-      <button className={styles.button} aria-pressed={!follow} onClick={() => { setFollow(false); camera.current?.view("iso"); }}><Eye /> Vista general</button>
-      <button className={styles.button} aria-pressed={follow} onClick={() => setFollow(v => !v)}><LocateFixed /> Seguir el cambio</button>
-      <button className={styles.button} aria-pressed={ghost} onClick={() => setGhost(v => !v)}>Fantasma A</button>
+      <button className={styles.button} aria-pressed={!follow} onClick={()=>{setFollow(false);camera.current?.view("iso");}}><Eye/> Vista general</button>
+      <button className={styles.button} aria-pressed={follow} onClick={()=>setFollow(v=>!v)}><LocateFixed/> Seguir el cambio</button>
+      <button className={styles.button} aria-pressed={ghost} onClick={()=>setGhost(v=>!v)}>Fantasma A</button>
     </div>
-    <div className={styles.badge}>{progress === 1 ? "IFC B exacto" : progress === 0 ? "IFC A exacto" : "Interpolación ilustrativa"} · sintético</div>
-    <label className={styles.scrub}>A<input className={styles.range} type="range" min="0" max="1" step=".001"
-      value={progress} aria-label="Interpolación IFC de A a B" onChange={e => { setPlaying(false); setProgress(Number(e.target.value)); }} />B
-      <output>{Math.round(progress * 100)} %</output>
-    </label>
-    {showNarration ? <div className={styles.narration}>
-      <button className={styles.button} aria-label={playing ? "Pausar morph" : "Reproducir morph"} onClick={() => {
-        if (reduced) { setPlaying(false); setProgress(progress < 1 ? 1 : 0); return; }
-        if (progress >= 1) { current.current = 0; setProgress(0); }
-        setPlaying(v => !v);
-      }}>{playing ? <Pause /> : <Play />}</button>
-      <p><strong>{step ? `Cambio ${stepIndex + 1} de ${steps.length}` : "Revisiones A → B"}</strong>
-        {step?.narration ?? "Arrastra el avance para comparar las dos revisiones IFC."}</p>
-      <button className={styles.button} aria-label="Siguiente cambio" onClick={() => {
-        setPlaying(false); setProgress(steps.length ? Math.min(1, (stepIndex + 1.5) / steps.length) : 1);
-      }}><SkipForward /></button>
-    </div> : <div className={styles.caption}>A: referencia azul · B: mallas IFC exactas al finalizar</div>}
-    <Legend />
+    <div ref={badge} className={styles.badge}>IFC A exacto · sintético</div>
+    {!split?<div className={deltaStyles.transport}>
+      <div className={deltaStyles.marks}>{steps.map((s,i)=><button key={s.id} aria-label={`Ir al cambio ${i+1}: ${s.narration}`} onClick={()=>seek(i/steps.length)} title={s.narration}>{i+1}</button>)}</div>
+      <label className={deltaStyles.scrub}>A<input ref={range} className={styles.range} type="range" min="0" max="1" step=".001" defaultValue={progress??0} aria-label="Interpolación IFC de A a B" disabled={!ready} onInput={e=>seek(Number(e.currentTarget.value))}/>B<output ref={output}>0 %</output></label>
+      {showNarration?<div className={deltaStyles.narration}>
+        <button className={styles.button} disabled={!ready} aria-label={playing?"Pausar morph":"Reproducir morph"} onClick={()=>{if(playing)playback.current?.pause();else playback.current?.play();setPlaying(!playing);}}>{playing?<Pause/>:<Play/>}</button>
+        <p><strong>{step?`Cambio ${stepIndex+1} de ${steps.length}`:"Revisiones A → B"}</strong>{step?.narration??"Arrastra el avance para comparar las dos revisiones IFC."}</p>
+        <label className={deltaStyles.speed}>Velocidad<select aria-label="Velocidad de los cambios" value={ownSpeed} onChange={e=>setSpeed(Number(e.target.value))}>{[.5,1,2].map(v=><option key={v} value={v}>{v.toLocaleString("es-ES")}×</option>)}</select></label>
+        <button className={styles.button} aria-label="Siguiente cambio" onClick={()=>seek(Math.min(1,(stepIndex+1)/Math.max(1,steps.length)))}><SkipForward/></button>
+      </div>:null}
+    </div>:null}
   </div>;
 }

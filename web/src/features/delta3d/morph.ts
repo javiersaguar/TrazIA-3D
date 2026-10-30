@@ -42,7 +42,7 @@ export function morphState(pair: Pair<IfcProduct>, progress: number) {
 
 export type Change = { path: string; operation: string; before: { value: number | string; unit: string } | null;
   after: { value: number | string; unit: string } | null; affects_geometry: boolean; impact: string };
-export type ChangeStep = { id: string; elementId: string; label: string; narration: string; geometry: boolean };
+export type ChangeStep = { id: string; elementId: string; label: string; narration: string; geometry: boolean; fields: Change[] };
 
 function isRecord(value: unknown): value is Record<string, unknown> { return value !== null && typeof value === "object"; }
 
@@ -60,7 +60,7 @@ export function changeSteps(input: unknown): ChangeStep[] {
   }
   const labels: Record<string, string> = { height: "Longitud de virola", skirt_height: "Altura del faldón",
     "attributes.operating_weight": "Peso de operación", head_depth: "Profundidad de fondos", diameter: "Diámetro" };
-  return [...byElement].map(([elementId, changes]) => {
+  return [...byElement].sort(([a], [b]) => a.localeCompare(b)).map(([elementId, changes]) => {
     const added = changes.every(c => c.operation === "added"), removed = changes.every(c => c.operation === "removed");
     const deltas = changes.map(c => {
       if (typeof c.before?.value === "number" && typeof c.after?.value === "number" && c.before.unit === c.after.unit) {
@@ -73,7 +73,39 @@ export function changeSteps(input: unknown): ChangeStep[] {
       label: added ? "Nueva boquilla" : removed ? "Retirado" : [...new Set(deltas)].join(" · "),
       narration: added ? `${elementLabel(elementId)} se incorpora a la revisión B.` : removed ? `${elementLabel(elementId)} se retira en B.` :
         changes.map((c, i) => `${labels[c.path] ?? elementLabel(elementId)}: ${deltas[i]}.`).join(" "),
-      geometry: changes.some(c => c.affects_geometry),
+      geometry: changes.some(c => c.affects_geometry), fields: changes,
     };
   });
+}
+
+/** Un segmento por elemento: cámara 0–18 %, pulso 18–30 %, transformación 30–85 %. */
+export const SEGMENT_SECONDS = 2.6;
+export function timelineAt(progress: number, count: number) {
+  const p = clampProgress(progress), n = Math.max(1, count);
+  const index = Math.min(n - 1, Math.floor(p * n));
+  const phase = p === 1 ? 1 : p * n - index;
+  return { index, phase };
+}
+// Bézier (.65, 0, .35, 1), invertida en X para que el tiempo sea uniforme.
+export function transformEase(value: number) {
+  const x = clampProgress(value); let lo = 0, hi = 1;
+  for (let i = 0; i < 14; i++) {
+    const t = (lo + hi) / 2, u = 1 - t;
+    const bx = 3 * u * u * t * .65 + 3 * u * t * t * .35 + t * t * t;
+    if (bx < x) lo = t; else hi = t;
+  }
+  const t = (lo + hi) / 2; return x === 0 || x === 1 ? x : t * t * (3 - 2 * t);
+}
+export function segmentProgress(progress: number, index: number, count: number) {
+  const local = clampProgress(progress) * Math.max(1, count) - index;
+  return transformEase((local - .3) / .55);
+}
+export function dimensionText(step: ChangeStep, progress: number) {
+  return step.fields.map(f => {
+    if (typeof f.before?.value === "number" && typeof f.after?.value === "number" && f.before.unit === f.after.unit) {
+      const value = lerp(f.before.value, f.after.value, clampProgress(progress));
+      return `${value.toLocaleString("es-ES", { maximumFractionDigits: 1 })} ${f.after.unit}`;
+    }
+    return `${f.before ? progress < .5 ? f.before.value : f.after?.value ?? "—" : f.after?.value ?? "—"} ${f.after?.unit ?? f.before?.unit ?? ""}`;
+  }).join(" · ");
 }

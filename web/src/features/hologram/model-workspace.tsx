@@ -16,7 +16,7 @@ export function ModelWorkspace() {
   const [layout, setLayout] = useState<"side" | "inplace">("side");
   const [kind, setKind] = useState<EquipmentKind>("vertical");
   return <div className="space-y-6" data-testid="model-workspace">
-    <header className="flex flex-wrap items-end justify-between gap-4"><div><h1 className="text-2xl font-semibold">Del plano al modelo</h1>
+    <header className="flex flex-wrap items-end justify-between gap-4"><div><h1 className="text-2xl font-semibold">Modelo 3D</h1>
       <p className="mt-2 max-w-3xl text-sm text-muted">El holograma y el acero comparten la geometría leída del IFC. El barrido explica la transición; no añade piezas al archivo.</p></div>
       <Link className="rounded-lg border border-border px-4 py-2 text-sm text-accent-text" href="/revision">Abrir en Revisión</Link></header>
     <div className="flex flex-wrap items-center justify-between gap-3"><span className="font-mono text-xs text-warning">Datos sintéticos · rev B · IFC DRAFT</span>

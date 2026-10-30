@@ -3,7 +3,7 @@
 import { FileDiff, Fingerprint, GitCompareArrows, Pause, Play, Ruler } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { isTyping } from "@/components/shell/global-keys";
 import { RevisionMorph } from "@/components/three";
 import { Segmented, Tip } from "@/components/ui/controls";
@@ -22,7 +22,7 @@ const ImpactGraph = dynamic(() => import("./impact-graph").then((m) => m.ImpactG
   loading: () => <Skeleton className="h-[420px] w-full" />,
 });
 
-type Mode = "A" | "B" | "delta";
+type Mode = "A" | "B" | "delta" | "split";
 
 const LEAF_LABEL: Record<string, string> = {
   azimuth: "orientación",
@@ -30,7 +30,6 @@ const LEAF_LABEL: Record<string, string> = {
   elevation: "elevación",
   projection: "proyección",
 };
-const STEP_MS = 2600;
 
 export function ChangesWorkspace() {
   const { data: diff } = useChanges();
@@ -39,8 +38,9 @@ export function ChangesWorkspace() {
   const [mode, setMode] = useState<Mode>("delta");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
-  const [progress, setProgress] = useState(1);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [presentation, setPresentation] = useState(false);
+  const [timelineStep, setTimelineStep] = useState(0);
+  const selectedId = useSelection(s => s.selectedId);
 
   const focus = useCallback(
     (g: ChangeGroup) => {
@@ -50,34 +50,11 @@ export function ChangesWorkspace() {
     [setSelected],
   );
 
-  // Reproducción: recorre los cambios por severidad; el avance del morph acompaña al paso.
-  useEffect(() => {
-    if (!playing || !groups.length) return;
-    const index = groups.findIndex((g) => g.id === activeId);
-    const next = groups[index + 1];
-    timer.current = setTimeout(
-      () => {
-        if (!next) {
-          setPlaying(false);
-          setProgress(1);
-          return;
-        }
-        focus(next);
-        setProgress((index + 2) / groups.length);
-      },
-      index < 0 ? 150 : STEP_MS,
-    );
-    return () => {
-      if (timer.current) clearTimeout(timer.current);
-    };
-  }, [playing, activeId, groups, focus]);
-
   const togglePlay = useCallback(() => {
     setMode("delta");
     setPlaying((p) => {
       if (!p) {
         setActiveId(null);
-        setProgress(0);
       }
       return !p;
     });
@@ -93,15 +70,19 @@ export function ChangesWorkspace() {
     return () => window.removeEventListener("keydown", onKey);
   }, [togglePlay]);
 
-  const morphProgress = mode === "A" ? 0 : mode === "B" ? 1 : progress;
-  const active = groups.find((g) => g.id === activeId);
-  const step = active ? groups.indexOf(active) + 1 : 0;
+  const morphProgress = mode === "A" ? 0 : mode === "B" ? 1 : undefined;
+  const active = groups.find((g) => g.id === activeId) ?? groups.find(g => g.elementId === selectedId);
+  const step = playing ? timelineStep + 1 : active ? groups.indexOf(active) + 1 : 0;
+  useEffect(() => {
+    const exit = (event: KeyboardEvent) => { if (event.key === "Escape") setPresentation(false); };
+    window.addEventListener("keydown", exit); return () => window.removeEventListener("keydown", exit);
+  }, []);
 
   return (
-    <div className="space-y-5">
+    <div className={cn("space-y-5", presentation && "fixed inset-0 z-40 overflow-auto bg-bg p-5")}>
       <SyntheticNotice>Las revisiones A y B se generaron para la demo con cambios conocidos.</SyntheticNotice>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className={cn("grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4", presentation && "hidden")}>
         <KpiCard icon={GitCompareArrows} tone="revision" label="Cambios de campos" loading={!diff} value={diff?.summary.changes ?? 0} context={`${groups.length} cambios agrupados por elemento`} />
         <KpiCard icon={Ruler} tone="accent" label="Afectan a la geometría" loading={!diff} value={diff?.summary.geometry_changes ?? 0} context="El IFC rev B conserva los GUID" />
         <KpiCard icon={FileDiff} tone="sky" label="Documentos nuevos" loading={!diff} value={diff?.summary.document_changes ?? 0} context="GA y hoja de datos reemitidos" />
@@ -121,7 +102,7 @@ export function ChangesWorkspace() {
           <ol className="min-h-0 flex-1 space-y-1.5 overflow-y-auto px-3 pb-3">
             {!diff
               ? Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-24 w-full" />)
-              : groups.map((g) => <ChangeItem key={g.id} group={g} active={g.id === activeId} onSelect={() => (setPlaying(false), focus(g))} />)}
+              : groups.map((g) => <ChangeItem key={g.id} group={g} active={g.id === active?.id} onSelect={() => { setPlaying(false); focus(g); }} />)}
           </ol>
         </Panel>
 
@@ -137,12 +118,11 @@ export function ChangesWorkspace() {
               options={[
                 { value: "A", label: "rev A" },
                 { value: "B", label: "rev B" },
-                { value: "delta", label: "Δ", title: "Fantasma de la rev A sobre la rev B" },
+                { value: "delta", label: "Δ", title: "Coreografía por elemento" },
+                { value: "split", label: "A | B", title: "Cámaras sincronizadas" },
               ]}
             />
-            <span className="ml-auto text-xs text-muted">
-              Avance {Math.round(morphProgress * 100)} % · arrastra la barra del visor
-            </span>
+            <button type="button" className="ml-auto rounded-md border border-border px-3 py-1.5 text-xs text-muted" aria-pressed={presentation} onClick={() => setPresentation(v => !v)}>{presentation ? "Salir de presentación" : "Presentación"}</button>
           </div>
           <div className="min-h-0 flex-1 px-2 pb-2">
             <RevisionMorph
@@ -150,12 +130,11 @@ export function ChangesWorkspace() {
               toUrl={DEMO.revisions.B.ifc}
               changes={diff}
               progress={morphProgress}
-              onProgress={(p) => {
-                // Arrastrar el avance en el visor pausa también la reproducción de la pantalla.
-                setPlaying(false);
-                setMode("delta");
-                setProgress(p);
-              }}
+              playing={playing && mode === "delta"}
+              onPlayingChange={setPlaying}
+              split={mode === "split"}
+              onStep={(id, index) => { setTimelineStep(index); const group = groups.find(g => g.elementId === id); if (group && playing) setActiveId(group.id); }}
+
             />
           </div>
 

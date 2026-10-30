@@ -75,7 +75,23 @@ fuentes, scrub al 50 % y movimiento reducido al 100 % con controles desactivados
 agente2-23-procedural/ifc/barrido.png. Integración con portada pendiente del Agente 1;
 ambos componentes funcionan en laboratorios independientes sin providers propios de la app.
 
-## 2.4–2.6
+## 2.4 · Cambios por elemento
+
+Timeline segmentada por elemento, curva Bézier, pulso emisivo naranja, outline de selección,
+fantasma A y anillo de barrido. Las cotas interpolan el delta recibido; añadidos usan el barrido
+físico y retirados emiten partículas rojas de su propia superficie. El final usa las mallas B
+exactas. La interpolación sigue etiquetada como ilustrativa.
+
+Playback en useFrame/refs, sin setState por frame. React se actualiza al entrar en otro segmento.
+Scrub con marcas por cambio, velocidades 0,5/1/2×, seguimiento de selección, A | B con canal de
+cámaras sin renders React y presentación con Escape. Se conservan las firmas públicas.
+
+Comprobado: typecheck, lint y 28 unitarias, incluidas tres pruebas nuevas de segmentos, curva y
+cotas. Chrome: reproducción, Paso 1, dos canvas en A | B, sin errores de página; capturas
+agente2-24-cambios/comparacion.png. La primera pasada de humo detectó título de /modelo y reinicio
+del primer paso; corregidos, pendiente la pasada completa al terminar Revisión.
+
+## 2.5–2.6
 
 Pendientes. Antes de editar families/ o ifc.py se requiere la confirmación de Javier indicada
 en el encargo. No se han modificado esos archivos ni datos de data/private/.

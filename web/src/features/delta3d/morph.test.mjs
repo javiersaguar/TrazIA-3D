@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { changeSteps, clampProgress, interpolateBounds, morphState, pairByGlobalId } from "./morph.ts";
+import { changeSteps, segmentProgress, timelineAt, transformEase, dimensionText, clampProgress, interpolateBounds, morphState, pairByGlobalId } from "./morph.ts";
 import { semanticId } from "../viewer3d/semantic.ts";
 
 const product = (globalId, center, size = [2, 6, 2]) => ({ globalId, center,
@@ -54,5 +54,27 @@ describe("interpolación de revisiones", () => {
       before: { value: 3500, unit: "mm" }, after: { value: 3700, unit: "mm" }, affects_geometry: true }] });
     expect(steps[0]).toMatchObject({ elementId: "nozzle:N3", label: "+200 mm" });
     expect(changeSteps(undefined)).toEqual([]);
+  });
+});
+
+describe("coreografía segmentada", () => {
+  it("transforma solo el elemento de su segmento y permite retroceder", () => {
+    expect(timelineAt(.4, 3).index).toBe(1);
+    expect(segmentProgress(.4, 0, 3)).toBe(1);
+    expect(segmentProgress(.4, 1, 3)).toBe(0);
+    expect(segmentProgress(.4, 2, 3)).toBe(0);
+    expect(timelineAt(1, 3)).toEqual({ index: 2, phase: 1 });
+    expect(segmentProgress(0, 0, 3)).toBe(0);
+    expect(segmentProgress(1, 2, 3)).toBe(1);
+  });
+  it("la curva conserva extremos, simetría y orden temporal", () => {
+    const values=Array.from({length:21},(_,i)=>transformEase(i/20));
+    expect(values[0]).toBe(0);expect(values[20]).toBe(1);
+    expect(transformEase(.5)).toBeCloseTo(.5,3);
+    expect(values.every((v,i)=>i===0||v>=values[i-1])).toBe(true);
+  });
+  it("la cota interpola valores reales del delta, sin inventar medidas", () => {
+    const [step]=changeSteps([{path:"height",operation:"modified",before:{value:8200,unit:"mm"},after:{value:8600,unit:"mm"},affects_geometry:true}]);
+    expect(dimensionText(step,.5).replace(/[.\s]/g,"")).toBe("8400mm");
   });
 });

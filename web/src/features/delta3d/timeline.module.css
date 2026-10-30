@@ -1,0 +1,6 @@
+.transport{position:absolute;bottom:10px;left:12px;right:12px;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface-raised);z-index:4}
+.marks{display:flex;justify-content:space-between;gap:6px;padding:0 38px 6px}.marks button{font:10px var(--font-mono);border-left:1px solid var(--revision);padding-left:5px;color:var(--text-muted)}
+.scrub{display:flex;align-items:center;gap:10px;font:11px var(--font-mono);color:var(--text-muted)}.scrub input{flex:1;width:0}.scrub output{width:42px;text-align:right}
+.narration{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:12px}.narration p{flex:1;color:var(--text-muted)}.narration strong{display:block;color:var(--text)}
+.speed{font-size:10px;color:var(--text-muted)}.speed select{display:block;background:var(--surface);padding:3px;border:1px solid var(--border);border-radius:4px;color:var(--text)}
+.split{display:flex;height:100%;width:100%}.half{position:relative;flex:1;min-width:0}.half+.half{border-left:1px solid var(--border)}.revision{position:absolute;top:68px;left:16px;z-index:3;font:11px var(--font-mono);color:var(--text-muted);pointer-events:none}

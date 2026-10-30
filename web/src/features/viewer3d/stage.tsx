@@ -11,6 +11,7 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { BRAND } from "@/lib/brand";
 import type { Bounds, Vec3 } from "@/workers/ifc-protocol";
 import styles from "./viewer.module.css";
+import type { CameraLink } from "./camera-link";
 
 export type View = "iso" | "front" | "top" | "plan";
 export type CameraHandle = { view(v: View): void; fit(bounds?: Bounds): void; zoom(factor: number): void; capture(): void };
@@ -23,13 +24,27 @@ export function SceneLabel(props: ComponentProps<typeof DreiHtml>) {
   return <DreiHtml {...props} portal={portal as RefObject<HTMLElement> | undefined} />;
 }
 
-export function CameraRig({ bounds, view = "iso", handle, onUserControl, measureKey, onMeasure, interactive = true }: {
+export function CameraRig({ bounds, view = "iso", handle, onUserControl, measureKey, onMeasure, interactive = true, link }: {
   bounds: Bounds; view?: View; handle: Ref<CameraHandle>; onUserControl?(): void;
-  measureKey?: number; onMeasure?(sample: PerformanceSample): void; interactive?: boolean;
+  measureKey?: number; onMeasure?(sample: PerformanceSample): void; interactive?: boolean; link?: CameraLink;
 }) {
   const controls = useRef<CameraControls>(null);
   const { camera, gl, scene, invalidate, size: viewport } = useThree();
   const reduce = useReducedMotion();
+  const channel = useRef(Symbol("camera"));
+  const received = useRef(false);
+  useEffect(() => link?.subscribe(channel.current, pose => {
+    received.current = true;
+    void controls.current?.setLookAt(...pose.eye, ...pose.target, false);
+    void controls.current?.zoomTo(pose.zoom, false); invalidate();
+  }), [link, invalidate]);
+  const publishPose = () => {
+    if (!link) return;
+    if (received.current) { received.current = false; return; }
+    const target = controls.current?.getTarget(new Vector3());
+    if (target) link.publish(channel.current, { eye: camera.position.toArray() as Vec3,
+      target: target.toArray() as Vec3, zoom: (camera as OrthographicCamera).zoom });
+  };
   const sample = useRef({ key: 0, started: 0, previous: 0, deltas: [] as number[] });
   const frame = (box: Box3, eye: Vector3, smooth: boolean) => {
     const center = box.getCenter(new Vector3());
@@ -94,7 +109,7 @@ export function CameraRig({ bounds, view = "iso", handle, onUserControl, measure
   useEffect(() => { if (measureKey) invalidate(); }, [measureKey, invalidate]);
   return <CameraControls ref={controls} enabled={interactive} makeDefault smoothTime={reduce ? 0 : .4} draggingSmoothTime={.1}
     minZoom={5} maxZoom={650} maxPolarAngle={Math.PI * .98} regress
-    onControlStart={() => { controls.current?.stop(); onUserControl?.(); }} />;
+    onUpdate={publishPose} onControlStart={() => { controls.current?.stop(); onUserControl?.(); }} />;
 }
 
 function AdaptiveResolution() {
