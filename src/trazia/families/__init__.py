@@ -19,6 +19,8 @@ class Solid:
     points: tuple = ()
     vertices: list = field(default_factory=list)
     triangles: list = field(default_factory=list)
+    holes: tuple = ()
+    cutouts: tuple = ()
 
 
 @dataclass(frozen=True)
@@ -28,6 +30,8 @@ class Part:
     solids: tuple[Solid, ...]
     ifc_class: str = "IfcBuildingElementProxy"
     object_type: str = "COMPONENT"
+    parent_id: str | None = None
+    properties: dict = field(default_factory=dict)
 
 
 def vector(value: Vector3):

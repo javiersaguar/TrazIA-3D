@@ -145,12 +145,12 @@ test("los cambios se reproducen paso a paso", async ({ page }) => {
 });
 
 
-test("el laboratorio 3D sigue leyendo los siete productos del IFC", async ({ page }) => {
+test("el laboratorio 3D sigue leyendo los productos enriquecidos del IFC", async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto("/lab/3d");
   await expect(page.getByRole("heading", { level: 1, name: "Laboratorio 3D / TrazIA" })).toBeVisible();
   await expect(page.locator('[data-testid="ifc-viewer"]').first()).toHaveAttribute("data-phase", "ready", { timeout: 30_000 });
-  await expect(page.locator('[data-testid="ifc-viewer"]').first()).toHaveAttribute("data-products", "7");
+  await expect(page.locator('[data-testid="ifc-viewer"]').first()).toHaveAttribute("data-products", "73");
   expect(errors, errors.join("\n")).toEqual([]);
 });
 

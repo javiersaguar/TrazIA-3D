@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { changeSteps, segmentProgress, timelineAt, transformEase, dimensionText, clampProgress, interpolateBounds, morphState, pairByGlobalId } from "./morph.ts";
-import { semanticId } from "../viewer3d/semantic.ts";
+import { semanticId, parentElementId, elementLabel } from "../viewer3d/semantic.ts";
 
 const product = (globalId, center, size = [2, 6, 2]) => ({ globalId, center,
   bounds: { min: center.map((v, i) => v - size[i] / 2), max: center.map((v, i) => v + size[i] / 2) } });
@@ -77,4 +77,12 @@ describe("coreografía segmentada", () => {
     const [step]=changeSteps([{path:"height",operation:"modified",before:{value:8200,unit:"mm"},after:{value:8600,unit:"mm"},affects_geometry:true}]);
     expect(dimensionText(step,.5).replace(/[.\s]/g,"")).toBe("8400mm");
   });
+});
+
+describe("detalle IFC con procedencia",()=>{
+ it("conserva identidad de la brida y conecta sus campos a la boquilla",()=>{
+   const id=semanticId("V-101/nozzle-N3/flange","IfcBuildingElementProxy",{TrazIA_Identity:{ComponentId:"nozzle-N3/flange",ParentComponentId:"N3"}});
+   expect(id).toBe("detail:nozzle:N3/nozzle-N3/flange");
+   expect(parentElementId(id)).toBe("nozzle:N3");expect(elementLabel(id)).toContain("Brida");
+ });
 });

@@ -129,7 +129,7 @@ def create_app(
         allow_origins=[
             f"http://{host}:{port}"
             for host in ("localhost", "127.0.0.1")
-            for port in (3000, 3100, 3200)
+            for port in (3000, 3100, 3200, 3300, 3310, 3311)
         ],
         allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
         allow_headers=["Content-Type", "Idempotency-Key", "If-Match", "Last-Event-ID"],
@@ -357,7 +357,11 @@ def create_app(
             row = get_revision(session, identity)
             model = Revision.model_validate_json(row.payload)
         try:
-            content = build_ifc(model, draft=draft, schema=schema).to_string().encode()
+            content = (
+                build_ifc(model, draft=draft, schema=schema, details=model.dataset == "synthetic")
+                .to_string()
+                .encode()
+            )
         except ValueError as error:
             raise HTTPException(409, str(error)) from error
         filename = quote(f"{model.equipment.tag.value}_{model.revision}", safe="")
