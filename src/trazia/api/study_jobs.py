@@ -15,13 +15,31 @@ from trazia.store import EventRecord, JobRecord, Store
 
 
 async def start_study(config_path: Path, output: Path):
-    return await asyncio.create_subprocess_exec(
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    command = [
         sys.executable,
         "-u",
         "-m",
-        "trazia.api.study_worker",
-        str(config_path),
-        str(output),
+        "bench.estudio",
+        "--datos",
+        config["datos"],
+        "--conjuntos",
+        *config["conjuntos"],
+        "--variantes",
+        *config["variantes"],
+        "--remuestreos",
+        str(config["remuestreos"]),
+        "--semilla",
+        str(config["semilla"]),
+        "--salida",
+        str(output.parent),
+    ]
+    if config["casos"] is not None:
+        command.extend(["--casos", str(config["casos"])])
+    if config["degradaciones"]:
+        command.extend(["--degradaciones", *config["degradaciones"]])
+    return await asyncio.create_subprocess_exec(
+        *command,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.STDOUT,
         env={**os.environ, "PYTHONIOENCODING": "utf-8"},
@@ -86,8 +104,13 @@ async def run_study_job(store: Store, job_id: str):
                 emit(store, job_id, "estudio", "ok", "", text[:4000])
             code = await process.wait()
             if code:
-                raise ValueError(tail.strip() or f"El estudio terminó con código {code}")
-            result = json.loads(output.read_text(encoding="utf-8"))
+                raise ValueError(f"El estudio terminó con código {code}: {tail.strip()}")
+            if not output.is_file():
+                raise ValueError("El estudio terminó sin producir estudio.json")
+            try:
+                result = json.loads(output.read_text(encoding="utf-8"))
+            except ValueError as failure:
+                raise ValueError("El estudio produjo un JSON inválido") from failure
             if not result.get("variants"):
                 raise ValueError("El estudio no contiene variantes medidas")
             # El blob puede existir sin publicarse si se cancela justo al finalizar.
@@ -105,7 +128,10 @@ async def run_study_job(store: Store, job_id: str):
     finally:
         # Terminar antes de borrar sus temporales, también en Windows.
         if process is not None and process.returncode is None:
-            process.kill()
+            try:
+                process.kill()
+            except ProcessLookupError:
+                pass
             await process.wait()
         temporary.cleanup()
         with Session(store.engine) as session:

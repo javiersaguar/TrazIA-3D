@@ -344,3 +344,15 @@ La ruta de conjuntos sintéticos la fija `TRAZIA_STUDY_DATA`, nunca el cliente.
 `GET /learning/corrections?after=0&limit=100` no entrena ni recalibra.
 Con `TRAZIA_OFFLINE=1`, visión y copiloto usan sus cachés; una consulta sin caché devuelve
 un error recuperable. Los tipos OpenAPI de la web reflejan el contrato actualizado.
+
+
+## Estudio mediante CLI estable · sesión Plataforma 30/10
+
+El trabajo lanza `python -u -m bench.estudio` como subproceso con los argumentos estables
+`--datos`, `--conjuntos`, `--variantes`, `--casos`, `--degradaciones`, `--remuestreos`,
+`--semilla` y `--salida`. No importa funciones internas de `bench`. El directorio de
+salida pertenece al trabajo; el JSON se guarda en el almacén SHA-256 al terminar.
+Se conservan SSE de inicio/salida resumida/fin, timeout, cancelación del proceso e
+idempotencia. Un proceso que termine sin `estudio.json` deja un error explícito; no
+publica resultados ni sustituye el estado vacío. Prueba real: un caso, variante B,
+vectorial, 20 remuestreos.

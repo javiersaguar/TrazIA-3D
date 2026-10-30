@@ -33,7 +33,7 @@ def client(tmp_path, synthetic_data, monkeypatch):
 def submit(client, key=None, **overrides):
     return client.post(
         "/estudio",
-        json={"casos": 1, "remuestreos": 10, "degradaciones": ["vectorial"], **overrides},
+        json={"casos": 1, "remuestreos": 20, "degradaciones": ["vectorial"], **overrides},
         headers={"Idempotency-Key": key or str(uuid4())},
     )
 
@@ -117,7 +117,7 @@ def test_input_rejection_and_failure_are_explicit(client, synthetic_data, monkey
     assert submit(client, conjuntos=["s-reservado"]).status_code == 422
     identity = submit(client, variantes=["no_existe"]).json()["job_id"]
     result = finished(client, identity)
-    assert result["status"] == "error" and "desconocidas" in result["error"]
+    assert result["status"] == "error" and "variantes medidas" in result["error"]
     assert result["result_sha256"] is None
     assert client.get("/estudio?job_id=no-existe").status_code == 404
     root = client.app.state.store.root / "non-synthetic"
@@ -125,3 +125,48 @@ def test_input_rejection_and_failure_are_explicit(client, synthetic_data, monkey
     (root / "s-dev/manifest.json").write_text(json.dumps({"synthetic": False}))
     monkeypatch.setenv("TRAZIA_STUDY_DATA", str(root))
     assert submit(client).status_code == 422
+
+
+def test_study_uses_stable_cli_arguments_without_shell(tmp_path, monkeypatch):
+    config = {
+        "datos": str(tmp_path / "datos con espacios"),
+        "conjuntos": ["s-dev"],
+        "variantes": ["b_reglas"],
+        "remuestreos": 20,
+        "semilla": 2026,
+        "casos": 1,
+        "degradaciones": ["vectorial"],
+    }
+    path = tmp_path / "config.json"
+    path.write_text(json.dumps(config), encoding="utf-8")
+    calls = []
+
+    async def spawn(*args, **kwargs):
+        calls.append((args, kwargs))
+
+    monkeypatch.setattr(study_jobs.asyncio, "create_subprocess_exec", spawn)
+    asyncio.run(study_jobs.start_study(path, tmp_path / "estudio.json"))
+    command, options = calls[0]
+    assert command[:4] == (sys.executable, "-u", "-m", "bench.estudio")
+    assert command[command.index("--datos") + 1] == config["datos"]
+    for name, value in (("casos", "1"), ("remuestreos", "20"), ("semilla", "2026")):
+        assert command[command.index("--" + name) + 1] == value
+    assert command[command.index("--salida") + 1] == str(tmp_path)
+    assert not options.get("shell")
+
+
+def test_success_without_report_is_an_explicit_error(client, monkeypatch):
+    async def empty_process(_config, _output):
+        return await asyncio.create_subprocess_exec(
+            sys.executable,
+            "-c",
+            "print('sin resultados')",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,
+        )
+
+    monkeypatch.setattr(study_jobs, "start_study", empty_process)
+    identity = submit(client).json()["job_id"]
+    result = finished(client, identity)
+    assert result["status"] == "error" and "sin producir estudio.json" in result["error"]
+    assert client.get("/estudio").json()["status"] == "empty"

@@ -395,3 +395,24 @@ recalibración y uso few-shot esperan la interfaz pública de Lectura y siguen a
 
 [Informe, reproducción, límites y evidencia](../BACKEND_2026-10-30.md). El ROADMAP marca
 H.1/H.3/4.2 con sus comprobaciones y mantiene 3.7/H.7 y 3.8 parciales.
+
+
+## Sesión 30/10 · backend independiente y publicación de feat/plataforma
+
+Encargo actual: cinco tareas, sin editar Lectura, web ni el contrato model.py.
+Se reutiliza el worktree ya existente, se fusiona main `a75e8ef` y se instala con
+`uv sync --frozen --extra dev --extra api --extra geo`. Base verde: Ruff y
+239 pruebas Python correctas, una omitida, 166,42 s. La omisión corresponde al extra
+OCR opcional no incluido en la instalación requerida. No se usa la GPU.
+
+### 1 · H.1/H.3: CLI estable del estudio
+
+Sustituido el adaptador que importaba run_study por la invocación de la CLI estable
+como subproceso. Se mantienen cola, idempotencia, leases, SSE, timeout, cancelación
+y resultado por SHA-256. Se elimina study_worker.py. Las pruebas comprueban el
+argv sin shell, un estudio real de un caso y 20 remuestreos, ausencia de informe,
+error, timeout, cancelación, persistencia y replay. No cambia ninguna interfaz de
+Lectura ni se esperan funciones nuevas suyas.
+
+Cierre tarea 1: Ruff check y format globales correctos; 241 pruebas correctas y una
+omitida en 251,74 s. Seis pruebas específicas del estudio correctas.
