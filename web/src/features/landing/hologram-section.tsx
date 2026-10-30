@@ -66,14 +66,8 @@ export function HologramSection() {
           </div>
 
           <div className="relative h-[min(62vh,560px)] overflow-hidden rounded-[16px] border border-border bg-surface-sunken">
+            {/* El aviso «Ilustrativo» y el avance ya los pinta HologramToReal (arriba y abajo) */}
             <HologramToReal source="procedural" layout="side" progress={p} callouts className="h-full w-full" />
-            <div className="pointer-events-none absolute inset-x-4 bottom-4 flex items-center gap-3 font-mono text-[11px] text-faint">
-              <span>Ilustrativo, no procede del IFC</span>
-              <span className="ml-auto tabular-nums text-muted">{Math.round(p * 100)} %</span>
-              <span className="h-1 w-24 overflow-hidden rounded-full bg-border">
-                <span className="block h-full origin-left bg-accent" style={{ transform: `scaleX(${p})` }} />
-              </span>
-            </div>
           </div>
         </div>
       </div>

@@ -82,7 +82,7 @@ const rev = { stroke: REV, strokeWidth: 1.35, fill: "none", vectorEffect: "non-s
 function Elevation({ revB }: { revB: boolean }) {
   const hatch = Array.from({ length: 13 }, (_, i) => `M${90 + i * 10} 455 l-7 8`).join(" ");
   return (
-    <svg viewBox="0 0 420 480" className="block h-full w-auto overflow-visible" role="img" aria-label="Alzado del recipiente V-101, revisión B">
+    <svg viewBox="0 0 420 480" className="block h-full w-auto max-w-full overflow-visible" role="img" aria-label="Alzado del recipiente V-101, revisión B">
       {/* Eje */}
       <DrawPath d="M150 14 V472" {...thin} strokeDasharray="14 3 2 3" delay={0.5} duration={0.8} />
 
@@ -212,8 +212,8 @@ function TitleBlock() {
   return (
     <dl className="grid grid-cols-3 border-l border-border-strong font-mono text-[10.5px]">
       {cells.map(([k, v, span]) => (
-        <div key={k} className={cn("border-t border-r border-border-strong px-2 py-1.5", span)}>
-          <dt className="text-[9px] text-faint">{k}</dt>
+        <div key={k} className={cn("min-w-0 border-t border-r border-border-strong px-2 py-1.5", span)}>
+          <dt className="truncate text-[9px] text-faint">{k}</dt>
           <dd className="truncate text-text">{v}</dd>
         </div>
       ))}
@@ -276,20 +276,23 @@ export function DrawingSheet({ play, className }: { play: boolean; className?: s
       <ZoneMarks />
 
       <div className="relative flex min-h-0 flex-1 items-stretch px-7 pt-8 pb-3">
-        <div className="relative z-[1] h-full min-h-0 shrink-0">{play ? <Elevation revB={revB} /> : null}</div>
+        {/* En móvil el alzado no puede llevarse todo el ancho: el recipiente 3D necesita su hueco */}
+        <div className="relative z-[1] h-full min-h-0 max-w-[58%] shrink-0 sm:max-w-none">{play ? <Elevation revB={revB} /> : null}</div>
         <div className="relative -ml-[14%] min-w-0 flex-1">
           {play ? (
             <motion.div className="absolute inset-0" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.9, delay: reduced ? 0 : 2.3, ease: EASE_OUT }}>
-              <ShowcaseVessel kind="vertical" mode="particles" interactive hud={false} className="h-full w-full !bg-transparent" />
+              {/* Sin `kind`: empieza en el vertical y el clic cambia de familia, como promete la pista */}
+              <ShowcaseVessel mode="particles" interactive hud={false} className="h-full w-full !bg-transparent" />
             </motion.div>
           ) : null}
-          <p className="pointer-events-none absolute top-1 right-1 font-mono text-[10px] text-faint">Ilustrativo, no procede del IFC</p>
-          <p className="pointer-events-none absolute right-1 bottom-1 hidden font-mono text-[10px] text-faint sm:block">Arrastra para girar. Clic para cambiar de equipo.</p>
+          {/* El aviso «Ilustrativo» lo pone el propio ShowcaseVessel abajo; la pista va arriba para no pisarlo */}
+          <p className="pointer-events-none absolute top-1 right-1 hidden font-mono text-[10px] text-faint sm:block">Arrastra para girar. Clic para cambiar de equipo.</p>
         </div>
       </div>
 
-      <figcaption className="relative mx-3 mb-3 grid grid-cols-1 border-b border-border-strong bg-surface-sunken/80 sm:grid-cols-[1.1fr_1fr]">
-        <div className="border-l border-border-strong sm:border-l">
+      {/* Tabla y cajetín lado a lado solo cuando la lámina es ancha; en tableta van uno sobre otro */}
+      <figcaption className="relative mx-3 mb-3 grid grid-cols-1 border-b border-border-strong bg-surface-sunken/80 xl:grid-cols-[1.1fr_1fr]">
+        <div className="border-l border-border-strong">
           <RevisionTable revB={revB} />
         </div>
         <TitleBlock />
