@@ -405,7 +405,7 @@ agente de Fase 2; no se editan las estrategias ni sus carpetas.
 - [x] **3.5 (Plataforma)** Pantalla **Estudio** en la web (DEC-28) y conexión de la pantalla Bench al estudio. *Hecho:* misma fuente/query, variante y rúbrica con IC; bench v1 separado, errores/vacío explícitos y pruebas en ambos transportes.
 - [x] **3.6 (Plataforma)** **Copiloto con modelo local**, herramientas de solo lectura y citas (DEC-26). *Verificado:* Ollama local, evidencia por hash, sin herramientas de escritura y pruebas de citas/concurrencia.
 - [ ] **3.7 (Plataforma)** Escala: perfil Redis + workers, lote de todo el conjunto, coste y tiempo medidos por equipo (DEC-23, 25). *Parcial:* corpus completo de 336 revisiones medido con 1/4 workers, 221,4/65,4 s; 20 done y 316 errores en ambos. Coste desconocido conservado como null. Falta cubrir el conjunto y medir el coste tras Fase 2. [Resultados](FASE3.md#37--medición-real-de-la-cola-parcial).
-- [ ] **3.8 (E)** Aprendizaje activo: las correcciones recalibran y se usan como few-shot (DEC-27).
+- [ ] **3.8 (E)** Aprendizaje activo: las correcciones recalibran y se usan como few-shot (DEC-27). *Avance 30/10:* exportación trazada de correcciones vigentes y aprobadas; pendiente la interfaz de recalibración/few-shot de Lectura. [Detalle](BACKEND_2026-10-30.md).
 - [x] **3.9 (I)** Vista Cambios con morph 3D por GUID, fantasma rev1, marcadores Δ y grafo de impacto.
 - [x] **3.10 (I)** Momento firma «del plano al modelo» (`/lab/firma`).
 - [ ] **3.11 (J)** Guion de 6 min v1 + `.pptx` v0 con la diapositiva «Elegimos con datos».
@@ -413,7 +413,7 @@ agente de Fase 2; no se editan las estrategias ni sus carpetas.
 ### Fase 4 · Endurecer (22 – 24 nov)
 
 - [ ] **4.1** Congelar alcance el 22/11 a las 20:00: solo bugs, rendimiento y pulido.
-- [ ] **4.2** **Modo offline:** `TRAZIA_OFFLINE=1` sirve resultados de modelos cacheados por hash. Si cae la red el viernes, la demo funciona igual.
+- [x] **4.2** **Modo offline:** `TRAZIA_OFFLINE=1` sirve resultados de modelos cacheados por hash. Si cae la red el viernes, la demo funciona igual. *Implementado 30/10:* caché de visión y copiloto, invalidación y errores recuperables; requiere preparar los cachés antes del ensayo. [Alcance y pruebas](BACKEND_2026-10-30.md).
 - [ ] **4.3** Dos ensayos cronometrados del pitch (6:00 exactos) con alguien externo haciendo de jurado de TR.
 - [ ] **4.4** `PREVIOUS_WORK.md` redactado; tag preparado.
 - [ ] **4.5** Instalación en limpio en **los 4 portátiles** (Windows y Linux) siguiendo solo el README, incluidos los modelos locales descargados de antemano.
@@ -701,7 +701,7 @@ Es nuestra arma principal: **llegamos al jurado con su propia rúbrica ya medida
 
 ### H. Backend, API y escalado (10 %)
 
-- [ ] **H.1 Endpoints:**
+- [x] **H.1 Endpoints:**
   - `POST /documents` (multipart, cabecera `Idempotency-Key`, dedupe por SHA-256)
   - `POST /equipment/{tag}/jobs` → `job_id`; `GET /jobs/{id}/events` (SSE: etapa, progreso, logs)
   - `GET /equipment`, `GET /equipment/{tag}/revisions/{rev}`
@@ -711,11 +711,13 @@ Es nuestra arma principal: **llegamos al jurado con su propia rúbrica ya medida
   - `GET /diff?from=&to=`, `GET /diff/bcf`, `GET /bench`, `GET /plant`
   - `POST /estudio` (lanza el estudio como trabajo) y `GET /estudio` (resultados para la pantalla Estudio)
   - `POST /copiloto` (preguntas con herramientas de solo lectura y citas, DEC-26)
+  - *Cierre 30/10:* estudio en cola real, resultados por SHA-256 y API documentada; [pruebas y límites](BACKEND_2026-10-30.md).
 - [x] **H.2 Idempotency keys** en todo POST con efecto (subida, jobs, aprobación): repetir la petición
   devuelve el mismo resultado, sin duplicar. Clave guardada 24 h con hash del cuerpo. *Verificado 28/10:* Caducidad de 24 h, huella del cuerpo y respuesta/efecto transaccionales; `Store.perform` y `test_api_base.py`.
-- [ ] **H.3 Trabajos asíncronos** (DEC-23): interfaz de cola con **dos implementaciones**, en
+- [x] **H.3 Trabajos asíncronos** (DEC-23): interfaz de cola con **dos implementaciones**, en
   proceso (por defecto) y Redis con `arq` y workers (perfil `escala`); reintentos con backoff para los
   modelos, timeouts y cancelación. El estudio comparativo también se lanza como trabajo.
+  *Verificado 30/10:* proceso y Redis/arq/Postgres, SSE, idempotencia, timeout, cancelación y persistencia; [evidencias](BACKEND_2026-10-30.md).
 - [x] **H.4 Persistencia:** SQLModel sobre SQLite (local) con migraciones Alembic; Postgres en
   `docker-compose.prod.yml` para el discurso de escala. Almacén de archivos direccionado por contenido. *Verificado 28/10:* SQLite/SQLModel/Alembic y Postgres con almacén SHA; pruebas API y los tres perfiles de Compose documentados en FASE1.md.
 - [x] **H.5 Observabilidad:** logs estructurados (JSON), traza por job, métricas de coste y latencia. *Verificado 28/10:* Eventos estructurados por trabajo y RunInfo con tiempos, intentos, llamadas y coste; `api/jobs.py` y `test_api_queue.py`. Coste desconocido no se convierte en cero.

@@ -1,0 +1,13 @@
+{
+  "job_id": "d292dcae-889f-42da-87d7-35564f1fc223",
+  "result_sha256": "8ffbe052ff18a92d4aa4f515f1840906982a812b7dcb85409f9f83edae613191",
+  "seconds": 6.134391356999998,
+  "idempotency": true,
+  "sse": true,
+  "cancelled": true,
+  "timeout": true,
+  "offline": true,
+  "queue": "Redis/arq",
+  "database": "Postgres",
+  "restart_persistence": true
+}

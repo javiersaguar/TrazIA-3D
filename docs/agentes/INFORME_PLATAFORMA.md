@@ -378,3 +378,20 @@ CI añade job web, sin eliminar pasos Python existentes. Evidencia y reproducci�
 [FASE3.md](../FASE3.md), con JSON de métricas por equipo/condición bajo docs/evidencias/fase3.
 No hay nuevas dependencias ni cambios de contrato con Lectura. Commit y push autorizados por
 el encargo actual, a feat/plataforma; no se fusiona su trabajo sin terminar ni se hace push forzado.
+
+
+## Sesión 30/10/2026 · estudio en cola, offline y correcciones
+
+Trabajo en el worktree `TrazIA-3D-plataforma`, rama `feat/plataforma`, desde el frontend
+integrado de `feat/web-3d`. Se respeta SESION_LECTURA.md; no se modifican sus carpetas
+ni se ocupa la GPU. Sin push, PR, cambios en main o datos privados.
+
+H.1/H.3: POST /estudio usa la cola común con subproceso cancelable y resultados por SHA-256.
+La prueba Redis/arq/Postgres real acredita idempotencia, SSE, timeout, cancelación y
+persistencia tras reinicio: 6,134 s para un equipo sintético y dos revisiones vectoriales.
+4.2: modo offline de visión y caché del copiloto, invalidada por datos/modelo/código y
+con originales comprobados de nuevo. 3.8: exportación de correcciones aprobadas; la
+recalibración y uso few-shot esperan la interfaz pública de Lectura y siguen abiertos.
+
+[Informe, reproducción, límites y evidencia](../BACKEND_2026-10-30.md). El ROADMAP marca
+H.1/H.3/4.2 con sus comprobaciones y mantiene 3.7/H.7 y 3.8 parciales.

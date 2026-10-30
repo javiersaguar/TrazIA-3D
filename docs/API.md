@@ -34,12 +34,14 @@ Las credenciales se configuran por entorno y no se guardan en Git.
 | GET /diff?from=A&to=B | Diferencias actuales de campos/evidencia/documentos |
 | GET /bench?extractor=etiquetas | Informe sintético existente, sin inventar mediciones |
 | GET /plant | Equipos; layout=null hasta disponer de posición real |
-| GET /estudio | Archivo de Lectura o estado vacío explícito |
+| GET /estudio | Último trabajo terminado, informe de Lectura o estado vacío explícito |
+| POST /estudio | StudyInput, Idempotency-Key, trabajo asíncrono 202 |
+| GET /learning/corrections | Correcciones sintéticas vigentes y aprobadas, con cursor |
 
 El id completo de revisión es `proyecto:equipo:revisión`; A/B son alias de la demo V-101.
 BCF y exportación multiesquema están implementados (ver secciones posteriores).
-POST /copiloto usa Ollama local y herramientas de lectura. POST /estudio sigue respondiendo
-503: el arnés se ejecuta por CLI; no se simula un lanzamiento asíncrono desde esta ruta.
+POST /copiloto usa Ollama local y herramientas de lectura, o una respuesta cacheada.
+POST /estudio ejecuta el arnés mediante la cola común y publica el resultado por trabajo.
 
 ## Concurrencia e idempotencia
 
@@ -331,3 +333,14 @@ y se eliminan con sus contenedores al terminar. Se conserva el estado terminal d
 El informe separa tiempos observados, costes no informados y extrapolación a 400×4. No supone
 que un trabajo fallido haya producido un IFC, ni que un IFC estructuralmente válido coincida
 con el plano. Resultados y límites de la primera medición: [FASE3.md](FASE3.md).
+
+
+## Estudio, modo offline y correcciones · 30/10/2026
+
+[Contrato, ejemplos, arquitectura y verificación](BACKEND_2026-10-30.md).
+`POST /estudio` exige un cuerpo StudyInput y `Idempotency-Key`. Devuelve 202 con `job_id`;
+se consulta y cancela mediante `/jobs/{id}`. `GET /estudio?job_id=…` selecciona su resultado.
+La ruta de conjuntos sintéticos la fija `TRAZIA_STUDY_DATA`, nunca el cliente.
+`GET /learning/corrections?after=0&limit=100` no entrena ni recalibra.
+Con `TRAZIA_OFFLINE=1`, visión y copiloto usan sus cachés; una consulta sin caché devuelve
+un error recuperable. Los tipos OpenAPI de la web reflejan el contrato actualizado.
