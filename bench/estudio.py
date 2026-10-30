@@ -590,13 +590,21 @@ def _calibration_info() -> dict | None:
 
 
 def _recommend(variants_out, results, by_id, scored) -> dict:
+    """Selector por tipo de documento (tarea 3.4): la regla se fija solo con S-dev y se mide en
+    S-reservado frente a la mejor variante única, para que la elección no vea los datos con los
+    que se juzga. Si no se midió S-dev, se elige con lo que haya."""
     candidates = [e for e in variants_out if not by_id[e["id"]].ablation_of]
-    out, notes = {}, []
+    has_dev = any(c.dataset == "S-dev" for cs in results.values() for c in cs)
+
+    def choice_cases(vid):
+        cases = scored(results[vid])
+        return [c for c in cases if c.dataset == "S-dev"] if has_dev else cases
+
+    out, notes, rule = {}, [], {}
     for label, wanted in (("vectorial", ("vectorial",)), ("escaneado", SCANS)):
         scores = []
         for e in candidates:
-            cases = [c for c in scored(results[e["id"]]) if c.degradation in wanted]
-            m = metrics(cases)
+            m = metrics([c for c in choice_cases(e["id"]) if c.degradation in wanted])
             if m:
                 scores.append((eligible(m), m["score"], e["id"], m))
         if not scores:
@@ -605,14 +613,38 @@ def _recommend(variants_out, results, by_id, scored) -> dict:
         scores.sort(key=lambda s: (s[0], s[1]), reverse=True)
         ok, score, winner, m = scores[0]
         out[label] = winner
+        for degradation in wanted:
+            rule[degradation] = winner
         notes.append(
             f"{label}: {winner} (puntuación {_num(score)}, geometría {_pct(m['geometry'])}, "
             f"atributos {_pct(m['attributes'])})" + ("" if ok else " — no cumple las restricciones")
         )
     out["rationale"] = (
         "Elegida por mayor Puntuación GA2MODEL entre las variantes que cumplen alucinación < 1 % "
-        "y cita = 100 %, sobre S-dev y S-reservado (sintéticos). " + "; ".join(notes) + "."
+        f"y cita = 100 %, sobre {'S-dev' if has_dev else 'los conjuntos medidos'} (sintético). "
+        + "; ".join(notes)
+        + "."
     )
+    held = [c for cs in results.values() for c in cs if c.dataset == "S-reservado"]
+    if has_dev and held and rule:
+        by_key = {vid: {c.key: c for c in results[vid]} for vid in results}
+        keys = sorted({c.key for c in held if c.degradation in rule})
+        chosen = [by_key[rule[k[1]]][k] for k in keys if k in by_key[rule[k[1]]]]
+        selector = metrics(chosen)
+        singles = sorted(
+            (
+                (m["score"], e["id"])
+                for e in candidates
+                if (m := metrics([by_key[e["id"]][k] for k in keys if k in by_key[e["id"]]]))
+            ),
+            reverse=True,
+        )
+        out["selector"] = {
+            "fixed_on": "S-dev",
+            "rule": rule,
+            "s_reservado": _public(selector),
+            "best_single": {"id": singles[0][1], "score": singles[0][0]} if singles else None,
+        }
     return out
 
 

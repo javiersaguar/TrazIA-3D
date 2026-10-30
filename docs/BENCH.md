@@ -183,11 +183,11 @@ Resultado en **S-reservado** (sintético, no visto en el ajuste):
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | B | 456 | 91,7 % | 0,191 | **0,035** | **100 %** | 85,5 % · 0,0 % |
 | C | 954 | 77,8 % | 0,023 | 0,210 | 77,0 % | 24,3 % · 0,0 % |
-| D | 1.963 | 76,7 % | 0,127 | 0,270 | **94,0 %** | 59,9 % · 10,9 % |
+| D | 1.991 | 77,0 % | 0,126 | 0,270 | **94,1 %** | 58,4 % · 10,2 % |
 
 - **Objetivo del ROADMAP (ECE < 0,05 y cobertura ≥ 90 %):** B lo cumple. D cumple la cobertura,
   pero no la ECE. C no cumple ninguno de los dos.
-- **En S-dev** el ajuste sí cumple: la ECE de D baja de 0,048 a 0,006 y la cobertura es del 97,6 %.
+- **En S-dev** el ajuste sí cumple: la ECE de D baja de 0,047 a 0,008 y la cobertura es del 97,7 %.
   El fallo en S-reservado es un cambio de reparto que S-dev no puede enseñar:
   - En S-dev, B lee las tablas de los seis proveedores. La geometría solo rellena 37 campos
     vectoriales sueltos y casi todos son errores (boquillas trampa). La curva aprende que
@@ -199,9 +199,9 @@ Resultado en **S-reservado** (sintético, no visto en el ajuste):
 
   | Umbral | Se quedan | Riesgo |
   | --- | --- | --- |
-  | 0 | 100 % | 23,3 % |
-  | 0,4 | 51 % | 5,9 % |
-  | 0,8 | 38 % | 2,3 % |
+  | 0 | 100 % | 23,0 % |
+  | 0,4 | 52 % | 5,7 % |
+  | 0,8 | 38 % | 2,2 % |
 
   La ordenación sirve aunque los valores absolutos no estén bien calibrados.
 - **Intervalos.** En las franjas de confianza baja el cuantil es enorme, del orden de ±70 veces el

@@ -139,3 +139,89 @@ Lo que dice, a favor y en contra:
   comprobación visual de D (DEC-10) tiene que cerrar este hueco.
 - McNemar: B completo acierta 374 campos más que sin tablas (p < 10⁻⁶) y 554 más que sin hoja de
   datos (p < 10⁻⁶), de 7.452 campos pareados.
+
+### Estudio 2 · B, C, D, ablaciones y selector (30/10/2026)
+
+Generador v2, S-dev (24 casos, semilla 2026), S-reservado (16, semilla 7919) y S-adversarial (12,
+semilla 6666), con 3 degradaciones y rev1 + rev2: 132 equipos-degradación y 264 revisiones por
+variante. 1.000 remuestreos por equipo. La rev2 recibe como `previous` la rev1 aprobada por el
+oráculo (la memoria solo usa revisiones aprobadas, tarea 3.2). Calibración ajustada solo en S-dev,
+sha256 `a8e2977b7a5c…`. **Datos sintéticos.**
+
+| Variante | Puntuación | IC 95 % | Geometría | Atributos | ECE | F1 cambios | Cobertura 90 % | Alucinación | Cita | s/revisión |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `d_hibrido` | **0,642** | [0,607; 0,678] | 42,4 % | 90,3 % | 0,101 | 45,9 % | 96,5 % | 0,0 % | 100 % | 1,55 |
+| `c_rag` | 0,558 | [0,502; 0,611] | 28,2 % | 82,6 % | 0,132 | 40,1 % | 92,0 % | 0,0 % | 100 % | 0,30 |
+| `b_reglas` | 0,536 | [0,493; 0,579] | 19,9 % | 80,8 % | 0,007 | 32,8 % | 100 % | 0,0 % | 100 % | 0,03 |
+| `b_reglas-hdm` | 0,393 | [0,349; 0,435] | 19,9 % | 23,3 % | 0,009 | 32,8 % | 100 % | 0,0 % | 100 % | 0,02 |
+| `b_reglas-tablas` | 0,388 | [0,356; 0,419] | 0,0 % | 75,0 % | 0,000 | 0,0 % | 100 % | 0,0 % | 100 % | 0,02 |
+
+Por conjunto (puntuación):
+
+| Variante | S-dev | S-reservado | S-adversarial | Envenenamiento |
+| --- | --- | --- | --- | --- |
+| `d_hibrido` | 0,717 | **0,525** | 0,942 | 13,9 % |
+| `c_rag` | 0,671 | 0,350 | 0,758 | 13,9 % |
+| `b_reglas` | 0,625 | 0,386 | 0,904 | 30,6 % |
+
+D por degradación: vectorial 0,893 · escaneado limpio 0,556 · escaneado pobre 0,418.
+
+| Ablación de D | Δ puntuación | IC 95 % | Lectura |
+| --- | --- | --- | --- |
+| sin RAG | −0,076 | [−0,113; −0,042] | El canal que más aporta |
+| sin geometría | −0,045 | [−0,075; −0,016] | Aporta; sin él D no construye ningún modelo en S-reservado |
+| sin detector propio | −0,011 | [−0,023; −0,001] | Aporta poco, pero el intervalo no cruza 0 |
+| sin memoria | +0,009 | [−0,002; 0,020] | Sin efecto medible |
+
+McNemar sobre 7.452 campos pareados: D acierta 1.206 campos que C falla y C 79 que D falla
+(p < 10⁻²⁵⁰); frente a B, 3.039 contra 25 (p ≈ 0). C supera a B: 1.949 contra 62 (p ≈ 0).
+
+**Selector por tipo de documento.** La regla se fija en S-dev: vectorial → `b_reglas` (0,998 en
+S-dev), escaneado limpio y pobre → `d_hibrido`. En S-reservado esa regla puntúa **0,372**, frente a
+**0,525** de D solo. B resuelve el vectorial de los 6 proveedores vistos y ninguno de los 2 no
+vistos (0 % de modelos en S-reservado). **Decisión: D para todos los tipos de documento.** El
+selector por tipo sobreajusta a los proveedores de desarrollo. `estudio.json` publica la regla de
+S-dev y su resultado en S-reservado (`recommendation.selector`).
+
+Hipótesis:
+
+- **H1 · se confirma.** B pasa de 0,625 en S-dev a 0,386 en S-reservado, con 0 % de modelos IFC en
+  los proveedores no vistos. En S-dev vectorial puntúa 0,998.
+- **H2 · sin medir.** A (visión) no entra en este estudio: con Qwen3-VL 4B a unos 129 s por página
+  (tabla 0.10 de `docs/PLATAFORMA.md`), las 264 revisiones no caben en la sesión. Queda pendiente
+  un subconjunto declarado como tal.
+- **H3 · compatible, sin la prueba que pedía.** C cae de 0,671 en S-dev a 0,350 en S-reservado, con
+  bibliotecas que excluyen al proveedor medido. No se ha medido el acierto frente a la similitud
+  con el caso recuperado.
+- **H4 · se confirma en puntuación, no en coste.** D es la mejor variante en los tres conjuntos y
+  la diferencia es significativa. Coste 0 € para todas (todo local), pero D tarda 1,55 s por
+  revisión frente a 0,03 s de B: 55 veces más, aunque muy lejos del límite de 60 s de la escala.
+- **H5 · se rechaza.** Quitar la memoria no baja la puntuación ni el F1 de cambios (45,9 % con
+  memoria, 51,3 % sin ella). Con la memoria limitada a revisiones aprobadas (3.2) el canal ya no
+  aporta en estos datos.
+- **H6 · se rechaza.** Sin geometría el ECE baja (0,101 → 0,041), no sube. La geometría sube la
+  puntuación, pero sus campos en S-reservado no se parecen a los de S-dev (en S-dev rellena 37
+  campos vectoriales; en S-reservado 593, con el 95 % de aciertos) y la curva de calibración
+  ajustada en S-dev los infravalora. Detalle en `docs/BENCH.md`.
+
+Más cosas que salen:
+
+- **Alucinación 0 % y cita 100 % en todas las variantes**, también en D y C con canales de
+  modelo: la etapa de anclaje descarta lo que no se puede verificar en el documento.
+- **Envenenamiento: B sube del 2,8 % (estudio 1) al 30,6 %.** Ahora B lee más campos en
+  S-adversarial (74 % de geometría) y con ellos más trampas. D lo baja al 13,9 % y D sin geometría
+  vuelve al 30,6 %: la comprobación geométrica es la que frena parte de las trampas. No hay
+  desglose por tipo de trampa en esta salida.
+- **Calibración.** El ECE de D en S-dev es 0,017, pero en S-reservado 0,279. La cobertura del
+  intervalo al 90 % sí se mantiene: 94,1 % en S-reservado. Detalle y curva riesgo-cobertura en
+  `docs/BENCH.md`.
+- **S-reservado se ha abierto más de una vez** en esta sesión, y dos cambios vienen de mirarlo:
+  1. Tras la primera calibración (ECE de D 0,356 en S-reservado) se añadieron las bibliotecas que
+     excluyen al proveedor y la distinción escaneado/vectorial.
+  2. El primer estudio dio «sin detector» +0,020: la fusión elegía como representante una lectura
+     del detector que luego no pasaba el anclaje. Se corrigió la fusión (prefiere un canal
+     verificable) y se repitió el estudio.
+
+  Las dos correcciones son de diseño, no de parámetros: todo lo que se ajusta (curvas, cuantiles y
+  umbrales) sigue saliendo solo de S-dev. Aun así, las cifras de S-reservado de este estudio ya no
+  son una medida a ciegas.
