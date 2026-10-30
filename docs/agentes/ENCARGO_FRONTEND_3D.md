@@ -8,7 +8,7 @@ Trabaja en TrazIA-3D siguiendo AGENTS.md (raíz) y web/AGENTS.md. Eres el Agente
 docs/PLAN_FRONTEND.md. A la vez trabaja el Agente 1 (marca, portada, shell y gráficas 2D) en la rama
 feat/web-marca; no toques sus carpetas.
 
-Repo: C:\Users\Javier\Documents\Codex\2026-10-26\https-indesiahack-org-tecnicas-reunidas-2026\outputs\TrazIA-3D
+Repo: javiersaguar/TrazIA-3D (tu checkout local; el worktree va en la carpeta hermana).
 Equipo: Windows 11 (Git Bash y PowerShell), RTX 5070 Laptop 8 GB.
 
 ANTES DE EMPEZAR
