@@ -379,3 +379,20 @@ modelo actualizado. Al cambiar modelos/reglas se prepara una caché nueva.
 Persistencia: Alembic 0004 añade job_cache y el indicador de acierto al trabajo. No cambia
 el contrato 0.3 ni se modifica vision/cache.py. Las cachés de visión/copiloto existentes
 se conservan, separadas de esta caché de resultados del pipeline.
+
+
+## CORS configurable · sesión Plataforma
+
+`TRAZIA_CORS_ORIGINS` acepta orígenes HTTP(S) separados por comas y sustituye la lista
+predeterminada. Se recortan espacios, se normalizan puertos estándar y se eliminan
+duplicados. Rutas, credenciales, comodines y puertos inválidos se rechazan al crear la API.
+Ausente o vacía conserva localhost y 127.0.0.1 en 3000, 3100, 3200, 3300, 3310 y 3311.
+Compose propaga la variable a API y workers. Para el frontend de esta sesión, PowerShell:
+
+```powershell
+$env:TRAZIA_CORS_ORIGINS="http://localhost:3120,http://127.0.0.1:3120"
+$env:TRAZIA_PORT="8020"
+uv run --extra api python -m trazia.api
+```
+
+Las cabeceras de idempotencia, If-Match y ETag y los métodos admitidos no cambian.

@@ -34,6 +34,7 @@ from trazia.store import (
     Store,
 )
 
+from .cors import origins
 from .jobs import TERMINAL, recover_jobs, run_job
 from .repository import check_match, get_revision, read_report, save_revision, seed_demo
 from .security import UploadLimit
@@ -142,11 +143,7 @@ def create_app(
     app.add_middleware(UploadLimit, limit=MAX_UPLOAD + 1024 * 1024)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[
-            f"http://{host}:{port}"
-            for host in ("localhost", "127.0.0.1")
-            for port in (3000, 3100, 3200, 3300, 3310, 3311)
-        ],
+        allow_origins=origins(),
         allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
         allow_headers=["Content-Type", "Idempotency-Key", "If-Match", "Last-Event-ID"],
         expose_headers=["ETag"],

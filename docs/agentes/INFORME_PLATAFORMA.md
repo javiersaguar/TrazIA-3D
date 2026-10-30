@@ -431,3 +431,15 @@ Cierre tarea 2: Ruff y formato global correctos; 245 pruebas correctas y una omi
 en 271,05 s. API HTTP 8020, mismo almacén tras reinicio: trabajo original 3,192 s y
 recuperación cacheada 0,022 s registrados por el job (no latencia HTTP total), con
 pipeline omitido y fallo explícito al cambiar la estrategia. Solo sintéticos.
+
+### 3 · CORS configurable
+
+TRAZIA_CORS_ORIGINS sustituye la lista por orígenes explícitos separados por comas.
+Vacío conserva exactamente los puertos actuales; configuración para 3120 documentada
+en .env.example y API.md y propagada por Compose. Nueve comprobaciones específicas
+pasan: defaults, reemplazo, normalización, rechazo de otros sitios y configuración
+inválida. No se cambia web ni se usan los puertos de otros equipos.
+
+Cierre tarea 3: Ruff y formato globales correctos; 253 pruebas correctas y una omitida
+en 301,02 s. API real 8020: preflight desde localhost:3120 devuelve 200 con el origen
+permitido; un origen ajeno devuelve 400 sin cabecera de autorización CORS.

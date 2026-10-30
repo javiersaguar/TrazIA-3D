@@ -3,6 +3,7 @@ name: trazia
 x-api-env: &api-env
   TRAZIA_DATA: /data
   TRAZIA_HOST: 0.0.0.0
+  TRAZIA_CORS_ORIGINS: ${TRAZIA_CORS_ORIGINS:-}
   TRAZIA_ROOT: /app
   TRAZIA_OFFLINE: ${TRAZIA_OFFLINE:-0}
   TRAZIA_STUDY_DATA: ${TRAZIA_STUDY_DATA:-/data/synthetic_v2}
