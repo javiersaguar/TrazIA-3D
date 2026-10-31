@@ -511,3 +511,11 @@ ejecutar; un cambio de pesos invalida resultados anteriores, incluidos los offli
 Ver [auditoría y límites](AUDITORIA_REVISION.md), [sesión manual preparada](MUESTRA_REVISION_MANUAL.md)
 y [diagrama y coste para el pitch](PITCH_ESCALA.md). Migración de almacén `0006`; sin dependencias
 nuevas ni cambios del contrato `model.py` 0.3.
+
+
+## Ampliaciones 01/11
+
+- PATCH de campo admite `decimal_separator: "." | ","`, convierte con Pint y conserva texto/unidad originales. Ambigüedad, unidad incompatible o cambio de unidad sin valor devuelve 422 sin mutación ni cambio de ETag. La base absoluta/manométrica no se convierte implícitamente. [Normalización](NORMALIZACION.md).
+- POST de trabajo admite `use_learning: boolean` (por defecto true): ejemplos y prioridades solo desde revisiones aprobadas con sesión humana finalizada; exclusión de equipo/documentos y verificación de originales. Caché v4 incluye estado de feedback. [Condiciones y límites](APRENDIZAJE_APROBADO.md).
+- `POST /viewer/bcf` convierte una captura del navegador en BCF 2.1: `png_base64`, `eye`, `target`, `up` (triples de coordenadas web), `zoom`, `viewport_height`, `guid` IFC seleccionado y `actor` opcional. Devuelve application/zip con ZIP BCF, snapshot PNG y cámara ortográfica convertida a IFC; no modifica revisiones ni aprueba. Rechaza PNG inválido/demasiado grande, cámara degenerada, coordenadas no finitas y GUID inválido con 422. Es una conversión de datos aportados; no certifica su procedencia ni sus rótulos. El visor adjunta DRAFT y procedencia de su IFC real.
+- `TRAZIA_PAGE_CACHE` es opcional; por defecto, las etapas de texto, raster y geometría usan `TRAZIA_OCR_CACHE/page-stages`. La caché OCR por página tiene huella propia de contenido/recursos/geometría PDF más DPI y motor; se regenera si falla la integridad. Una página reutilizada recibe el document_id actual, no el de la revisión anterior. Sin huella segura se procesa normalmente.

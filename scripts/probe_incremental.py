@@ -16,7 +16,10 @@ def main():
     import pdfplumber
     from PIL import Image, ImageDraw, ImageFont
 
+    from trazia.geometry2d import page_cache as geometry_cache
+    from trazia.ingest import ingest_bytes
     from trazia.ocr import engine
+    from trazia.strategies import a_vision
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--documento", type=Path, required=True, help="PDF sintético público")
@@ -71,6 +74,28 @@ def main():
     actual = factory()
     init_seconds = time.perf_counter() - started
     calls = []
+    renders = []
+    text_pages, vector_pages, geometry_pages = [], [], []
+    render_page = pdfplumber.page.Page.to_image
+    text_reader = pdfplumber.page.Page.extract_text_lines
+    vector_reader = geometry_cache.find_elevation
+    geometry_reader = a_vision._uncached_raster_geometry
+
+    def render_spy(page, *args, **kwargs):
+        renders.append(page.page_number)
+        return render_page(page, *args, **kwargs)
+
+    def text_spy(page, *args, **kwargs):
+        text_pages.append(page.page_number)
+        return text_reader(page, *args, **kwargs)
+
+    def vector_spy(page):
+        vector_pages.append(page.page_number)
+        return vector_reader(page)
+
+    def geometry_spy(content, page):
+        geometry_pages.append(page)
+        return geometry_reader(content, page)
 
     def recognize(array):
         started = time.perf_counter()
@@ -80,17 +105,37 @@ def main():
 
     def measure(name, content, cache):
         calls.clear()
+        renders.clear()
+        text_pages.clear()
+        vector_pages.clear()
+        geometry_pages.clear()
         os.environ["TRAZIA_OCR_CACHE"] = str(output / cache)
+        os.environ["TRAZIA_PAGE_CACHE"] = str(output / cache / "page-stages")
         started = time.perf_counter()
+        ingest_bytes(
+            content, "GAD_INCREMENTAL.pdf", "GA-INCREMENTAL", "B" if name.startswith("B") else "A"
+        )
         lines = engine.ocr_pdf_lines(content, "GA-INCREMENTAL")
+        with pdfplumber.open(io.BytesIO(content)) as document:
+            for page in document.pages:
+                geometry_cache.vector_geometry(page)
+                a_vision._raster_geometry(content, page.page_number)
         return {
             "name": name,
             "seconds": time.perf_counter() - started,
             "recognizer_calls": list(calls),
+            "rendered_pages": list(renders),
+            "text_extraction_pages": list(text_pages),
+            "vector_analysis_pages": list(vector_pages),
+            "raster_analysis_pages": list(geometry_pages),
             "lines_per_page": dict(Counter(line.source.page for line in lines)),
         }
 
     engine._rapidocr = lambda: recognize
+    pdfplumber.page.Page.to_image = render_spy
+    pdfplumber.page.Page.extract_text_lines = text_spy
+    geometry_cache.find_elevation = vector_spy
+    a_vision._uncached_raster_geometry = geometry_spy
     try:
         phases = [
             measure("A_frio", a, "cache-ab"),
@@ -100,13 +145,17 @@ def main():
         ]
     finally:
         engine._rapidocr = factory
+        pdfplumber.page.Page.to_image = render_page
+        pdfplumber.page.Page.extract_text_lines = text_reader
+        geometry_cache.find_elevation = vector_reader
+        a_vision._uncached_raster_geometry = geometry_reader
     counts = [len(p["recognizer_calls"]) for p in phases]
     same_page_reused = counts == [2, 1, 0, 2] and (
         phases[1]["recognizer_calls"][0]["pixels_sha256"] == pages_b[1]
     )
     result = {
         "synthetic": True,
-        "component": "OCR CPU",
+        "component": "Texto, render, OCR y geometría por página · CPU",
         "engine": engine.ENGINE,
         "onnx_available_providers": onnxruntime.get_available_providers(),
         "engine_initialization_seconds": init_seconds,
@@ -114,17 +163,30 @@ def main():
         "page_pixels_sha256": {"A": pages_a, "B": pages_b},
         "phases": phases,
         "only_changed_page_recognized": same_page_reused,
+        "page_stages_incremental": all(
+            [p[key] for p in phases] == [[1, 2], [2], [], [1, 2]]
+            for key in (
+                "rendered_pages",
+                "text_extraction_pages",
+                "vector_analysis_pages",
+                "raster_analysis_pages",
+            )
+        ),
+        "only_changed_page_rendered": [p["rendered_pages"] for p in phases]
+        == [[1, 2], [2], [], [1, 2]],
         "warm_vs_cold_seconds_saved": phases[3]["seconds"] - phases[1]["seconds"],
         "whole_pipeline_incremental": False,
         "limit": (
-            "El OCR se reutiliza por imagen; se renderizan todas las páginas para obtener su hash."
+            "Se ejercitan las etapas reales por página, incluida geometría, en una sola secuencia. "
+            "Se sigue leyendo la estructura PDF para huellas; la reconciliación global y el IFC "
+            "no son una edición incremental de mallas. No es precisión industrial."
         ),
     }
     (output / "incremental.json").write_text(
         json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf8"
     )
     print(json.dumps(result, ensure_ascii=False))
-    return 0 if same_page_reused else 2
+    return 0 if same_page_reused and result["page_stages_incremental"] else 2
 
 
 if __name__ == "__main__":

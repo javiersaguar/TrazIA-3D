@@ -8,6 +8,7 @@ from pydantic import Field
 
 from .ingest import Bundle
 from .model import GEOMETRY_FIELDS, Channel, FieldState, Model, Revision, Source, nozzle_misfit
+from .units import normalize
 
 CHANNELS = set(get_args(Channel))
 
@@ -84,7 +85,11 @@ class LabelExtractor:
                         result.append(
                             Candidate(
                                 path=path,
-                                value=float(match[1]) * LENGTH[match[2].lower()],
+                                value=normalize(
+                                    f"{match[1]} {match[2]}", "length", decimal="."
+                                ).value,
+                                unit_original=match[2],
+                                text_original=match[0],
                                 unit="mm",
                                 source=line.source,
                             )
@@ -105,7 +110,13 @@ class LabelExtractor:
                         result.append(
                             Candidate(
                                 path=f"nozzles.{nozzle[1]}.{key}",
-                                value=value if unit == "deg" else value * LENGTH[unit],
+                                value=normalize(
+                                    f"{value} {unit}",
+                                    "angle" if unit == "deg" else "length",
+                                    decimal=".",
+                                ).value,
+                                unit_original=match[3],
+                                text_original=match[0],
                                 unit="deg" if unit == "deg" else "mm",
                                 source=line.source,
                             )
@@ -127,8 +138,22 @@ class LabelExtractor:
                         result.append(
                             Candidate(
                                 path=f"attributes.{key}",
-                                value=float(attribute[2]),
-                                unit=unit,
+                                value=normalize(
+                                    f"{attribute[2]} {unit}",
+                                    {
+                                        "design_pressure": "pressure",
+                                        "design_temperature": "temperature",
+                                        "operating_weight": "mass",
+                                    }[key],
+                                    decimal=".",
+                                ).value,
+                                unit={
+                                    "design_pressure": "bar",
+                                    "design_temperature": "C",
+                                    "operating_weight": "kg",
+                                }[key],
+                                unit_original=unit,
+                                text_original=attribute[0],
                                 source=line.source,
                             )
                         )

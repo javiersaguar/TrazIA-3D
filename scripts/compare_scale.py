@@ -84,6 +84,7 @@ def main():
     parser.add_argument("--uno", required=True, type=Path)
     parser.add_argument("--cuatro", required=True, type=Path)
     parser.add_argument("--anterior", required=True, type=Path)
+    parser.add_argument("--etiqueta-anterior", default="D heurístico (histórico)")
     parser.add_argument("--salida", required=True, type=Path)
     args = parser.parse_args()
     one, four, old = [
@@ -93,7 +94,8 @@ def main():
         "synthetic": True,
         "input_sha256": one["input_sha256"],
         "comparison_workers": compare(one, four),
-        "comparison_previous_heuristic_to_learned": compare(old, four),
+        "previous_label": args.etiqueta_anterior,
+        "comparison_previous": compare(old, four),
         "speedup_observed": one["summary"]["seconds_batch"] / four["summary"]["seconds_batch"],
         "runs": [
             {
@@ -116,7 +118,7 @@ def main():
         json.dumps(
             {
                 "speedup": result["speedup_observed"],
-                "transitions": result["comparison_previous_heuristic_to_learned"]["transitions"],
+                "transitions": result["comparison_previous"]["transitions"],
             }
         )
     )

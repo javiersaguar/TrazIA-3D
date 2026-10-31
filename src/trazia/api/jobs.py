@@ -68,17 +68,37 @@ def execute_pipeline(store: Store, job_id: str, request: dict):
     def event(value):
         emit(store, job_id, value.stage, value.status, value.file, value.detail)
 
-    result = process(
-        documents,
-        project_id=request["project_id"],
-        equipment_id=request["equipment_id"],
-        revision=request["revision"],
-        strategy=request["strategy"],
-        previous=previous,
-        providers=request["providers"],
-        dataset=request["dataset"],
-        on_event=event,
-    )
+    from trazia.feedback import using
+
+    from .extraction_feedback import build_feedback, epoch
+
+    with Session(store.engine) as session:
+        request["_cache_feedback_epoch"] = epoch(session)
+    feedback = build_feedback(store, request)
+    request["_feedback_unverifiable"] = not feedback.verified
+    if feedback.examples or feedback.priorities or not feedback.verified:
+        emit(
+            store,
+            job_id,
+            "memory",
+            "ok" if feedback.verified else "omitido",
+            "",
+            f"Feedback: {len(feedback.examples)} ejemplos de otros equipos; "
+            f"{len(feedback.priorities)} prioridades de canal; originales "
+            + ("verificados" if feedback.verified else "no verificables, no aplicado"),
+        )
+    with using(feedback):
+        result = process(
+            documents,
+            project_id=request["project_id"],
+            equipment_id=request["equipment_id"],
+            revision=request["revision"],
+            strategy=request["strategy"],
+            previous=previous,
+            providers=request["providers"],
+            dataset=request["dataset"],
+            on_event=event,
+        )
     if result.error and getattr(result, "retryable", False):
         raise TransientPipelineFailure(result.error, result.run)
     if result.error or result.revision is None:

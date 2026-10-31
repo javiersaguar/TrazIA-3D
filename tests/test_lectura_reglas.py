@@ -38,7 +38,8 @@ def test_numbers_sizes_and_attribute_units():
     assert parse_pressure("145.0 psig")[0] == pytest.approx(10, abs=0.01)
     assert parse_pressure("30 bar(g)") == (30, "bar(g)")
     assert parse_temperature("302 °F")[0] == pytest.approx(150)
-    assert parse_weight("27,558 lb")[0] == pytest.approx(12500, abs=0.5)
+    assert parse_weight("27,558 lb") is None  # Ambiguo sin contexto del documento.
+    assert parse_weight("27,558 lb", decimal=".")[0] == pytest.approx(12500, abs=0.5)
     assert parse_weight("69.300 kg", decimal=",")[0] == 69300
 
 

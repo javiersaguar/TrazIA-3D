@@ -24,7 +24,7 @@ import pdfplumber
 from ..extraction import Candidate, LabelExtractor
 from ..extractors.drawing import DIMENSION_TEXT, MARK, DrawingExtractor, document_context
 from ..extractors.units import DN_SERIES, parse_length_any_direction
-from ..geometry2d.vector import Elevation, Plan, find_elevation, find_plan
+from ..geometry2d.vector import Elevation, Plan
 from ..ingest import EvidenceLine
 from ..model import Source
 from .base import StageEvent, StrategyContext, StrategyOutput, tag_candidates
@@ -69,10 +69,12 @@ class VisionGeometryStrategy:
                 for n, page in enumerate(pdf.pages, 1)
             ]
             for number, page, w, h in pages:
-                elevation = find_elevation(page)
-                if elevation is None:
+                from ..geometry2d.page_cache import vector_geometry
+
+                measured = vector_geometry(page)
+                if measured is None:
                     continue
-                plan = find_plan(page, elevation.shell)
+                elevation, plan = measured
                 return self._finish(bundle, data, ctx, number, (w, h), elevation, plan, "vectorial")
         # Sin trazos vectoriales (escaneado): geometría por imagen.
         for number, _, w, h in pages:
@@ -140,6 +142,9 @@ class VisionGeometryStrategy:
                         locator=f"Visión ({provider.name}) · página {page}",
                         bbox=tuple(item["bbox"]),
                         confidence=0.8,
+                        channel="vision",
+                        model=reading.model or None,
+                        prompt_sha256=reading.prompt_sha256 or None,
                     ),
                 )
                 for item in reading.items
@@ -376,6 +381,14 @@ RASTER_DPI = 200
 
 
 def _raster_geometry(data: bytes, page: int):
+    from ..geometry2d.page_cache import raster_geometry
+
+    return raster_geometry(
+        data, page, lambda: _uncached_raster_geometry(data, page), dpi=RASTER_DPI
+    )
+
+
+def _uncached_raster_geometry(data: bytes, page: int):
     """Alzado y planta de una página escaneada, en puntos del marco original de la página."""
     from dataclasses import replace
 

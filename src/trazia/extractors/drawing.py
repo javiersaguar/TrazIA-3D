@@ -24,14 +24,12 @@ from dataclasses import dataclass
 from ..extraction import Candidate
 from ..ingest import Bundle, EvidenceLine
 from ..model import Source
+from ..units import UnitError, normalize
 from .units import (
     parse_angle,
     parse_length,
     parse_length_any_direction,
     parse_nominal_size,
-    parse_pressure,
-    parse_temperature,
-    parse_weight,
 )
 
 MARK = re.compile(r"^[A-Z]{1,2}\d{1,3}[A-Z]?$")
@@ -255,25 +253,28 @@ class DrawingExtractor:
                                 _candidate("attributes.material", text, "1", value, 0.85, locator)
                             )
                         break
-                    parser = {
-                        "design_pressure": (parse_pressure, "bar"),
-                        "design_temperature": (parse_temperature, "C"),
-                        "operating_weight": (parse_weight, "kg"),
+                    magnitude = {
+                        "design_pressure": "pressure",
+                        "design_temperature": "temperature",
+                        "operating_weight": "mass",
                     }[key]
-                    parsed = parser[0](value.text, decimal=ctx.decimal)
-                    if parsed is not None:
-                        number, unit_original = parsed
-                        out.append(
-                            _candidate(
-                                f"attributes.{key}",
-                                round(number, 4),
-                                parser[1],
-                                value,
-                                0.9,
-                                locator,
-                                unit_original=unit_original,
-                            )
-                        )
+                    try:
+                        parsed = normalize(value.text, magnitude, decimal=ctx.decimal)
+                    except UnitError:
+                        break
+                    candidate = _candidate(
+                        f"attributes.{key}",
+                        round(parsed.value, 4),
+                        parsed.unit,
+                        value,
+                        0.9,
+                        locator,
+                        unit_original=parsed.unit_original,
+                    )
+                    if parsed.notices:
+                        candidate.state = "assumed"
+                        candidate.explanation = "; ".join(parsed.notices)
+                    out.append(candidate)
                     break
         return out
 

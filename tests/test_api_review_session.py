@@ -115,8 +115,10 @@ def test_validation_is_actionable_and_rolls_back(client):
     assert response.json()["issues"][0]["action"]
     assert "No se ha guardado" in response.json()["detail"]
     assert client.get("/equipment/V-101/revisions/A").headers["etag"] == '"1"'
-    bad_unit = change(client, "diameter", {"state": "corrected", "value": 2, "unit": "m"})
-    assert bad_unit.status_code == 422 and "mm" in bad_unit.json()["detail"]
+    # Metros ahora se convierten a mm (C.1); una masa sigue siendo incompatible con longitud.
+    bad_unit = change(client, "diameter", {"state": "corrected", "value": 2, "unit": "kg"})
+    assert bad_unit.status_code == 422 and "incompatible" in bad_unit.json()["detail"]
+    assert client.get("/equipment/V-101/revisions/A").headers["etag"] == '"1"'
     fields = client.get("/revisions/A/fields").json()
     a, b = fields["nozzles.N1.elevation"], fields["nozzles.N1.azimuth"]
     assert (

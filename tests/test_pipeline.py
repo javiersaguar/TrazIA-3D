@@ -207,7 +207,18 @@ def test_ingest_extract_and_render_from_originals(revision):
         revision=revision.revision,
         dataset="synthetic",
     )
-    assert output.fingerprint() == revision.fingerprint()
+    assert (
+        output.fingerprint() != revision.fingerprint()
+    )  # La evidencia original ahora se conserva.
+    legacy = output.model_copy(deep=True)
+    for path, field in fields(legacy.equipment).items():
+        expected = fields(revision.equipment)[path]
+        if field.unit != "1":
+            assert fields(output.equipment)[path].source.unit_original
+        # Igualdad estricta del contrato legado salvo estos metadatos opcionales nuevos.
+        field.source.unit_original = expected.source.unit_original
+        field.source.text_original = expected.source.text_original
+    assert legacy.fingerprint() == revision.fingerprint()
     height = next(c for c in candidates if c.path == "height")
     assert height.source.bbox and height.source.page == 1
     pressure = next(c for c in candidates if c.path == "attributes.design_pressure")

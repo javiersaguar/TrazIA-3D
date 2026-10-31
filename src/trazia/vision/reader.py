@@ -27,8 +27,10 @@ class PageReading:
 
 
 def render_page(pdf: bytes, page: int, dpi: int = 150) -> Image.Image:
+    from ..page_cache import render_page as cached_render
+
     with pdfplumber.open(io.BytesIO(pdf)) as document:
-        return document.pages[page - 1].to_image(resolution=dpi).original.convert("RGB")
+        return cached_render(document.pages[page - 1], dpi)
 
 
 def read_page(

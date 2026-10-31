@@ -33,6 +33,7 @@ def build_ifc(
     draft: bool = True,
     schema: Literal["IFC4", "IFC4X3", "IFC2X3"] = "IFC4",
     details: bool = False,
+    plant_north_deg: float | None = None,
 ) -> ifcopenshell.file:
     revision = Revision.model_validate_json(revision.model_dump_json())
     pending = revision.pending_review()
@@ -240,6 +241,18 @@ def build_ifc(
         p = ifcopenshell.api.pset.add_pset(model, product=product, name=name)
         ifcopenshell.api.pset.edit_pset(model, pset=p, properties=properties)
 
+    from .reference import metadata
+
+    reference = metadata(plant_north_deg)
+    pset(storey, "TrazIA_ReferenceFrame", reference)
+    if plant_north_deg is not None:
+        import math
+
+        angle = math.radians(plant_north_deg)
+        context.TrueNorth = model.create_entity(
+            "IfcDirection", DirectionRatios=(math.cos(angle), math.sin(angle))
+        )
+
     equipment = revision.equipment
     key = f"equipment/{equipment.id}"
     tag = equipment.tag.value
@@ -265,6 +278,7 @@ def build_ifc(
         else "NOTDEFINED",
     )
     vessel.Tag = tag
+    pset(vessel, "TrazIA_ReferenceFrame", reference)
     if schema == "IFC2X3" and semantic_class != "IfcBuildingElementProxy":
         element_type = root(
             semantic_class + "Type",

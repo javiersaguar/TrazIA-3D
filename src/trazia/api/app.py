@@ -55,6 +55,7 @@ class JobInput(Model):
     )
     revision: str = Field(default="C", min_length=1, max_length=50)
     strategy: str = Field(default="b_reglas", min_length=1, max_length=80)
+    use_learning: bool = True
     providers: list[str] = Field(default_factory=list, max_length=10)
     dataset: Literal["synthetic", "real"] = "synthetic"
     previous_id: str | None = None
@@ -79,6 +80,7 @@ class FieldInput(Model):
     state: FieldState
     value: float | str | None = None
     unit: str | None = Field(default=None, min_length=1)
+    decimal_separator: Literal[".", ","] | None = None
     source: Source | None = None
     explanation: str | None = Field(default=None, max_length=2000)
     actor: str = Field(min_length=2, max_length=100)
@@ -180,6 +182,9 @@ def create_app(
             store.close()
 
     app = FastAPI(title="TrazIA-3D", version="0.3", lifespan=lifespan)
+    from .snapshots import router as snapshots_router
+
+    app.include_router(snapshots_router)
     app.add_middleware(UploadLimit, limit=MAX_UPLOAD + 1024 * 1024)
     app.add_middleware(
         CORSMiddleware,
@@ -409,8 +414,11 @@ def create_app(
                 review_sessions.validate_clock(
                     session, body.review_session_id, record.id, body.actor, body.seconds
                 )
+            from .normalization import normalize_patch
+
+            value, unit, source = normalize_patch(target, body)
             if body.value is not None:
-                target.value = body.value
+                target.value = value
                 target.interval = None
                 if body.source is None:
                     target.source = target.source.model_copy(
@@ -422,11 +430,11 @@ def create_app(
                             "prompt_sha256": None,
                         }
                     )
-            if body.unit is not None:
-                target.unit = body.unit
+            if unit is not None:
+                target.unit = unit
                 target.interval = None
-            if body.source is not None:
-                target.source = body.source
+            if source is not None:
+                target.source = source
             target.state = body.state
             if "explanation" in body.model_fields_set:
                 target.explanation = body.explanation

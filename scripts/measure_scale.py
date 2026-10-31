@@ -248,6 +248,7 @@ def run(
                         model_info = {
                             "lod": model["equipment"]["lod"],
                             "equipment_kind": model["equipment"]["kind"],
+                            "unplaced_nozzles": len(model["equipment"].get("unplaced_nozzles", [])),
                         }
                     except urllib.error.HTTPError as error:
                         model_info = {
@@ -288,6 +289,11 @@ def run(
             "draft_ifc": done,
             "missing_or_failed": len(plan) - done,
             "engineering_accuracy_verified": False,
+            "drafts_with_unplaced_nozzles": sum(
+                r["unplaced_nozzles"] > 0 for r in rows if r["status"] == "done"
+            )
+            if all("unplaced_nozzles" in r for r in rows if r["status"] == "done")
+            else None,
         }
         if not report["complete"]:
             projection = report["summary"]["projection_400x4"]

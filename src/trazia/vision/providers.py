@@ -98,9 +98,12 @@ class _Provider:
 
     def read(self, image_png: bytes, task: str, schema: dict | None = None, *, page_ref: str):
         spec = TASKS[task]
+        from trazia.feedback import extraction_prompt
+
+        prompt, prompt_sha256 = extraction_prompt(spec)
         schema = schema or spec.schema
         key = cache.cache_key(
-            image_png, spec.prompt_sha256, schema, getattr(self, "cache_identity", self.name)
+            image_png, prompt_sha256, schema, getattr(self, "cache_identity", self.name)
         )
         hit = cache.load(key)
         if hit is not None:
@@ -116,7 +119,7 @@ class _Provider:
             page_ref=page_ref,
         )
         started = time.perf_counter()
-        data, usage = self._call(image_png, spec.prompt, schema)
+        data, usage = self._call(image_png, prompt, schema)
         errors = validate(data, schema)
         if errors:
             raise VisionError(f"{self.name}: respuesta fuera de esquema: {'; '.join(errors[:3])}")
@@ -124,7 +127,7 @@ class _Provider:
             data=_scale_boxes(data),
             provider=self.name,
             model=self.model,
-            prompt_sha256=spec.prompt_sha256,
+            prompt_sha256=prompt_sha256,
             seconds=usage.get("seconds", time.perf_counter() - started),
             tokens_in=usage.get("tokens_in"),
             tokens_out=usage.get("tokens_out"),

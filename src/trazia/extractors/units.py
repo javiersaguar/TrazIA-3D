@@ -6,7 +6,8 @@ Todo vuelve en la unidad del contrato (mm, deg, bar, C, kg). El texto leído se 
 """
 
 import re
-from fractions import Fraction
+
+from trazia.units import UnitError, normalize
 
 MM_PER_INCH = 25.4
 # Diámetro nominal: pulgadas NPS → DN (serie normalizada ASME B36.10 / ISO 6708).
@@ -64,29 +65,11 @@ def parse_number(text: str, *, decimal: str | None = None) -> float | None:
 
 def parse_length(text: str, *, decimal: str | None = None) -> float | None:
     """Longitud en mm. Admite «2000», «2.000», «78 3/4"», «6'-6 3/4"» y «1 3/16"»."""
-    raw = text.strip().replace("″", '"').replace("′", "'").replace("''", '"')
-    if "'" in raw:
-        m = FT_IN.match(raw)
-        if not m:
-            return None
-        inches = Fraction(int(m[1]) * 12 + int(m[2] or 0))
-        if m[3]:
-            inches += Fraction(int(m[3]), int(m[4]))
-        elif m[5]:
-            inches += Fraction(int(m[5]), int(m[6]))
-        return float(inches) * MM_PER_INCH
-    if raw.endswith('"'):
-        m = INCHES.match(raw)
-        if not m:
-            value = parse_number(raw[:-1], decimal=decimal)
-            return None if value is None else value * MM_PER_INCH
-        if m[4]:
-            return int(m[4]) * MM_PER_INCH
-        inches = Fraction(int(m[1] or 0)) + Fraction(int(m[2]), int(m[3]))
-        return float(inches) * MM_PER_INCH
-    if raw.lower().endswith("mm"):
-        raw = raw[:-2].strip()
-    return parse_number(raw, decimal=decimal)
+    try:
+        raw = re.sub(r"(?<=\d)-(?=\d+/)", " ", text.strip())
+        return normalize(raw, "length", decimal=decimal, default_unit="mm").value
+    except UnitError:
+        return None
 
 
 def parse_length_any_direction(text: str, *, decimal: str | None = None) -> list[float]:
@@ -126,27 +109,22 @@ WEIGHT = re.compile(r"^([\d.,\s]+?)\s*(kg|lbs?)$", re.I)
 
 def parse_pressure(text: str, *, decimal: str | None = None) -> tuple[float, str] | None:
     """Presión manométrica → (bar, unidad original)."""
-    m = PRESSURE.match(text.strip())
-    if not m or (value := parse_number(m[1], decimal=decimal)) is None:
-        return None
-    unit = m[2].lower().replace(" ", "")
-    factor = {"kpa": 0.01, "mpa": 10.0, "psig": 1 / 14.5038, "psi": 1 / 14.5038}.get(unit, 1.0)
-    return value * factor, m[2]
+    return _parsed(text, "pressure", decimal)
 
 
 def parse_temperature(text: str, *, decimal: str | None = None) -> tuple[float, str] | None:
-    m = TEMPERATURE.match(text.strip())
-    if not m or (value := parse_number(m[1], decimal=decimal)) is None:
-        return None
-    if m[2].upper() == "F":
-        return (value - 32) / 1.8, "°F"
-    return value, "°C"
+    return _parsed(text, "temperature", decimal)
 
 
 def parse_weight(text: str, *, decimal: str | None = None) -> tuple[float, str] | None:
-    m = WEIGHT.match(text.strip())
-    if not m or (value := parse_number(m[1], decimal=decimal)) is None:
+    return _parsed(text, "mass", decimal)
+
+
+def _parsed(text, kind, decimal):
+    try:
+        result = normalize(text, kind, decimal=decimal)
+        if result.unit == "bara" or result.notices:
+            return None  # La interfaz legada no puede expresar base absoluta ni un supuesto.
+        return result.value, result.unit_original
+    except UnitError:
         return None
-    if m[2].lower().startswith("lb"):
-        return value / 2.204623, "lb"
-    return value, "kg"

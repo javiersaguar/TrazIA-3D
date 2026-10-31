@@ -44,6 +44,8 @@ def fusion_fingerprint() -> str | None:
 
 
 def key_for(session: Session, request: dict) -> str:
+    from .extraction_feedback import epoch
+
     documents = []
     for identity in request["documents"]:
         record = session.get(DocumentRecord, identity)
@@ -64,7 +66,9 @@ def key_for(session: Session, request: dict) -> str:
             raise CacheMiss("No existe la revisión anterior")
         previous = hashlib.sha256(record.payload.encode()).hexdigest()
     content = {
-        "version": 3,
+        "version": 4,
+        "reading": "pint-v1/page-signature-v1/revisable-draft-v1",
+        "feedback": epoch(session) if request.get("use_learning", True) else None,
         "calibration": request.get("_cache_calibration", calibration_fingerprint()),
         "fusion": request.get("_cache_fusion", fusion_fingerprint()),
         "documents": documents,
@@ -77,6 +81,10 @@ def key_for(session: Session, request: dict) -> str:
 
 
 def load(store: Store, session: Session, request: dict):
+    from .extraction_feedback import build_feedback
+
+    if not build_feedback(store, request).verified:
+        raise CacheMiss("No se pueden verificar los originales del aprendizaje aprobado")
     cached = session.get(JobCacheRecord, key_for(session, request))
     if cached is None:
         raise CacheMiss(
@@ -122,6 +130,12 @@ def restore(store: Store, job_id: str, request: dict):
 
 
 def remember(store: Store, session: Session, request: dict, revision: Revision, warnings: list):
+    from .extraction_feedback import epoch
+
+    if request.get("_feedback_unverifiable"):
+        return None
+    if request.get("_cache_feedback_epoch", epoch(session)) != epoch(session):
+        return None
     if request.get("_cache_calibration") != calibration_fingerprint():
         # Los parámetros cambiaron durante la ejecución: no asociar el resultado a otra curva.
         return None

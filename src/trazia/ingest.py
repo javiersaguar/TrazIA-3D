@@ -49,7 +49,20 @@ def ingest_bytes(data: bytes, filename: str, document_id: str, revision: str) ->
             for page in pdf.pages:
                 clipped = dropped = 0
                 page_lines: list[EvidenceLine] = []
-                rows = page.extract_text_lines(return_chars=True)
+                from .page_cache import memo_page
+
+                def text_rows(page=page):
+                    return [
+                        {
+                            "chars": [
+                                {key: char[key] for key in ("text", "x0", "x1", "top", "bottom")}
+                                for char in row["chars"]
+                            ]
+                        }
+                        for row in page.extract_text_lines(return_chars=True)
+                    ]
+
+                rows = memo_page(page, "text-lines-v1", text_rows)
                 if not rows:
                     bundle.warnings.append(
                         f"Página {page.page_number}: sin texto; necesita OCR/visión"

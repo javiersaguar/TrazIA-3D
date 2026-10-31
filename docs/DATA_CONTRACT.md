@@ -208,3 +208,8 @@ IFC están en `tests/test_plataforma_pitch.py`.
 La orientación del Norte de planta y la equivalencia con el IFC de referencia TR **no están
 verificadas**. C.4 permanece parcial hasta disponer de una referencia autorizada. No se ha
 abierto `data/private/` ni se atribuye este convenio matemático a VESOR o a TR.
+
+
+### Normalización y referencia (01/11)
+
+Sin cambios de esquema 0.3: Source conserva la unidad y el texto originales; presión absoluta sigue marcada como bara. El PATCH normaliza antes de validar y deja auditoría de la conversión. El IFC puede declarar Norte explícito y lleva Pset TrazIA_ReferenceFrame. [Convenios, casos ambiguos y límite TR](NORMALIZACION.md).

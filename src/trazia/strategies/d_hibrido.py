@@ -109,7 +109,9 @@ class HybridStrategy:
         evidence: dict[str, list] = {}
 
         def take(output: StrategyOutput):
-            pool.extend(output.candidates)
+            from trazia.feedback import prioritize
+
+            pool.extend(prioritize(output.candidates))
             cost.add(output.cost)
             warnings.extend(output.warnings)
             for doc, lines in output.evidence.items():
