@@ -208,10 +208,45 @@ Resultados en `docs/ESTUDIO.md`, «Estudio 3». Puntuación GA2MODEL con IC 95 %
 ### Lo que necesito de Plataforma (31/10)
 
 - **Clave de la caché de trabajos.** Además del sha256 de la calibración, debe incluir el de la
-  fusión aprendida: `trazia.strategies.fusion.load_fusion().sha256`, o `None` si no hay.
-- **Convertir la fusión aprendida en el D por defecto.** Es una decisión de producto que queda
-  abierta. `generated/fusion/fusion.json` no está en Git, como la calibración. Sin ese fichero, la
-  variante avisa y usa la heurística.
+  fusión aprendida: `trazia.strategies.fusion.load_fusion().sha256`, o `None` si no hay. Ahora es
+  más urgente: D usa la fusión aprendida por defecto, y si se reentrena, la caché serviría
+  resultados del modelo anterior.
+- **`.env.example`.** Añadir, vacías, las claves nuevas de visión: `GROQ_API_KEY`,
+  `OPENROUTER_API_KEY`, `NVIDIA_API_KEY`, `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID`.
+- **Calibración en un clon limpio.** Sigue en `generated/calibration/`, fuera de Git. La v5 es la
+  que corresponde a D con fusión aprendida (sha256 `dd2f98c238da…`).
+
+### D con fusión aprendida por defecto (31/10, tarde)
+
+- Decidido con el estudio 3: la fusión aprendida gana a la heurística en puntuación (0,670 frente
+  a 0,640), ECE (0,072 frente a 0,270) y tiempo (1,8 s frente a 3,2 s por revisión), con McNemar
+  p ≈ 10⁻⁷ (86 campos que solo acierta la aprendida, 29 que solo acierta la heurística).
+- `HybridStrategy` usa `fusion="aprendida"` por defecto. El modelo va versionado en
+  `src/trazia/strategies/fusion_model.json`: 1,7 KB de coeficientes, sin datos. `bench.fusion
+  --publicar` lo sustituye. `TRAZIA_FUSION=off` vuelve a la heurística.
+- La heurística sigue en el estudio como `d_hibrido+heuristica`. Los informes de los estudios 1 a
+  3 usan los nombres de antes: allí `d_hibrido` es la heurística y `d_hibrido+fusion` la aprendida.
+- Calibración v5: D sin curva isotónica e intervalos recalculados. En S-reservado, ECE 0,066 y
+  cobertura del intervalo 91,5 %; con abstención se queda el 69 % de los campos con un riesgo del
+  8,3 %. El estudio 4, con la D nueva, está en curso.
+
+### Proveedores de visión (31/10, tarde)
+
+- `OpenAICompatibleProvider` para Groq, OpenRouter, NVIDIA NIM y Cloudflare Workers AI
+  (`groq:<modelo>`, `openrouter:<modelo>`, `nvidia:<modelo>`, `cloudflare:<modelo>`). Pide JSON por
+  esquema y, si el modelo no lo admite, pasa a JSON libre con el esquema en el prompt. Reintenta
+  ante 429 y 503. Coste 0 € por defecto (cuotas gratuitas); configurable por servicio.
+- Las peticiones llevan un agente de usuario propio: Groq rechaza con 403 el de urllib.
+- Una tesela sintética de 1280 px por modelo:
+  - responden con JSON válido `gemini-3.5-flash-lite` (5 s), Groq `qwen/qwen3.8-27b` (3 s),
+    OpenRouter `nvidia/nemotron-3.5-super-vl:free` (17 s), NVIDIA
+    `nemotron-3.5-super-vl-120b-a12b` (52 s) y `llama-3.2-90b-vision-instruct` (185 s), y
+    Cloudflare `@cf/qwen/qwen3.8-27b` (51 s);
+  - fallan `gemini-3.8-flash` y `gemini-3.1-flash-lite` (503, saturados), Gemma 4 en OpenRouter
+    (429), Llama 4 Scout en Cloudflare (JSON roto) y Moondream (otro formato de entrada).
+- `python -m bench.proveedores` mide cada modelo como lector de A junto a Qwen3-VL local y A sin
+  visión, y cuenta las teselas fallidas por cuota: un modelo con fallos no está medido del todo.
+  Primera ronda en curso.
 
 ### 1.9 y 2.2 · Mistral
 

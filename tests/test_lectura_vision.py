@@ -323,3 +323,45 @@ def test_mistral_chat_reads_lines_with_schema_cost_and_offline_replay(isolated, 
         b"synthetic", "lineas", page_ref="doc#p1"
     )
     assert replay.cached and len(requests) == 1
+
+
+def test_openai_compatible_services_fall_back_on_json_mode_and_retry(isolated, monkeypatch):
+    from trazia.vision import providers
+
+    for env in ("GROQ_API_KEY", "CLOUDFLARE_API_TOKEN"):
+        monkeypatch.setenv(env, "test-only")
+    monkeypatch.setenv("CLOUDFLARE_ACCOUNT_ID", "cuenta")
+    monkeypatch.setattr(providers, "RETRY_WAITS", (0,))
+    requests = []
+
+    def post(url, payload, headers=None):
+        requests.append((url, payload))
+        if len(requests) == 1:
+            raise VisionError(f"{url}: HTTP 429 cuota")  # se reintenta
+        if payload.get("response_format", {}).get("type") == "json_schema":
+            raise VisionError(f"{url}: HTTP 400 response_format no admitido")
+        content = '<think>leo la tabla</think>```json\n{"items": [{"text": "ID 2000", '
+        content += '"bbox": [100, 200, 300, 260]}]}\n```'
+        return {"choices": [{"message": {"content": content}}], "usage": {"prompt_tokens": 10}}
+
+    monkeypatch.setattr(providers, "_post", post)
+    groq = providers.get_provider("groq:qwen/qwen3.8-27b")
+    answer = groq.read(b"synthetic", "lineas", page_ref="doc#p1")
+    assert answer.data["items"][0]["bbox"] == [0.1, 0.2, 0.3, 0.26]
+    assert answer.external and answer.cost_eur == 0.0 and groq.mode == 1
+    assert [p.get("response_format", {}).get("type") for _, p in requests] == [
+        "json_schema",
+        "json_schema",
+        "json_object",
+    ]
+    _, payload = requests[-1]
+    text = payload["messages"][0]["content"][0]["text"]
+    assert "JSON Schema of the answer" in text  # sin esquema estricto, va en el prompt
+    assert payload["messages"][0]["content"][1]["image_url"]["url"].startswith("data:image/png")
+    cloudflare = providers.get_provider("cloudflare:@cf/qwen/qwen3.8-27b")
+    assert cloudflare.url.endswith("/accounts/cuenta/ai/v1/chat/completions")
+    with pytest.raises(PolicyError):
+        providers.get_provider("groq", dataset="real").read(b"x", "lineas", page_ref="d#p2")
+    monkeypatch.delenv("GROQ_API_KEY")
+    with pytest.raises(VisionUnavailable):
+        providers.get_provider("groq")

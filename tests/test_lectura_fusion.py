@@ -78,8 +78,15 @@ def test_model_file_round_trip_and_off_switch(tmp_path, monkeypatch):
     assert load_fusion() is None
 
 
-def test_strategy_without_model_warns_and_uses_the_heuristic(monkeypatch):
-    monkeypatch.setenv("TRAZIA_FUSION", "off")
-    strategy = get_strategy("d_hibrido+fusion")
-    assert strategy.fusion == "aprendida" and strategy.name == "d_hibrido+fusion"
+def test_d_uses_the_packaged_learned_fusion_by_default(monkeypatch):
+    monkeypatch.delenv("TRAZIA_FUSION", raising=False)
+    strategy = get_strategy("d_hibrido")
+    assert strategy.fusion == "aprendida" and strategy.name == "d_hibrido"
+    packaged = load_fusion()  # versionado en Git: un clon limpio tiene el mismo modelo
+    assert packaged is not None and packaged.fitted_on == "S-dev"
+    assert packaged.covers({"tabla": 1, "rag": 1, "geometria": 1})
+    old = get_strategy("d_hibrido+heuristica")
+    assert old.fusion == "heuristica" and old.name == "d_hibrido+heuristica"
     assert get_strategy("a_detector").reader == "detector"
+    monkeypatch.setenv("TRAZIA_FUSION", "off")
+    assert load_fusion() is None

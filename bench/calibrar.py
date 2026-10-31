@@ -36,7 +36,7 @@ from .units import same, to_canonical
 
 STRATEGIES = ("b_reglas", "c_rag", "d_hibrido")
 # Su confianza ya es una probabilidad ajustada en S-dev (fusión aprendida, tarea 3.4): sin curva.
-PASSTHROUGH = ("d_hibrido+fusion",)
+PASSTHROUGH = ("d_hibrido",)  # la fusión aprendida ya da probabilidades: sin curva isotónica
 TARGET_RISK = 0.05  # error máximo entre los campos que no se abstienen
 MIN_GROUP = 30  # menos datos no bastan para una curva o un cuantil propios
 TARGET_ECE = 0.05

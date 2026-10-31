@@ -28,6 +28,7 @@ import {
   useRef,
   useMemo,
   useState,
+  useSyncExternalStore,
   type ComponentProps,
   type ReactNode,
   type Ref,
@@ -36,8 +37,11 @@ import {
 import {
   AgXToneMapping,
   Box3,
+  CanvasTexture,
   Matrix4,
   OrthographicCamera,
+  RepeatWrapping,
+  SRGBColorSpace,
   Vector3,
   type DirectionalLight,
 } from "three";
@@ -402,14 +406,84 @@ function AdaptiveResolution() {
   return null;
 }
 
+/** Fondo del modo claro: papel gris muy claro con una retícula de puntos, como un cuaderno. */
+export const LIGHT_PAPER = "#f1f3f6";
+const LIGHT_DOT = "rgba(15, 23, 42, 0.18)";
+const DOT_SPACING_PX = 22;
+
+function subscribeTheme(onChange: () => void) {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+  return () => observer.disconnect();
+}
+
+/** Si la página está en modo claro. Lee `data-theme` de <html>: sirve también dentro del lienzo. */
+export function useLightPage(): boolean {
+  return useSyncExternalStore(
+    subscribeTheme,
+    () => document.documentElement.dataset.theme === "light",
+    () => false,
+  );
+}
+
+/** Retícula de puntos como fondo de la escena, con separación fija en píxeles de pantalla. */
+function dotTexture(): CanvasTexture {
+  const cell = 64;
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = cell;
+  const context = canvas.getContext("2d");
+  if (context) {
+    context.fillStyle = LIGHT_PAPER;
+    context.fillRect(0, 0, cell, cell);
+    context.fillStyle = LIGHT_DOT;
+    context.beginPath();
+    context.arc(cell / 2, cell / 2, cell * 0.055, 0, Math.PI * 2);
+    context.fill();
+  }
+  const dots = new CanvasTexture(canvas);
+  dots.colorSpace = SRGBColorSpace; // sRGB: three no le aplica el mapeo de tonos
+  dots.wrapS = dots.wrapT = RepeatWrapping;
+  return dots;
+}
+
+function DotBackdrop() {
+  const get = useThree((state) => state.get);
+  const width = useThree((state) => state.size.width);
+  const height = useThree((state) => state.size.height);
+  const invalidate = useThree((state) => state.invalidate);
+  const dots = useRef<CanvasTexture | null>(null);
+  useEffect(() => {
+    const texture = dotTexture();
+    const { scene } = get();
+    dots.current = texture;
+    scene.background = texture;
+    invalidate();
+    return () => {
+      // Al volver al modo oscuro, <color attach> ya puede haber puesto su fondo.
+      if (scene.background === texture) scene.background = null;
+      texture.dispose();
+      dots.current = null;
+    };
+  }, [get, invalidate]);
+  useEffect(() => {
+    dots.current?.repeat.set(width / DOT_SPACING_PX, height / DOT_SPACING_PX);
+    invalidate();
+  }, [width, height, invalidate]);
+  return null;
+}
+
 export function Studio({ effects = true }: { effects?: boolean }) {
   const room = useMemo(() => new RoomEnvironment(), []);
   const key = useRef<DirectionalLight>(null),
     rim = useRef<DirectionalLight>(null);
+  const light = useLightPage();
   useEffect(() => () => room.dispose(), [room]);
   return (
     <>
-      <color attach="background" args={[BRAND.black]} />
+      {light ? <DotBackdrop /> : <color attach="background" args={[BRAND.black]} />}
       <ambientLight intensity={0.4} color={BRAND.text} />
       <directionalLight
         ref={key}
@@ -490,7 +564,7 @@ export function Studio({ effects = true }: { effects?: boolean }) {
             ignoreBackground
           />
           <SMAA />
-          <Vignette offset={0.3} darkness={0.55} />
+          <Vignette offset={0.3} darkness={light ? 0.12 : 0.55} />
         </EffectComposer>
       ) : null}
     </>

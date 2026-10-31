@@ -28,7 +28,7 @@ from statistics import fmean
 from synthetic.cases import flatten, spec_from_dict
 from trazia.pipeline import InputDocument, process
 from trazia.strategies import d_hibrido
-from trazia.strategies.fusion import FEATURES, FusionModel
+from trazia.strategies.fusion import FEATURES, PACKAGED_PATH, FusionModel
 
 from .calibrar import vendor_libraries
 from .estudio import DATASET_NAMES, _documents, reviewed_by_oracle
@@ -212,6 +212,11 @@ def main(argv=None) -> int:
     parser.add_argument(
         "--reusar", action="store_true", help="Reajusta con las filas ya recogidas (filas.json)"
     )
+    parser.add_argument(
+        "--publicar",
+        action="store_true",
+        help="Copia el modelo a src/trazia/strategies/fusion_model.json, el que usa D",
+    )
     args = parser.parse_args(argv)
 
     os.environ["TRAZIA_CALIBRATION"] = "off"
@@ -272,6 +277,11 @@ def main(argv=None) -> int:
     )
     print(json.dumps(grid[best_c]["summary"], indent=1, ensure_ascii=False))
     print(f"Modelo en {args.salida / 'fusion.json'} (C={best_c}, sha256 {model.sha256[:12]})")
+    if args.publicar:
+        PACKAGED_PATH.write_text(
+            json.dumps(model.to_dict(), indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
+        print(f"Publicado en {PACKAGED_PATH}: es el que usa D a partir de ahora")
     return 0
 
 

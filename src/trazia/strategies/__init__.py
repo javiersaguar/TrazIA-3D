@@ -27,9 +27,11 @@ ABLATIONS: dict[str, Callable[[], Strategy]] = {
         )
         for channel in ("geometria", "memoria", "rag", "vision", "detector")
     },
-    # Variantes del estudio que no quitan un canal: D con fusión aprendida (3.4) y A con el
-    # detector propio como lector (2.4).
-    "d_hibrido+fusion": lambda: HybridStrategy(fusion="aprendida", name="d_hibrido+fusion"),
+    # Variantes del estudio que no quitan un canal: D con la fusión heurística de antes del
+    # 31/10 (la aprendida de 3.4 es ya la de D) y A con el detector propio como lector (2.4).
+    "d_hibrido+heuristica": lambda: HybridStrategy(
+        fusion="heuristica", name="d_hibrido+heuristica"
+    ),
     "a_detector": lambda: VisionGeometryStrategy(reader="detector", name="a_detector"),
 }
 

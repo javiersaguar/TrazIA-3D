@@ -1,4 +1,5 @@
-"""Proveedores de visión: Ollama local, Gemini y Mistral (DEC-03).
+"""Proveedores de visión: Ollama local, Gemini, Mistral y los servicios con la API de chat de
+OpenAI (Groq, OpenRouter, NVIDIA NIM y Cloudflare Workers AI) (DEC-03).
 
 Todos comparten `_cached_call`: caché, modo sin conexión, política de confidencialidad y registro
 de envíos. Solo cambia cómo se habla con cada servicio y cómo devuelve las cajas. HTTP con la
@@ -21,12 +22,15 @@ from . import cache, policy
 from .base import ProviderResult, VisionError, VisionUnavailable
 from .prompts import TASKS, validate
 
+# Algunos servicios (Groq) rechazan con 403 el agente por defecto de urllib.
+USER_AGENT = "TrazIA-3D/0.1"
+
 
 def _post(url: str, payload: dict, headers: dict | None = None, timeout: float = 600) -> dict:
     request = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json", **(headers or {})},
+        headers={"Content-Type": "application/json", "User-Agent": USER_AGENT, **(headers or {})},
         method="POST",
     )
     try:
@@ -47,7 +51,9 @@ def _post(url: str, payload: dict, headers: dict | None = None, timeout: float =
 
 def _get(url: str, key: str, timeout: float = 60) -> dict:
     """GET con clave, sin seguir redirecciones (la clave no sale hacia otro sitio)."""
-    request = urllib.request.Request(url, headers={"Authorization": f"Bearer {key}"})
+    request = urllib.request.Request(
+        url, headers={"Authorization": f"Bearer {key}", "User-Agent": USER_AGENT}
+    )
 
     class NoRedirect(urllib.request.HTTPRedirectHandler):
         def redirect_request(self, req, fp, code, msg, headers, newurl):
@@ -248,7 +254,7 @@ class GeminiProvider(_Provider):
                 "responseSchema": _gemini_schema(schema),
             },
         }
-        response = _post(url, payload, {"x-goog-api-key": self.key})
+        response = _post_retry(url, payload, {"x-goog-api-key": self.key})
         try:
             text = response["candidates"][0]["content"]["parts"][0]["text"]
             data = json.loads(text)
@@ -417,12 +423,166 @@ class MistralChatProvider(_Provider):
         }
 
 
+RETRY_WAITS = (5, 10, 20, 40, 60)  # segundos ante 429/503: cuotas gratuitas por minuto
+
+
+def _post_retry(url: str, payload: dict, headers: dict | None = None) -> dict:
+    """`_post` con reintentos cuando el servicio pide esperar (límite de tasa o saturación)."""
+    for wait in (*RETRY_WAITS, None):
+        try:
+            return _post(url, payload, headers)
+        except VisionError as exc:
+            if wait is None or not any(f"HTTP {c}" in str(exc) for c in (429, 503)):
+                raise
+            time.sleep(wait)
+    raise AssertionError("inalcanzable")
+
+
+def _json_from_text(text: str) -> dict:
+    """JSON de una respuesta de chat: sin razonamiento `<think>` ni vallas ```json."""
+    if "</think>" in text:
+        text = text.rsplit("</think>", 1)[1]
+    start, end = text.find("{"), text.rfind("}")
+    if start < 0 or end <= start:
+        raise json.JSONDecodeError("sin objeto JSON", text, 0)
+    return json.loads(text[start : end + 1])
+
+
+# Servicios con la API de chat de OpenAI: URL, variable de la clave y modelo por defecto.
+OPENAI_COMPATIBLE = {
+    "groq": (
+        "https://api.groq.com/openai/v1/chat/completions",
+        "GROQ_API_KEY",
+        "qwen/qwen3.8-27b",
+    ),
+    "openrouter": (
+        "https://openrouter.ai/api/v1/chat/completions",
+        "OPENROUTER_API_KEY",
+        "nvidia/nemotron-3.5-super-vl:free",
+    ),
+    "nvidia": (
+        "https://integrate.api.nvidia.com/v1/chat/completions",
+        "NVIDIA_API_KEY",
+        "meta/llama-3.2-90b-vision-instruct",
+    ),
+    "cloudflare": (
+        "https://api.cloudflare.com/client/v4/accounts/{account}/ai/v1/chat/completions",
+        "CLOUDFLARE_API_TOKEN",
+        "@cf/meta/llama-3.2-11b-vision-instruct",
+    ),
+}
+# Cómo se pide JSON, de más a menos estricto. Si el modelo rechaza un modo, se pasa al siguiente
+# y se recuerda para las siguientes llamadas.
+JSON_MODES = ("json_schema", "json_object", "texto")
+
+
+class OpenAICompatibleProvider(_Provider):
+    """Groq, OpenRouter, NVIDIA NIM y Cloudflare Workers AI con el formato de chat de OpenAI.
+
+    Externos: solo sintéticos salvo autorización (DEC-03). Coste 0 € por defecto porque se usan
+    las cuotas gratuitas; con `<SERVICIO>_EUR_PER_MTOK_IN/OUT` se fija el precio de pago.
+    """
+
+    external = True
+
+    def __init__(self, family: str, model: str | None = None, *, dataset: str = "synthetic"):
+        super().__init__(dataset=dataset)
+        url, key_env, default = OPENAI_COMPATIBLE[family]
+        self.family = family
+        self.model = model or os.environ.get(f"{family.upper()}_MODEL", default)
+        self.name = f"{family}:{self.model}"
+        self.key = os.environ.get(key_env)
+        if family == "cloudflare":
+            account = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
+            url = url.format(account=account) if account else ""
+        self.url = url
+        self.mode = 0
+        if (not self.key or not self.url) and not cache.offline():
+            raise VisionUnavailable(f"{family}: falta {key_env} en .env")
+
+    def _payload(self, image_png: bytes, prompt: str, schema: dict) -> dict:
+        mode = JSON_MODES[self.mode]
+        text = prompt
+        if mode != "json_schema":
+            text += "\nJSON Schema of the answer: " + json.dumps(schema, separators=(",", ":"))
+        payload = {
+            "model": self.model,
+            "temperature": 0,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": text},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": "data:image/png;base64,"
+                                + base64.b64encode(image_png).decode("ascii")
+                            },
+                        },
+                    ],
+                }
+            ],
+        }
+        if mode == "json_schema":
+            payload["response_format"] = {
+                "type": "json_schema",
+                "json_schema": {"name": "lectura", "schema": schema, "strict": True},
+            }
+        elif mode == "json_object":
+            payload["response_format"] = {"type": "json_object"}
+        return payload
+
+    def _call(self, image_png, prompt, schema):
+        if not self.key or not self.url:
+            raise VisionUnavailable(f"{self.family}: falta la clave")
+        started = time.perf_counter()
+        while True:
+            try:
+                response = _post_retry(
+                    self.url,
+                    self._payload(image_png, prompt, schema),
+                    {"Authorization": f"Bearer {self.key}"},
+                )
+                break
+            except VisionError as exc:
+                rejected = "HTTP 400" in str(exc) or "HTTP 422" in str(exc)
+                if not rejected or self.mode == len(JSON_MODES) - 1:
+                    raise
+                self.mode += 1  # el modelo no acepta este modo de JSON: probar el siguiente
+        try:
+            content = response["choices"][0]["message"]["content"]
+            data = _json_from_text(content) if isinstance(content, str) else content
+        except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
+            raise VisionError(f"{self.name}: respuesta inesperada ({exc})") from None
+        usage = response.get("usage") or {}
+        tokens_in, tokens_out = usage.get("prompt_tokens"), usage.get("completion_tokens")
+        prefix = self.family.upper()
+        cost = (tokens_in or 0) / 1e6 * _price(f"{prefix}_EUR_PER_MTOK_IN", 0.0) + (
+            tokens_out or 0
+        ) / 1e6 * _price(f"{prefix}_EUR_PER_MTOK_OUT", 0.0)
+        return data, {
+            "seconds": time.perf_counter() - started,
+            "tokens_in": tokens_in,
+            "tokens_out": tokens_out,
+            "cost_eur": cost,
+        }
+
+
+def _openai_compatible(family: str) -> Callable[..., _Provider]:
+    def factory(model: str | None = None, *, dataset: str = "synthetic") -> _Provider:
+        return OpenAICompatibleProvider(family, model, dataset=dataset)
+
+    return factory
+
+
 FACTORIES: dict[str, Callable[..., _Provider]] = {
     "ollama": OllamaProvider,
     "gemini": GeminiProvider,
     "mistral-ocr": MistralOCRProvider,
     "mistral": MistralOCRProvider,
     "mistral-chat": MistralChatProvider,
+    **{family: _openai_compatible(family) for family in OPENAI_COMPATIBLE},
 }
 
 
