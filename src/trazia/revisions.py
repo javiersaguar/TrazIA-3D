@@ -216,8 +216,11 @@ def compare(
                 "identity_proposal": match,
             }
         )
+    unplaced = {*before.unplaced_nozzles, *after.unplaced_nozzles}
     for path in sorted(old.keys() | new.keys()):
         left, right = old.get(path), new.get(path)
+        if path.startswith("nozzles.") and path.split(".")[1] in unplaced and not (left and right):
+            continue  # se leyó en las dos revisiones: falta colocarla, no es un alta ni una baja
         evidence = {
             "before_source": left.source.model_dump(mode="json") if left else None,
             "after_source": right.source.model_dump(mode="json") if right else None,
@@ -339,6 +342,7 @@ def compare(
         "changes": changes,
         "provenance_changes": provenance,
         "document_changes": documents,
+        "unplaced_nozzles": sorted(unplaced),
         "before_sha256": before.fingerprint(),
         "after_sha256": after.fingerprint(),
     }

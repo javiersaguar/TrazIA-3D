@@ -19,7 +19,7 @@ from trazia.cli import main
 from trazia.extraction import LabelExtractor, assemble
 from trazia.ifc import build_ifc, export_ifc, head_mesh
 from trazia.ingest import ingest_bytes, render_evidence
-from trazia.model import Revision, load_revision
+from trazia.model import Revision, fields, load_revision
 from trazia.review import approve, verify_originals
 from trazia.revisions import compare
 from trazia.viewer import figure, meshes_from_ifc
@@ -60,7 +60,7 @@ def test_nonfinite_dimensions(revision, value):
 
 
 @pytest.mark.parametrize(
-    "case", ["unit", "document", "duplicate", "height", "extra", "hash", "page", "skirt", "count"]
+    "case", ["unit", "document", "duplicate", "height", "extra", "hash", "page", "skirt"]
 )
 def test_invalid_contract(data, case):
     if case == "unit":
@@ -77,10 +77,8 @@ def test_invalid_contract(data, case):
         del data["documents"][0]["sha256"]
     elif case == "page":
         data["equipment"]["height"]["source"]["page"] = 2
-    elif case == "skirt":
-        data["equipment"]["skirt_thickness"]["value"] = 1000
     else:
-        data["equipment"]["nozzles"] = data["equipment"]["nozzles"][:2]
+        data["equipment"]["skirt_thickness"]["value"] = 1000
     with pytest.raises(ValidationError):
         validate(data)
 
@@ -233,6 +231,63 @@ def test_conflicts_missing_values_and_length_conversion(revision):
     line.text = "DIAMETER = 2 m"
     bundle.lines = [line]
     assert LabelExtractor().extract([bundle])[0].value == 2000
+
+
+def test_a_nozzle_outside_the_shell_stays_out_of_the_model_not_the_whole_equipment(revision):
+    bundle = ingest_bytes(originals(revision)["GA-V101"], "drawing.pdf", "GA-V101", "A")
+    candidates = LabelExtractor().extract([bundle])
+    copies = [
+        c.model_copy(update={"path": c.path.replace("N1", "N9")}, deep=True)
+        for c in candidates
+        if c.path.startswith("nozzles.N1.")
+    ]
+    next(c for c in copies if c.path.endswith(".elevation")).value = 90000.0
+    warnings = []
+    output = assemble(
+        [bundle],
+        candidates + copies,
+        project_id="DEMO",
+        equipment_id="V101",
+        revision="A",
+        warnings=warnings,
+    )
+    assert "N9" not in [n.id for n in output.equipment.nozzles]
+    assert any("no caben en la virola" in w and "N9" in w for w in warnings)
+    assert output.unplaced_nozzles == ["N9"]
+
+
+def test_a_draft_with_two_nozzles_can_be_reviewed_but_not_approved(revision):
+    bundle = ingest_bytes(originals(revision)["GA-V101"], "drawing.pdf", "GA-V101", "A")
+    candidates = LabelExtractor().extract([bundle])
+    next(c for c in candidates if c.path == "nozzles.N1.elevation").value = 90000.0
+    draft = assemble([bundle], candidates, project_id="DEMO", equipment_id="V101", revision="A")
+    assert [n.id for n in draft.equipment.nozzles] == ["N2", "N3"]
+    assert draft.unplaced_nozzles == ["N1"]
+    build_ifc(draft, draft=True)
+    for traced in fields(draft.equipment).values():
+        traced.state = "accepted"
+    with pytest.raises(ValueError, match="al menos tres boquillas"):
+        approve(draft, "Revisora", {"GA-V101": originals(revision)["GA-V101"]})
+
+
+def test_an_empty_unplaced_list_does_not_change_approved_fingerprints(revision):
+    data = revision.model_dump(mode="json")
+    data.pop("unplaced_nozzles")
+    assert Revision.model_validate(data).fingerprint() == revision.fingerprint()
+    other = revision.model_copy(update={"unplaced_nozzles": ["N9"]})
+    assert other.fingerprint() != revision.fingerprint()
+
+
+def test_a_nozzle_read_but_not_placed_is_neither_added_nor_removed(revision):
+    gone = revision.model_copy(deep=True)
+    del gone.equipment.nozzles[0]
+    removed = compare(revision, gone)["changes"]
+    assert sum(c["operation"] == "removed" for c in removed) == 4
+    unread = gone.model_copy(update={"unplaced_nozzles": ["N1"]})
+    report = compare(revision, unread)
+    assert not [c for c in report["changes"] if c["path"].startswith("nozzles.N1.")]
+    assert report["unplaced_nozzles"] == ["N1"]
+    assert compare(unread, revision)["changes"] == []
 
 
 def test_formulas_and_images_require_review():

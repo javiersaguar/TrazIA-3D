@@ -4,6 +4,7 @@
 reconciliación, contrato, familia e IFC. No lanza excepciones por datos malos: devuelve `error`.
 """
 
+import re
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -12,7 +13,7 @@ from typing import Literal
 from .calibration import load_calibration
 from .extraction import Candidate, assemble
 from .ingest import ingest_bytes
-from .model import Revision, RunInfo
+from .model import Revision, RunInfo, Source
 from .reconcile import resolve
 from .reconcile.grounding import is_grounded
 from .strategies import STRATEGIES, StageEvent, StrategyContext, get_strategy
@@ -44,6 +45,38 @@ KINDS = (
     ("VESOR_", "orientación de boquillas"),
     ("ESTRUCTURA_", "estructura auxiliar"),
 )
+
+
+# Convención de nombres del dataset (pág. 12 del reto): GAD_<TAG>_rev1.pdf, HDM_<TAG>_rev1.xlsx…
+FILENAME_TAG = re.compile(r"^(?:GAD|GA|HDM|VESOR|ESTRUCTURA)_(.+?)(?:_rev[^_.]*)?\.\w+$", re.I)
+FILENAME_LOCATOR = "Nombre del archivo"
+
+
+def _tag_from_filename(bundles) -> Candidate | None:
+    """El tag cuando ningún documento lo trae escrito: el dataset llega sin cajetines.
+
+    La evidencia es el nombre del archivo, no una región de la página, y el campo pasa por la misma
+    revisión humana que cualquier otro.
+    """
+    for bundle in bundles:
+        match = FILENAME_TAG.match(bundle.document.filename)
+        if match:
+            name = bundle.document.filename
+            return Candidate(
+                path="tag",
+                value=match[1],
+                unit="1",
+                source=Source(
+                    document_id=bundle.document.id,
+                    page=1,
+                    locator=f"{FILENAME_LOCATOR}: {name}",
+                    confidence=0.6,
+                ),
+                channel="nombre_archivo",
+                text_original=name,
+                explanation="Ningún documento trae el tag escrito: sale del nombre del archivo.",
+            )
+    return None
 
 
 def _classify(filename: str) -> str | None:
@@ -148,6 +181,9 @@ def process(
     run.accounting_complete = run.cost_eur is not None
 
     candidates = _ground(output.candidates, bundles, warnings, emit, equipment_id, output.evidence)
+    if not any(c.path == "tag" for c in candidates) and (tag := _tag_from_filename(bundles)):
+        candidates.append(tag)
+        warnings.append(f"Tag tomado del nombre del archivo: {tag.value}.")
     resolution = resolve(candidates)
     warnings += resolution.warnings
     emit(

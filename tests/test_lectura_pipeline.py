@@ -2,7 +2,10 @@
 
 from pathlib import Path
 
+from bench.support import is_cited, is_supported
+from trazia import pipeline
 from trazia.extraction import Candidate
+from trazia.ingest import ingest_bytes
 from trazia.model import Source
 from trazia.pipeline import InputDocument, process
 from trazia.reconcile import resolve
@@ -78,6 +81,38 @@ def test_default_strategy_falls_back_to_b_with_a_warning_until_d_exists():
         any("D aún no está implementada" in w for w in result.warnings)
         or result.run.strategy == "d_hibrido"
     )
+
+
+def test_the_tag_falls_back_to_the_filename_when_no_document_has_it(monkeypatch):
+    original = pipeline._ground
+
+    def without_tag(*args, **kwargs):  # como un plano sin cajetín
+        return [c for c in original(*args, **kwargs) if c.path != "tag"]
+
+    monkeypatch.setattr(pipeline, "_ground", without_tag)
+    result = process(
+        demo_documents(), project_id="P", equipment_id="v-101", revision="A", strategy="b_reglas"
+    )
+    assert result.error is None
+    tag = result.revision.equipment.tag
+    assert tag.value == "V-101"
+    assert tag.source.bbox is None and tag.source.locator.startswith(pipeline.FILENAME_LOCATOR)
+    assert tag.state == "candidate" and result.revision.pending_review()
+    assert any("nombre del archivo" in w for w in result.warnings)
+    [cited] = [c for c in result.candidates if c.path == "tag"]
+    assert is_cited(cited)
+    bundle = ingest_bytes(demo_documents()[0].data, "GAD_V-101_revA.pdf", "GA-V101", "A")
+    assert is_supported(cited, bundle) is True
+    assert is_supported(cited.model_copy(update={"value": "P-999"}), bundle) is False
+
+
+def test_a_tag_read_from_a_document_keeps_priority_over_the_filename():
+    documents = [
+        InputDocument(d.filename.replace("V-101", "X-999"), d.data, d.document_id)
+        for d in demo_documents()
+    ]
+    result = process(documents, project_id="P", equipment_id="v-101", revision="A")
+    assert result.revision.equipment.tag.value == "V-101"
 
 
 def test_bad_inputs_return_errors_instead_of_raising():

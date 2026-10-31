@@ -333,3 +333,70 @@ limpio, 10 condiciones, 6 equipos. Salida en `generated/estudio-avision/`.
   fallo visto en la demo V-101.
 - **Excepción.** Los canales apagados al entrenar la fusión responden al diagnóstico del 30/10, que
   salió de S-reservado.
+
+### Estudio 4 · correcciones de delta y DRAFT revisable (31/10/2026)
+
+> **Base de estas cifras:** `a4dd9a7`, antes de integrar la fusión aprendida del estudio 3. Sobre
+> `origin/main` solo se ha comprobado que pasan las 317 pruebas y el recorrido por la API; la
+> comparación medida con esa fusión sigue pendiente. No citar estas cifras como resultado de D con
+> fusión aprendida.
+
+Mismos conjuntos, semillas y 1.000 remuestreos que el estudio 2. **Datos sintéticos.** Calibración
+reajustada solo con S-dev, sha256 `585563fae0d9…`. No es comparable al céntimo con el estudio 2:
+esta máquina no tiene la caché del detector propio. La línea base se repitió aquí con el mismo
+arnés y da 0,633, frente a 0,642 publicado, una diferencia que coincide con el aporte del detector.
+
+| Variante | Puntuación | IC 95 % | Geometría | Atributos | ECE | F1 cambios | Cobertura 90 % | Modelos |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `d_hibrido` | **0,678** | [0,645; 0,710] | 47,7 % | 89,5 % | 0,112 | 57,7 % | 96,9 % | 82,5 % |
+| `d_hibrido` antes | 0,633 | [0,601; 0,665] | 42,0 % | 89,5 % | 0,107 | 44,5 % | 95,2 % | 45,0 % |
+| `d_hibrido-memoria` | 0,673 | [0,639; 0,706] | 47,5 % | 89,5 % | 0,125 | 57,0 % | 97,1 % | 82,5 % |
+| `c_rag` | 0,591 | [0,542; 0,634] | 33,9 % | 82,6 % | 0,136 | 46,8 % | 93,7 % | 67,1 % |
+| `b_reglas` | 0,548 | [0,509; 0,588] | 20,6 % | 80,8 % | 0,006 | 37,4 % | 100 % | 33,3 % |
+
+Alucinación 0 % y cita 100 % en todas.
+
+| D, antes → después | Puntuación | F1 cambios |
+| --- | --- | --- |
+| Vectorial | 0,893 → 0,919 | 82,2 % → 93,4 % |
+| Escaneado limpio | 0,527 → 0,632 | 14,1 % → 49,2 % |
+| Escaneado pobre | 0,414 → 0,468 | 6,6 % → 25,1 % |
+| S-dev | 0,702 → 0,750 | 48,2 % → 63,2 % |
+| S-reservado | 0,526 → 0,566 | 38,9 % → 48,4 % |
+| S-adversarial (aparte) | 0,942 → 0,999 | 71,4 % → 100 % |
+
+Por pasos, en una pasada sin calibrar sobre S-dev y S-reservado (F1 de cambios):
+
+| Paso | F1 | Lectura |
+| --- | --- | --- |
+| Línea base | 44,5 % | 74 de 120 casos sin modelo en alguna revisión; 73 son escaneados |
+| Memoria comprueba la marca en la fila + boquilla que no cabe fuera del modelo | 50,1 % | Las 12 boquillas eliminadas que la memoria resucitaba desaparecen |
+| Tolerancias de ROADMAP F.2 (±1 mm, ±0,5°) | 51,3 % | 17 falsos cambios de 0,1 a 0,3 mm |
+| Tag desde el nombre del archivo | 51,3 % | Sin efecto medible aquí; necesario porque el dataset llega sin cajetines |
+| DRAFT con menos de 3 boquillas | 44,8 % | Muchos más modelos, pero 341 falsos altas y bajas |
+| `unplaced_nozzles`: leída y sin colocar no es alta ni baja | 57,7 % | Precisión 0,61 y recall 0,55, frente a 0,71 y 0,32 en la línea base |
+
+Lo que cambia respecto al estudio 2:
+
+- **H5 sigue rechazada, pero la memoria ya no resta.** Quitarla vale ahora −0,005 [−0,009; −0,002]
+  y baja el F1 de 57,7 % a 57,0 %. El 45,9 % frente a 51,3 % del estudio 2 era un fallo: la memoria
+  heredaba la región sin comprobar la marca y mantenía viva una boquilla eliminada.
+- **Alucinación 0 % no detectó ese fallo:** el número estaba en la región citada, pero era de otra
+  boquilla. Esa cifra mide si el valor existe en la cita, no si es del campo correcto.
+- **La media esconde el reparto.** Dos de cada tres condiciones son escaneados porque así lo decidió
+  el generador. Con planos vectoriales, D ya está en 93,4 % de F1; la proporción real se desconoce
+  hasta resolver la tarea 0.9.
+- **La calibración no mejora.** En S-reservado, D pasa de ECE bruta 0,142 a 0,267 calibrada, igual
+  que antes. Sigue siendo el reparto de `geometria|vector`: 593 campos con 95 % de acierto que la
+  curva deja en 0,36.
+
+Límites de esta medición:
+
+- Se midió con `bench.estudio.run_case` en lotes cortos, no con `python -m bench.estudio`. Ese
+  proceso largo cayó tres veces en esta máquina con una violación de acceso en
+  `ifcopenshell.create_shape`. En lotes no cayó ninguno de los 528 casos, y las 198 revisiones
+  guardadas pasan aisladas; la causa exacta queda sin confirmar.
+- Sin detector propio, y sin repetir las ablaciones de geometría y RAG.
+- El diagnóstico miró resultados de S-reservado, que ya no era una medida a ciegas.
+- El F1 de esta sección usa las tolerancias nuevas, más próximas a las de la verdad del bench; la
+  línea base usa las antiguas.
