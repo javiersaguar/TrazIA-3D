@@ -159,6 +159,7 @@ export function IfcViewer({
           <Studio />
           <CameraRig
             bounds={displayBounds ?? model.bounds}
+            orbitCenter={displayBounds ? undefined : products.find(product => product.semanticId === "shell")?.center}
             view={activeView}
             handle={camera}
             measureKey={measureKey}

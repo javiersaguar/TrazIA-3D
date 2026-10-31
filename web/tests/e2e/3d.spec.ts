@@ -85,6 +85,8 @@ test("Cambios conserva extremos exactos, segmentos y comparación A B", async ({
   await expect(page.getByText(/Paso 1 de/)).toBeVisible();
   await page.getByText("A | B", { exact: true }).click();
   await expect(viewer.locator("canvas")).toHaveCount(2);
+  await viewer.getByRole("button", { name: "Pausar giro de cámara 360°", exact: true }).nth(1).click();
+  await expect(viewer.getByRole("button", { name: "Activar giro de cámara 360°", exact: true })).toHaveCount(2);
   await page.getByRole("button", { name: "Presentación", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Salir de presentación" }),
@@ -302,4 +304,48 @@ test("el seguimiento de cambios conserva el acercamiento al cambiar la narració
       timeout: 5000,
     })
     .toBeGreaterThan(initial * 2);
+});
+
+
+test("la cámara gira alrededor del equipo y permite detener el giro", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/lab/showcase");
+  const canvas = page.locator("canvas");
+  await expect(canvas).toHaveAttribute("data-camera-position", /,/);
+  const family = await page.locator("[data-equipment-kind]").getAttribute("data-equipment-kind");
+  const before = await canvas.getAttribute("data-camera-position");
+  await expect.poll(() => canvas.getAttribute("data-camera-position")).not.toBe(before);
+  await page.getByRole("button", { name: "Pausar giro de cámara 360°", exact: true }).click();
+  await expect(page.locator("[data-equipment-kind]")).toHaveAttribute("data-equipment-kind", family!);
+  await page.waitForTimeout(600);
+  const paused = await canvas.getAttribute("data-camera-position");
+  await page.waitForTimeout(500);
+  expect(await canvas.getAttribute("data-camera-position")).toBe(paused);
+  await page.getByRole("button", { name: "Activar giro de cámara 360°", exact: true }).click();
+  await expect.poll(() => canvas.getAttribute("data-camera-position")).not.toBe(paused);
+});
+
+test("movimiento reducido mantiene la cámara estática", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/lab/showcase");
+  await expect(page.getByRole("button", { name: "Activar giro de cámara 360°", exact: true })).toBeDisabled();
+  const canvas = page.locator("canvas");
+  await expect(canvas).toHaveAttribute("data-camera-position", /,/);
+  await page.waitForTimeout(500);
+  const before = await canvas.getAttribute("data-camera-position");
+  await page.waitForTimeout(500);
+  expect(await canvas.getAttribute("data-camera-position")).toBe(before);
+});
+
+test("el holograma IFC con tres recortes cumple el presupuesto de triángulos", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/lab/holograma");
+  await page.getByRole("button", { name: "ifc", exact: true }).click();
+  await expect(page.getByText("Brida de boquilla · IFC", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Medir 5 s", exact: true }).click();
+  const output = page.getByTestId("hologram-performance");
+  await expect(output).toContainText('"triangles"', { timeout: 20000 });
+  const measurement = JSON.parse((await output.textContent())!);
+  expect(measurement.triangles).toBeGreaterThan(0);
+  expect(measurement.triangles).toBeLessThanOrEqual(200000);
 });

@@ -285,6 +285,7 @@ function TransitionScene({
       <Studio />
       <CameraRig
         bounds={viewBounds}
+        orbitCenter={data.bounds.min.map((value, index) => (value + data.bounds.max[index]!) / 2) as [number, number, number]}
         view="front"
         handle={camera}
         measureKey={measureKey}

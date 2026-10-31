@@ -33,7 +33,7 @@ scope.onmessage = async ({ data }: MessageEvent<LoadRequest>) => {
     api.SetWasmPath(data.wasmPath, true);
     await api.Init(undefined, true);
     initialized = true;
-    modelId = api.OpenModel(new Uint8Array(buffer), { COORDINATE_TO_ORIGIN: false, CIRCLE_SEGMENTS: 48 });
+    modelId = api.OpenModel(new Uint8Array(buffer), { COORDINATE_TO_ORIGIN: false, CIRCLE_SEGMENTS: 24 });
     if (modelId < 0) throw new Error("El archivo no se pudo abrir como IFC");
     const products: IfcProduct[] = [];
     const bounds = emptyBounds();

@@ -16,11 +16,12 @@ import {
   SSAO,
   Vignette,
 } from "@react-three/postprocessing";
-import { Camera, Maximize, Minus, Plus, RotateCcw } from "lucide-react";
+import { Camera, Maximize, Minus, Plus, RotateCcw, Pause, Play } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import {
   Component,
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useImperativeHandle,
@@ -68,6 +69,9 @@ const OverlayContext = createContext<RefObject<HTMLDivElement | null> | null>(
   null,
 );
 
+const OrbitContext = createContext({ enabled: true, pause: () => {} });
+export const ORBIT_SECONDS = 60;
+
 export function SceneLabel(props: ComponentProps<typeof DreiHtml>) {
   const portal = useContext(OverlayContext);
   return (
@@ -86,6 +90,8 @@ export function CameraRig({
   measureKey,
   onMeasure,
   interactive = true,
+  orbit = true,
+  orbitCenter,
   link,
 }: {
   bounds: Bounds;
@@ -95,9 +101,16 @@ export function CameraRig({
   measureKey?: number;
   onMeasure?(sample: PerformanceSample): void;
   interactive?: boolean;
+  orbit?: boolean;
+  orbitCenter?: Vec3;
   link?: CameraLink;
 }) {
   const controls = useRef<CameraControls>(null);
+  const rotation = useContext(OrbitContext);
+  const holding = useRef(false);
+  const resumeAt = useRef(0);
+  const orbitEnabled = orbit && rotation.enabled;
+  const holdOrbit = () => { resumeAt.current = performance.now() + 6000; };
   const { camera, gl, scene, invalidate, size: viewport } = useThree();
   const reduce = useReducedMotion();
   const canvasNode = useRef<HTMLCanvasElement | null>(null);
@@ -124,6 +137,8 @@ export function CameraRig({
         "data-camera-zoom",
         String((camera as OrthographicCamera).zoom),
       );
+      canvasNode.current?.setAttribute("data-camera-position", camera.position.toArray().join(","));
+      canvasNode.current?.setAttribute("data-camera-target", controls.current?.getTarget(new Vector3()).toArray().join(",") ?? "");
       lastPose.current = now;
     }
     if (!link) return;
@@ -175,6 +190,14 @@ export function CameraRig({
       Math.min(650, Math.max(5, zoom)),
       smooth && !reduce,
     );
+    if (orbitCenter && !smooth && !focusBounds.current) {
+      // El centro físico prevalece sobre el espacio reservado para rótulos y recortes.
+      controls.current?.update(0);
+      controls.current?.setOrbitPoint(...orbitCenter);
+      controls.current?.update(0);
+      lastPose.current = 0;
+      publishPose();
+    }
     invalidate();
   };
   const show = (next: View, smooth: boolean) => {
@@ -216,6 +239,7 @@ export function CameraRig({
   });
   useEffect(() => {
     const previous = configured.current;
+    if (previous.initialized && previous.view !== view) rotation.pause();
     if (
       !previous.initialized ||
       previous.view !== view ||
@@ -242,11 +266,13 @@ export function CameraRig({
   }, [view, boundsKey, viewport.width, viewport.height]);
   useImperativeHandle(handle, () => ({
     view: (next) => {
+      rotation.pause();
       focusBounds.current = null;
       focusNormal.current = undefined;
       show(next, true);
     },
     fit: (target, normal) => {
+      holdOrbit();
       focusBounds.current = target ?? bounds;
       focusNormal.current = normal;
       void controls.current?.fitToBox(asBox(focusBounds.current), !reduce, {
@@ -273,6 +299,7 @@ export function CameraRig({
       invalidate();
     },
     zoom: (factor) => {
+      holdOrbit();
       void controls.current?.zoomTo(
         (camera as OrthographicCamera).zoom * factor,
         !reduce,
@@ -292,7 +319,14 @@ export function CameraRig({
       });
     },
   }));
+  useEffect(() => { invalidate(); }, [orbitEnabled, reduce, invalidate]);
   useFrame((_, delta) => {
+    if (orbitEnabled && reduce === false) {
+      if (!holding.current && performance.now() >= resumeAt.current) {
+        void controls.current?.rotate(Math.min(delta, 0.05) * Math.PI * 2 / ORBIT_SECONDS, 0, false);
+      }
+      invalidate();
+    }
     const drawCalls = gl.info.render.calls,
       triangles = gl.info.render.triangles;
     gl.info.reset();
@@ -307,7 +341,7 @@ export function CameraRig({
     if (elapsed > 300) s.deltas.push(now - s.previous);
     s.previous = now;
     if (elapsed < 5300) {
-      if (!reduce) void controls.current?.rotate(delta * 0.35, 0, false);
+
       invalidate();
     } else {
       const deltas = [...s.deltas].sort((a, b) => a - b);
@@ -346,7 +380,10 @@ export function CameraRig({
       maxPolarAngle={Math.PI * 0.98}
       regress
       onUpdate={publishPose}
+      onControl={holdOrbit}
+      onControlEnd={() => { holding.current = false; holdOrbit(); }}
       onControlStart={() => {
+        holding.current = true;
         controls.current?.stop();
         onUserControl?.();
       }}
@@ -483,13 +520,25 @@ class RenderBoundary extends Component<
 export function SceneCanvas({
   children,
   label,
+  rotating: controlledRotating,
+  onRotationChange,
 }: {
   children: ReactNode;
   label: string;
+  rotating?: boolean;
+  onRotationChange?(value: boolean): void;
 }) {
   const portal = useRef<HTMLDivElement>(null),
     root = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(true);
+  const [localRotating, setLocalRotating] = useState(true);
+  const rotating = controlledRotating ?? localRotating;
+  const setRotating = useCallback((value: boolean) => {
+    setLocalRotating(value);
+    onRotationChange?.(value);
+  }, [onRotationChange]);
+  const reduce = useReducedMotion();
+  const rotation = useMemo(() => ({ enabled: active && rotating, pause: () => setRotating(false) }), [active, rotating, setRotating]);
   useEffect(() => {
     let visible = true;
     const update = () => setActive(visible && !document.hidden);
@@ -526,12 +575,23 @@ export function SceneCanvas({
           aria-label={label}
         >
           <Selection>
-            <OverlayContext.Provider value={portal}>
-              {children}
-            </OverlayContext.Provider>
+            <OrbitContext.Provider value={rotation}>
+              <OverlayContext.Provider value={portal}>
+                {children}
+              </OverlayContext.Provider>
+            </OrbitContext.Provider>
           </Selection>
         </Canvas>
         <div ref={portal} className={styles.labels} />
+        <button type="button" className={`${styles.button} ${styles.orbit}`} disabled={!!reduce}
+          aria-label={rotating && !reduce ? "Pausar giro de cámara 360°" : "Activar giro de cámara 360°"}
+          aria-pressed={rotating && !reduce}
+          title={reduce ? "Giro desactivado por movimiento reducido" : "Una vuelta por minuto · pausa al arrastrar"}
+          onPointerDown={event => event.stopPropagation()}
+          onPointerUp={event => event.stopPropagation()}
+          onClick={event => { event.stopPropagation(); setRotating(!rotating); }}>
+          {rotating && !reduce ? <Pause /> : <Play />} 360°
+        </button>
       </RenderBoundary>
     </div>
   );

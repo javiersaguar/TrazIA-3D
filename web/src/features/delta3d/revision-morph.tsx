@@ -287,6 +287,7 @@ function TimelineScene({
       <CameraRig
         bounds={bounds}
         handle={rig}
+        orbit={!playing}
         onUserControl={() => {
           state.current.playing = false;
           onStop();
@@ -402,6 +403,7 @@ export function RevisionMorph({
     hoveredId = useSelection((s) => s.hoveredId),
     setHovered = useSelection((s) => s.setHovered);
   const [onlyChanged, setOnlyChanged] = useState(false);
+  const [orbiting, setOrbiting] = useState(true);
   const steps = useMemo(() => changeSteps(changes), [changes]);
   const link = useMemo(() => new CameraLink(), []);
   const bounds = useMemo<Bounds>(
@@ -493,12 +495,16 @@ export function RevisionMorph({
                 </span>
                 <SceneCanvas
                   label={`IFC ${i ? "B" : "A"} sintético, cámaras sincronizadas`}
+                  rotating={orbiting}
+                  onRotationChange={setOrbiting}
                 >
                   <Studio />
                   <CameraRig
                     bounds={bounds}
                     handle={i ? null : camera}
                     link={link}
+                    orbit={i === 0}
+                    onUserControl={() => setOrbiting(false)}
                   />
                   {products
                     .filter(

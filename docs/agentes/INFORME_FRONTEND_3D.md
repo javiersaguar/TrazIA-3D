@@ -88,3 +88,54 @@ package.json o el lockfile. Se mantienen las firmas públicas; solo se añaden p
 
 Skills aplicadas: frontend-design, ui-ux-pro-max, react-best-practices, emil-design-eng y animate;
 guías de Next 16 consultadas en la versión instalada. Sin firmas de herramientas ni coautores.
+
+
+## Sesión 31/10 · giro de cámara y presupuesto geométrico
+
+### Hecho
+
+- Giro automático de cámara alrededor del centro físico del modelo, sobre el eje
+  vertical, a una vuelta por minuto. Se comparte en los visores que usan CameraRig:
+  escaparate, holograma/Modelo, Revisión, Cambios y planta. Las miniaturas PNG siguen
+  siendo imágenes. La figura y sus coordenadas IFC no se transforman para simular el giro.
+- Botón 360° para pausar/reanudar. Arrastrar, enfocar o ampliar suspende temporalmente
+  el giro; una vista fija elegida por la persona lo pausa. En A | B el estado se
+  comparte y arrastrar cualquiera de las cámaras pausa ambas. Durante la coreografía
+  de Cambios manda su cámara, y después vuelve la órbita.
+- Con movimiento reducido no hay giro automático. Fuera de pantalla o con la pestaña
+  oculta el Canvas sigue sin dibujar. useFrame/refs, sin estado React por fotograma.
+- El espacio reservado a recortes/rótulos no desplaza el eje de órbita. Pausar no
+  dispara el clic que cambia la familia del escaparate.
+- Teselación circular del worker IFC de 48 a 24 segmentos y menor densidad en perfiles
+  ilustrativos. Se mantienen geometría leída del IFC, huecos, GUID, Psets y selección.
+  No cambian los archivos IFC públicos ni se añade una malla aproximada alternativa.
+  La prueba de las cinco familias cuenta también los pernos instanciados.
+
+### Verificación medida
+
+Escena IFC sintética enriquecida con los tres recortes: **157.538 triángulos**,
+**235.3 fps**, p95 **4.9 ms**, 944 draw calls, DPR **1**,
+Chrome y RTX 5070 Laptop. Reduce el conteo anterior de 296.162 por debajo de 200.000.
+No se interpreta como comparación controlada de FPS con la sesión anterior: cambian
+DPR y carga compartida; Lectura ejecutaba estudios. No acredita un portátil sin GPU dedicada.
+
+Órbita completa comprobada en navegador: **385.7° en 64.185 s**;
+variación máxima del radio **7.1e-15** unidades de escena. El giro no altera
+la geometría ni desplaza el modelo respecto a su propio eje.
+
+Typecheck, lint (aviso previo de TanStack), 32 unitarias y builds offline/API correctos.
+Humo final: 25 correctas + 6 omitidas offline; 30 correctas + 1 omitida con API real.
+Incluye giro, pausa sin cambiar familia, movimiento reducido, pausa A | B sincronizada,
+interacción/identidad IFC, aprobación ETag y límite de 200.000 triángulos.
+
+Reproducción con la web ya levantada:
+
+```powershell
+node web/scripts/measure-viewer.mjs --orbita-completa
+```
+
+Se conserva la vista previa conectada en http://localhost:3120/modelo y API propia 8022.
+No se para 8010/3100 ni el servicio de Lectura en 8020. Capturas oscuras en
+`docs/capturas/31oct-{revision,cambios,modelo,holograma-ifc}.png`.
+Medidas exactas en `docs/evidencias/frontend/31oct/`. El techo de triángulos está
+comprobado en la escena de referencia; queda medir el objetivo en otro portátil normal.
