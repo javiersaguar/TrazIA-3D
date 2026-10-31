@@ -90,9 +90,15 @@ la cobertura; el ajuste debe hacerse con S-dev y reevaluarse después sin filtra
 Reproducción acotada, contra una API propia y con datos sintéticos:
 
 ```powershell
-uv run python scripts/measure_scale.py --api http://127.0.0.1:8022 --data ../TrazIA-3D/generated/synthetic_v2 --sets s-reservado --degradaciones vectorial --tags D-712 --output generated/triage-d712.json --exigir-todos
+uv run python scripts/measure_scale.py --api http://127.0.0.1:8022 --data ../TrazIA-3D/generated/synthetic_v2 --estrategia d_hibrido+heuristica --sets s-reservado --degradaciones vectorial --tags D-712 --output generated/triage-d712.json --exigir-todos
 ```
 
 `run_scale.py` también admite `--tags` y `--exigir-todos`; conserva informes y limpia su despliegue
 aislado antes de devolver el código de rechazo. Un lote completo significa que terminaron sus
 trabajos; el nuevo bloque `acceptance` indica por separado si todos produjeron un IFC DRAFT.
+
+
+Integración con main e46573d: D usa ahora la fusión aprendida empaquetada; las mediciones
+históricas de esta página pertenecen a D heurístico. No se transfieren sus tasas al nuevo D
+sin volver a medir el lote completo. El comando de diagnóstico usa explícitamente la variante
+`d_hibrido+heuristica` disponible en el código integrado.

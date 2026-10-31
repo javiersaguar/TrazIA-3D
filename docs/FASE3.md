@@ -422,3 +422,12 @@ revisión/edición sin inferencia nueva: el Copiloto sin respuesta cacheada expl
 La [captura oscura](capturas/revision-sesion-manual-31.png) muestra la sesión preparada; la
 [comprobación de interfaz](evidencias/fase3/31oct/piloto-interfaz.json) registra cero errores JS,
 cero sesiones humanas y tiempo humano null. La muestra real sigue pendiente de una persona.
+
+
+### Integración posterior con main e46573d
+
+Al preparar la subida, main incorporó el modelo de fusión versionado de Lectura y cambió D
+para usarlo por defecto. Los resultados 173/336 y la reproducción D-712 de esta sesión siguen
+correspondiendo a D heurístico sobre la base 8713f7a; no se atribuyen al nuevo D aprendido.
+La variante actual para reproducir la fusión anterior es `d_hibrido+heuristica`. El modelo
+empaquetado sí participa en la huella de caché v3. Se conserva el trabajo de ambos equipos.

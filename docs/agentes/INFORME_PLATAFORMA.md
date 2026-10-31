@@ -589,3 +589,17 @@ criterios de triángulos. No se añaden dependencias.
 
 ROADMAP: E.1–E.3 marcados; E.5/E.6/3.7/3.8/C.4/H.7 conservan el trabajo pendiente explícito.
 Detalle de interfaces y límites: [auditoría](../AUDITORIA_REVISION.md) y [API](../API.md).
+
+
+### Integración posterior con main e46573d
+
+Al preparar la subida, main incorporó el modelo de fusión versionado de Lectura y cambió D
+para usarlo por defecto. Los resultados 173/336 y la reproducción D-712 de esta sesión siguen
+correspondiendo a D heurístico sobre la base 8713f7a; no se atribuyen al nuevo D aprendido.
+La variante actual para reproducir la fusión anterior es `d_hibrido+heuristica`. El modelo
+empaquetado sí participa en la huella de caché v3. Se conserva el trabajo de ambos equipos.
+
+Verificación del resultado integrado antes del push: Ruff check/format (168 archivos),
+304 pruebas Python correctas y una omisión en 267,28 s; 38 unitarias web, typecheck,
+lint sin errores y build correctos. Revisión cargada con 22 campos y cero errores JS,
+mediante Chrome/SwiftShader y sin modificar la sesión manual.
