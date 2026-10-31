@@ -1,0 +1,26 @@
+{
+  "checked_at": "2026-10-31T14:12:04.964342+00:00",
+  "dataset": "synthetic",
+  "method": "web-ifc IfcAPI.StreamAllMeshes, sin render",
+  "ifc_sha256": "cca4a291f406758b6b489eb2e24ae6b8a5abd7e55e786d875a925cf0bfcc5654",
+  "flat_transformation": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    -1,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0.02025351319275126,
+    4.2,
+    -1.1102230246251565e-16,
+    1
+  ],
+  "mapping": "(X,Y,Z) IFC -> (X,Z,-Y) Three.js",
+  "tr_reference_verified": false
+}

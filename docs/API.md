@@ -461,3 +461,53 @@ El lote de escala informa ahora `lod` y `equipment_kind` para cada modelo accesi
 `successful_lods`/`errors_by_message` en el resumen. Una envolvente de bomba LOD 1 no
 se presenta como un recipiente detallado. Los errores de inspección por tag permanecen
 explícitos y no interrumpen la contabilidad del lote.
+
+
+## Revisión, sesiones y ejemplos aprobados (31/10)
+
+- `GET /reference-system`: origen, ejes y unidades internos; Norte de planta/TR sin verificar.
+- `GET /revisions/{id}/validation`: avisos de revisión y posible solape; no certificación normativa.
+- `PATCH /revisions/{id}/fields/{path}` admite `source`, `explanation`, `seconds`,
+  `review_session_id`, `action` y `expected` opcionales. `expected` es el campo trazado mostrado
+  al usuario; si ya cambió se devuelve 412 aunque el ETag global fuese reciente.
+- `action=reject` exige `state=abstained`. Conserva el candidato, añade la explicación de rechazo
+  y bloquea aprobar. `accept/correct/assume` deben coincidir con el estado correspondiente.
+- `X-Audit-Id` y ETag identifican una escritura confirmada y se exponen por CORS.
+- `POST /revisions/{id}/audit/{audit_id}/undo`: actor, segundos/sesión opcionales, If-Match e
+  Idempotency-Key. Restaura el campo completo, registra `undo_of` y retira la aprobación. 409 si
+  el campo cambió después o la acción ya fue deshecha; 404 para auditoría ajena o aprobación.
+- Un 422 devuelve `detail` legible y `issues` con `path`, `message`, `action`; la transacción no
+  guarda datos inválidos. Los avisos de geometría aproximada se distinguen de las restricciones
+  bloqueantes del contrato.
+- Si solo falla exportar el JSONL, el 503 contiene `persisted=true`, `revision`, ETag y
+  X-Audit-Id. La edición SQL ya existe. `POST /correcciones/export` reintenta idempotentemente el
+  volcado, sin reescribir el campo. También se conserva el reintento del PATCH con su clave original.
+
+`POST /review-sessions` recibe `revision_id`, `actor`, `kind=human|test` e Idempotency-Key.
+`POST /review-sessions/{id}/finish` recibe `active_seconds`; finalizar otra vez no modifica el
+registro anterior. El reloj declarado debe caber en el tiempo de sesión (tolerancia 2 s) e incluir
+los segundos de sus acciones. No se permiten acciones nuevas en una sesión terminada.
+
+`GET /revisions/{id}/review-metrics` y `GET /equipment/{tag}/review-metrics?project_id=...`
+informan de tiempo activo del cliente, sesiones abiertas/terminadas/de prueba, dataset, pendientes
+y aprobación. Agrupan por proyecto, equipo y dataset; no mezclan sintéticos con reales. Sin
+sesiones humanas terminadas con acciones, `active_seconds=null`. En la auditoría, `review_seconds`
+es solo la suma de tiempos declarados de acciones, `null` si no hay ninguno; `untimed_actions`
+explicita la cobertura faltante. No es una duración completa de revisión.
+
+`GET /learning/few-shot?path=diameter&strategy=b_reglas&target_revision_id=B&limit=3`
+entrega hasta cinco pares user/assistant de correcciones sintéticas actualmente aprobadas,
+con hashes de documento y aprobación. `target_revision_id` excluye el mismo equipo y los
+mismos documentos. `GET /learning/few-shot/{id}/evidence` verifica el original y devuelve su
+recorte PNG PDF (CPU, hasta 1000 px de página); si se revoca la aprobación, deja de servirlo.
+La selección se limita a revisiones marcadas sintéticas; las marcadas reales quedan excluidas.
+
+El contexto del Copiloto recibe esos ejemplos como datos de revisión, sin usarlos como evidencia
+actual. Su caché cambia con el manifiesto. El uso por extractores y el ajuste de prioridad de
+fuentes se coordinan con Lectura: `applied_to_extraction=false`. No se activa calibración al leer
+un ejemplo. La caché de trabajos v3 incluye SHA de fusión y calibración, capturados antes de
+ejecutar; un cambio de pesos invalida resultados anteriores, incluidos los offline v2.
+
+Ver [auditoría y límites](AUDITORIA_REVISION.md), [sesión manual preparada](MUESTRA_REVISION_MANUAL.md)
+y [diagrama y coste para el pitch](PITCH_ESCALA.md). Migración de almacén `0006`; sin dependencias
+nuevas ni cambios del contrato `model.py` 0.3.

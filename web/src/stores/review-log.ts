@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import type { RevisionId } from "@/lib/mock/api";
-import type { FieldStatus } from "@/lib/mock/fields";
+import type { FieldStatus, ReviewField } from "@/lib/mock/fields";
 
 /** Registro de acciones de revisión de la sesión: alimenta "Deshacer" y la serie de progreso. */
 export type ReviewAction = {
@@ -11,6 +11,8 @@ export type ReviewAction = {
   rev: RevisionId;
   path: string;
   label: string;
+  before: ReviewField;
+  auditId?: number;
   from: { status: FieldStatus; correctedValue?: number | string };
   to: { status: FieldStatus; correctedValue?: number | string };
   /** Campos revisados tras la acción (para la micrográfica). */

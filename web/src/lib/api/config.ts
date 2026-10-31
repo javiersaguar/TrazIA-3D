@@ -9,6 +9,8 @@ export function apiURL(path: string): string {
 }
 
 export function rememberVersion(revision: string, identity: string, etag: string | null) {
+  const current = versions.get(revision);
+  if (current?.identity === identity && etag && Number(etag.replace(/"/g, "")) < Number(current.etag.replace(/"/g, ""))) return;
   if (etag) versions.set(revision, { identity, etag });
 }
 

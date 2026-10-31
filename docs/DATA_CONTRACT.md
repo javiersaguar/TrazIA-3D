@@ -182,3 +182,24 @@ conservan sus validaciones, incluido el mínimo de tres boquillas completas.
 La lectura alternativa de un tag aislado no utiliza el nombre del archivo ni la verdad
 sintética. Solo acepta un identificador único cuando no ha encontrado uno rotulado;
 si hay identificadores contradictorios, conserva la falta de datos como error.
+
+
+## Sistema de referencia interno (C.4, 31/10)
+
+El IFC usa un sistema local dextrógiro, con Z vertical positiva y origen en el centro del equipo
+en planta a nivel del suelo local; no implica georreferenciación ni Norte de planta. Las longitudes
+del contrato se expresan en mm y se convierten una vez a metros en el IFC.
+
+Para las boquillas radiales del recipiente vertical, azimut 0° apunta a +X y 90° a +Y:
+`(x, y, z) = (R cos(a), R sin(a), elevación)`. El giro es antihorario visto desde +Z.
+Los elementos con posición/dirección explícitas usan esos vectores trazados. Cambiar este
+convenio silenciosamente a Norte/horario desplazaría la geometría existente.
+
+En la web, web-ifc incorpora `(X,Y,Z) → (X,Z,-Y)` en `flatTransformation`; el worker aplica
+esa matriz una vez. Se comprobó su base con el IFC sintético, sin render ni inferencia GPU.
+`GET /reference-system` declara unidades, ejes y límites. Las pruebas cardinales y de unidades
+IFC están en `tests/test_plataforma_pitch.py`.
+
+La orientación del Norte de planta y la equivalencia con el IFC de referencia TR **no están
+verificadas**. C.4 permanece parcial hasta disponer de una referencia autorizada. No se ha
+abierto `data/private/` ni se atribuye este convenio matemático a VESOR o a TR.

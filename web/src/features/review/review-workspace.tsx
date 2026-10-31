@@ -16,6 +16,8 @@ import { useUi } from "@/stores/ui";
 import { parentElementId } from "@/features/viewer3d/semantic";
 import { FieldQueue } from "./field-queue";
 import { ApprovalButton } from "./approval-button";
+import { ManualSession } from "./manual-session";
+import { ValidationNotice } from "./validation-notice";
 
 import { EvidenceLink } from "./evidence-link";
 import { useFieldAction } from "./use-field-action";
@@ -37,7 +39,7 @@ export function ReviewWorkspace() {
   const { data: fields } = useReviewFields(revision);
   const { selectedId, hoveredId, selectedPath, setSelected, setHovered } =
     useSelection();
-  const { apply, undoLast } = useFieldAction(revision);
+  const { apply, undoLast, busy } = useFieldAction(revision);
   const [editingPath, setEditingPath] = useState<string | null>(null);
   const [view, setView] = useState<"iso" | "front" | "top">("iso");
   const [mode, setMode] = useState<"solid" | "xray" | "exploded">("solid");
@@ -133,6 +135,12 @@ export function ReviewWorkspace() {
         guarda vinculada a la huella de esta versión.
       </SyntheticNotice>
 
+      <ManualSession revision={revision} />
+      <ValidationNotice revision={revision} onSelect={(path) => {
+        const field = fields?.find((f) => f.path === path);
+        if (field) selectField(field);
+      }} />
+
       <div className="flex flex-wrap items-center gap-3">
         <Segmented<RevisionId>
           label="Revisión"
@@ -204,6 +212,7 @@ export function ReviewWorkspace() {
         }
         fields={
           <FieldQueue
+            busy={busy}
             fields={fields}
             selectedPath={selectedPath}
             hoveredId={hoveredId}

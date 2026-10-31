@@ -40,25 +40,55 @@ export async function apiFields(rev: RevisionId): Promise<ReviewField[]> {
 // Serializar las acciones de una revisión evita que dos pulsaciones rápidas usen el mismo ETag.
 const writes = new Map<string, Promise<unknown>>();
 export async function apiUpdate(update: FieldUpdate): Promise<ReviewField> {
+  const body: FieldInput = {
+    state: update.action === "reject" ? "abstained" : update.status,
+    actor: update.actor ?? "Revisor local", seconds: update.seconds,
+    review_session_id: update.reviewSessionId, action: update.action,
+    expected: update.expected,
+    explanation: update.explanation, source: update.source ? {
+      ...update.source, bbox: update.source.bbox ? update.source.bbox.map(Number) as [number, number, number, number] : null,
+    } : undefined,
+  };
+  if (update.correctedValue !== undefined) body.value = update.correctedValue;
+  return writeField(update, "PATCH", `fields/${encodeURIComponent(update.path)}`, body);
+}
+
+export function apiUndo(update: FieldUpdate, auditId: number): Promise<ReviewField> {
+  return writeField(update, "POST", `audit/${auditId}/undo`, {
+    actor: update.actor ?? "Revisor local", seconds: update.seconds, review_session_id: update.reviewSessionId,
+  });
+}
+
+async function writeField(update: FieldUpdate, method: "PATCH" | "POST", suffix: string, body: object): Promise<ReviewField> {
   const previous = writes.get(update.rev) ?? Promise.resolve();
   const action = previous.catch(() => undefined).then(async () => {
     if (!revisionVersion(update.rev)) await apiRevision(update.rev);
     const version = revisionVersion(update.rev);
     if (!version) throw new ApiError(428, "La API no ha devuelto la versión de la revisión");
-    const body: FieldInput = { state: update.status, actor: "Revisor local" };
-    if (update.correctedValue !== undefined) body.value = update.correctedValue;
-    const response = await checked(await fetch(apiURL(`/revisions/${encodeURIComponent(version.identity)}/fields/${encodeURIComponent(update.path)}`), {
-      method: "PATCH", headers: { "Content-Type": "application/json", "If-Match": version.etag, "Idempotency-Key": update.idempotencyKey },
+    const raw = await fetch(apiURL(`/revisions/${encodeURIComponent(version.identity)}/${suffix}`), {
+      method, headers: { "Content-Type": "application/json", "If-Match": version.etag, "Idempotency-Key": update.idempotencyKey },
       body: JSON.stringify(body),
-    }));
+    });
+    if (raw.status === 412) await apiRevision(update.rev).catch(() => undefined);
+    const pendingExport = raw.status === 503 ? await raw.clone().json().catch(() => null) : null;
+    const response = pendingExport?.persisted && pendingExport?.revision
+      ? new Response(JSON.stringify(pendingExport.revision), { status: 200, headers: raw.headers })
+      : await checked(raw);
     const revision = await response.json() as Revision;
     rememberVersion(update.rev, version.identity, response.headers.get("ETag"));
     const field = flattenRevision(revision).find(f => f.path === update.path);
     if (!field) throw new ApiError(422, "La API no devolvió el campo modificado");
+    const auditId = response.headers.get("X-Audit-Id");
+    if (auditId) field.auditId = Number(auditId);
+    if (pendingExport?.persisted) field.saveWarning = pendingExport.detail;
     return field;
   });
   writes.set(update.rev, action);
   try { return await action; } finally { if (writes.get(update.rev) === action) writes.delete(update.rev); }
+}
+
+export async function apiExportCorrections() {
+  return checked(await fetch(apiURL("/correcciones/export"), { method: "POST" }));
 }
 
 export const apiChanges = () => get<DiffReport>("/diff?from=A&to=B");

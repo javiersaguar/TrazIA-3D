@@ -1,33 +1,36 @@
 "use client";
 
-import { Check, Pencil, CircleHelp } from "lucide-react";
+import { Check, Pencil, CircleHelp, X } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { Tip } from "@/components/ui/controls";
 import { ConfidenceBar } from "@/components/ui/data";
 import { FieldStatusBadge } from "@/components/ui/status";
-import { Badge, Button, Icon, Kbd, Skeleton } from "@/components/ui/primitives";
+import { Badge, Button, Icon, Skeleton } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
-import { displayUnit, formatInterval, formatValue } from "@/lib/format";
-import { riskLevel, type FieldStatus, type ReviewField } from "@/lib/mock/fields";
+import { formatInterval, formatValue } from "@/lib/format";
+import { isResolved, riskLevel, type FieldStatus, type ReviewField } from "@/lib/mock/fields";
+import { CorrectionEditor as EditValue } from "./correction-editor";
+import type { FieldOptions } from "@/lib/mock/api";
 
 type Props = {
+  busy?: boolean;
   fields: ReviewField[] | undefined;
   selectedPath: string | null;
   hoveredId: string | null;
   editingPath: string | null;
   onSelect: (f: ReviewField) => void;
   onHover: (f: ReviewField | null) => void;
-  onAction: (f: ReviewField, status: FieldStatus, value?: number | string) => void;
+  onAction: (f: ReviewField, status: FieldStatus, value?: number | string, options?: FieldOptions) => void | Promise<boolean>;
   onEdit: (path: string | null) => void;
 };
 
-export function FieldQueue({ fields, selectedPath, hoveredId, editingPath, onSelect, onHover, onAction, onEdit }: Props) {
+export function FieldQueue({ busy = false, fields, selectedPath, hoveredId, editingPath, onSelect, onHover, onAction, onEdit }: Props) {
   const list = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<"all" | "pending">("all");
-  const reviewed = fields?.filter((f) => f.status !== "candidate").length ?? 0;
+  const reviewed = fields?.filter(isResolved).length ?? 0;
   const total = fields?.length ?? 0;
-  const shown = filter === "pending" ? fields?.filter((f) => f.status === "candidate" || f.path === selectedPath) : fields;
+  const shown = filter === "pending" ? fields?.filter((f) => !isResolved(f) || f.path === selectedPath) : fields;
 
   useEffect(() => {
     if (!selectedPath || !list.current) return;
@@ -73,6 +76,7 @@ export function FieldQueue({ fields, selectedPath, hoveredId, editingPath, onSel
           ? Array.from({ length: 8 }, (_, i) => <Skeleton key={i} className="mb-1.5 h-14 w-full" />)
           : shown.map((f) => (
               <FieldRow
+                busy={busy}
                 key={f.path}
                 field={f}
                 selected={f.path === selectedPath}
@@ -80,7 +84,7 @@ export function FieldQueue({ fields, selectedPath, hoveredId, editingPath, onSel
                 editing={f.path === editingPath}
                 onSelect={() => onSelect(f)}
                 onHover={(h) => onHover(h ? f : null)}
-                onAction={(status, value) => onAction(f, status, value)}
+                onAction={(status, value, options) => onAction(f, status, value, options)}
                 onEdit={(on) => onEdit(on ? f.path : null)}
               />
             ))}
@@ -90,6 +94,7 @@ export function FieldQueue({ fields, selectedPath, hoveredId, editingPath, onSel
 }
 
 function FieldRow({
+  busy,
   field,
   selected,
   related,
@@ -99,13 +104,14 @@ function FieldRow({
   onAction,
   onEdit,
 }: {
+  busy: boolean;
   field: ReviewField;
   selected: boolean;
   related: boolean;
   editing: boolean;
   onSelect: () => void;
   onHover: (h: boolean) => void;
-  onAction: (status: FieldStatus, value?: number | string) => void;
+  onAction: (status: FieldStatus, value?: number | string, options?: FieldOptions) => void | Promise<boolean>;
   onEdit: (on: boolean) => void;
 }) {
   const level = riskLevel(field);
@@ -156,9 +162,9 @@ function FieldRow({
           ) : null}
           {!pending ? (
             <FieldStatusBadge status={field.status} />
-          ) : field.abstained ? (
+          ) : field.conflict ? <Badge tone="warning">Fuentes en conflicto</Badge> : field.abstained ? (
             <span title={`Confianza ${field.confidence.toFixed(2).replace(".", ",")} por debajo del umbral de revisión`}>
-              <Badge tone="warning">Confírmelo</Badge>
+              <Badge tone="warning">{field.explanation?.startsWith("Rechazado") ? "Rechazado" : "Confírmelo"}</Badge>
             </span>
           ) : (
             <ConfidenceBar value={field.confidence} calibrated={field.calibrated} />
@@ -170,27 +176,31 @@ function FieldRow({
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.16 }} className="mt-2.5 border-t border-border pt-2.5">
           <p className="mb-2 text-xs text-muted">
             Evidencia: <span className="text-text">{where}</span>
-            {field.status === "corrected" ? (
+            {field.status === "corrected" && field.correctedValue !== undefined && field.correctedValue !== field.value ? (
               <span className="text-faint"> · leído {formatValue(field.value, field.unit)}</span>
             ) : null}
           </p>
           {field.explanation ? <p className="mb-2 text-xs text-muted">{field.explanation}</p> : null}
           {editing ? (
             <EditValue
+              busy={busy}
               field={field}
               onCancel={() => onEdit(false)}
-              onSave={(v) => {
-                onAction("corrected", v);
-                onEdit(false);
+              onSave={async (v, options) => {
+                const saved = await onAction("corrected", v, options);
+                if (saved !== false) onEdit(false);
               }}
             />
           ) : (
-            <div className="flex flex-wrap gap-1.5">
+            <fieldset disabled={busy} className="flex flex-wrap gap-1.5 disabled:opacity-60">
               <Tip content="Coincide con el plano" shortcut={["A"]}>
                 <Button size="sm" variant="primary" onClick={(e) => (e.stopPropagation(), onAction("accepted"))}>
                   <Icon icon={Check} size={14} /> Aceptar
                 </Button>
               </Tip>
+              <Button size="sm" variant="ghost" onClick={(e) => (e.stopPropagation(), onAction("candidate", undefined, { action: "reject" }))}>
+                <Icon icon={X} size={14} /> Rechazar
+              </Button>
               <Tip content="Escribir el valor correcto" shortcut={["E"]}>
                 <Button size="sm" onClick={(e) => (e.stopPropagation(), onEdit(true))}>
                   <Icon icon={Pencil} size={14} /> Corregir
@@ -201,50 +211,10 @@ function FieldRow({
                   <Icon icon={CircleHelp} size={14} /> Supuesto
                 </Button>
               </Tip>
-            </div>
+            </fieldset>
           )}
         </motion.div>
       ) : null}
     </div>
-  );
-}
-
-function EditValue({ field, onSave, onCancel }: { field: ReviewField; onSave: (v: number | string) => void; onCancel: () => void }) {
-  const numeric = typeof field.value === "number";
-  const [draft, setDraft] = useState(String(field.correctedValue ?? field.value).replace(".", ","));
-  const input = useRef<HTMLInputElement>(null);
-  useEffect(() => input.current?.select(), []);
-  const parsed = numeric ? Number(draft.replace(/\./g, "").replace(",", ".")) : draft.trim();
-  const invalid = numeric ? !Number.isFinite(parsed) || (parsed as number) < 0 : !draft.trim();
-
-  return (
-    <form
-      onClick={(e) => e.stopPropagation()}
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (!invalid) onSave(parsed);
-      }}
-      className="flex items-center gap-1.5"
-    >
-      <div className="flex h-8 flex-1 items-center rounded-[var(--radius-control)] border border-border bg-surface focus-within:border-accent">
-        <input
-          ref={input}
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => e.key === "Escape" && onCancel()}
-          inputMode={numeric ? "decimal" : "text"}
-          aria-label={`Nuevo valor de ${field.label}`}
-          aria-invalid={invalid}
-          className="h-full min-w-0 flex-1 bg-transparent px-2.5 text-[13px] text-text outline-none"
-        />
-        {displayUnit(field.unit) ? <span className="pr-2.5 text-xs text-muted">{displayUnit(field.unit)}</span> : null}
-      </div>
-      <Button size="sm" variant="primary" type="submit" disabled={invalid}>
-        Guardar
-      </Button>
-      <Button size="sm" variant="ghost" onClick={onCancel}>
-        <Kbd>Esc</Kbd>
-      </Button>
-    </form>
   );
 }

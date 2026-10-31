@@ -43,6 +43,8 @@ def save_revision(
     path: str,
     actor: str,
     seconds: float | None = None,
+    review_session_id: str | None = None,
+    undo_of: int | None = None,
 ):
     before = record.payload
     version = record.version
@@ -57,20 +59,27 @@ def save_revision(
     )
     if changed.rowcount != 1:
         raise HTTPException(412, "Otra persona ha modificado la revisión")
-    session.add(
-        AuditRecord(
-            revision_id=record.id,
-            path=path,
-            actor=actor,
-            before_json=before,
-            after_json=revision.model_dump_json(),
-            seconds=seconds,
-        )
+    audit = AuditRecord(
+        revision_id=record.id,
+        path=path,
+        actor=actor,
+        before_json=before,
+        after_json=revision.model_dump_json(),
+        seconds=seconds,
+        review_session_id=review_session_id,
+        undo_of=undo_of,
     )
+    session.add(audit)
+    session.flush()
     from .corrections import record_change
 
     record_change(session, record, Revision.model_validate_json(before), revision, path, actor)
-    return {"data": revision.model_dump(mode="json"), "version": version + 1, "status": 200}
+    return {
+        "data": revision.model_dump(mode="json"),
+        "version": version + 1,
+        "status": 200,
+        "audit_id": audit.id,
+    }
 
 
 def seed_demo(store: Store, root: Path):

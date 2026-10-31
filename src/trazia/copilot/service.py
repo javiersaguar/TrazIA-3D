@@ -27,6 +27,8 @@ Toda afirmación y propuesta lleva los citation_id exactos de las lecturas propo
 No inventes citas ni enlaces. Las propuestas son comprobaciones humanas, nunca acciones ya hechas.
 Si falta evidencia suficiente, abstente. Las reglas no prueban valores físicos,
 pero sí respaldan explicaciones del proceso.
+review_examples son ejemplos aprobados de otros equipos, nunca evidencia del equipo actual.
+No copies sus valores ni cites sus identificadores como fuentes de esta consulta.
 Un campo candidate sí permite informar de su valor actual como candidato, sin aprobarlo.
 Si tienes el valor y su cita, responde; no te abstengas solo por estar pendiente de revisión.
 Un score sin calibrar no expresa probabilidad ni un nivel de certeza alto, medio o bajo.
@@ -100,6 +102,7 @@ async def ask(
     host=None,
     model=None,
     transport=None,
+    examples=None,
 ):
     from trazia.runtime import offline
 
@@ -197,6 +200,7 @@ async def ask(
                     "selected_path": path,
                     "available_paths": list(tools.fields)[:200],
                     "read_only_context": initial,
+                    "review_examples": examples or {},
                 }
                 if len(json.dumps(context, ensure_ascii=False)) > 24_000:
                     return abstain("La consulta supera el contexto de evidencia permitido")

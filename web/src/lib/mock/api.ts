@@ -4,8 +4,8 @@
   Para conectar la API real basta con sustituir el cuerpo por fetch al endpoint indicado.
 */
 import { apiEnabled, revisionResource } from "../api/config";
-import { apiUpdate } from "../api/client";
-import type { Revision } from "@/lib/types/revision";
+import { apiUpdate, apiUndo } from "../api/client";
+import type { Revision, Source } from "@/lib/types/revision";
 import type { BenchReport } from "./bench-types";
 import type { DiffReport } from "./diff-types";
 import { flattenRevision, type FieldStatus, type ReviewField } from "./fields";
@@ -47,8 +47,7 @@ export async function getRevision(rev: RevisionId): Promise<Revision> {
 }
 
 /* Estado de revisión en memoria: hace de "servidor" mientras no exista la API. */
-type StoredReview = { status: FieldStatus; correctedValue?: number | string };
-const reviewStore = new Map<string, StoredReview>();
+const reviewStore = new Map<string, ReviewField>();
 const idempotency = new Map<string, ReviewField>();
 const key = (rev: RevisionId, path: string) => `${rev}:${path}`;
 
@@ -61,7 +60,16 @@ export async function getReviewFields(rev: RevisionId): Promise<ReviewField[]> {
   });
 }
 
-export type FieldUpdate = {
+export type FieldOptions = {
+  source?: Source;
+  explanation?: string;
+  actor?: string;
+  seconds?: number;
+  reviewSessionId?: string;
+  action?: "accept" | "correct" | "assume" | "reject";
+};
+export type FieldUpdate = FieldOptions & {
+  expected?: Record<string, unknown>;
   rev: RevisionId;
   path: string;
   status: FieldStatus;
@@ -76,12 +84,36 @@ export async function updateField(update: FieldUpdate, current: ReviewField): Pr
   const seen = idempotency.get(update.idempotencyKey);
   if (seen) return seen;
   await wait(220);
-  const stored: StoredReview = { status: update.status, correctedValue: update.correctedValue };
-  if (update.status === "candidate") reviewStore.delete(key(update.rev, update.path));
-  else reviewStore.set(key(update.rev, update.path), stored);
-  const result = { ...current, ...stored };
+  const corrected = update.status === "corrected";
+  const source = update.source ?? (corrected ? {
+    ...current.source, channel: "humano" as const, grounded: null, strategy: null, model: null, prompt_sha256: null,
+  } : current.source);
+  const result: ReviewField = {
+    ...current, status: update.status, correctedValue: update.correctedValue,
+    interval: corrected ? null : current.interval,
+    source: { ...source, reviewed: update.status === "accepted" || corrected },
+    calibrated: source.channel !== "humano" && source.confidence_raw != null && source.confidence_raw !== source.confidence,
+    explanation: update.action === "reject" ? `Rechazado por el revisor. ${update.explanation ?? "Hace falta una lectura nueva."}` : update.explanation ?? current.explanation,
+    abstained: update.action === "reject",
+    conflict: false,
+    risk: current.impact * (1 - source.confidence) + (update.action === "reject" ? 1 : 0),
+  };
+  reviewStore.set(key(update.rev, update.path), result);
   idempotency.set(update.idempotencyKey, result);
   return result;
+}
+
+export async function undoField(update: FieldUpdate, before: ReviewField, auditId?: number): Promise<ReviewField> {
+  if (apiEnabled) {
+    if (auditId === undefined) throw new Error("Esta acción no tiene auditoría confirmada para deshacer");
+    return apiUndo(update, auditId);
+  }
+  const seen = idempotency.get(update.idempotencyKey);
+  if (seen) return seen;
+  await wait(100);
+  reviewStore.set(key(update.rev, update.path), before);
+  idempotency.set(update.idempotencyKey, before);
+  return before;
 }
 
 /** GET /diff?from=A&to=B */

@@ -17,6 +17,10 @@ export type FieldGroup = "Identificación" | "Envolvente" | "Soporte" | "Boquill
 export type ElementId = "shell" | "head-top" | "head-bottom" | "skirt" | `nozzle:${string}`;
 
 export type ReviewField = {
+  /** Auditoría de la última escritura confirmada, utilizada para deshacer en la API. */
+  auditId?: number;
+  saveWarning?: string;
+  snapshot?: Record<string, unknown>;
   /** Ruta en el contrato, p. ej. "nozzles.N3.elevation". */
   path: string;
   label: string;
@@ -36,6 +40,7 @@ export type ReviewField = {
   interval?: { low: number; high: number; level: number } | null;
   /** Confianza calibrada bajo el umbral de riesgo: hay que confirmarlo a mano (DEC-12). */
   abstained: boolean;
+  conflict?: boolean;
   /** La confianza viene de la etapa `calibrate`, no directamente de la estrategia. */
   calibrated: boolean;
   explanation?: string | null;
@@ -81,6 +86,7 @@ function field(
   const confidence = data.source.confidence;
   const abstained = data.state === "abstained";
   return {
+    snapshot: data as unknown as Record<string, unknown>,
     path,
     label,
     group,
@@ -91,10 +97,11 @@ function field(
     confidence,
     impact,
     // Un campo abstenido va antes que cualquier otro: no se puede aprobar sin confirmarlo.
-    risk: impact * (1 - confidence) + (abstained ? 1 : 0),
+    risk: impact * (1 - confidence) + (abstained || data.state === "conflict" ? 1 : 0),
     interval: data.interval ?? null,
     abstained,
-    calibrated: data.source.confidence_raw != null,
+    conflict: data.state === "conflict",
+    calibrated: data.source.channel !== "humano" && data.source.confidence_raw != null && data.source.confidence_raw !== confidence,
     explanation: data.explanation ?? null,
     status: data.state === "corrected" || data.state === "assumed" ? data.state : data.state === "accepted" || data.source.reviewed ? "accepted" : "candidate",
   };
@@ -131,8 +138,26 @@ export function flattenRevision(revision: Revision): ReviewField[] {
     out.push(field(`attributes.${key}`, meta.label, "Datos de diseño", "shell", meta.impact, attr));
   }
 
-  return out.sort((a, b) => b.risk - a.risk || b.impact - a.impact || a.path.localeCompare(b.path));
+  const known = new Set(out.map((f) => f.path));
+  function visit(value: unknown, path: string) {
+    if (!value || typeof value !== "object") return;
+    const record = value as Record<string, unknown>;
+    if ("value" in record && "source" in record) {
+      if (!known.has(path) && (typeof record.value === "string" || typeof record.value === "number")) {
+        const data = record as unknown as Parameters<typeof field>[5];
+        out.push(field(path, path, "Envolvente", elementForPath(path), 0.8, data));
+      }
+      return;
+    }
+    if (Array.isArray(value)) value.forEach((item, i) => visit(item, `${path}.${item?.id ?? i}`));
+    else Object.entries(record).forEach(([key, child]) => visit(child, path ? `${path}.${key}` : key));
+  }
+  visit(eq, "");
+  return out.sort(compareRisk);
 }
+
+export const compareRisk = (a: ReviewField, b: ReviewField) => b.risk - a.risk || b.impact - a.impact || a.path.localeCompare(b.path);
+export const isResolved = (field: Pick<ReviewField, "status">) => field.status === "accepted" || field.status === "corrected";
 
 export function riskLevel(f: Pick<ReviewField, "impact">): "alto" | "medio" | "bajo" {
   if (f.impact >= 0.9) return "alto";

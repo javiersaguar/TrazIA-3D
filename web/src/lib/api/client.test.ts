@@ -38,6 +38,8 @@ describe("cliente HTTP", () => {
     const first = config.revisionResource("A", "ifc");
     config.rememberVersion("A", "DEMO-PLANT:V101:A", '"2"');
     expect(config.revisionResource("A", "ifc")).not.toBe(first);
+    config.rememberVersion("A", "DEMO-PLANT:V101:A", '"1"');
+    expect(config.revisionVersion("A")?.etag).toBe('"2"');
     expect(config.revisionResource("A", "pdf")).toContain("/documents/GA-V101");
   });
 
@@ -46,5 +48,26 @@ describe("cliente HTTP", () => {
     const config = await import("./config");
     expect(config.apiEnabled).toBe(false);
     expect(config.revisionResource("B", "ifc")).toBe("/demo/ifc/rev_b.ifc");
+  });
+
+  it("conserva una edición persistida con JSONL pendiente y deshace por auditoría", async () => {
+    const changed = structuredClone(revision);
+    changed.equipment.diameter.value = 2100;
+    changed.equipment.diameter.state = "corrected";
+    const fetcher = vi.fn(async (_url: string, init?: RequestInit) => {
+      if (!init?.method) return new Response(JSON.stringify(revision), { headers: { ETag: '"1"' } });
+      if (init.method === "PATCH") return new Response(JSON.stringify({ detail: "JSONL pendiente", persisted: true, revision: changed }), {
+        status: 503, headers: { ETag: '"2"', "X-Audit-Id": "8" },
+      });
+      return new Response(JSON.stringify(revision), { headers: { ETag: '"3"', "X-Audit-Id": "9" } });
+    });
+    vi.stubGlobal("fetch", fetcher);
+    const client = await import("./client");
+    const result = await client.apiUpdate({ rev: "A", path: "diameter", status: "corrected", correctedValue: 2100, idempotencyKey: "edit" });
+    expect(result).toMatchObject({ auditId: 8, value: 2100, saveWarning: "JSONL pendiente" });
+    await client.apiUndo({ rev: "A", path: "diameter", status: "candidate", idempotencyKey: "undo" }, 8);
+    expect(fetcher.mock.calls[2]![0]).toContain("audit/8/undo");
+    expect(fetcher.mock.calls[2]![1]?.method).toBe("POST");
+    expect((fetcher.mock.calls[2]![1]?.headers as Record<string, string>)["If-Match"]).toBe('"2"');
   });
 });
