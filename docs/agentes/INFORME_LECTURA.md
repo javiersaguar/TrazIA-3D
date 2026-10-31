@@ -229,6 +229,10 @@ Resultados en `docs/ESTUDIO.md`, «Estudio 3». Puntuación GA2MODEL con IC 95 %
 - Calibración v5: D sin curva isotónica e intervalos recalculados. En S-reservado, ECE 0,066 y
   cobertura del intervalo 91,5 %; con abstención se queda el 69 % de los campos con un riesgo del
   8,3 %. Medida en el estudio 5 de `docs/ESTUDIO.md`.
+- Estudio 6, sobre `main` `b3c3ebf` (fusión aprendida + PR de Alejandro): D 0,703 [0,671; 0,736],
+  ECE 0,036, F1 de cambios 56,0 %, 82,3 % de modelos y 0,614 en S-reservado. La heurística queda en
+  0,691 (McNemar 78/25, p ≈ 2·10⁻⁷). Son las cifras de D que hay que citar a partir de ahora;
+  `generated/estudio/` ya las tiene (el estudio 5 queda en `generated/estudio-5/`).
 
 ### Proveedores de visión (31/10, tarde)
 
