@@ -336,7 +336,10 @@ Resumen. El análisis completo, con las opciones descartadas y cómo se valida c
 
 ## 7. Calendario por fases
 
-Inicio del plan: **lunes 26/10/2026**. Revisión de estado: **28/10/2026**. Las casillas se cierran por evidencia, no por fecha prevista. Las tareas parciales permanecen abiertas; detalle en [REVISION_ROADMAP_2026-10-28.md](REVISION_ROADMAP_2026-10-28.md).
+Inicio del plan: **lunes 26/10/2026**. Revisión de estado: **28/10/2026**; actualizada el
+**31/10/2026** con lo que cerraron los agentes Lectura, Plataforma y 3D el 30/10
+([Lectura](agentes/INFORME_LECTURA.md), [Plataforma](agentes/INFORME_PLATAFORMA.md),
+[3D](agentes/INFORME_FRONTEND_3D.md)). Las casillas se cierran por evidencia, no por fecha prevista. Las tareas parciales permanecen abiertas; detalle en [REVISION_ROADMAP_2026-10-28.md](REVISION_ROADMAP_2026-10-28.md).
 
 | Fase | Fechas | Objetivo | Hito de salida |
 | --- | --- | --- | --- |
@@ -359,7 +362,7 @@ Inicio del plan: **lunes 26/10/2026**. Revisión de estado: **28/10/2026**. Las 
 - [x] **0.7** `LICENSE` MIT con los 4 nombres; `CONTRIBUTING.md`.
 - [x] **0.8** Skills de frontend instaladas en el repo.
 - [ ] **0.9** Pedir al mentor de TR (si hay canal): formato real de los GA (¿vectorial o escaneado?), unidades habituales, si las boquillas vienen en tabla, qué consideran "dimensiones principales" y con qué tolerancia comparan, y **si autorizan procesar el dataset con APIs externas** (DEC-31). *Hecho:* respuestas o pregunta enviada.
-- [x] **0.10** Medir en la RTX 5070 Laptop (8 GB) qué modelos de visión caben con imágenes A3 en mosaico: `qwen3-vl:4b`, `qwen3-vl:8b` cuantizado y PaddleOCR-VL. Anotar VRAM y segundos por página en `docs/PLATAFORMA.md`. *Hecho:* tabla medida. *Medido:* 4B al 100 % en GPU (5,8 GB, 129 s/página); 8B no cabe (22 % CPU, 339 s/página); PaddleOCR-VL sin medir. [Tabla](PLATAFORMA.md).
+- [x] **0.10** Medir en la RTX 5070 Laptop (8 GB) qué modelos de visión caben con imágenes A3 en mosaico: `qwen3-vl:4b`, `qwen3-vl:8b` cuantizado y PaddleOCR-VL. Anotar VRAM y segundos por página en `docs/PLATAFORMA.md`. *Hecho:* tabla medida. *Medido:* 4B al 100 % en GPU (5,8 GB, 129 s/página); 8B no cabe (22 % CPU, 339 s/página); PaddleOCR-VL medido el 30/10: carga en 2,7 GB, pero no acaba una página A3 en 25 min, y se descarta. [Tabla](PLATAFORMA.md).
 
 ### Fase 1 · Cimientos (29 oct – 4 nov)
 
@@ -382,16 +385,16 @@ comprobar un segundo proveedor real; no se cuentan mocks como mediciones.
 ### Fase 2 · Estrategias (5 – 14 nov)
 
 - [ ] **2.1 (Lectura)** **B completo**: tablas por cabecera con sinónimos es/en, cotas en cualquier orientación, cajetín, hoja de datos, VESOR; sobre texto vectorial o líneas de OCR. *Parcial:* B y OCR están implementados y probados; falta verificar explícitamente el alcance VESOR antes de cerrar toda la tarea.
-- [ ] **2.2 (Lectura)** **OCR** (RapidOCR, PaddleOCR-VL; Mistral solo sintéticos) y comprobación de cita (DEC-06, 10). *Parcial:* RapidOCR en CPU y comprobación de cita implementados; PaddleOCR-VL sigue sin medir y la segunda familia real sigue pendiente en 1.9.
+- [ ] **2.2 (Lectura)** **OCR** (RapidOCR, PaddleOCR-VL; Mistral solo sintéticos) y comprobación de cita (DEC-06, 10). *Parcial:* RapidOCR en CPU y comprobación de cita implementados. PaddleOCR-VL medido el 30/10 y descartado: no acaba una página A3 en 25 min en la RTX 5070 ([tarea 2.2](PLATAFORMA.md)). Falta Mistral, que depende de la credencial de 1.9.
 - [x] **2.3 (Lectura)** **A · visión + 3D**: segmentación de vistas, geometría desde trazos (`pdfplumber`/OpenCV), escala desde cotas leídas por el modelo de visión, cruce alzado ↔ planta (DEC-07). *Verificado 28/10:* Implementación A con lector de texto/OCR o visión, trazos y cruce alzado/planta; pruebas CPU en `test_lectura_estrategia_a.py`. Su calidad en el banco no se da por garantizada.
-- [ ] **2.4 (Lectura)** **Detector propio**: Florence-2 ajustado con S-dev en la RTX 5070 (`training/`), aleatorización de dominio; medido en S-reservado (DEC-05). *Parcial:* herramientas de entrenamiento/etiquetado disponibles; no consta un ajuste y una medición final. Requiere GPU y queda fuera de esta tanda.
+- [x] **2.4 (Lectura)** **Detector propio**: Florence-2 ajustado con S-dev en la RTX 5070 (`training/`), aleatorización de dominio; medido en S-reservado (DEC-05). *Hecho 30/10:* Florence-2 base ajustado con 1.410 mosaicos de S-dev (525 s, 4,9 GB). En 200 mosaicos de S-reservado: F1 0,982 y texto exacto 90,2 %. Conectado como canal `detector` de D; su ablación vale −0,011 [−0,023; −0,001]. [Tarea 2.4](PLATAFORMA.md).
 - [ ] **2.5 (Lectura)** **C · RAG**: biblioteca aprobada, recuperación visual ColQwen2/ColSmol + texto, adaptación de plantilla y parámetros (DEC-08). *Parcial:* C v1 con huella visual ligera + vocabulario, exclusión del mismo equipo y lectura de la región actual; ColQwen2/ColSmol no está integrado.
 - [x] **2.6 (Lectura)** **D v1**: cascada, verificación cruzada, reconciliación con restricciones (DEC-09, 11). *Verificado 28/10:* D v1 implementado con B/OCR, C, memoria, geometría y fusión heurística; `test_lectura_estrategia_d.py`. No equivale a fusión aprendida ni al estudio completo de 3.4.
 - [x] **2.7 (Plataforma)** Familias: vertical (mejorar), horizontal con silletas, columna por tramos, tanque, envolvente de reserva (nivel 1) para mecánicos (DEC-16). *Verificado 28/10:* Familias paramétricas y envolventes LOD 1 verificadas en `test_plataforma_families.py`.
 - [x] **2.8 (Plataforma)** IFC rico: puertos, Psets de trazabilidad, `IfcDocumentReference`, `IfcApproval`, exportación IFC4X3 e IFC2X3, validación en CI (DEC-17, 18). *Verificado 28/10:* IFC4/IFC4X3/IFC2X3, puertos, trazabilidad, originales y aprobación; `test_plataforma_ifc.py` y validación EXPRESS en CI.
 - [x] **2.9 (E/I)** Espacio de revisión: PDF + 3D + campos enlazados, cola por riesgo, atajos, deshacer.
 - [x] **2.10 (I)** Visor 3D: selección, aislar, corte, explosionado, cotas 3D, rosa de orientación.
-- [ ] **2.11 (Lectura)** **Primer estudio A/B/C/D** en S-dev. *Hecho:* tabla con intervalos.
+- [ ] **2.11 (Lectura)** **Primer estudio A/B/C/D** en S-dev. *Hecho:* tabla con intervalos. *Parcial 30/10:* B, C y D medidos con IC 95 % en S-dev, S-reservado y S-adversarial. D 0,642 [0,607; 0,678], C 0,558 y B 0,536. Falta A (visión), que tarda unos 129 s por página. [Estudio 2](ESTUDIO.md).
 
 ### Fase 3 · Diferenciales (15 – 21 nov)
 
@@ -399,13 +402,13 @@ comprobar un segundo proveedor real; no se cuentan mocks como mediciones.
 agente de Fase 2; no se editan las estrategias ni sus carpetas.
 
 - [x] **3.1 (Plataforma)** Cambios en **tres capas** (diferencia visual, campos emparejados, geometría por GUID) + nubes Δ + BCF 2.1 (DEC-19, 20). *Verificado:* API, comparación y BCF en la batería Python; marcadores heurísticos y sin nuevas ediciones del visor.
-- [ ] **3.2 (Lectura)** **Memoria de revisión** en D: la rev1 aprobada guía la lectura de la rev2. *Parcial:* el canal existe y tiene prueba de lectura rev1→rev2, pero todavía admite una revisión DRAFT; falta la condición de aprobación y la medición de su aporte.
-- [ ] **3.3 (Lectura)** Calibración isotónica + **intervalos conformes** + curva riesgo-cobertura (DEC-12). *Hecho:* ECE < 0,05 y cobertura empírica ≥ nominal en S-reservado.
-- [ ] **3.4 (Lectura)** **Fusión aprendida y selector** por tipo de documento; **ablaciones** de D; estudio completo con S-reservado (H1–H6 de [ESTUDIO.md](ESTUDIO.md)).
+- [x] **3.2 (Lectura)** **Memoria de revisión** en D: la rev1 aprobada guía la lectura de la rev2. *Hecho 30/10:* D solo usa la memoria si la revisión anterior está aprobada y su huella cuadra; si no, la omite con aviso. Medida con ablación: +0,009 [−0,002; 0,020], sin efecto medible (H5 rechazada).
+- [ ] **3.3 (Lectura)** Calibración isotónica + **intervalos conformes** + curva riesgo-cobertura (DEC-12). *Hecho:* ECE < 0,05 y cobertura empírica ≥ nominal en S-reservado. *Parcial 30/10:* implementada y conectada como etapa `calibrate`, con abstención. En S-reservado, B cumple (ECE 0,035; cobertura 100 %). C y D no: ECE 0,210 y 0,270, y cobertura de D 94,1 %. [Detalle](BENCH.md).
+- [ ] **3.4 (Lectura)** **Fusión aprendida y selector** por tipo de documento; **ablaciones** de D; estudio completo con S-reservado (H1–H6 de [ESTUDIO.md](ESTUDIO.md)). *Parcial 30/10:* selector, ablaciones y estudio con S-reservado hechos. El selector fijado en S-dev pierde frente a D solo (0,372 frente a 0,525), así que se recomienda D para todo. Ablaciones: RAG −0,076, geometría −0,045, detector −0,011 y memoria +0,009. Falta la fusión aprendida.
 - [x] **3.5 (Plataforma)** Pantalla **Estudio** en la web (DEC-28) y conexión de la pantalla Bench al estudio. *Hecho:* misma fuente/query, variante y rúbrica con IC; bench v1 separado, errores/vacío explícitos y pruebas en ambos transportes.
 - [x] **3.6 (Plataforma)** **Copiloto con modelo local**, herramientas de solo lectura y citas (DEC-26). *Verificado:* Ollama local, evidencia por hash, sin herramientas de escritura y pruebas de citas/concurrencia.
-- [ ] **3.7 (Plataforma)** Escala: perfil Redis + workers, lote de todo el conjunto, coste y tiempo medidos por equipo (DEC-23, 25). *Parcial:* corpus completo de 336 revisiones medido con 1/4 workers, 221,4/65,4 s; 20 done y 316 errores en ambos. Coste desconocido conservado como null. Falta cubrir el conjunto y medir el coste tras Fase 2. [Resultados](FASE3.md#37--medición-real-de-la-cola-parcial).
-- [ ] **3.8 (E)** Aprendizaje activo: las correcciones recalibran y se usan como few-shot (DEC-27). *Avance 30/10:* exportación trazada de correcciones vigentes y aprobadas; pendiente la interfaz de recalibración/few-shot de Lectura. [Detalle](BACKEND_2026-10-30.md).
+- [ ] **3.7 (Plataforma)** Escala: perfil Redis + workers, lote de todo el conjunto, coste y tiempo medidos por equipo (DEC-23, 25). *Parcial:* corpus completo de 336 revisiones medido con 1/4 workers, 221,4/65,4 s; 20 done y 316 errores en ambos. Coste desconocido conservado como null. *Avance 30/10:* lote CPU de 336 revisiones con B, Redis/arq/Postgres: 72 done y 264 errores, 352,5 s con 1 worker y 97,3 s con 4 (3,62×). Coste de proveedores 0 €. Falta que el lote salga sin errores para dar un tiempo defendible. [Resultados](FASE3.md#37--medición-real-de-la-cola-parcial).
+- [ ] **3.8 (E)** Aprendizaje activo: las correcciones recalibran y se usan como few-shot (DEC-27). *Avance 30/10:* exportación trazada de correcciones vigentes y aprobadas; cada cambio humano queda en un JSONL y en `GET /correcciones?desde=`. Pendiente que Lectura lea ese JSONL para recalibrar y usarlo como few-shot. [Detalle](BACKEND_2026-10-30.md).
 - [x] **3.9 (I)** Vista Cambios con morph 3D por GUID, fantasma rev1, marcadores Δ y grafo de impacto.
 - [x] **3.10 (I)** Momento firma «del plano al modelo» (`/lab/firma`).
 - [ ] **3.11 (J)** Guion de 6 min v1 + `.pptx` v0 con la diapositiva «Elegimos con datos».
@@ -413,7 +416,7 @@ agente de Fase 2; no se editan las estrategias ni sus carpetas.
 ### Fase 4 · Endurecer (22 – 24 nov)
 
 - [ ] **4.1** Congelar alcance el 22/11 a las 20:00: solo bugs, rendimiento y pulido.
-- [x] **4.2** **Modo offline:** `TRAZIA_OFFLINE=1` sirve resultados de modelos cacheados por hash. Si cae la red el viernes, la demo funciona igual. *Implementado 30/10:* caché de visión y copiloto, invalidación y errores recuperables; requiere preparar los cachés antes del ensayo. [Alcance y pruebas](BACKEND_2026-10-30.md).
+- [x] **4.2** **Modo offline:** `TRAZIA_OFFLINE=1` sirve resultados de modelos cacheados por hash. Si cae la red el viernes, la demo funciona igual. *Implementado 30/10:* caché de visión y copiloto, invalidación y errores recuperables; requiere preparar los cachés antes del ensayo. Además, la API guarda los trabajos validados y en offline los repite sin ejecutar el pipeline: 0,022 s frente a 3,192 s. [Alcance y pruebas](BACKEND_2026-10-30.md).
 - [ ] **4.3** Dos ensayos cronometrados del pitch (6:00 exactos) con alguien externo haciendo de jurado de TR.
 - [ ] **4.4** `PREVIOUS_WORK.md` redactado; tag preparado.
 - [ ] **4.5** Instalación en limpio en **los 4 portátiles** (Windows y Linux) siguiendo solo el README, incluidos los modelos locales descargados de antemano.
@@ -641,7 +644,8 @@ dependa solo de la extracción, no de la familia.
 - [ ] **E.5** Medir **tiempo de revisión por equipo** con el propio log → cifra de impacto del pitch.
 - [ ] **E.6** Aprendizaje activo (DEC-27): corrección aprobada → ejemplo few-shot + recalibración + ajuste de prioridad de fuentes.
 - [ ] **E.7** Intervalo conforme visible por campo («2.000 mm ± 3 mm, 90 %») y umbral de revisión
-  obligatoria fijado con la curva riesgo-cobertura (DEC-12).
+  obligatoria fijado con la curva riesgo-cobertura (DEC-12). *Parcial 30/10:* el backend ya rellena
+  `interval` al 90 % y marca `abstained` según el umbral de riesgo. Falta mostrarlo en la revisión.
 
 ### F. Revisiones y delta (20 %)
 
@@ -662,8 +666,9 @@ dependa solo de la extracción, no de la familia.
 - [x] **F.8** **Diferencia visual de páginas** (DEC-19): alinear rev1 y rev2 (ECC de OpenCV) y
   localizar zonas cambiadas en píxeles o trazos. Se cruza con las nubes Δ y con la diferencia de
   campos: un cambio visual sin cambio de campo, o al revés, se señala como sospechoso. *Verificado 28/10:* ECC y cruce de regiones visuales/campos, comprobación SHA y errores de alineación explícitos; pruebas CPU en `test_plataforma_changes.py`.
-- [ ] **F.9** **Memoria de revisión**: la rev1 aprobada guía la lectura de la rev2 (B.8). Se mide su
-  aporte al F1 con la ablación correspondiente.
+- [x] **F.9** **Memoria de revisión**: la rev1 aprobada guía la lectura de la rev2 (B.8). Se mide su
+  aporte al F1 con la ablación correspondiente. *Hecho 30/10:* igual que 3.2. F1 de cambios: 45,9 %
+  con memoria y 51,3 % sin ella, así que no aporta en sintéticos.
 
 *Hecho:* en sintéticos con mutaciones conocidas, F1 ≥ 0,95; en reales, precisión/recall medidos a mano.
 
@@ -695,9 +700,10 @@ Es nuestra arma principal: **llegamos al jurado con su propia rúbrica ya medida
   degradación, multipágina, paquetes de proveedor, mecánicos y corpus adversarial. *Verificado 28/10:* Coincide con 1.10: generador v2/v2.1 implementado; semillas, separación de proveedores reservados y degradaciones verificadas en `test_lectura_synthetic.py`.
 - [ ] **G.8** **Estudio comparativo** ([ESTUDIO.md](ESTUDIO.md)): variantes A/B/C/D y ablaciones,
   bootstrap del 95 %, McNemar, **Puntuación GA2MODEL** (DEC-22), frontera de Pareto coste-acierto y
-  recomendación del selector.
-- [ ] **G.9** Métricas nuevas: tasa de alucinación, cobertura de cita, cobertura de intervalos
-  conformes, curva riesgo-cobertura y coste por equipo.
+  recomendación del selector. *Parcial 30/10:* todo hecho para B, C y D (ver 2.11 y 3.4); falta A.
+- [x] **G.9** Métricas nuevas: tasa de alucinación, cobertura de cita, cobertura de intervalos
+  conformes, curva riesgo-cobertura y coste por equipo. *Hecho 30/10:* las cinco salen en
+  `estudio.json`; la curva riesgo-cobertura sale de `python -m bench.calibrar` ([BENCH.md](BENCH.md)).
 
 ### H. Backend, API y escalado (10 %)
 
@@ -725,7 +731,9 @@ Es nuestra arma principal: **llegamos al jurado con su propia rúbrica ya medida
   documentos tratados como datos. *Verificado 28/10:* CORS, límite de subida, hashes y separación documento/instrucción verificados en las pruebas API; no se afirma una auditoría de seguridad completa.
 - [ ] **H.7 Escala (para el pitch):** diagrama con cola, workers horizontales, caché por hash (una
   revisión que solo cambia una página solo reprocesa esa página), coste estimado de un proyecto de
-  400 equipos × 4 revisiones.
+  400 equipos × 4 revisiones. *Parcial 30/10:* diagrama, caché de trabajos por hash y extrapolación
+  a 400 × 4 en [FASE3.md](FASE3.md). Con 264 errores en el lote todavía no hay un tiempo defendible
+  para 1.600 IFC.
 
 ### I. Frontend: diseño, 3D y animación
 
@@ -919,21 +927,23 @@ el estilo.
 
 #### I.5 3D: todo lo que debe poder hacer el visor
 
-- [ ] Carga del IFC en Worker con barra/skeleton; nunca congela la UI.
+- [x] Carga del IFC en Worker con barra/skeleton; nunca congela la UI. *Hecho:* ver 1.7.
 - [ ] Órbita, paneo y zoom suaves e **interrumpibles**; "fly-to" a un elemento con muelle; doble clic = encuadrar.
 - [ ] Selección con resaltado (outline) y **hit slop**: zona de picking ampliada para boquillas pequeñas.
-- [ ] Aislar / ocultar / transparentar componentes; árbol IFC (proyecto → equipo → componentes → puertos).
+- [x] Aislar / ocultar / transparentar componentes; árbol IFC (proyecto → equipo → componentes → puertos).
 - [ ] **Plano de corte** animado (ver interior, espesores) con relleno de sección rayado (hatch).
-- [ ] **Vista explosionada** animada (virola, fondos, faldón y boquillas se separan a lo largo de su eje).
+- [x] **Vista explosionada** animada (virola, fondos, faldón y boquillas se separan a lo largo de su eje).
 - [ ] **Cotas 3D** generadas a partir de los parámetros y ancladas a la geometría IFC, con la misma
   estética que el plano; al pasar el ratón muestran valor, unidad, confianza y fuente.
-- [ ] **Rosa de orientación** (anillo de azimut 0–360° en planta) con las boquillas proyectadas: cruza
+- [x] **Rosa de orientación** (anillo de azimut 0–360° en planta) con las boquillas proyectadas: cruza
   con el VESOR.
 - [ ] Vistas guardadas: isométrica, alzado, planta, "como el plano" (cámara ortográfica alineada con la
   vista del GA para poder superponer plano y modelo).
 - [ ] Supuestos (valores por defecto de familia) dibujados con material distinto (rayado o translúcido).
 - [ ] Rendimiento: `frameloop="demand"`, instancing para elementos repetidos, BVH, ≤ 200 k triángulos a
-  60 fps en un portátil normal; DPR adaptativo.
+  60 fps en un portátil normal; DPR adaptativo. *Parcial 30/10:* render a demanda, BVH, pernos
+  instanciados y DPR adaptativo. Medido: 239 fps con 296.162 triángulos en la RTX 5070, por encima
+  del tope de 200 k. Falta medirlo en un portátil normal.
 - [ ] Captura de pantalla del visor en PNG para el informe y el BCF.
 
 #### I.6 Momentos firma (lo que el jurado recordará)
