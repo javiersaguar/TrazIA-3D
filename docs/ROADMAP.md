@@ -411,8 +411,8 @@ agente de Fase 2; no se editan las estrategias ni sus carpetas.
 - [x] **3.4 (Lectura)** **Fusión aprendida y selector** por tipo de documento; **ablaciones** de D; estudio completo con S-reservado (H1–H6 de [ESTUDIO.md](ESTUDIO.md)). *Parcial 30/10:* selector, ablaciones y estudio con S-reservado hechos. El selector fijado en S-dev pierde frente a D solo (0,372 frente a 0,525), así que se recomienda D para todo. Ablaciones: RAG −0,076, geometría −0,045, detector −0,011 y memoria +0,009. *Hecho 31/10:* fusión aprendida (`d_hibrido+fusion`, regresión logística entrenada en S-dev con canales apagados). Dejando fuera un proveedor de S-dev, acierta el 93,2 % de los campos frente al 92,5 % de la heurística. En el estudio sube a 0,670 frente a 0,640 (McNemar p ≈ 10⁻⁷), y en S-reservado a 0,570 frente a 0,524. El selector sigue perdiendo: se recomienda la fusión aprendida para todo.
 - [x] **3.5 (Plataforma)** Pantalla **Estudio** en la web (DEC-28) y conexión de la pantalla Bench al estudio. *Hecho:* misma fuente/query, variante y rúbrica con IC; bench v1 separado, errores/vacío explícitos y pruebas en ambos transportes.
 - [x] **3.6 (Plataforma)** **Copiloto con modelo local**, herramientas de solo lectura y citas (DEC-26). *Verificado:* Ollama local, evidencia por hash, sin herramientas de escritura y pruebas de citas/concurrencia.
-- [ ] **3.7 (Plataforma)** Escala: perfil Redis + workers, lote de todo el conjunto, coste y tiempo medidos por equipo (DEC-23, 25). *Parcial:* B dio 72 done/264 errores y 3,62× con 1/4 workers. *31/10:* D/CPU sobre las mismas 336 revisiones: 173 done (133 LOD 2 y 40 envolventes LOD 1), 163 errores; 1.823,1/1.035,2 s (1,76×) en host compartido, mismos estados por revisión. No equivale a una mejora causal frente a B. No se proyectan 1600 IFC válidos con esa cobertura. [Evidencias](FASE3.md).
-- [ ] **3.8 (E)** Aprendizaje activo: las correcciones recalibran y se usan como few-shot (DEC-27). *31/10:* JSONL trazado y GET /correcciones; recalibración CPU implementada contra auditoría SQL y revisiones aprobadas, con separación por equipo, mínimos por estrategia y propuesta sin activar. Ensayo de nueve equipos/544 etiquetas de revisión simulada sintética. Huella de calibración en caché offline. Pendiente few-shot y validación con correcciones de uso representativas. [Detalle](API.md#recalibración-desde-las-correcciones-3110).
+- [ ] **3.7 (Plataforma)** Escala: perfil Redis + workers, lote de todo el conjunto, coste y tiempo medidos por equipo (DEC-23, 25). *Parcial:* B dio 72 done/264 errores y 3,62× con 1/4 workers. *31/10:* D/CPU sobre las mismas 336 revisiones: 173 done (133 LOD 2 y 40 envolventes LOD 1), 163 errores; 1.823,1/1.035,2 s (1,76×) en host compartido, mismos estados por revisión. No equivale a una mejora causal frente a B. No se proyectan 1600 IFC válidos con esa cobertura. [Evidencias](FASE3.md). *Cierre de Plataforma:* inventario de los 163 fallos, reproducción por `--tags` y control `--exigir-todos` (salida 2 si falta algún DRAFT); no resuelve la lectura de escaneados. [Material de pitch](PITCH_ESCALA.md).
+- [ ] **3.8 (E)** Aprendizaje activo: las correcciones recalibran y se usan como few-shot (DEC-27). *31/10:* JSONL trazado y GET /correcciones; recalibración CPU implementada contra auditoría SQL y revisiones aprobadas, con separación por equipo, mínimos por estrategia y propuesta sin activar. Ensayo de nueve equipos/544 etiquetas de revisión simulada sintética. Huella de calibración en caché offline. Pares few-shot aprobados servidos por API y utilizados en el contexto del Copiloto; huella de fusión añadida a caché. Pendientes su consumo en extracción/ajuste de fuentes con Lectura y validación con correcciones de uso representativas; piloto manual preparado. [Detalle](API.md#recalibración-desde-las-correcciones-3110).
 - [x] **3.9 (I)** Vista Cambios con morph 3D por GUID, fantasma rev1, marcadores Δ y grafo de impacto.
 - [x] **3.10 (I)** Momento firma «del plano al modelo» (`/lab/firma`).
 - [ ] **3.11 (J)** Guion de 6 min v1 + `.pptx` v0 con la diapositiva «Elegimos con datos».
@@ -580,7 +580,8 @@ precios versionada, segundos de GPU y segundos totales. Objetivo para D: < 60 s 
 - [ ] **C.2** Unidad canónica por magnitud y **unidad original conservada** en la evidencia.
 - [x] **C.3** Equivalencias en el delta: 10 bar = 1 MPa no es un cambio; 10 bar → 10 MPa sí. *Verificado 28/10:* Equivalencias con Pint y pruebas de cambios equivalentes/incompatibles en `test_plataforma_changes.py`.
 - [ ] **C.4** Sistema de referencia documentado: origen, eje Z vertical, azimut (Norte de planta =
-  0°, sentido horario como en VESOR **o** el convenio que use TR — confirmar con el IFC de referencia).
+  0°, sentido horario como en VESOR **o** el convenio que use TR — confirmar con el IFC de referencia). *31/10:* documentado y probado el convenio interno actual (+Z, 0°=+X, 90°=+Y, antihorario desde +Z; mm→m y conversión web-ifc). Norte/TR todavía sin verificar; permanece parcial. [Contrato](DATA_CONTRACT.md#sistema-de-referencia-interno-c4-3110).
+
 - [x] **C.5** Versionado del esquema + migradores + ejemplos válidos en CI. *Verificado 28/10:* Migración 0.2→0.3 y ejemplos validados en `test_plataforma_contract.py` y `test_pipeline.py`, ejecutados en CI.
 - [x] **C.6** JSON exportable "para humanos": también CSV/Excel de campos con evidencia para el ingeniero. *Hecho 28/10:* `trazia fields` exporta ambos formatos con SHA, página/celda, estado, alternativas e intervalos, sin modificar la revisión; [uso](EXPORTACION_CAMPOS.md).
 - [x] **C.7** **Contrato 0.3** cerrado de antemano (DEC-13, especificación en
@@ -637,16 +638,16 @@ dependa solo de la extracción, no de la familia.
 
 ### E. Validación y humano en el bucle
 
-- [ ] **E.1** Reglas de validación con mensajes claros y accionables (qué pasa y cómo arreglarlo):
+- [x] **E.1** Reglas de validación con mensajes claros y accionables (qué pasa y cómo arreglarlo):
   geométricas (boquillas fuera de la virola, solapes entre boquillas, fondos imposibles), de unidades,
-  de coherencia entre documentos.
-- [ ] **E.2** **Cola de revisión priorizada** por `impacto × (1 − confianza)`: primero lo que más daño
-  haría si estuviera mal (diámetro, elevaciones de boquillas) y menos seguro está.
-- [ ] **E.3** Acciones por campo: aceptar, corregir (con nueva evidencia opcional), marcar como
-  supuesto, rechazar. Todo con **deshacer** y registro de auditoría (quién, cuándo, antes/después).
+  de coherencia entre documentos. *31/10:* 422 con campo/mensaje/acción, avisos de alternativas y cribado de solape radial; no certificación normativa. [Auditoría](AUDITORIA_REVISION.md).
+- [x] **E.2** **Cola de revisión priorizada** por `impacto × (1 − confianza)`: primero lo que más daño
+  haría si estuviera mal (diámetro, elevaciones de boquillas) y menos seguro está. *31/10:* verificada la cola existente; conflictos y abstenciones primero, todos los campos trazados y supuestos/rechazos pendientes. Impactos declarados por regla.
+- [x] **E.3** Acciones por campo: aceptar, corregir (con nueva evidencia opcional), marcar como
+  supuesto, rechazar. Todo con **deshacer** y registro de auditoría (quién, cuándo, antes/después). *31/10:* evidencia opcional, rechazo como abstención humana, deshacer completo por auditoría inversa, ETag/instantánea e idempotencia; errores recuperables y exportación JSONL separada. [Detalle](AUDITORIA_REVISION.md).
 - [x] **E.4** Aprobación ligada a la huella (existe) + idempotencia + bloqueo si hay `conflict` sin resolver. *Verificado 28/10:* Aprobación vinculada al fingerprint, bloqueo de conflictos y cambios que invalidan aprobación; `test_pipeline.py` y `test_api_base.py`.
-- [ ] **E.5** Medir **tiempo de revisión por equipo** con el propio log → cifra de impacto del pitch.
-- [ ] **E.6** Aprendizaje activo (DEC-27): corrección aprobada → ejemplo few-shot + recalibración + ajuste de prioridad de fuentes.
+- [ ] **E.5** Medir **tiempo de revisión por equipo** con el propio log → cifra de impacto del pitch. *31/10:* sesiones y reloj activo conectados a acciones/auditoría, métricas por revisión y equipo y separación de pruebas. [Piloto manual preparado](MUESTRA_REVISION_MANUAL.md), todavía sin muestra humana ni cifra medida de impacto.
+- [ ] **E.6** Aprendizaje activo (DEC-27): corrección aprobada → ejemplo few-shot + recalibración + ajuste de prioridad de fuentes. *31/10:* pares aprobados/recortes por API y contexto del Copiloto, retirada al revocar y exclusión del equipo/documentos consultados; recalibración CPU existente. Pendientes consumo por extractores, evaluación del ajuste de fuentes con Lectura y muestra humana representativa.
 - [x] **E.7** Intervalo conforme visible por campo («2.000 mm ± 3 mm, 90 %») y umbral de revisión
   obligatoria fijado con la curva riesgo-cobertura (DEC-12). *Hecho 31/10:* la cola de revisión
   muestra el intervalo («± 0,5° · 90 %») y marca «Confírmelo» en los campos abstenidos. Estos van
@@ -742,6 +743,8 @@ Es nuestra arma principal: **llegamos al jurado con su propia rúbrica ya medida
   a 400 × 4 en [FASE3.md](FASE3.md). *31/10:* D/CPU completa 336 trabajos con 173 IFC DRAFT
   válidos y 163 errores, idénticos con 1/4 workers (1,76× en máquina compartida). Se conserva
   el desglose LOD 1/2. Todavía no hay un tiempo defendible para 1.600 IFC válidos.
+  - [x] Diagrama reutilizable y calculador de coste paramétrico para 400 × 4: [pitch](PITCH_ESCALA.md).
+  - [ ] Medición del ahorro incremental de extremo a extremo por página y presupuesto de IFC válidos; cobertura y muestra humana pendientes.
 
 ### I. Frontend: diseño, 3D y animación
 
