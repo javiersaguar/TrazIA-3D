@@ -411,8 +411,8 @@ agente de Fase 2; no se editan las estrategias ni sus carpetas.
 - [x] **3.4 (Lectura)** **Fusión aprendida y selector** por tipo de documento; **ablaciones** de D; estudio completo con S-reservado (H1–H6 de [ESTUDIO.md](ESTUDIO.md)). *Parcial 30/10:* selector, ablaciones y estudio con S-reservado hechos. El selector fijado en S-dev pierde frente a D solo (0,372 frente a 0,525), así que se recomienda D para todo. Ablaciones: RAG −0,076, geometría −0,045, detector −0,011 y memoria +0,009. *Hecho 31/10:* fusión aprendida (`d_hibrido+fusion`, regresión logística entrenada en S-dev con canales apagados). Dejando fuera un proveedor de S-dev, acierta el 93,2 % de los campos frente al 92,5 % de la heurística. En el estudio sube a 0,670 frente a 0,640 (McNemar p ≈ 10⁻⁷), y en S-reservado a 0,570 frente a 0,524. El selector sigue perdiendo: se recomienda la fusión aprendida para todo.
 - [x] **3.5 (Plataforma)** Pantalla **Estudio** en la web (DEC-28) y conexión de la pantalla Bench al estudio. *Hecho:* misma fuente/query, variante y rúbrica con IC; bench v1 separado, errores/vacío explícitos y pruebas en ambos transportes.
 - [x] **3.6 (Plataforma)** **Copiloto con modelo local**, herramientas de solo lectura y citas (DEC-26). *Verificado:* Ollama local, evidencia por hash, sin herramientas de escritura y pruebas de citas/concurrencia.
-- [ ] **3.7 (Plataforma)** Escala: perfil Redis + workers, lote de todo el conjunto, coste y tiempo medidos por equipo (DEC-23, 25). *Parcial:* corpus completo de 336 revisiones medido con 1/4 workers, 221,4/65,4 s; 20 done y 316 errores en ambos. Coste desconocido conservado como null. *Avance 30/10:* lote CPU de 336 revisiones con B, Redis/arq/Postgres: 72 done y 264 errores, 352,5 s con 1 worker y 97,3 s con 4 (3,62×). Coste de proveedores 0 €. Falta que el lote salga sin errores para dar un tiempo defendible. [Resultados](FASE3.md#37--medición-real-de-la-cola-parcial).
-- [ ] **3.8 (E)** Aprendizaje activo: las correcciones recalibran y se usan como few-shot (DEC-27). *Avance 30/10:* exportación trazada de correcciones vigentes y aprobadas; cada cambio humano queda en un JSONL y en `GET /correcciones?desde=`. Pendiente que Lectura lea ese JSONL para recalibrar y usarlo como few-shot. [Detalle](BACKEND_2026-10-30.md).
+- [ ] **3.7 (Plataforma)** Escala: perfil Redis + workers, lote de todo el conjunto, coste y tiempo medidos por equipo (DEC-23, 25). *Parcial:* B dio 72 done/264 errores y 3,62× con 1/4 workers. *31/10:* D/CPU sobre las mismas 336 revisiones: 173 done (133 LOD 2 y 40 envolventes LOD 1), 163 errores; 1.823,1/1.035,2 s (1,76×) en host compartido, mismos estados por revisión. No equivale a una mejora causal frente a B. No se proyectan 1600 IFC válidos con esa cobertura. [Evidencias](FASE3.md).
+- [ ] **3.8 (E)** Aprendizaje activo: las correcciones recalibran y se usan como few-shot (DEC-27). *31/10:* JSONL trazado y GET /correcciones; recalibración CPU implementada contra auditoría SQL y revisiones aprobadas, con separación por equipo, mínimos por estrategia y propuesta sin activar. Ensayo de nueve equipos/544 etiquetas de revisión simulada sintética. Huella de calibración en caché offline. Pendiente few-shot y validación con correcciones de uso representativas. [Detalle](API.md#recalibración-desde-las-correcciones-3110).
 - [x] **3.9 (I)** Vista Cambios con morph 3D por GUID, fantasma rev1, marcadores Δ y grafo de impacto.
 - [x] **3.10 (I)** Momento firma «del plano al modelo» (`/lab/firma`).
 - [ ] **3.11 (J)** Guion de 6 min v1 + `.pptx` v0 con la diapositiva «Elegimos con datos».
@@ -739,8 +739,9 @@ Es nuestra arma principal: **llegamos al jurado con su propia rúbrica ya medida
 - [ ] **H.7 Escala (para el pitch):** diagrama con cola, workers horizontales, caché por hash (una
   revisión que solo cambia una página solo reprocesa esa página), coste estimado de un proyecto de
   400 equipos × 4 revisiones. *Parcial 30/10:* diagrama, caché de trabajos por hash y extrapolación
-  a 400 × 4 en [FASE3.md](FASE3.md). Con 264 errores en el lote todavía no hay un tiempo defendible
-  para 1.600 IFC.
+  a 400 × 4 en [FASE3.md](FASE3.md). *31/10:* D/CPU completa 336 trabajos con 173 IFC DRAFT
+  válidos y 163 errores, idénticos con 1/4 workers (1,76× en máquina compartida). Se conserva
+  el desglose LOD 1/2. Todavía no hay un tiempo defendible para 1.600 IFC válidos.
 
 ### I. Frontend: diseño, 3D y animación
 
@@ -948,9 +949,12 @@ el estilo.
   vista del GA para poder superponer plano y modelo).
 - [ ] Supuestos (valores por defecto de familia) dibujados con material distinto (rayado o translúcido).
 - [ ] Rendimiento: `frameloop="demand"`, instancing para elementos repetidos, BVH, ≤ 200 k triángulos a
-  60 fps en un portátil normal; DPR adaptativo. *Parcial 30/10:* render a demanda, BVH, pernos
-  instanciados y DPR adaptativo. Medido: 239 fps con 296.162 triángulos en la RTX 5070, por encima
-  del tope de 200 k. Falta medirlo en un portátil normal.
+  60 fps en un portátil normal; DPR adaptativo. *31/10:* escena IFC con tres recortes en
+  **157.538 triángulos y 235.3 fps** (RTX 5070, DPR 1): techo de 200 k cumplido. Render a
+  demanda, instancing y BVH conservados. Falta verificarlo en otro portátil normal.
+- [x] Giro automático de cámara **360°** alrededor del eje del modelo, una vuelta por minuto,
+  con pausa manual, pausa por interacción, sincronización A | B y movimiento reducido.
+  Comprobado: 385.7° en 64.2 s, radio estable; capturas y medidas en el informe 3D.
 - [ ] Captura de pantalla del visor en PNG para el informe y el BCF.
 
 #### I.6 Momentos firma (lo que el jurado recordará)

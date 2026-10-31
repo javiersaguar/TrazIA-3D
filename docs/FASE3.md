@@ -236,3 +236,145 @@ correctas y una omitida en 327,83 s**. La instalación requerida no incorpora el
 OCR local; la omisión correspondiente permanece explícita. Nueve pruebas de los scripts
 verifican límites de sonda, preservación de errores/coste desconocido y rechazo de
 puertos reservados antes de llamar a Docker. No se modifica web ni el contrato 0.3.
+
+
+## Sesión 31/10 · correcciones y nueva escala CPU
+
+La base es main a4dd9a7, con los trabajos previos de Lectura ya integrados. Este ensayo
+no incorpora su nueva fusión ni la calibración que estaba ajustando en paralelo.
+Se conserva el corpus íntegro y se mide D sin proveedores de visión, con OCR CPU,
+sin respuestas precalculadas de Florence, biblioteca RAG ni parámetros de calibración
+montados en el contenedor. La imagen Docker se identifica por su SHA en las evidencias.
+
+Se corrigen dos limitaciones de la entrada: el tag puede salir de un identificador
+único del plano aunque el rótulo del cajetín sea desconocido; el ensamblador ya admite
+las seis coordenadas trazadas de una envolvente LOD 1. El lector de bombas reconoce
+alzado, planta, datum y cotas exteriores. Sus coordenadas locales de representación
+son supuestos explícitos; no aparecen motores o salientes deducidos sin datos.
+Los recipientes detallados mantienen todas las comprobaciones de dimensiones y boquillas.
+
+El runner registra el LOD de cada modelo accesible y conserva los errores de consulta,
+lectura y validación. `done` sigue significando IFC estructuralmente válido, no exactitud
+frente al plano. Si no se lee lo necesario, el trabajo termina con su error: no se usan
+la verdad sintética ni otros niveles de degradación para rellenar el equipo.
+
+### 3.8 · circuito de recalibración CPU
+
+`bench.recalibrar` contrasta el JSONL con SQL, la auditoría original, los originales por
+hash y la aprobación vigente. Incluye confirmaciones y correcciones; deduplica clics.
+Omite borradores, cambios sustituidos, predicciones sin confianza bruta, valores ya
+humanos/supuestos y cambios de unidad sin normalizar. Ajuste y validación no comparten
+equipos. El ajuste divide de nuevo sus equipos entre isotónica y cuantiles conformes.
+Se exige muestra mínima por estrategia y un ECE de validación que no empeore. Una
+estrategia sin nuevos ejemplos conserva su modelo anterior, incluidos intervalos y
+abstención. La propuesta no se activa automáticamente ni cambia revisiones aprobadas.
+
+La caché de trabajos añade la huella de calibración a su clave. Si cambia mientras
+corre un trabajo no se guarda ese resultado en caché. Compose comparte el archivo
+entre API y workers. El ensayo `scripts.measure_feedback` usa exclusivamente S-dev
+vectorial y una revisión simulada con la verdad sintética; no representa revisiones
+humanas medidas ni acredita generalización a escaneados o documentos reales.
+
+```powershell
+uv run python -m scripts.measure_feedback --data ../TrazIA-3D/generated/synthetic_v2 --output generated/recalibracion-nueva --casos 9
+uv run python -m bench.recalibrar --almacen <TRAZIA_DATA> --correcciones <JSONL> --base <calibracion-base.json> --salida generated/recalibracion
+```
+
+El uso de estas correcciones como few-shot y la validación con intervenciones de uso
+representativas siguen pendientes del hito completo 3.8. Detalle operativo en API.md.
+
+
+### Resultados del lote D (31/10)
+
+| Workers | Revisiones | Válidos DRAFT | Error | LOD 2 / LOD 1 | Tiempo total (s) | Respuesta media (s) | p95 respuesta (s) |
+| --- | ---: | ---: | ---: | --- | ---: | ---: | ---: |
+| 1 | 336 | 173 | 163 | 133 / 40 | 1823.100 | 168.374 | 280.016 |
+| 4 | 336 | 173 | 163 | 133 / 40 | 1035.171 | 94.956 | 166.529 |
+
+Aceleración observada: **1.76×**. Los 336 resultados terminales (estado, error,
+LOD y familia) coinciden entre uno y cuatro workers; imagen y hash de entrada idénticos.
+No hay cancelaciones ni timeouts en el lote. Los errores son falta de datos o
+inconsistencias geométricas en la extracción; no se eliminan del cómputo. Los 40 modelos
+LOD 1 son envolventes de bombas, sin detalle interno. El resto de válidos son LOD 2.
+
+| Conjunto | done | error |
+| --- | ---: | ---: |
+| s-adversarial | 24 | 0 |
+| s-dev | 75 | 69 |
+| s-mecanico | 40 | 32 |
+| s-reservado | 34 | 62 |
+
+El resultado no debe atribuirse por completo a las dos correcciones de código: la
+estrategia anterior era B y esta es D con OCR/geometría. Tampoco se traslada el 3,62×
+anterior a esta carga. Durante el ensayo Lectura ejecutó calibración y dos estudios;
+la instantánea de Docker muestra unos 2.370 % de CPU entre cuatro workers en 24 CPU
+lógicas. Es una instantánea, no una media ni una atribución causal del límite de escala.
+No se ejecutaron pruebas pesadas propias durante los lotes. El cliente incluye ahora
+la consulta del LOD tras cada `done`, además de subida, HTTP, cola, extracción y validación;
+construir/arrancar/parar Docker queda fuera del tiempo del lote.
+
+### Proyección 400 × 4, separada de la medición
+
+| Workers | 1600 terminaciones (min, extrapolado) | 1600 IFC válidos | Proveedores declarados (EUR) | Cómputo a 0,25 EUR/worker-h (EUR, hipotético) |
+| --- | ---: | --- | ---: | ---: |
+| 1 | 144.690 | No calculable | 0.00 | 0.6029 |
+| 4 | 82.156 | No calculable | 0.00 | 1.3693 |
+
+Cero llamadas externas y coste de proveedores declarado de 0 EUR en ambos lotes;
+no se midieron energía, infraestructura ni trabajo humano. La tarifa por worker-hora
+es solo un escenario aritmético, no un precio ni un coste real de este portátil. La
+CPU compartida y los 163 errores impiden defender un tiempo de producción de 1600 IFC
+correctos. **3.7/H.7 sigue parcial.**
+
+Reproducción en Windows con WSL/Ubuntu y Docker (puerto 8022, porque Lectura ocupaba 8020):
+
+```powershell
+wsl -d Ubuntu --cd <ruta-linux-del-checkout> --exec docker build -t trazia-cierre:20261031 -f Dockerfile.api .
+uv run python scripts/run_scale.py --wsl Ubuntu --workers 1 4 --estrategia d_hibrido --image trazia-cierre:20261031 --data ../TrazIA-3D/generated/synthetic_v2 --output generated/escala-nueva --api-port 8022 --eur-worker-hora 0.25
+```
+
+La imagen medida es la identificada por SHA en el informe: incluye las correcciones
+de tag/envolvente. No tiene un archivo de calibración montado. Los ajustes posteriores
+al alcance de la propuesta de recalibración no participan en esta medición.
+
+Evidencias completas: [resumen](evidencias/fase3/31oct/resumen.json),
+[un worker](evidencias/fase3/31oct/d-workers-1.json),
+[cuatro workers](evidencias/fase3/31oct/d-workers-4.json) e
+[instantánea de contención](evidencias/fase3/31oct/contencion.json).
+
+### Ensayo del circuito de correcciones
+
+S-dev/vectorial: **18 revisiones de nueve equipos**, con **544 etiquetas** de una
+revisión explícitamente **simulada** con la verdad sintética. Se usan 376
+campos para ajuste (dividido entre curva y conforme) y 168 para prueba
+con equipos distintos. Tiempo total del ensayo: **6.344 s**.
+ECE de B: **0.1018 → 0.0000**;
+cobertura numérica de los intervalos: **100%** en este subconjunto.
+La propuesta se genera, pero **no se activa**. Es una comprobación del circuito sobre
+un conjunto vectorial pequeño y seleccionado, no una medida de mejora en todos los
+planos. No participan S-reservado ni datos privados.
+
+[Informe completo de recalibración](evidencias/fase3/31oct/recalibracion.json).
+
+
+Por degradación (mismos resultados con uno y cuatro workers):
+
+| Entrada | done | error |
+| --- | ---: | ---: |
+| Vectorial | 126 | 2 |
+| Escaneado limpio | 42 | 62 |
+| Escaneado pobre | 5 | 99 |
+
+Los dos fallos vectoriales son D-712, revisiones 1/2, por menos de tres boquillas
+completas. Los otros 161 errores están en escaneados. De los 163 errores, 84 son por
+menos de tres boquillas completas; 63 por campos obligatorios ausentes y 16 por
+incoherencias de posición de boquilla o fondo inferior. Estas cifras son estados de
+generación/validación; no son precisión de extracción medida contra la verdad.
+
+Verificación final del código: Ruff check y format correctos (153 archivos Python),
+284 pruebas correctas y una omisión OCR opcional en 255,11 s. No se añadieron dependencias
+ni se modificó el contrato model.py. La web pasa typecheck, lint (un aviso previo de
+TanStack), 32 unitarias, builds offline/conectado y humo en ambos modos: 25 + 6 omitidas
+offline y 30 + 1 omitida con API. Los puertos de prueba final fueron API 8022/web 3120,
+con TRAZIA_CORS_ORIGINS explícito. La prueba de estudio ya usa una raíz temporal para
+que generated/estudio de otra sesión no afecte a su estado vacío.

@@ -59,7 +59,7 @@ function EquipmentScene({ kind, mode, interactive, onBearing, measureKey, onMeas
   useEffect(() => () => hologram.dispose(), [hologram]);
   return <>
     <Studio />
-    <CameraRig bounds={bounds} handle={camera} interactive={interactive} measureKey={measureKey} onMeasure={onMeasure} />
+    <CameraRig bounds={bounds} orbitCenter={[0, (bounds.min[1] + bounds.max[1]) / 2, 0]} handle={camera} interactive={interactive} measureKey={measureKey} onMeasure={onMeasure} />
     <Bearing onChange={onBearing} />
     {mode === "particles" ? <ParticleAssembly model={model} reduce={!!reduce} /> :
       <AssemblyMeshes key={kind} model={model} material={mode === "hologram" ? hologram : undefined} />}

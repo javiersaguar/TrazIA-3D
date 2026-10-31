@@ -36,7 +36,7 @@ function subtract(base: BufferGeometry, cutter: BufferGeometry) {
   return result;
 }
 
-function annulus(outer: number, inner: number, thickness: number, segments = 48) {
+function annulus(outer: number, inner: number, thickness: number, segments = 32) {
   const bevel = Math.min(thickness * .12, .007);
   return new LatheGeometry([
     new Vector2(inner, -thickness / 2), new Vector2(outer - bevel, -thickness / 2),
@@ -47,11 +47,11 @@ function annulus(outer: number, inner: number, thickness: number, segments = 48)
 }
 
 function head(radius: number, top: boolean) {
-  const profile = Array.from({ length: 25 }, (_, i) => {
-    const angle = (top ? 24 - i : i) / 24 * Math.PI / 2;
+  const profile = Array.from({ length: 17 }, (_, i) => {
+    const angle = (top ? 16 - i : i) / 16 * Math.PI / 2;
     return new Vector2(radius * Math.sin(angle), (top ? 1 : -1) * radius / 2 * Math.cos(angle));
   });
-  return new LatheGeometry(profile, 72);
+  return new LatheGeometry(profile, 48);
 }
 
 class Builder {
@@ -70,7 +70,7 @@ class Builder {
       a.add(b).multiplyScalar(.5).toArray() as Point, direction.toArray() as Point);
   }
   ring(radius: number, y: number, at: Point = [0, 0, 0], axis: Point = [0, 1, 0]) {
-    const geometry = new TorusGeometry(radius, .012, 6, 72).rotateX(Math.PI / 2).translate(0, y, 0);
+    const geometry = new TorusGeometry(radius, .012, 6, 48).rotateX(Math.PI / 2).translate(0, y, 0);
     this.add(geometry, "bolts", at, axis);
   }
   nozzle(at: Point, axis: Point, radius = .13, blind = false) {
@@ -92,7 +92,7 @@ class Builder {
   }
   shell(radius: number, length: number, at: Point, axis: Point = [0, 1, 0], cutaway = false) {
     const rotation = transform(at, axis);
-    const shell = new CylinderGeometry(radius, radius, length, 72, 1, true, cutaway ? .75 : 0, cutaway ? Math.PI * 2 - 1.5 : Math.PI * 2);
+    const shell = new CylinderGeometry(radius, radius, length, 48, 1, true, cutaway ? .75 : 0, cutaway ? Math.PI * 2 - 1.5 : Math.PI * 2);
     this.parts.steel.push(shell.applyMatrix4(rotation));
     for (const side of [-1, 1]) {
       if (!cutaway) this.parts.steel.push(head(radius, side > 0).translate(0, side * length / 2, 0).applyMatrix4(rotation));
@@ -131,8 +131,8 @@ export function buildVerticalVessel(spec: { radius?: number; height?: number; pl
   if (!(radius > 0 && height > radius)) throw new Error("Dimensiones ilustrativas no válidas");
   const b = new Builder(), bottom = 1.55, top = bottom + height;
   b.shell(radius, height, [0, bottom + height / 2, 0]);
-  let skirt = subtract(new CylinderGeometry(radius * .98, radius * .98, 1.5, 64),
-    new CylinderGeometry(radius * .98 - .05, radius * .98 - .05, 1.6, 64));
+  let skirt = subtract(new CylinderGeometry(radius * .98, radius * .98, 1.5, 48),
+    new CylinderGeometry(radius * .98 - .05, radius * .98 - .05, 1.6, 48));
   for (const angle of [0, Math.PI / 2]) {
     const cut = new BoxGeometry(.42, .65, radius * 3).translate(0, -.32, 0).rotateY(angle);
     skirt = subtract(skirt, cut);

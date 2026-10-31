@@ -19,7 +19,9 @@ describe("familias ilustrativas (sin IFC)", () => {
           expect(Array.from(positions.array).every(Number.isFinite)).toBe(true);
           triangles += positions.count / 3;
         }
-        expect(triangles).toBeLessThan(100_000);
+        triangles += (model.boltGeometry.index?.count ?? model.boltGeometry.getAttribute("position").count) / 3 * model.bolts.length;
+        // Dos recipientes y dos pases principales en el holograma, con margen para overlays.
+        expect(triangles * 4).toBeLessThan(190_000);
       } finally { model.dispose(); }
     });
   }

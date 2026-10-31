@@ -1,0 +1,32 @@
+{
+  "observed_at": "2026-10-31T12:00:41+01:00",
+  "docker_cpus": 24,
+  "shared_host": true,
+  "other_workloads": [
+    "bench.estudio con visión en Lectura",
+    "bench.estudio con estrategias y fusión en Lectura"
+  ],
+  "workers_snapshot": [
+    {
+      "worker": 3,
+      "cpu_percent": 610.84,
+      "ram_gib": 1.26
+    },
+    {
+      "worker": 1,
+      "cpu_percent": 561.2,
+      "ram_gib": 1.333
+    },
+    {
+      "worker": 4,
+      "cpu_percent": 600.27,
+      "ram_gib": 1.248
+    },
+    {
+      "worker": 2,
+      "cpu_percent": 597.91,
+      "ram_gib": 1.36
+    }
+  ],
+  "limitation": "Instantánea de docker stats; no es una media ni acredita causalidad. La CPU no estuvo dedicada."
+}

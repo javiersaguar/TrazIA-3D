@@ -181,7 +181,8 @@ def process(
             "family",
             "ok",
             equipment_id,
-            f"Recipiente vertical · {len(model.equipment.nozzles)} boquillas.",
+            f"{model.equipment.kind} · LOD {model.equipment.lod} · "
+            f"{len(model.equipment.nozzles)} boquillas.",
         )
     )
     try:
@@ -215,6 +216,9 @@ def _calibrate(
             StageEvent("calibrate", "omitido", equipment_id, "Parámetros de calibración ilegibles.")
         )
         return candidates
+    from .calibration.scope import for_strategy
+
+    calibration = for_strategy(calibration, strategy)
     if calibration is None:
         emit(
             StageEvent(

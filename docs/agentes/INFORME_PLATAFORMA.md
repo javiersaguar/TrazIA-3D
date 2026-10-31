@@ -494,3 +494,56 @@ de esta sesión. Los datos generados siguen en el worktree de Plataforma.
 Publicación autorizada exclusivamente de feat/plataforma, sin fusión a main ni PR.
 El hito amplio de cobertura/IFC correctos y la recalibración automática de 3.8 no se
 declaran terminados; no forman parte de la porción de datos/medición cerrada aquí.
+
+
+## Sesión 31/10 · escala CPU y recalibración
+
+Trabajo en `feat/cierre-plataforma-visor`, desde main a4dd9a7. Se conservan sin tocar los
+cambios en curso de Lectura (fusión, estrategias, calibración base y UI de abstención).
+No se detiene su API 8020 ni la API 8010/web 3100. Pruebas/preview propias en 8022/3120.
+No se usan datos privados ni GPU para extracción, calibración o escala.
+
+### Hecho
+
+- El ensamblador admite las coordenadas trazadas de una envolvente LOD 1. El nuevo lector
+  de bombas obtiene cotas exteriores de alzado/planta; el origen local es un supuesto
+  declarado. No inventa conexiones. Las validaciones de recipientes detallados permanecen.
+- Lectura de un tag aislado y único cuando el rótulo de proveedor es desconocido, sin
+  recurrir al nombre del fichero ni elegir entre identificadores contradictorios.
+- Nuevo circuito CPU JSONL → auditoría SQL → revisiones sintéticas con aprobación vigente
+  → isotónica/conforme. Confianza bruta identificable, confirmaciones y correcciones,
+  deduplicación por campo, exclusión de unidades cambiadas sin normalizar y separación de
+  equipos entre ajuste y prueba. Mínimos por estrategia. No publica candidatos si la
+  muestra es insuficiente o el ECE empeora. No activa nada ni modifica aprobaciones.
+- Las estrategias no reajustadas conservan su calibración previa, incluidos intervalos
+  y abstención. Huella de calibración en caché v2 y protección frente a cambio durante
+  la ejecución. Compose comparte el archivo entre API y workers.
+- `scripts.measure_feedback` verifica el circuito en S-dev/vectorial: nueve equipos,
+  18 revisiones aprobadas de forma simulada, 544 etiquetas; 376 de ajuste y 168 de prueba.
+  En 6,344 s genera una propuesta para B: ECE 0,1018 → 0 y cobertura de intervalo 100 %
+  en este subconjunto. Son etiquetas de un oráculo sintético, no trabajo humano medido.
+- Lote completo D/CPU: 336 revisiones; 173 done y 163 error, idénticos por revisión con
+  uno/cuatro workers. 1.823,100/1.035,171 s: 1,76× observado en host compartido. 133 LOD 2
+  y 40 LOD 1; sin timeouts ni cancelaciones. Proveedores declarados 0 EUR, cero llamadas
+  externas. No incluye energía ni coste operativo. No se atribuye causalmente la mejora
+  de cobertura frente al B anterior a una sola corrección: cambió la estrategia.
+
+### Cómo se comprueba
+
+Ruff check/format globales; 284 pytest correctos y una omisión en 255,11 s. Pruebas del
+feedback con aprobaciones reales de la API, invalidación, deduplicación y separación
+por estrategia/equipo; CLI rechaza muestra insuficiente sin dejar propuestas antiguas.
+Ensayo reproducible y cada trabajo del lote en docs/evidencias/fase3/31oct. API.md y
+DATA_CONTRACT.md documentan operación, semántica de LOD y clave de caché. Web validada
+por separado: typecheck/lint/32 unitarias/builds y 25/30 pruebas de humo offline/API.
+
+### Interfaces y límites
+
+Sin cambios de modelo 0.3 ni dependencias. `bench.recalibrar --almacen --correcciones
+--base --salida` es nuevo. `scripts.measure_scale` añade LOD/familia y grupos de error.
+Los estados `done` son IFC DRAFT estructuralmente válidos, no exactitud frente al plano.
+Quedan 161 errores de escaneados y D-712 rev1/2 vectoriales por boquillas incompletas.
+3.7/H.7 no se cierran: solo se extrapolan terminaciones, no 1600 IFC válidos. La CPU no
+estuvo dedicada y Lectura ejecutaba estudios paralelos. 3.8 no se cierra completo:
+falta few-shot y una muestra de correcciones de uso representativa. El candidato del
+ensayo sintético se conserva sin activar. El visor y el giro se describen en el informe 3D.

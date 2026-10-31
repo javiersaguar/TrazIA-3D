@@ -26,7 +26,8 @@ def synthetic_data(tmp_path_factory):
 @pytest.fixture
 def client(tmp_path, synthetic_data, monkeypatch):
     monkeypatch.setenv("TRAZIA_STUDY_DATA", str(synthetic_data))
-    with TestClient(create_app(root=ROOT, data_root=tmp_path, seed=False)) as value:
+    app = create_app(root=tmp_path, data_root=tmp_path / "store-root", seed=False)
+    with TestClient(app) as value:
         yield value
 
 

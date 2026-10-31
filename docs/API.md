@@ -426,3 +426,38 @@ y vuelve a publicar; el archivo perdido o truncado se reconstruye con las filas 
 Usar un único almacén SQL por archivo configurado. Si falla la exportación, el PATCH
 informa 503: el campo está guardado y se reintenta con la misma Idempotency-Key. Las
 filas siguen accesibles por GET; al arrancar se intenta publicar lo pendiente.
+
+
+## Recalibración desde las correcciones (31/10)
+
+`uv run python -m bench.recalibrar --almacen <TRAZIA_DATA> --correcciones <JSONL> --base <calibracion.json> --salida generated/recalibracion`
+propone un reajuste isotónico y conforme en CPU, sin ejecutar visión. `--base` es opcional.
+El JSONL se contrasta con el registro SQL, la predicción original de la auditoría, la
+aprobación vigente y los originales disponibles. Se deduplican los clics por campo;
+se incluyen confirmaciones correctas y correcciones, no solo errores. Los ejemplos
+reales, borradores, intervenciones sustituidas, valores ya humanos y predicciones sin
+confianza bruta identificable quedan fuera. Las revisiones del mismo tag no se reparten
+entre ajuste y prueba. Los cambios de unidad sin normalizar se excluyen, y los textos
+se comparan sin distinguir mayúsculas.
+
+Mínimos: seis equipos independientes por estrategia, 30 campos por grupo de ajuste
+y 30 campos de validación por estrategia. Dos tercios de los equipos se dividen de nuevo entre curva y cuantil; el
+tercio restante valida ECE. Solo se escribe `calibracion.json` si todas las estrategias
+observadas tienen curva y el ECE de validación no empeora frente a la base. Siempre se
+escribe `informe.json`, con estado `insufficient`, `rejected` o `candidate`; la propuesta
+no activa nada. No se sobrescribe la base. Las estrategias sin nuevos ejemplos
+conservan su calibración anterior (o confianza bruta si no tenían parámetros), también
+para intervalos y abstención. El sesgo de qué campos revisa una persona
+impide interpretar esta validación como precisión sobre todos los planos.
+
+Para activar una propuesta revisada, usar su archivo como `TRAZIA_CALIBRATION`. En
+Compose, API y workers comparten `/data/calibration/calibracion.json` por defecto. La
+clave de caché incorpora la huella de la calibración; las entradas de la versión previa
+no se reutilizan. Si los parámetros cambian mientras corre un trabajo, ese resultado
+se entrega pero no se incorpora a la caché. Los valores/calibraciones no cambian las
+revisiones ya aprobadas.
+
+El lote de escala informa ahora `lod` y `equipment_kind` para cada modelo accesible y
+`successful_lods`/`errors_by_message` en el resumen. Una envolvente de bomba LOD 1 no
+se presenta como un recipiente detallado. Los errores de inspección por tag permanecen
+explícitos y no interrumpen la contabilidad del lote.

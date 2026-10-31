@@ -176,10 +176,23 @@ def assemble(
         if previous and (previous.value, previous.unit) != (candidate.value, candidate.unit):
             raise ValueError(f"Conflicto en {candidate.path}: seleccione la evidencia correcta")
         chosen.setdefault(candidate.path, candidate)
-    missing = [key for key in ("tag", *GEOMETRY_FIELDS) if key not in chosen]
+    envelope = any(path.startswith("envelope.") for path in chosen)
+    required = (
+        ("tag", *(f"envelope.{part}.{axis}" for part in ("origin", "size") for axis in "xyz"))
+        if envelope
+        else ("tag", *GEOMETRY_FIELDS)
+    )
+    missing = [key for key in required if key not in chosen]
     if missing:
         raise ValueError("Faltan datos explícitos: " + ", ".join(missing))
     equipment = {"id": equipment_id, "kind": "vertical_vessel", "attributes": {}, "nozzles": []}
+    if envelope:
+        kind = chosen.get("attributes.equipment_type")
+        equipment.update(
+            kind="pump" if kind and kind.value == "pump" else "generic",
+            lod=1,
+            envelope={"origin": {}, "size": {}},
+        )
     nozzles = {}
     for path, candidate in chosen.items():
         value = {
@@ -198,7 +211,12 @@ def assemble(
             ],
             "explanation": candidate.explanation,
         }
-        if path.startswith("nozzles."):
+        if envelope and path.startswith("envelope."):
+            _, part, axis = path.split(".")
+            equipment["envelope"][part][axis] = value
+        elif envelope and not (path == "tag" or path.startswith("attributes.")):
+            continue  # LOD 1 no convierte coordenadas de conexión en salientes supuestos.
+        elif path.startswith("nozzles."):
             _, nozzle_id, key = path.split(".")
             nozzles.setdefault(nozzle_id, {"id": nozzle_id})[key] = value
         elif path.startswith("attributes."):
