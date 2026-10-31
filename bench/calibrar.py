@@ -27,7 +27,7 @@ from statistics import fmean
 
 from synthetic.cases import flatten, spec_from_dict
 from trazia.calibration import Calibration, conformal
-from trazia.calibration.isotonic import fit_curve
+from trazia.calibration.isotonic import apply_curve, fit_curve
 from trazia.pipeline import InputDocument, process
 
 from .estudio import DATASET_NAMES, _documents, reviewed_by_oracle
@@ -35,8 +35,8 @@ from .metrics import ece
 from .units import same, to_canonical
 
 STRATEGIES = ("b_reglas", "c_rag", "d_hibrido")
-# Su confianza ya es una probabilidad ajustada en S-dev (fusión aprendida, tarea 3.4): sin curva.
-PASSTHROUGH = ("d_hibrido",)  # la fusión aprendida ya da probabilidades: sin curva isotónica
+# D (fusión aprendida, tarea 3.4) no lleva curvas por canal: se ajustarían a un S-dev con tablas.
+PASSTHROUGH = ("d_hibrido",)  # sin curva por canal: su curva sale de la fusión con máscaras
 TARGET_RISK = 0.05  # error máximo entre los campos que no se abstienen
 MIN_GROUP = 30  # menos datos no bastan para una curva o un cuantil propios
 TARGET_ECE = 0.05
@@ -202,18 +202,71 @@ def choose_calibrator(rows: list[dict], vendors: dict[str, str]) -> dict[str, di
     return out
 
 
-def fit(rows: list[dict], vendors: dict[str, str] | None = None) -> Calibration:
+def masked_fusion_curve(fusion_rows: list[dict]) -> dict:
+    """Curva de D sacada de las elecciones de su fusión en S-dev con canales apagados.
+
+    En S-dev las tablas casi siempre se leen, y la medida del dibujo solo gana cuando todo lo
+    demás falla: una curva ajustada con esas filas aprende que el dibujo nunca acierta. Las filas de
+    `bench.fusion` repiten cada fusión sin tablas, sin plantilla y sin ambas (proveedores nuevos),
+    que es lo que trae S-reservado. Todo sale de S-dev.
+    """
+    from trazia.strategies.fusion import load_fusion
+
+    from .fusion import _groups
+
+    model = load_fusion()
+    if model is None:
+        raise ValueError("Sin fusión aprendida no hay curva de D")
+    scores, hits = [], []
+    for group in _groups(fusion_rows).values():
+        if not group[0]["expected"]:
+            continue
+        probs = [model.prob(r["features"]) for r in group]
+        best = max(range(len(group)), key=probs.__getitem__)
+        scores.append(probs[best])
+        hits.append(bool(group[best]["correct"]))
+    return fit_curve(scores, hits)
+
+
+def fit(
+    rows: list[dict],
+    vendors: dict[str, str] | None = None,
+    *,
+    fusion_rows: list[dict] | None = None,
+) -> Calibration:
     """Curvas con la primera mitad de S-dev; cuantiles y umbrales con la segunda.
 
     Con `vendors` (equipo → proveedor) se elige antes, por estrategia, si lleva curva o no.
+    Con `fusion_rows` (filas de `bench.fusion`), D lleva una sola curva sacada de su fusión con
+    canales apagados si reduce su ECE en S-dev; si no, pasa sin curva.
     """
     choice = choose_calibrator(rows, vendors) if vendors else {}
-    passthrough = sorted(
-        {r["strategy"] for r in rows if r["strategy"] in PASSTHROUGH}
-        | {s for s, c in choice.items() if c["choice"] == "sin_curva"}
-    )
+    passthrough = {r["strategy"] for r in rows if r["strategy"] in PASSTHROUGH} | {
+        s for s, c in choice.items() if c["choice"] == "sin_curva"
+    }
+    masked: dict[str, dict] = {}
+    masked_meta: dict[str, dict] = {}
+    if fusion_rows:
+        for strategy in sorted(passthrough & set(PASSTHROUGH)):
+            curve = masked_fusion_curve(fusion_rows)
+            own = [(r["raw"], r["correct"]) for r in rows if r["strategy"] == strategy]
+            before = ece(own)
+            after = ece([(apply_curve(curve, c), ok) for c, ok in own])
+            use = before is not None and after is not None and after <= before
+            masked_meta[strategy] = {
+                "source": "fusión en S-dev con canales apagados (bench.fusion)",
+                "fields": curve["n"],
+                "ece_sdev_raw": _round(before),
+                "ece_sdev_curve": _round(after),
+                "choice": "curva_mascaras" if use else "sin_curva",
+            }
+            if use:
+                masked[f"{strategy}|*"] = curve
+                passthrough.discard(strategy)
+    skip = passthrough | set(PASSTHROUGH)  # D nunca lleva curvas por canal de S-dev sin máscaras
+    passthrough = sorted(passthrough)
     curve_rows, conformal_rows = _halves(rows)
-    curves = _fit_curves(curve_rows, set(passthrough))
+    curves = {**_fit_curves(curve_rows, skip), **masked}
     partial = Calibration(curves=curves, quantiles={}, thresholds={}, passthrough=passthrough)
     for r in conformal_rows:
         r["calibrated"] = partial.calibrated(r["strategy"], r["channel"], r["raw"], r["media"])
@@ -253,6 +306,7 @@ def fit(rows: list[dict], vendors: dict[str, str] | None = None) -> Calibration:
             "fields_curves": len(curve_rows),
             "fields_conformal": len(conformal_rows),
             "calibrator_choice": choice,
+            **({"masked_fusion_curve": masked_meta} if masked_meta else {}),
             "fitted_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         },
     )
@@ -394,6 +448,12 @@ def main(argv=None) -> int:
         action="store_true",
         help="Recoge solo --estrategias y las suma a filas.json, sustituyendo sus filas",
     )
+    parser.add_argument(
+        "--fusion-filas",
+        type=Path,
+        default=Path("generated/fusion/filas.json"),
+        help="Filas de bench.fusion (S-dev con canales apagados) para la curva de D",
+    )
     args = parser.parse_args(argv)
 
     os.environ["TRAZIA_CALIBRATION"] = "off"  # se mide la confianza que da cada estrategia
@@ -428,7 +488,12 @@ def main(argv=None) -> int:
         stored.write_text(json.dumps({"fit": fit_rows, "test": test_rows}), encoding="utf-8")
     manifest = json.loads((args.datos / args.ajuste / "manifest.json").read_text(encoding="utf-8"))
     vendors = {case["tag"]: case["vendor"] for case in manifest["cases"]}
-    calibration = fit(fit_rows, vendors)
+    fusion_rows = None
+    if args.fusion_filas.exists():
+        fusion_rows = json.loads(args.fusion_filas.read_text(encoding="utf-8"))
+    else:
+        print(f"Sin {args.fusion_filas}: D pasa sin curva (python -m bench.fusion las genera)")
+    calibration = fit(fit_rows, vendors, fusion_rows=fusion_rows)
     evaluation = evaluate(test_rows, calibration)
     met = {
         s: {

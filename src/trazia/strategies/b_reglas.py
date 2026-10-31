@@ -1,9 +1,10 @@
-"""Estrategia B · datos + reglas: texto, tablas, cotas, cajetín y hoja de datos, sin aprendizaje."""
+"""Estrategia B · datos + reglas: texto, tablas, cotas, cajetín, HDM y VESOR, sin aprendizaje."""
 
 import time
 
 from ..extraction import LabelExtractor
 from ..extractors import DrawingExtractor
+from ..extractors.vesor import is_vesor, plan_labels
 from .base import StageEvent, StrategyContext, StrategyOutput, tag_candidates
 
 
@@ -79,6 +80,22 @@ class ReglasStrategy:
                     f"{len(dibujo)} valores de tablas, cotas y cajetín.",
                 )
             )
+            if is_vesor(bundle):
+                # Plano de orientación: lo leído en él se cita como VESOR, y sus rótulos de planta
+                # («N3 135°») dan el ángulo aunque no haya tabla.
+                planta = tag_candidates(plan_labels(bundle), channel="vesor", strategy=self.name)
+                for c in rotulos + dibujo:
+                    if not from_ocr:
+                        c.channel = "vesor"
+                ctx.emit(
+                    StageEvent(
+                        "extract_tables",
+                        "ok",
+                        name,
+                        f"VESOR: {len(planta)} rótulos de orientación en planta.",
+                    )
+                )
+                dibujo += planta
             candidates += rotulos + dibujo
         out = StrategyOutput(candidates, evidence=evidence)
         out.cost.seconds = time.perf_counter() - started

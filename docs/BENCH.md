@@ -164,6 +164,20 @@ uv run python -m bench.calibrar --datos generated/synthetic_v2   # → generated
 uv run python -m bench.calibrar --reusar                         # reajusta sin volver a leer
 ```
 
+- **Curva de D (1/11).** D no lleva curvas por canal: se ajustarían a un S-dev donde las tablas se
+  leen siempre. Su curva sale de las elecciones de la fusión en S-dev con canales apagados
+  (`--fusion-filas`, por defecto `generated/fusion/filas.json`) y solo se usa si baja la ECE de D
+  en S-dev.
+
+## Marcas de revisión (F.5, 1/11/2026)
+
+```bash
+uv run python -m bench.marcas --datos generated/synthetic_v2   # → generated/marcas/marcas.json
+```
+
+Δ dibujados (verdad sacada del PDF vectorial por su color) frente a los leídos por forma, y qué
+parte de los cambios de la verdad, localizados con la lectura de D, cae junto a una marca.
+
 - **Qué hace.** Pasa B, C y D por `trazia.pipeline.process` sin calibrar sobre S-dev y
   S-reservado. Después ajusta en S-dev y mide en S-reservado, que tiene dos proveedores que S-dev no
   tiene.

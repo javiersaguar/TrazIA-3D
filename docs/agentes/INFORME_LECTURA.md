@@ -287,3 +287,70 @@ limpio, rev1 y rev2; calibración v5; `generated/proveedores-r1b/`). **Datos sin
     de A en el mismo subconjunto que Qwen3-VL local.
 - **Sin medir:** la cuenta de Mistral está en el plan Gratis, que ya no da acceso a la API. Hace
   falta pasar a «Pay-as-you-go» y poner `MISTRAL_API_KEY` en `.env`.
+
+## Sesión del 1/11/2026
+
+### 3.3 · Calibración v6: D cumple
+
+- Filas recogidas de nuevo sobre `main` `0d4d4dc` (fusión aprendida y PR de Alejandro), en
+  `generated/calibration-v6/` y promovidas a `generated/calibration/` (sha256 `5496cf49cbe4…`).
+  La v5 queda en `generated/calibration-v5/`.
+- Diagnóstico: en S-reservado, D da 0,79 de confianza a la medida del dibujo en vectorial y acierta
+  el 95 % (589 campos). En S-dev esa medida casi no gana (36 campos, 6 % de acierto), porque las
+  tablas se leen siempre. Una curva ajustada con S-dev tal cual empeora (ECE 0,28 en S-reservado).
+- Arreglo, solo con S-dev: `bench.calibrar` saca la curva de D de las elecciones de su fusión con
+  canales apagados (`generated/fusion/filas.json`, de `bench.fusion`), que simulan un proveedor
+  cuyas tablas no se leen. Con las tablas apagadas, el dibujo acierta el 100 % en S-dev y la fusión
+  le da 0,81–0,87. La curva solo se usa si baja la ECE de D en S-dev (0,018 → 0,012).
+  `--fusion-filas` cambia la ruta; sin ese fichero, D vuelve a ir sin curva.
+- En S-reservado:
+
+  | Estrategia | ECE calibrada | Cobertura 90 % | Se quedan con abstención | Riesgo de lo que se queda |
+  | --- | ---: | ---: | ---: | ---: |
+  | B | 0,029 | 100 % | 88,0 % | 0,0 % |
+  | C | 0,040 | 91,5 % | 0 % | — |
+  | D | **0,036** (antes 0,068) | 91,4 % | 68,6 % | 8,5 % |
+
+- Límites: cobertura de ángulos de D 63 %; el riesgo con abstención de D (8,5 %) sigue por encima
+  del 5 % buscado; las filas de la fusión son de antes del PR de Alejandro. Miré tres variantes de
+  curva en S-reservado; la elegida es también la de menor ECE en S-dev, que es la regla escrita.
+- **Para Plataforma:** la huella de calibración cambia. Hay que volver a fijarla en el contenedor
+  (escala, 3.7) y la caché de trabajos la invalida sola si usa el sha de la calibración.
+
+### A · Ingesta
+
+- `ingest_bytes` comprueba la firma de los primeros bytes contra la extensión, rechaza un PDF con
+  contraseña con su motivo, avisa de uno cifrado sin contraseña, acepta TIFF y rechaza `.xls` y
+  `.xlsm` pidiendo `.xlsx`.
+- `pipeline.process` convierte PNG, JPEG y TIFF (también de varias páginas) en un PDF escaneado a
+  200 ppp, así que B, C y D les pasan OCR y visión. El documento conserva el nombre y el SHA-256
+  del original. Un documento idéntico a otro de la misma llamada se lee una sola vez, con aviso y
+  evento `ingest` «omitido».
+- ROADMAP: A.7 cerrada; A.1–A.6 y G.1–G.5 anotadas con lo que hay y lo que falta.
+
+### 2.1 · VESOR en B
+
+- B reconoce un VESOR por el nombre (`VESOR_…`) o el id. Lee su tabla de orientación (sin exigir
+  columna de elevación y sin buscar cotas verticales) y los rótulos de planta «N3 135°». Canal
+  `vesor`, que la fusión de D no ha visto: en esos campos D decide con la heurística, como ya hacía
+  con cualquier canal nuevo.
+- Generador `synthetic/vesor.py` (fuera de los conjuntos S-*: no cambia el estudio).
+
+### F.5 · Marcas de revisión
+
+- `trazia.extractors.revision_marks.find_marks(pdf)` devuelve los Δ y las nubes de un PDF vectorial
+  y las páginas escaneadas que no ha podido leer; `check_changes(changes, reading)` señala los
+  cambios sin marca y las marcas sin cambio.
+- `python -m bench.marcas`: Δ 47/47 (S-dev) y 38/38 (S-reservado) en vectorial, sin falsos. El
+  91 % (S-dev) y el 65 % (S-reservado) de los cambios localizados caen junto a una marca.
+- **Necesito de Plataforma:** llamar a `check_changes` desde `revisions.compare` con las lecturas
+  de la revisión nueva (página y caja de cada cambio y de sus alternativas) y mostrar el resultado
+  en la revisión. `families/change_detection.py` ya cuelga marcadores heurísticos de cada cambio;
+  esto los sustituye en vectorial.
+
+### 2.2 y 2.5
+
+- 2.2 cerrada: sin Mistral (decisión del equipo), RapidOCR con comprobación de cita y el detector
+  propio. PaddleOCR-VL sigue descartado con lo medido el 30/10.
+- 2.5 sin empezar: ColQwen2 necesita bajar unos 4,4 GB de modelo (`vidore/colqwen2-v1.0-hf`).
+  `torch` ya está en la caché de uv.
