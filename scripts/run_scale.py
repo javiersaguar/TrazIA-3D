@@ -9,6 +9,41 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+ARTIFACT_PROBE = """import json, os
+from trazia.calibration import load_calibration
+from trazia.strategies.fusion import load_fusion
+c, f = load_calibration(), load_fusion()
+keys = ('GEMINI_API_KEY','GOOGLE_API_KEY','MISTRAL_API_KEY','GROQ_API_KEY',
+        'OPENROUTER_API_KEY','NVIDIA_API_KEY','CLOUDFLARE_API_TOKEN','CLOUDFLARE_ACCOUNT_ID')
+print(json.dumps({'calibration': c.sha256 if c else None, 'fusion': f.sha256 if f else None,
+    'cuda_visible_devices': os.getenv('CUDA_VISIBLE_DEVICES'),
+    'external_credentials_present': [k for k in keys if os.getenv(k)]}))
+"""
+
+
+def deployment_override(image, port, calibration_source=None):
+    services = []
+    for name in ("api-scale", "worker"):
+        service = f"  {name}:\n    image: {json.dumps(image)}\n"
+        if name == "api-scale":
+            service += f"    ports: !override [127.0.0.1:{port}:8000]\n"
+        service += (
+            "    environment:\n      TRAZIA_OFFLINE: '0'\n      TRAZIA_VISION_OFFLINE: '1'\n"
+            "      CUDA_VISIBLE_DEVICES: '-1'\n      TRAZIA_OCR_CACHE: /data/cache/ocr\n"
+            "      OMP_NUM_THREADS: '1'\n      OPENBLAS_NUM_THREADS: '1'\n"
+        )
+        if name == "worker":
+            service += "      TRAZIA_WORKER_CONCURRENCY: '1'\n"
+        if calibration_source:
+            service += (
+                "      TRAZIA_CALIBRATION: /run/trazia-calibracion.json\n"
+                "    volumes:\n      - type: bind\n"
+                f"        source: {json.dumps(calibration_source)}\n"
+                "        target: /run/trazia-calibracion.json\n        read_only: true\n"
+            )
+        services.append(service)
+    return "services:\n" + "".join(services)
+
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
@@ -18,7 +53,10 @@ def main():
     p.add_argument("--image", default="trazia-api:latest")
     p.add_argument("--data", type=Path, default=Path("generated/synthetic_v2"))
     p.add_argument("--output", type=Path, default=Path("generated/scale"))
-    p.add_argument("--api-port", type=int, default=8020)
+    p.add_argument("--api-port", type=int, default=8030)
+    p.add_argument("--calibration", type=Path, help="Parámetros montados en solo lectura")
+    p.add_argument("--expected-calibration", help="Abortar si no coincide la huella de parámetros")
+    p.add_argument("--expected-fusion", help="Abortar si no coincide el modelo de fusión")
     p.add_argument(
         "--sets", nargs="+", default=["s-dev", "s-reservado", "s-mecanico", "s-adversarial"]
     )
@@ -34,12 +72,14 @@ def main():
         p.error("Usa entre uno y ocho workers")
     if (
         not 1 <= args.api_port <= 65535
-        or args.api_port in (8010, 8011, 3100, 3300)
+        or args.api_port in (8010, 8011, 8020, 3100, 3125, 3300)
         or 3290 <= args.api_port <= 3299
     ):
         p.error("Puerto no disponible para el agente Plataforma")
     if args.casos is not None and args.casos < 1:
         p.error("casos debe ser positivo")
+    if args.calibration and not args.calibration.is_file():
+        p.error("No existe el archivo de calibración solicitado")
     if args.eur_worker_hora is not None and args.eur_worker_hora < 0:
         p.error("La tarifa hipotética no puede ser negativa")
     output = args.output.resolve()
@@ -72,15 +112,11 @@ def main():
         project = "trazia-scale-" + uuid.uuid4().hex[:10]
         override = output / (project + ".yml")
         override.write_text(
-            f"services:\n  api-scale:\n    image: {json.dumps(args.image)}\n"
-            f"    ports: !override [127.0.0.1:{args.api_port}:8000]\n"
-            "    environment:\n      TRAZIA_OFFLINE: '0'\n      TRAZIA_VISION_OFFLINE: '1'\n"
-            "      CUDA_VISIBLE_DEVICES: '-1'\n"
-            f"  worker:\n    image: {json.dumps(args.image)}\n    environment:\n"
-            "      TRAZIA_WORKER_CONCURRENCY: '1'\n"
-            "      TRAZIA_OFFLINE: '0'\n      TRAZIA_VISION_OFFLINE: '1'\n"
-            "      CUDA_VISIBLE_DEVICES: '-1'\n      TRAZIA_OCR_CACHE: /data/cache/ocr\n"
-            "      OMP_NUM_THREADS: '1'\n      OPENBLAS_NUM_THREADS: '1'\n",
+            deployment_override(
+                args.image,
+                args.api_port,
+                native_path(args.calibration) if args.calibration else None,
+            ),
             encoding="utf8",
         )
         compose = [
@@ -113,6 +149,21 @@ def main():
                 ]
             )
             image = execute(["docker", "image", "inspect", args.image, "--format", "{{.Id}}"])
+            containers = execute(compose + ["ps", "-q", "api-scale", "worker"]).splitlines()
+            artifacts = []
+            for identity in containers:
+                metadata = json.loads(
+                    execute(["docker", "exec", identity, ".venv/bin/python", "-c", ARTIFACT_PROBE])
+                )
+                if metadata["external_credentials_present"]:
+                    raise RuntimeError("El contenedor tiene credenciales externas; no medir")
+                for key, expected in (
+                    ("calibration", args.expected_calibration),
+                    ("fusion", args.expected_fusion),
+                ):
+                    if expected and metadata[key] != expected:
+                        raise RuntimeError(f"Huella {key} incorrecta; no se ejecuta el lote")
+                artifacts.append({"container": identity, **metadata})
             target = output / f"workers-{count}-{args.estrategia}.json"
             command = (
                 prefix
@@ -149,6 +200,7 @@ def main():
                 "queue": "Redis/arq",
                 "cpu_only": True,
                 "vision_providers": [],
+                "artifacts": artifacts,
             }
             projection = report["summary"]["projection_400x4"]
             seconds = projection["seconds_for_1600_terminal_jobs"]

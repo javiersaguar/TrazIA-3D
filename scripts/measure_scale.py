@@ -53,6 +53,7 @@ def tasks(data, sets, *, cases_limit=None, degradations=None, tags=None):
 
 def summarise(rows, seconds, upload_seconds):
     states = Counter(row["status"] for row in rows)
+    cached = [r["cache_hit"] for r in rows if isinstance(r.get("cache_hit"), bool)]
     durations = [row["seconds_turnaround"] for row in rows]
     known_cost = [
         row["run"]["cost_eur"]
@@ -78,6 +79,9 @@ def summarise(rows, seconds, upload_seconds):
                 "revisions": len(items),
                 "done": sum(i["status"] == "done" for i in items),
                 "seconds_turnaround_sum": sum(i["seconds_turnaround"] for i in items),
+                "pipeline_seconds_sum": sum(i["run"]["seconds"] for i in items)
+                if all(i.get("run") and i["run"].get("seconds") is not None for i in items)
+                else None,
                 "cost_eur": sum(values) if len(values) == len(items) else None,
             }
         )
@@ -87,6 +91,9 @@ def summarise(rows, seconds, upload_seconds):
         "equipment": len({(r["dataset"], r["tag"]) for r in rows}),
         "conditions": len(groups),
         "statuses": dict(states),
+        "job_cache_observed": len(cached),
+        "job_cache_hits": sum(cached) if cached else None,
+        "job_cache_hit_rate": sum(cached) / len(cached) if cached else None,
         "successful_lods": dict(
             Counter(str(row.get("lod", "unknown")) for row in rows if row["status"] == "done")
         ),
@@ -257,6 +264,8 @@ def run(
                         "status": job["status"],
                         "error": job["error"],
                         "run": job["run"],
+                        "cache_hit": job.get("cache_hit"),
+                        "job_elapsed_seconds": job.get("elapsed_seconds"),
                         "seconds_turnaround": time.perf_counter() - stamp,
                     }
                 )

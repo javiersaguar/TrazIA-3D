@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from scripts.measure_scale import summarise, tasks
+from scripts.run_scale import deployment_override
 
 
 def test_scale_report_preserves_failures_and_unknown_cost():
@@ -39,6 +40,19 @@ def test_scale_report_preserves_failures_and_unknown_cost():
     assert projection["seconds_for_1600_terminal_jobs"] == 8000
     assert projection["seconds_for_1600_valid_ifc"] is None and projection["cost_eur"] is None
     assert result["per_equipment_condition"][0]["cost_eur"] is None
+    assert result["job_cache_hits"] is None and result["job_cache_observed"] == 0
+    rows[0]["cache_hit"], rows[1]["cache_hit"] = True, False
+    observed = summarise(rows, 10, 1)
+    assert observed["job_cache_hits"] == 1 and observed["job_cache_hit_rate"] == 0.5
+
+
+def test_scale_mounts_same_calibration_read_only_without_exposing_a_team_port():
+    config = deployment_override("trazia:test", 8030, "/mnt/c/synthetic/calibracion.json")
+    assert "127.0.0.1:8030:8000" in config
+    assert config.count("TRAZIA_CALIBRATION: /run/trazia-calibracion.json") == 2
+    assert config.count("read_only: true") == 2
+    assert config.count("CUDA_VISIBLE_DEVICES: '-1'") == 2
+    assert "TRAZIA_WORKER_CONCURRENCY: '1'" in config
 
 
 def test_scale_projection_is_separate_from_measured_batch():
@@ -91,7 +105,7 @@ def test_probe_limits_keep_exact_cases_and_degradations(tmp_path):
     assert {(row["tag"], row["degradation"]) for row in probe} == {("V-1", "vectorial")}
 
 
-@pytest.mark.parametrize("port", [8010, 8011, 3100, 3300, 3295])
+@pytest.mark.parametrize("port", [8010, 8011, 8020, 3100, 3125, 3300, 3295])
 def test_scale_runner_rejects_other_teams_ports_before_docker(port):
     result = subprocess.run(
         [sys.executable, "scripts/run_scale.py", "--api-port", str(port)],
