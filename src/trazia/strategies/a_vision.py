@@ -11,7 +11,8 @@ A no usa la tabla de boquillas ni los datos de diseño del GA. Los atributos sal
 datos, que DEC-02 permite fuera de la geometría.
 
 Lectores: «texto» (capa de texto del PDF u OCR si no la hay; es la variante a_geometria, que mide
-el canal geométrico) y «vision» (modelo de visión por mosaicos: a_vision).
+el canal geométrico), «detector» (el detector propio en escaneados, desde su caché: a_detector) y
+«vision» (modelo de visión por mosaicos: a_vision).
 """
 
 import io
@@ -146,6 +147,21 @@ class VisionGeometryStrategy:
         own = [line for line in bundle.lines if line.source.page == page]
         if own:
             return own
+        if self.reader == "detector":
+            # Detector propio (tarea 2.4): solo su caché; sin ella, el OCR de siempre.
+            from ..ocr.detector import detector_pdf_lines
+
+            lines = detector_pdf_lines(data, bundle.document.id, bundle.document.page_count or 1)
+            if lines is not None:
+                ctx.emit(
+                    StageEvent(
+                        "extract_detector",
+                        "ok",
+                        bundle.document.filename,
+                        f"{len(lines)} textos del detector propio.",
+                    )
+                )
+                return [line for line in lines if line.source.page == page]
         from ..ocr import OcrUnavailable, ocr_pdf_lines
 
         try:

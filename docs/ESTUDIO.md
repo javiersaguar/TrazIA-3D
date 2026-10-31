@@ -31,6 +31,7 @@ incertidumbre? ¿Cómo cambia la respuesta según el tipo de documento?
 | `b_reglas+ocr` | B sobre líneas de OCR cuando no hay capa de texto |
 | `c_rag` | C con recuperación visual y adaptación de parámetros |
 | `d_hibrido` | D completo con el selector |
+| `d_hibrido+fusion` | D con fusión aprendida (regresión logística sobre las señales de los canales, tarea 3.4) |
 | `d_hibrido−geometria`, `−memoria`, `−rag`, `−vision`, `−detector` | Ablaciones de D, quitando un canal cada vez |
 
 Todas pasan por el mismo postproceso: normalización, contrato 0.3, familia e IFC.
@@ -225,3 +226,110 @@ Más cosas que salen:
   Las dos correcciones son de diseño, no de parámetros: todo lo que se ajusta (curvas, cuantiles y
   umbrales) sigue saliendo solo de S-dev. Aun así, las cifras de S-reservado de este estudio ya no
   son una medida a ciegas.
+
+### Estudio 3 · A, fusión aprendida y calibración revisada (31/10/2026)
+
+**Datos.**
+
+- Mismos conjuntos, degradaciones, oráculo y remuestreos que el estudio 2. **Datos sintéticos.**
+- Calibración nueva, ajustada solo en S-dev (sha256 `f7b78a0f73a1…`). Cambios en `docs/BENCH.md`,
+  «Revisión del 31/10/2026»:
+  - C sin curva;
+  - intervalo que no informa → abstención;
+  - cuantiles por estrategia.
+- Fusión aprendida ajustada en S-dev con `python -m bench.fusion`.
+
+| Variante | Puntuación | IC 95 % | Geometría | Atributos | ECE | F1 cambios | Cobertura 90 % | Alucinación | s/revisión |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `d_hibrido+fusion` | **0,670** | [0,638; 0,702] | 44,0 % | 92,5 % | **0,039** | 47,5 % | 98,4 % | 0,0 % | 1,84 |
+| `d_hibrido` | 0,640 | [0,606; 0,677] | 42,4 % | 90,3 % | 0,101 | 45,9 % | 97,8 % | 0,0 % | 3,23 |
+| `c_rag` | 0,567 | [0,516; 0,618] | 28,2 % | 82,6 % | 0,088 | 40,1 % | 77,7 % | 0,0 % | 0,40 |
+| `b_reglas` | 0,536 | [0,493; 0,579] | 19,9 % | 80,8 % | 0,007 | 32,8 % | 100 % | 0,0 % | 0,04 |
+| `a_detector` | 0,489 | [0,448; 0,533] | 19,5 % | 75,0 % | 0,139 | 30,4 % | 93,5 % | **4,0 %** | 1,52 |
+| `a_geometria` | 0,488 | [0,446; 0,531] | 19,2 % | 75,0 % | 0,139 | 30,4 % | 93,7 % | 0,0 % | 1,81 |
+
+- **Tiempos.** El estudio corrió a la vez que A con visión en la GPU: los segundos por revisión
+  son más altos que en el estudio 2 (D: 3,23 s frente a 1,55 s) y no se comparan entre estudios.
+- **Ablaciones de D.** Iguales al estudio 2 dentro del intervalo:
+
+  | Canal quitado | Δ |
+  | --- | ---: |
+  | RAG | −0,075 |
+  | Geometría | −0,043 |
+  | Detector | −0,010 |
+  | Memoria | +0,010 |
+
+Por conjunto (puntuación):
+
+| Variante | S-dev | S-reservado | S-adversarial | Envenenamiento |
+| --- | --- | --- | --- | --- |
+| `d_hibrido+fusion` | 0,732 | **0,570** | 0,940 | 13,9 % |
+| `d_hibrido` | 0,715 | 0,524 | 0,942 | 13,9 % |
+| `c_rag` | 0,672 | 0,386 | 0,757 | 13,9 % |
+| `b_reglas` | 0,625 | 0,386 | 0,904 | 30,6 % |
+| `a_geometria` | 0,564 | 0,361 | 0,710 | 0,0 % |
+
+Por degradación:
+
+| Variante | Vectorial | Escaneado limpio | Escaneado pobre |
+| --- | ---: | ---: | ---: |
+| `d_hibrido+fusion` | 0,919 | 0,600 | 0,432 |
+| `d_hibrido` | 0,892 | 0,553 | 0,416 |
+
+**Fusión aprendida frente a heurística.**
+
+- **Campos pareados.** McNemar sobre 7.452 campos: la aprendida acierta 86 que la heurística falla,
+  y la heurística 29 que la aprendida falla (p ≈ 10⁻⁷).
+- **Puntuación.** Sube en S-dev y en S-reservado. En S-adversarial queda igual (0,940 frente a
+  0,942).
+- **Calibración.** Es la única variante de D con ECE por debajo de 0,05 en el conjunto puntuado
+  (S-dev + S-reservado). Solo en S-reservado da 0,072 (`docs/BENCH.md`).
+- **Recomendación: `d_hibrido+fusion` para todo.**
+- **Selector.** Fijado en S-dev, sigue perdiendo: 0,386 en S-reservado frente a 0,570 de la
+  variante sola.
+
+**A sin modelo de visión.** Conjunto completo.
+
+- **Puntuación.** `a_geometria` (trazos + capa de texto u OCR) puntúa 0,488. En S-reservado queda
+  por debajo de B (0,361 frente a 0,386).
+- **Detector propio.** Como lector de A no cambia nada: `a_detector` 0,489 frente a 0,488, McNemar
+  p = 0,60. Además mete un 4,0 % de valores que no se pueden anclar, así que no es elegible.
+- **Lo que aporta A sin modelo.** No aporta como estrategia sola. En D sí aporta como canal de
+  geometría (−0,043 sin él).
+
+**A con Qwen3-VL local.** Subconjunto declarado: 2 equipos por conjunto, vectorial y escaneado
+limpio, 10 condiciones, 6 equipos. Salida en `generated/estudio-avision/`.
+
+| Variante (subconjunto) | Puntuación | IC 95 % | Alucinación | s/revisión |
+| --- | --- | --- | --- | --- |
+| `a_geometria` | **0,543** | [0,403; 0,688] | 0,0 % | 1,3 |
+| `a_vision` (Qwen3-VL 4B) | 0,445 | [0,355; 0,512] | 7,3 % | 172 |
+
+- **McNemar.** Sobre los mismos campos: 91 frente a 21, p ≈ 10⁻¹¹.
+- **Por conjunto.** El modelo de visión como lector empeora A en S-dev (0,512) y en S-reservado
+  (0,355).
+- **Alucinación.** Mete un 7,3 % de valores que no se pueden anclar.
+- **Tiempo.** Tarda 130 veces más.
+- **Mistral y Gemini.** Pendientes de clave: `python -m bench.mistral` mide los modelos de Mistral
+  en este mismo subconjunto.
+
+**Hipótesis (actualización).**
+
+- **H2 · se rechaza en lo que pedía.** A no generaliza mejor que B: en S-reservado `a_geometria`
+  saca 0,361 y B 0,386. Con lector de visión, A alucina más (7,3 %) y cuesta 130 veces más tiempo.
+  Lo segundo sí se confirma.
+- **H4 · se confirma con la fusión aprendida.** D con fusión aprendida es la mejor variante en
+  S-dev y en S-reservado. La diferencia con la heurística es significativa.
+- **H1, H3, H5 y H6.** Sin cambios frente al estudio 2.
+
+**S-reservado se ha vuelto a abrir para este estudio.**
+
+- **Las tres decisiones nuevas se tomaron solo con S-dev:**
+  - la fusión aprendida;
+  - la curva sí o no por estrategia;
+  - el umbral del intervalo informativo.
+
+  Las dos primeras se eligieron dejando fuera un proveedor de S-dev cada vez. El umbral salió de un
+  fallo visto en la demo V-101.
+- **Excepción.** Los canales apagados al entrenar la fusión responden al diagnóstico del 30/10, que
+  salió de S-reservado.

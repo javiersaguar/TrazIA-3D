@@ -45,6 +45,24 @@ def _post(url: str, payload: dict, headers: dict | None = None, timeout: float =
         raise VisionUnavailable(f"{url}: {exc}") from None
 
 
+def _get(url: str, key: str, timeout: float = 60) -> dict:
+    """GET con clave, sin seguir redirecciones (la clave no sale hacia otro sitio)."""
+    request = urllib.request.Request(url, headers={"Authorization": f"Bearer {key}"})
+
+    class NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, req, fp, code, msg, headers, newurl):
+            return None
+
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+    try:
+        with opener.open(request, timeout=timeout) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        raise VisionError(f"{url}: HTTP {exc.code}") from None
+    except (urllib.error.URLError, TimeoutError, ConnectionError) as exc:
+        raise VisionUnavailable(f"{url}: {exc}") from None
+
+
 def _scale_boxes(data, factor: float = 1000.0):
     """Cajas 0–1000 → 0–1, recortadas a la imagen y ordenadas (x0 ≤ x1, y0 ≤ y1)."""
     if isinstance(data, dict):
@@ -325,11 +343,86 @@ class MistralOCRProvider(_Provider):
         return {"items": items}, {"cost_eur": cost}
 
 
+# € por millón de tokens (entrada, salida) de los modelos de chat de Mistral con visión.
+# Aproximados y configurables con MISTRAL_EUR_PER_MTOK_IN/OUT: revisar antes del pitch.
+MISTRAL_PRICES = {
+    "mistral-small": (0.1, 0.3),
+    "mistral-medium": (0.4, 2.0),
+    "pixtral-12b": (0.15, 0.15),
+    "pixtral-large": (2.0, 6.0),
+    "mistral-large": (2.0, 6.0),
+}
+
+
+class MistralChatProvider(_Provider):
+    """Modelos de chat de Mistral con visión (Pixtral, Small, Medium, Large) con salida JSON por
+    esquema. Externo: solo sintéticos salvo autorización (DEC-03)."""
+
+    external = True
+
+    def __init__(self, model: str | None = None, *, dataset: str = "synthetic"):
+        super().__init__(dataset=dataset)
+        self.model = model or os.environ.get("MISTRAL_CHAT_MODEL", "mistral-small-latest")
+        self.name = f"mistral-chat:{self.model}"
+        self.key = os.environ.get("MISTRAL_API_KEY")
+        if not self.key and not cache.offline():
+            raise VisionUnavailable("Mistral: falta MISTRAL_API_KEY en .env")
+
+    def _call(self, image_png, prompt, schema):
+        if not self.key:
+            raise VisionUnavailable("Mistral: falta MISTRAL_API_KEY")
+        payload = {
+            "model": self.model,
+            "temperature": 0,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": "data:image/png;base64,"
+                            + base64.b64encode(image_png).decode("ascii"),
+                        },
+                    ],
+                }
+            ],
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {"name": "lectura", "schema": schema, "strict": True},
+            },
+        }
+        started = time.perf_counter()
+        response = _post(
+            "https://api.mistral.ai/v1/chat/completions",
+            payload,
+            {"Authorization": f"Bearer {self.key}"},
+        )
+        try:
+            data = json.loads(response["choices"][0]["message"]["content"])
+        except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
+            raise VisionError(f"{self.name}: respuesta inesperada ({exc})") from None
+        usage = response.get("usage", {})
+        tokens_in, tokens_out = usage.get("prompt_tokens"), usage.get("completion_tokens")
+        family = next((f for f in MISTRAL_PRICES if self.model.startswith(f)), None)
+        price_in, price_out = MISTRAL_PRICES.get(family, (2.0, 6.0))
+        cost = (tokens_in or 0) / 1e6 * _price("MISTRAL_EUR_PER_MTOK_IN", price_in) + (
+            tokens_out or 0
+        ) / 1e6 * _price("MISTRAL_EUR_PER_MTOK_OUT", price_out)
+        return data, {
+            "seconds": time.perf_counter() - started,
+            "tokens_in": tokens_in,
+            "tokens_out": tokens_out,
+            "cost_eur": cost,
+        }
+
+
 FACTORIES: dict[str, Callable[..., _Provider]] = {
     "ollama": OllamaProvider,
     "gemini": GeminiProvider,
     "mistral-ocr": MistralOCRProvider,
     "mistral": MistralOCRProvider,
+    "mistral-chat": MistralChatProvider,
 }
 
 

@@ -6,9 +6,9 @@ import { useEffect, useRef, useState } from "react";
 import { Tip } from "@/components/ui/controls";
 import { ConfidenceBar } from "@/components/ui/data";
 import { FieldStatusBadge } from "@/components/ui/status";
-import { Button, Icon, Kbd, Skeleton } from "@/components/ui/primitives";
+import { Badge, Button, Icon, Kbd, Skeleton } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
-import { displayUnit, formatValue } from "@/lib/format";
+import { displayUnit, formatInterval, formatValue } from "@/lib/format";
 import { riskLevel, type FieldStatus, type ReviewField } from "@/lib/mock/fields";
 
 type Props = {
@@ -64,7 +64,7 @@ export function FieldQueue({ fields, selectedPath, hoveredId, editingPath, onSel
           </span>
         </div>
         <p className="mt-2 text-xs text-faint">
-          Ordenada por riesgo: impacto del campo × (1 − confianza).
+          Ordenada por riesgo: primero lo que hay que confirmar; después, impacto × (1 − confianza).
         </p>
       </div>
 
@@ -112,6 +112,9 @@ function FieldRow({
   const shownValue = field.correctedValue ?? field.value;
   const s = field.source;
   const where = s.page ? `${s.document_id} · pág. ${s.page}` : `${s.document_id} · ${s.locator}`;
+  const pending = field.status === "candidate";
+  const interval =
+    pending && field.interval && typeof field.value === "number" ? formatInterval(field.value, field.interval, field.unit) : null;
 
   return (
     <div
@@ -146,7 +149,20 @@ function FieldRow({
           >
             {formatValue(shownValue, field.unit)}
           </motion.p>
-          {field.status !== "candidate" ? <FieldStatusBadge status={field.status} /> : <ConfidenceBar value={field.confidence} />}
+          {interval ? (
+            <p className="text-[11px] text-muted" title="Intervalo conforme: contiene el valor verdadero con esa probabilidad">
+              {interval}
+            </p>
+          ) : null}
+          {!pending ? (
+            <FieldStatusBadge status={field.status} />
+          ) : field.abstained ? (
+            <span title={`Confianza ${field.confidence.toFixed(2).replace(".", ",")} por debajo del umbral de revisión`}>
+              <Badge tone="warning">Confírmelo</Badge>
+            </span>
+          ) : (
+            <ConfidenceBar value={field.confidence} calibrated={field.calibrated} />
+          )}
         </div>
       </div>
 
@@ -158,6 +174,7 @@ function FieldRow({
               <span className="text-faint"> · leído {formatValue(field.value, field.unit)}</span>
             ) : null}
           </p>
+          {field.explanation ? <p className="mb-2 text-xs text-muted">{field.explanation}</p> : null}
           {editing ? (
             <EditValue
               field={field}

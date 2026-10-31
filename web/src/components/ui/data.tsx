@@ -101,10 +101,10 @@ export function HealthRing({ value, size = 76 }: { value: number | null; size?: 
 }
 
 /** Barra de confianza con su valor; el color indica el tramo (alta ≥ 0,9 · media · baja < 0,6). */
-export function ConfidenceBar({ value, className }: { value: number; className?: string }) {
+export function ConfidenceBar({ value, calibrated = false, className }: { value: number; calibrated?: boolean; className?: string }) {
   const tone = value >= 0.9 ? "bg-live-dot" : value >= 0.6 ? "bg-warning" : "bg-danger";
   return (
-    <div className={cn("flex items-center gap-2", className)} title={`Confianza ${value.toFixed(2)} · sin calibrar`}>
+    <div className={cn("flex items-center gap-2", className)} title={`Confianza ${value.toFixed(2)} · ${calibrated ? "calibrada" : "sin calibrar"}`}>
       <div className="h-1.5 w-16 overflow-hidden rounded-full bg-surface-sunken">
         <motion.div
           className={cn("h-full rounded-full", tone)}

@@ -32,6 +32,13 @@ export type ReviewField = {
   risk: number;
   status: FieldStatus;
   correctedValue?: number | string;
+  /** Intervalo conforme del valor leído (etapa `calibrate`), si es numérico. */
+  interval?: { low: number; high: number; level: number } | null;
+  /** Confianza calibrada bajo el umbral de riesgo: hay que confirmarlo a mano (DEC-12). */
+  abstained: boolean;
+  /** La confianza viene de la etapa `calibrate`, no directamente de la estrategia. */
+  calibrated: boolean;
+  explanation?: string | null;
 };
 
 const DIMENSIONS = [
@@ -62,9 +69,17 @@ function field(
   group: FieldGroup,
   elementId: ElementId,
   impact: number,
-  data: { value: number | string; unit?: string; source: Source; state?: string },
+  data: {
+    value: number | string;
+    unit?: string;
+    source: Source;
+    state?: string;
+    interval?: { low: number; high: number; level: number } | null;
+    explanation?: string | null;
+  },
 ): ReviewField {
   const confidence = data.source.confidence;
+  const abstained = data.state === "abstained";
   return {
     path,
     label,
@@ -75,7 +90,12 @@ function field(
     source: data.source,
     confidence,
     impact,
-    risk: impact * (1 - confidence),
+    // Un campo abstenido va antes que cualquier otro: no se puede aprobar sin confirmarlo.
+    risk: impact * (1 - confidence) + (abstained ? 1 : 0),
+    interval: data.interval ?? null,
+    abstained,
+    calibrated: data.source.confidence_raw != null,
+    explanation: data.explanation ?? null,
     status: data.state === "corrected" || data.state === "assumed" ? data.state : data.state === "accepted" || data.source.reviewed ? "accepted" : "candidate",
   };
 }

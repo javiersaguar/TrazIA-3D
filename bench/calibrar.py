@@ -35,6 +35,8 @@ from .metrics import ece
 from .units import same, to_canonical
 
 STRATEGIES = ("b_reglas", "c_rag", "d_hibrido")
+# Su confianza ya es una probabilidad ajustada en S-dev (fusión aprendida, tarea 3.4): sin curva.
+PASSTHROUGH = ("d_hibrido+fusion",)
 TARGET_RISK = 0.05  # error máximo entre los campos que no se abstienen
 MIN_GROUP = 30  # menos datos no bastan para una curva o un cuantil propios
 TARGET_ECE = 0.05
@@ -97,6 +99,10 @@ def collect(
                         "correct": False,
                         "kind": None,
                         "residual": None,
+                        # Clase del valor emitido, haya verdad o no: la usa la etapa.
+                        "value_kind": conformal.kind_of(*to_canonical(c.value, c.unit))
+                        if not isinstance(c.value, str)
+                        else None,
                     }
                     if c.path in expected:
                         value, unit = expected[c.path]
@@ -126,17 +132,31 @@ def vendor_libraries(library: Path, out: Path) -> dict[str, Path]:
     return paths
 
 
+def _value_kind(row: dict) -> str | None:
+    """Clase del valor emitido; las filas antiguas no la guardan y se deduce del campo."""
+    if "value_kind" in row:
+        return row["value_kind"]
+    path = row["path"]
+    if path == "tag" or path.endswith(".material") or path.endswith(".service"):
+        return None
+    if path.endswith(".azimuth"):
+        return "deg"
+    if path.startswith("attributes."):
+        return "num"
+    return "mm"
+
+
 def _halves(rows: list[dict]) -> tuple[list[dict], list[dict]]:
     tags = sorted({r["tag"] for r in rows})
     first = set(tags[::2])
     return [r for r in rows if r["tag"] in first], [r for r in rows if r["tag"] not in first]
 
 
-def fit(rows: list[dict]) -> Calibration:
-    """Curvas con la primera mitad de S-dev; cuantiles y umbrales con la segunda."""
-    curve_rows, conformal_rows = _halves(rows)
+def _fit_curves(rows: list[dict], skip: set[str]) -> dict[str, dict]:
     groups: dict[str, list[dict]] = defaultdict(list)
-    for r in curve_rows:
+    for r in rows:
+        if r["strategy"] in skip:
+            continue
         keys = (
             f"{r['strategy']}|{r['channel']}|{r['media']}",
             f"{r['strategy']}|{r['channel']}",
@@ -145,21 +165,66 @@ def fit(rows: list[dict]) -> Calibration:
         )
         for key in keys:
             groups[key].append(r)
-    curves = {
+    return {
         key: fit_curve([r["raw"] for r in group], [r["correct"] for r in group])
         for key, group in sorted(groups.items())
         if len(group) >= MIN_GROUP
     }
-    partial = Calibration(curves=curves, quantiles={}, thresholds={})
+
+
+def choose_calibrator(rows: list[dict], vendors: dict[str, str]) -> dict[str, dict]:
+    """Curva isotónica o confianza tal cual, por estrategia, dejando fuera un proveedor de S-dev.
+
+    Gana lo que da menor ECE en los proveedores no vistos. Si la curva no mejora la confianza de
+    la estrategia, esa estrategia pasa sin curva (S-reservado trae proveedores nuevos: es lo que se
+    quiere prever sin mirarlo).
+    """
+    out = {}
+    for strategy in sorted({r["strategy"] for r in rows} - set(PASSTHROUGH)):
+        own = [r for r in rows if r["strategy"] == strategy]
+        raw, iso = [], []
+        for vendor in sorted({vendors[r["tag"]] for r in own}):
+            train = [r for r in own if vendors[r["tag"]] != vendor]
+            fold = Calibration(curves=_fit_curves(train, set()), quantiles={}, thresholds={})
+            for r in own:
+                if vendors[r["tag"]] == vendor:
+                    raw.append((r["raw"], r["correct"]))
+                    calibrated = fold.calibrated(strategy, r["channel"], r["raw"], r["media"])
+                    iso.append((calibrated, r["correct"]))
+        e_raw, e_iso = ece(raw), ece(iso)
+        out[strategy] = {
+            "ece_raw_lovo": _round(e_raw),
+            "ece_isotonic_lovo": _round(e_iso),
+            "choice": "sin_curva" if e_raw is not None and e_raw <= (e_iso or 1) else "isotonica",
+        }
+    return out
+
+
+def fit(rows: list[dict], vendors: dict[str, str] | None = None) -> Calibration:
+    """Curvas con la primera mitad de S-dev; cuantiles y umbrales con la segunda.
+
+    Con `vendors` (equipo → proveedor) se elige antes, por estrategia, si lleva curva o no.
+    """
+    choice = choose_calibrator(rows, vendors) if vendors else {}
+    passthrough = sorted(
+        {r["strategy"] for r in rows if r["strategy"] in PASSTHROUGH}
+        | {s for s, c in choice.items() if c["choice"] == "sin_curva"}
+    )
+    curve_rows, conformal_rows = _halves(rows)
+    curves = _fit_curves(curve_rows, set(passthrough))
+    partial = Calibration(curves=curves, quantiles={}, thresholds={}, passthrough=passthrough)
     for r in conformal_rows:
         r["calibrated"] = partial.calibrated(r["strategy"], r["channel"], r["raw"], r["media"])
 
+    # Mondrian por estrategia, clase y franja; con respaldo por clase y franja (todas juntas).
     residuals: dict[str, list[float]] = defaultdict(list)
     for r in conformal_rows:
         if r["residual"] is None:
             continue
-        residuals[f"{r['kind']}|*"].append(r["residual"])
-        residuals[f"{r['kind']}|{conformal.band_of(r['calibrated'])}"].append(r["residual"])
+        band = conformal.band_of(r["calibrated"])
+        for prefix in ("", f"{r['strategy']}|"):
+            residuals[f"{prefix}{r['kind']}|*"].append(r["residual"])
+            residuals[f"{prefix}{r['kind']}|{band}"].append(r["residual"])
     quantiles = {}
     for key, values in sorted(residuals.items()):
         q = conformal.quantile(values) if len(values) >= MIN_GROUP else None
@@ -179,11 +244,13 @@ def fit(rows: list[dict]) -> Calibration:
         quantiles=quantiles,
         thresholds=thresholds,
         fitted_on="S-dev",
+        passthrough=passthrough,
         meta={
             "target_risk": TARGET_RISK,
             "min_group": MIN_GROUP,
             "fields_curves": len(curve_rows),
             "fields_conformal": len(conformal_rows),
+            "calibrator_choice": choice,
             "fitted_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         },
     )
@@ -235,18 +302,27 @@ def evaluate(rows: list[dict], calibration: Calibration) -> dict:
         for (confidence, ok), r in zip(cal, group):
             channels[f"{r['channel']}|{r['media']}"].append((r["raw"], confidence, ok))
         hits: dict[str, list[bool]] = defaultdict(list)
-        missing = 0
+        missing = vague_count = 0
+        vague = []  # como la etapa `calibrate`: sin intervalo útil, el campo se abstiene
         for (confidence, _), r in zip(cal, group):
+            kind = _value_kind(r)
+            q = None if kind is None else calibration.quantile_for(kind, confidence, strategy)
+            vague.append(q is not None and not conformal.informative(kind, q))
             if r["residual"] is None:
                 continue
-            q = calibration.quantile_for(r["kind"], confidence)
+            q = calibration.quantile_for(r["kind"], confidence, strategy)
             if q is None:
                 missing += 1
+                continue
+            if not conformal.informative(r["kind"], q):
+                vague_count += 1
                 continue
             hits[r["kind"]].append(r["residual"] <= q + 1e-12)
         all_hits = [h for values in hits.values() for h in values]
         threshold = calibration.threshold_for(strategy)
-        kept = [ok for c, ok in cal if threshold is None or c >= threshold]
+        kept = [
+            ok for (c, ok), v in zip(cal, vague) if (threshold is None or c >= threshold) and not v
+        ]
         out[strategy] = {
             "fields": len(group),
             "accuracy": round(fmean(ok for _, ok in raw), 4),
@@ -255,6 +331,7 @@ def evaluate(rows: list[dict], calibration: Calibration) -> dict:
             "interval_coverage": round(fmean(all_hits), 4) if all_hits else None,
             "interval_coverage_by_kind": {k: round(fmean(v), 4) for k, v in sorted(hits.items())},
             "numeric_fields_without_interval": missing,
+            "numeric_fields_vague_interval": vague_count,
             "abstention": {
                 "threshold": threshold,
                 "coverage": round(len(kept) / len(cal), 4) if cal else None,
@@ -310,6 +387,11 @@ def main(argv=None) -> int:
     parser.add_argument(
         "--reusar", action="store_true", help="Reajusta con las filas ya recogidas (filas.json)"
     )
+    parser.add_argument(
+        "--anadir",
+        action="store_true",
+        help="Recoge solo --estrategias y las suma a filas.json, sustituyendo sus filas",
+    )
     args = parser.parse_args(argv)
 
     os.environ["TRAZIA_CALIBRATION"] = "off"  # se mide la confianza que da cada estrategia
@@ -322,6 +404,12 @@ def main(argv=None) -> int:
         saved = json.loads(stored.read_text(encoding="utf-8"))
         fit_rows, test_rows = saved["fit"], saved["test"]
     else:
+        kept_fit, kept_test = [], []
+        if args.anadir:
+            saved = json.loads(stored.read_text(encoding="utf-8"))
+            new = set(args.estrategias)
+            kept_fit = [r for r in saved["fit"] if r["strategy"] not in new]
+            kept_test = [r for r in saved["test"] if r["strategy"] not in new]
         full = library_path()
         if not full.exists():
             build(args.datos / args.ajuste, full)
@@ -334,8 +422,11 @@ def main(argv=None) -> int:
             )
             os.environ["TRAZIA_RAG_LIBRARY"] = str(full)
             test_rows += collect(args.datos / args.prueba, strategy, args.degradaciones)
+        fit_rows, test_rows = kept_fit + fit_rows, kept_test + test_rows
         stored.write_text(json.dumps({"fit": fit_rows, "test": test_rows}), encoding="utf-8")
-    calibration = fit(fit_rows)
+    manifest = json.loads((args.datos / args.ajuste / "manifest.json").read_text(encoding="utf-8"))
+    vendors = {case["tag"]: case["vendor"] for case in manifest["cases"]}
+    calibration = fit(fit_rows, vendors)
     evaluation = evaluate(test_rows, calibration)
     met = {
         s: {

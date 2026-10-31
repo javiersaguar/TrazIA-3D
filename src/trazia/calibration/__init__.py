@@ -8,8 +8,9 @@ Etapa `calibrate` de `trazia.pipeline.process`, entre la reconciliación y el co
    La confianza de la estrategia pasa a `source.confidence_raw` y la calibrada a
    `source.confidence`.
 2. Intervalo conforme al 90 % para cada campo numérico (ver `conformal.py`).
-3. Abstención: por debajo del umbral de la estrategia el campo queda `abstained`. El valor se
-   conserva para la revisión, pero no se puede aprobar sin que una persona lo confirme.
+3. Abstención: por debajo del umbral de la estrategia, o si su intervalo al 90 % no informa, el
+   campo queda `abstained`. El valor se conserva para la revisión, pero no se puede aprobar sin
+   que una persona lo confirme.
 
 Los parámetros se ajustan con `uv run python -m bench.calibrar` (S-dev) y se guardan en
 `generated/calibration/calibracion.json`. Otra ruta: `TRAZIA_CALIBRATION`; `off` la desactiva.
@@ -37,6 +38,10 @@ def calibration_path() -> Path | None:
     return Path(value)
 
 
+def _es(x: float) -> str:
+    return f"{x:.2f}".replace(".", ",")
+
+
 def _base(strategy: str) -> str:
     """`d_hibrido-memoria` → `d_hibrido`: una ablación usa la curva de su estrategia si no tiene."""
     return strategy.split("-")[0]
@@ -45,11 +50,15 @@ def _base(strategy: str) -> str:
 @dataclass
 class Calibration:
     curves: dict[str, dict]  # "estrategia|canal|tipo" o "estrategia|canal" → curva; "*" comodín
-    quantiles: dict[str, float]  # "clase|franja" y "clase|*" → cuantil conforme
+    # "clase|franja", "clase|*" y "estrategia|clase|franja" → cuantil conforme
+    quantiles: dict[str, float]
     thresholds: dict[str, float]  # estrategia o "*" → umbral de abstención
     level: float = conformal.LEVEL
     fitted_on: str = ""
     meta: dict = field(default_factory=dict)
+    # Estrategias cuya confianza ya es una probabilidad ajustada en S-dev (fusión aprendida, 3.4):
+    # no pasan por la curva isotónica; sí reciben intervalo y umbral de abstención.
+    passthrough: list[str] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, data: dict) -> "Calibration":
@@ -62,10 +71,11 @@ class Calibration:
             level=data["level"],
             fitted_on=data.get("fitted_on", ""),
             meta=data.get("meta", {}),
+            passthrough=list(data.get("passthrough", [])),
         )
 
     def to_dict(self) -> dict:
-        return {
+        out = {
             "format": FORMAT,
             "level": self.level,
             "fitted_on": self.fitted_on,
@@ -74,6 +84,9 @@ class Calibration:
             "thresholds": self.thresholds,
             "meta": self.meta,
         }
+        if self.passthrough:  # sin la clave, la huella de los parámetros de antes no cambia
+            out["passthrough"] = self.passthrough
+        return out
 
     @property
     def sha256(self) -> str:
@@ -95,14 +108,20 @@ class Calibration:
     def threshold_for(self, strategy: str) -> float | None:
         return self._lookup(self.thresholds, [strategy, _base(strategy), "*"])
 
-    def quantile_for(self, kind: str, confidence: float) -> float | None:
+    def quantile_for(
+        self, kind: str, confidence: float, strategy: str | None = None
+    ) -> float | None:
         band = conformal.band_of(confidence)
-        return self._lookup(self.quantiles, [f"{kind}|{band}", f"{kind}|*"])
+        keys = [f"{kind}|{band}", f"{kind}|*"]
+        if strategy:  # cuantil de la propia estrategia si se ajustó; si no, el de todas
+            base = _base(strategy)
+            keys = [f"{strategy}|{kind}|{band}", f"{base}|{kind}|{band}", *keys]
+        return self._lookup(self.quantiles, keys)
 
     def calibrated(
         self, strategy: str, channel: str | None, raw: float, media: str | None = None
     ) -> float:
-        curve = self.curve_for(strategy, channel, media)
+        curve = None if strategy in self.passthrough else self.curve_for(strategy, channel, media)
         value = raw if curve is None else apply_curve(curve, raw)
         return round(min(1.0, max(0.0, value)), 4)
 
@@ -126,19 +145,31 @@ class Calibration:
                 )
             }
             kind = conformal.kind_of(c.value, c.unit)
-            q = None if kind is None else self.quantile_for(kind, confidence)
+            q = None if kind is None else self.quantile_for(kind, confidence, strategy)
+            vague = False
             if q is not None and isinstance(c.value, float | int):
-                width = conformal.half_width(kind, float(c.value), q)
-                update["interval"] = Interval(
-                    low=float(c.value) - width, high=float(c.value) + width, level=self.level
-                )
-                intervals += 1
+                if conformal.informative(kind, q):
+                    width = conformal.half_width(kind, float(c.value), q)
+                    update["interval"] = Interval(
+                        low=float(c.value) - width, high=float(c.value) + width, level=self.level
+                    )
+                    intervals += 1
+                else:
+                    vague = True
+            note = None
             if threshold is not None and confidence < threshold:
-                update["state"] = "abstained"
                 note = (
-                    f"Abstención: confianza calibrada {confidence:.2f} por debajo del umbral "
-                    f"{threshold:.2f}; confírmelo en la revisión."
+                    f"Abstención: confianza calibrada {_es(confidence)} por debajo del umbral "
+                    f"{_es(threshold)}; confírmelo en la revisión."
                 )
+            elif vague:
+                note = (
+                    f"Abstención: con confianza {_es(confidence)}, más del "
+                    f"{(1 - self.level) * 100:.0f} % de las lecturas parecidas fallan por "
+                    "mucho y no hay intervalo útil; confírmelo en la revisión."
+                )
+            if note is not None:
+                update["state"] = "abstained"
                 update["explanation"] = f"{c.explanation} {note}" if c.explanation else note
                 abstained += 1
             out.append(c.model_copy(update=update))

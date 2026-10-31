@@ -138,3 +138,87 @@ Ninguno rompe la firma de `pipeline.process`, el contrato ni la CLI del estudio.
 - **2.1 y 2.5** no empezadas.
 - **S-reservado se ha abierto más de una vez:** ver la nota del final de «Estudio 2».
 - **Lectura de `correcciones.jsonl` (3.8)** para recalibrar: pendiente.
+
+## Sesión del 31/10/2026
+
+Rama `feat/lectura`, rehecha desde `main` (a4dd9a7). Todo sobre **datos sintéticos**.
+
+### E.7 · Intervalo y abstención en la revisión
+
+- La cola de revisión (`web/src/features/review/field-queue.tsx`) muestra el intervalo conforme de
+  cada campo pendiente, por ejemplo «± 0,5° · 90 %».
+- Un campo `abstained` lleva la marca «Confírmelo» en lugar de la barra de confianza. Su
+  explicación sale al seleccionarlo.
+- La cola pone lo abstenido primero. La aprobación ya estaba bloqueada mientras queden campos sin
+  revisar.
+- La barra de confianza dice si la confianza está calibrada.
+- **Comprobado** con la API del worktree y D sobre la demo V-101 en `localhost:3125/revision`.
+- **Pruebas:** `web/src/lib/mock/fields.test.ts`.
+- **La demo sin conexión no cambia:** sus JSON de `web/public/demo` no traen intervalos.
+
+### 3.3 · Calibración (revisión)
+
+- **Fallo corregido.** En la API, D devolvía «2.000 mm, de −770.001 a 774.001 mm» como candidato
+  normal.
+- **Ahora:**
+  - un intervalo que no informa (más del 5 % del valor o 5°) no se da y el campo se abstiene;
+  - curva sí o no por estrategia, eligiendo dejando fuera un proveedor de S-dev: C va sin curva;
+  - cuantiles conformes por estrategia.
+- **Cifras:** en `docs/BENCH.md`, «Revisión del 31/10/2026».
+- **Objetivo cumplido por:**
+  - B: ECE y cobertura;
+  - C: solo ECE (0,023);
+  - D con fusión aprendida: solo cobertura (96,4 %), con una ECE de 0,072 (antes 0,270).
+
+### 3.4 · Fusión aprendida
+
+- **Código:** `trazia/strategies/fusion.py` (señales y modelo en JSON, sin pickle) y
+  `bench/fusion.py` (ajuste).
+- **Variante del estudio:** `d_hibrido+fusion`. Sin `generated/fusion/fusion.json` usa la
+  heurística y lo avisa.
+- **Validación** dejando fuera un proveedor de S-dev:
+
+  | | Elección acertada | ECE |
+  | --- | ---: | ---: |
+  | Aprendida | 93,2 % | 0,023 |
+  | Heurística | 92,5 % | 0,068 |
+
+### 2.11 y G.8 · Estudio 3
+
+Resultados en `docs/ESTUDIO.md`, «Estudio 3». Puntuación GA2MODEL con IC 95 %:
+
+| Variante | Puntuación | IC 95 % | Comentario |
+| --- | ---: | --- | --- |
+| D con fusión aprendida | 0,670 | [0,638; 0,702] | 0,570 en S-reservado |
+| D | 0,640 | | 0,524 en S-reservado |
+| C | 0,567 | | |
+| B | 0,536 | | |
+| A sin modelo | 0,488 | | |
+| A con detector | 0,489 | | 4 % sin anclar: no elegible |
+
+- **A con Qwen3-VL local** (subconjunto de 6 equipos): 0,445 frente a 0,543 de A sin modelo, con un
+  7,3 % de alucinación y 172 s por revisión.
+- **Recomendación:** `d_hibrido+fusion` para todo.
+
+### 2.4 · `a_detector`
+
+- A usa el detector propio como lector en escaneados (desde su caché).
+- Entra en el estudio como variante.
+
+### Lo que necesito de Plataforma (31/10)
+
+- **Clave de la caché de trabajos.** Además del sha256 de la calibración, debe incluir el de la
+  fusión aprendida: `trazia.strategies.fusion.load_fusion().sha256`, o `None` si no hay.
+- **Convertir la fusión aprendida en el D por defecto.** Es una decisión de producto que queda
+  abierta. `generated/fusion/fusion.json` no está en Git, como la calibración. Sin ese fichero, la
+  variante avisa y usa la heurística.
+
+### 1.9 y 2.2 · Mistral
+
+- **Código listo:**
+  - adaptador `mistral-chat:<modelo>` para los modelos de chat con visión, con salida JSON por
+    esquema, caché, coste y la misma política de solo sintéticos;
+  - `python -m bench.mistral`, que lista los modelos con visión de la clave y los mide como lector
+    de A en el mismo subconjunto que Qwen3-VL local.
+- **Sin medir:** la cuenta de Mistral está en el plan Gratis, que ya no da acceso a la API. Hace
+  falta pasar a «Pay-as-you-go» y poner `MISTRAL_API_KEY` en `.env`.

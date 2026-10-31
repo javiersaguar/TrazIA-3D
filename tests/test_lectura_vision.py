@@ -289,3 +289,37 @@ def test_comparison_requires_distinct_families_and_reports_missing_provider(isol
         == 0
     )
     assert json.loads(output.read_text(encoding="utf8"))["distinct_providers"] == 2
+
+
+def test_mistral_chat_reads_lines_with_schema_cost_and_offline_replay(isolated, monkeypatch):
+    from trazia.vision import providers
+
+    monkeypatch.setenv("MISTRAL_API_KEY", "test-only")
+    requests = []
+
+    def post(url, payload, headers=None):
+        requests.append((url, payload))
+        content = json.dumps({"items": [{"text": "ID 2000", "bbox": [100, 200, 300, 260]}]})
+        return {
+            "choices": [{"message": {"content": content}}],
+            "usage": {"prompt_tokens": 1_000_000, "completion_tokens": 0},
+        }
+
+    monkeypatch.setattr(providers, "_post", post)
+    provider = providers.get_provider("mistral-chat:mistral-small-latest")
+    answer = provider.read(b"synthetic", "lineas", page_ref="doc#p1")
+    url, payload = requests[0]
+    assert url.endswith("/v1/chat/completions") and payload["model"] == "mistral-small-latest"
+    assert payload["response_format"]["json_schema"]["schema"]["required"] == ["items"]
+    assert answer.data["items"][0]["bbox"] == [0.1, 0.2, 0.3, 0.26]
+    assert answer.external and answer.cost_eur == pytest.approx(0.1)
+    with pytest.raises(PolicyError):
+        providers.get_provider("mistral-chat", dataset="real").read(
+            b"private", "lineas", page_ref="doc#p2"
+        )
+    monkeypatch.setenv("TRAZIA_VISION_OFFLINE", "1")
+    monkeypatch.delenv("MISTRAL_API_KEY")
+    replay = providers.get_provider("mistral-chat:mistral-small-latest").read(
+        b"synthetic", "lineas", page_ref="doc#p1"
+    )
+    assert replay.cached and len(requests) == 1

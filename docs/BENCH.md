@@ -211,6 +211,73 @@ Resultado en **S-reservado** (sintético, no visto en el ajuste):
   próxima mejora necesita datos de otro reparto: el dataset real (R-ref), las correcciones humanas
   (3.8) o la fusión aprendida con señales de acuerdo entre canales (3.4).
 
+### Revisión del 31/10/2026
+
+```bash
+uv run python -m bench.fusion --datos generated/synthetic_v2            # → generated/fusion/
+uv run python -m bench.calibrar --anadir --estrategias d_hibrido+fusion # suma una estrategia
+```
+
+Tres cambios. Ninguno se ha decidido mirando S-reservado. El tercero responde al diagnóstico del
+30/10, que sí salió de S-reservado.
+
+1. **Intervalo que no informa → abstención.**
+   - **Qué fallaba.** El 30/10 este documento decía que un intervalo enorme deja el campo en
+     abstención, pero el código no lo hacía. La API devolvía «2.000 mm, de −770.001 a 774.001
+     mm» como candidato normal. Se vio al procesar la demo V-101 con D.
+   - **Qué hace ahora.** Si el cuantil supera el 5 % del valor (o 5°), no hay intervalo y el campo
+     queda `abstained` con una explicación.
+   - **Más cambios.** Los cuantiles se ajustan también por estrategia, con respaldo al cuantil
+     común. El informe cuenta la abstención igual que la etapa.
+2. **Curva sí o no, por estrategia, dejando fuera un proveedor de S-dev.**
+   - **Cómo se decide.** Para cada estrategia se comparan la ECE con curva isotónica y la ECE de la
+     confianza tal cual, en los proveedores no vistos de S-dev. Gana la menor.
+   - **C.**
+
+     | | ECE |
+     | --- | ---: |
+     | Tal cual | 0,023 |
+     | Con curva | 0,072 |
+
+     Va sin curva.
+   - **B y D.** Llevan curva: B 0,001 frente a 0,125 y D 0,013 frente a 0,047. La elección queda
+     en `calibracion.json` (`meta.calibrator_choice`).
+3. **Fusión aprendida de D (tarea 3.4).**
+   - **Qué hace.** Una regresión logística puntúa cada opción de cada campo con las señales de la
+     fusión. Las opciones son cada grupo de lecturas iguales y la medida del dibujo. Su probabilidad
+     es la confianza y no lleva curva (`passthrough`).
+   - **Cómo se entrena.** En S-dev, con canales apagados al azar: sin tablas ni cotas, sin
+     plantilla y sin ambos. Es la respuesta al diagnóstico de arriba: en S-dev la medida del dibujo
+     solo gana cuando todo falla.
+   - **Validación** dejando fuera un proveedor de S-dev, 16.055 campos:
+
+     | | Elección acertada | ECE |
+     | --- | ---: | ---: |
+     | Aprendida | 93,2 % | 0,023 |
+     | Heurística | 92,5 % | 0,068 (sin calibrar) |
+
+   - **Canales no vistos.** Si un campo tiene lecturas de un canal que S-dev no tiene (p. ej.
+     «texto», el extractor de etiquetas de la demo V-101), ese campo se fusiona con la heurística.
+
+Resultado en **S-reservado**:
+
+| Estrategia | Campos | Acierto | ECE bruta | ECE calibrada | Cobertura 90 % | Se quedan · riesgo |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| B | 456 | 91,7 % | 0,191 | **0,035** | **100 %** | 85,5 % · 0,0 % |
+| C (sin curva) | 954 | 77,8 % | 0,023 | **0,023** | 53,2 % | 0 % · — |
+| D | 1.991 | 77,0 % | 0,126 | 0,270 | **95,3 %** | 50,6 % · 4,2 % |
+| D con fusión aprendida | 1.998 | 77,7 % | 0,072 | **0,072** | **96,4 %** | **64,0 % · 4,7 %** |
+
+- **Objetivo (ECE < 0,05 y cobertura ≥ 90 %).**
+  - B lo cumple.
+  - C cumple la ECE, pero no la cobertura: con proveedores nuevos acierta menos en las franjas que
+    en S-dev salían exactas.
+  - D con fusión aprendida cumple la cobertura. Su ECE baja de 0,270 a 0,072, todavía por encima
+    del objetivo.
+  - Con abstención, D con fusión aprendida se queda el 64 % de los campos con un riesgo del 4,7 %,
+    por debajo del 5 % objetivo. D se queda el 51 %.
+- **S-reservado se ha abierto una vez más** para medir esta revisión.
+
 ## Hallazgos para el núcleo
 
 1. **Un texto fuera de la página tumbaba la ingesta del PDF.** `ingest_bytes` limitaba la caja a

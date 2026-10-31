@@ -62,12 +62,22 @@ def memory_blocker(previous: Revision) -> str | None:
     return None
 
 
+# `bench.fusion` deja aquí una lista para recibir, por cada ejecución, todas las lecturas antes de
+# fusionarlas; con ellas ajusta la fusión aprendida. En el producto queda en None.
+POOL_SINK: list | None = None
+
+
 class HybridStrategy:
     def __init__(
-        self, *, without: set[str] | frozenset[str] = frozenset(), name: str = "d_hibrido"
+        self,
+        *,
+        without: set[str] | frozenset[str] = frozenset(),
+        name: str = "d_hibrido",
+        fusion: str = "heuristica",
     ):
         self.channels = [c for c in CHANNELS if c not in without]
         self.name = name
+        self.fusion = fusion
 
     def run(self, ctx: StrategyContext) -> StrategyOutput:
         from .a_vision import VisionGeometryStrategy
@@ -102,11 +112,22 @@ class HybridStrategy:
                 ctx.emit(StageEvent("memory", "omitido", "", reason))
         if "geometria" in self.channels:
             take(VisionGeometryStrategy(reader="texto", name=self.name).run(ctx))
-        chosen, conflicts = fuse(pool)
+        model = None
+        if self.fusion == "aprendida":
+            from .fusion import load_fusion
+
+            model = load_fusion()
+            if model is None:
+                reason = "Sin modelo de fusión aprendida (bench.fusion): se usa la heurística."
+                warnings.append(reason)
+                ctx.emit(StageEvent("reconcile", "omitido", "", reason))
+        chosen, conflicts = fuse(pool, model)
         missing = [p for p in REQUIRED if p not in {c.path for c in chosen}]
         if missing and "vision" in self.channels and ctx.providers:
             take(self._vision(ctx))
-            chosen, conflicts = fuse(pool)
+            chosen, conflicts = fuse(pool, model)
+        if POOL_SINK is not None:
+            POOL_SINK.append(list(pool))
         for c in chosen:
             c.strategy = self.name
         ctx.emit(
@@ -274,7 +295,15 @@ def _combine(confidences: list[float]) -> float:
     return 1 - fail
 
 
-def fuse(pool: list[Candidate]) -> tuple[list[Candidate], dict[str, str]]:
+def fuse(
+    pool: list[Candidate], model=None, record: list | None = None
+) -> tuple[list[Candidate], dict[str, str]]:
+    """Elige un valor por campo.
+
+    Sin `model`, con la puntuación heurística. Con un `FusionModel` (tarea 3.4), cada opción del
+    campo se puntúa con la probabilidad aprendida. `record`, si se da, recibe las señales de cada
+    opción para ajustar ese modelo (`bench.fusion`).
+    """
     by_path: dict[str, list[Candidate]] = defaultdict(list)
     for c in pool:
         by_path[c.path].append(c)
@@ -292,9 +321,11 @@ def fuse(pool: list[Candidate]) -> tuple[list[Candidate], dict[str, str]]:
                     break
             else:
                 clusters.append([c])
-        if not clusters:
+        if not clusters and (model is None or not measured):  # sin lecturas ni medida que puntuar
             if measured:  # solo hay medida: entra con poca confianza y se dice
                 m = max(measured, key=lambda c: c.source.confidence)
+                if record is not None:
+                    record.append(_measure_option(path, m, 1, 0))
                 chosen.append(
                     m.model_copy(
                         update={
@@ -318,6 +349,14 @@ def fuse(pool: list[Candidate]) -> tuple[list[Candidate], dict[str, str]]:
                 key = _evidence_key(c)
                 per_evidence[key] = max(per_evidence.get(key, 0), c.source.confidence)
             score = _combine(list(per_evidence.values()))
+            signal = {
+                "per_channel": per_channel,
+                "n_evidence": len(per_evidence),
+                "base": score,
+                "share": len(cluster) / len(voters),
+                "geo": None if not measured else 0,
+                "rule": 0,
+            }
             notes = []
             # La cita del campo es la de un canal verificable si alguno coincide: una lectura de
             # modelo (detector, C, visión) cuya caja no cuadra con el texto de la página se descarta
@@ -340,16 +379,30 @@ def fuse(pool: list[Candidate]) -> tuple[list[Candidate], dict[str, str]]:
                 if rel <= tolerance:
                     score = _combine([score, g.source.confidence])
                     notes.append(f"la geometría del dibujo lo confirma ({rel * 100:.1f} %)")
+                    signal["geo"] = 1
                 elif rel > 3 * tolerance:
                     score *= 0.6
                     notes.append(
                         f"la geometría del dibujo no cuadra ({rel * 100:.0f} % de diferencia)"
                     )
+                    signal["geo"] = -1
+            before = score
             score, rule = _constraints(path, rep, score, diameter)
             if rule:
                 notes.append(rule)
-            scored.append((score, cluster, rep, per_channel, notes))
+                signal["rule"] = 1 if score > before else -1
+            scored.append((score, cluster, rep, per_channel, notes, signal))
         scored.sort(key=lambda s: s[0], reverse=True)
+        learned = model is not None and all(model.covers(s[3]) for s in scored)
+        if learned or record is not None:
+            options = _learned_options(path, scored, measured)
+            if record is not None:
+                record += [features for _, features in options]
+            if learned:
+                picked = _pick_learned(path, options, scored, model, conflicts)
+                if picked is not None:
+                    chosen.append(picked)
+                continue
         exact = [m for m in measured if m.source.confidence >= 0.5]  # medida vectorial
         if exact and all(any("no cuadra" in n for n in s[4]) for s in scored):
             # Todas las lecturas contradicen un dibujo vectorial (medida exacta): gana el dibujo
@@ -377,7 +430,7 @@ def fuse(pool: list[Candidate]) -> tuple[list[Candidate], dict[str, str]]:
                 )
             )
             continue
-        score, cluster, rep, per_channel, notes = scored[0]
+        score, cluster, rep, per_channel, notes, _ = scored[0]
         sources = ", ".join(CHANNEL_NAMES.get(ch, ch) for ch in per_channel)
         agree = f"Coinciden: {sources}." if len(per_channel) > 1 else f"Fuente: {sources}."
         explanation = " ".join([agree] + [n[0].upper() + n[1:] + "." for n in notes])
@@ -410,6 +463,108 @@ def fuse(pool: list[Candidate]) -> tuple[list[Candidate], dict[str, str]]:
             )
         )
     return chosen, conflicts
+
+
+def _measure_option(path: str, m: Candidate, n_options: int, contradicted: int) -> dict:
+    from .fusion import measure_features
+
+    return {
+        "path": path,
+        "value": m.value,
+        "unit": m.unit,
+        "measure": True,
+        "features": measure_features(
+            path,
+            confidence=m.source.confidence,
+            vector=m.source.confidence >= 0.5,
+            n_options=n_options,
+            contradicted=contradicted,
+        ),
+    }
+
+
+def _learned_options(path: str, scored: list, measured: list[Candidate]) -> list[tuple]:
+    """Opciones del campo con sus señales: cada grupo y, si nadie la confirma, la medida."""
+    from .fusion import cluster_features
+
+    g = max(measured, key=lambda c: c.source.confidence) if measured else None
+    confirmed = any(s[5]["geo"] == 1 for s in scored)
+    n_options = len(scored) + (1 if g is not None and not confirmed else 0)
+    options = []
+    for s in scored:
+        signal = s[5]
+        options.append(
+            (
+                s,
+                {
+                    "path": path,
+                    "value": s[2].value,
+                    "unit": s[2].unit,
+                    "measure": False,
+                    "heuristic": s[0],
+                    "features": cluster_features(
+                        path,
+                        per_channel=signal["per_channel"],
+                        n_evidence=signal["n_evidence"],
+                        base=signal["base"],
+                        share=signal["share"],
+                        n_options=n_options,
+                        geo=signal["geo"],
+                        geo_vector=g is not None and g.source.confidence >= 0.5,
+                        rule=signal["rule"],
+                    ),
+                },
+            )
+        )
+    if g is not None and not confirmed:
+        contradicted = sum(1 for s in scored if s[5]["geo"] == -1)
+        options.append((g, _measure_option(path, g, n_options, contradicted)))
+    return options
+
+
+def _pick_learned(path, options, scored, model, conflicts) -> Candidate | None:
+    if not options:
+        return None
+    probs = [model.prob(o[1]["features"]) for o in options]
+    best = max(range(len(options)), key=lambda i: probs[i])
+    p = probs[best]
+    others = [o for i, o in enumerate(options) if i != best]
+    alternatives = [
+        Alternative(
+            value=o[1]["value"],
+            unit=o[1]["unit"],
+            source=(o[0][2] if not o[1]["measure"] else o[0]).source,
+            channel=(o[0][2] if not o[1]["measure"] else o[0]).channel,
+        )
+        for o in others
+    ]
+    note = f"Fusión aprendida: probabilidad de acierto {p:.2f}."
+    if options[best][1]["measure"]:
+        g = options[best][0]
+        explanation = (g.explanation or "") + " Se propone la medida del dibujo. " + note
+        base = g
+    else:
+        _, cluster, rep, per_channel, notes, _ = options[best][0]
+        sources = ", ".join(CHANNEL_NAMES.get(ch, ch) for ch in per_channel)
+        agree = f"Coinciden: {sources}." if len(per_channel) > 1 else f"Fuente: {sources}."
+        explanation = " ".join([agree] + [n[0].upper() + n[1:] + "." for n in notes] + [note])
+        base = rep
+    rivals = [q for i, q in enumerate(probs) if i != best and q >= 0.5 * p]
+    if rivals:
+        why = (
+            f"{len(rivals) + 1} lecturas distintas; se propone la más probable "
+            f"({options[best][1]['value']})."
+        )
+        conflicts[path] = why
+        explanation += " " + why
+    return base.model_copy(
+        update={
+            "source": base.source.model_copy(update={"confidence": round(min(0.99, p), 4)}),
+            "confidence_raw": base.source.confidence,
+            "explanation": explanation.strip(),
+            "alternatives": alternatives,
+        }
+    )
 
 
 def _evidence_key(c: Candidate) -> tuple:

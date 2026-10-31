@@ -152,3 +152,30 @@ def test_pipeline_calibrates_and_carries_it_into_the_contract(tmp_path, monkeypa
     )
     assert [e.status for e in events if e.stage == "calibrate"] == ["omitido"]
     assert all(f.state == "candidate" for f in fields(plain.revision.equipment).values())
+
+
+def test_an_uninformative_interval_is_dropped_and_the_field_abstains():
+    """±386 veces el valor cubre el 90 % pero no informa: sin intervalo y a confirmar."""
+    vague = Calibration(curves={}, quantiles={"mm|*": 386.0, "deg|*": 2.0}, thresholds={})
+    [mm, deg], summary = vague.apply(
+        [cand(2000.0, conf=0.6), cand(90.0, "deg", conf=0.9, path="nozzles.N1.azimuth")],
+        "d_hibrido",
+    )
+    assert mm.interval is None and mm.state == "abstained"
+    assert "no hay intervalo útil" in mm.explanation and "0,60" in mm.explanation
+    assert deg.interval is not None and deg.state is None
+    assert summary == {"fields": 2, "intervals": 1, "abstained": 1}
+
+
+def test_passthrough_strategy_keeps_its_learned_probability():
+    learned = Calibration(
+        curves={"*|*": {"x": [0.0, 1.0], "y": [0.0, 0.1], "n": 100}},
+        quantiles={},
+        thresholds={},
+        passthrough=["d_hibrido+fusion"],
+    )
+    assert learned.calibrated("d_hibrido+fusion", "tabla", 0.83) == pytest.approx(0.83)
+    assert learned.calibrated("d_hibrido", "tabla", 0.83) == pytest.approx(0.083)
+    assert Calibration.from_dict(learned.to_dict()).passthrough == ["d_hibrido+fusion"]
+    # Sin estrategias de paso, la huella de los parámetros antiguos no cambia.
+    assert "passthrough" not in calibration().to_dict()

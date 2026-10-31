@@ -36,6 +36,15 @@ export function formatValue(value: number | string, unit?: string): string {
   return u === "°" ? `${formatNumber(value)}°` : `${formatNumber(value)} ${u}`;
 }
 
+/** Intervalo conforme: «± 3 mm · 90 %», o «1.990–2.010 mm · 90 %» si no es simétrico. */
+export function formatInterval(value: number, interval: { low: number; high: number; level: number }, unit?: string): string {
+  const level = `${Math.round(interval.level * 100)} %`;
+  const half = (interval.high - interval.low) / 2;
+  const centre = (interval.high + interval.low) / 2;
+  if (Math.abs(centre - value) <= Math.max(1e-6, 0.01 * half)) return `± ${formatValue(half, unit)} · ${level}`;
+  return `${formatNumber(interval.low)}–${formatValue(interval.high, unit)} · ${level}`;
+}
+
 export function formatDelta(delta: number, unit?: string): string {
   const u = displayUnit(unit);
   const n = signedFormat.format(delta);

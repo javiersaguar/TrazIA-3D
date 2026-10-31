@@ -9,12 +9,18 @@ El residuo no depende de la unidad, para poder juntar campos de escalas distinta
 Los grupos de Mondrian son (clase de campo, franja de confianza calibrada). El cuantil es el de
 muestra finita, ⌈(n+1)·nivel⌉-ésimo residuo: con datos intercambiables, la cobertura del grupo es
 al menos el nivel. Si el grupo es tan pequeño que ese cuantil no existe, no se da intervalo.
+
+Un intervalo que cubre el 90 % solo porque es enorme no informa: en las franjas de confianza baja
+más del 10 % de las lecturas son otro número (residuo de cientos de veces el valor). Por encima de
+`MAX_RESIDUAL` no se da intervalo y el campo se abstiene: hay que confirmarlo a mano.
 """
 
 import math
 
 LEVEL = 0.9
 BANDS = (0.5, 0.8, 0.95)  # cortes de la confianza calibrada
+# Residuo máximo de un intervalo útil: 5 % del valor (mm, num) o 5° (deg) además de la tolerancia.
+MAX_RESIDUAL = {"mm": 0.05, "num": 0.05, "deg": 5.0}
 
 
 def kind_of(value: float | str, unit: str) -> str | None:
@@ -59,6 +65,10 @@ def quantile(residuals: list[float], level: float = LEVEL) -> float | None:
     if n == 0 or k > n:
         return None
     return sorted(residuals)[k - 1]
+
+
+def informative(kind: str, q: float) -> bool:
+    return q <= MAX_RESIDUAL[kind]
 
 
 def half_width(kind: str, value: float, q: float) -> float:

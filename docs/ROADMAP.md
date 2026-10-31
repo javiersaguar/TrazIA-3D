@@ -385,7 +385,7 @@ comprobar un segundo proveedor real; no se cuentan mocks como mediciones.
 ### Fase 2 · Estrategias (5 – 14 nov)
 
 - [ ] **2.1 (Lectura)** **B completo**: tablas por cabecera con sinónimos es/en, cotas en cualquier orientación, cajetín, hoja de datos, VESOR; sobre texto vectorial o líneas de OCR. *Parcial:* B y OCR están implementados y probados; falta verificar explícitamente el alcance VESOR antes de cerrar toda la tarea.
-- [ ] **2.2 (Lectura)** **OCR** (RapidOCR, PaddleOCR-VL; Mistral solo sintéticos) y comprobación de cita (DEC-06, 10). *Parcial:* RapidOCR en CPU y comprobación de cita implementados. PaddleOCR-VL medido el 30/10 y descartado: no acaba una página A3 en 25 min en la RTX 5070 ([tarea 2.2](PLATAFORMA.md)). Falta Mistral, que depende de la credencial de 1.9.
+- [ ] **2.2 (Lectura)** **OCR** (RapidOCR, PaddleOCR-VL; Mistral solo sintéticos) y comprobación de cita (DEC-06, 10). *Parcial:* RapidOCR en CPU y comprobación de cita implementados. PaddleOCR-VL medido el 30/10 y descartado: no acaba una página A3 en 25 min en la RTX 5070 ([tarea 2.2](PLATAFORMA.md)). Falta Mistral, que depende de la credencial de 1.9. *31/10:* adaptador de chat de Mistral con visión y `python -m bench.mistral` listos y probados sin red. Falta la clave: la cuenta está en el plan Gratis, sin acceso a la API.
 - [x] **2.3 (Lectura)** **A · visión + 3D**: segmentación de vistas, geometría desde trazos (`pdfplumber`/OpenCV), escala desde cotas leídas por el modelo de visión, cruce alzado ↔ planta (DEC-07). *Verificado 28/10:* Implementación A con lector de texto/OCR o visión, trazos y cruce alzado/planta; pruebas CPU en `test_lectura_estrategia_a.py`. Su calidad en el banco no se da por garantizada.
 - [x] **2.4 (Lectura)** **Detector propio**: Florence-2 ajustado con S-dev en la RTX 5070 (`training/`), aleatorización de dominio; medido en S-reservado (DEC-05). *Hecho 30/10:* Florence-2 base ajustado con 1.410 mosaicos de S-dev (525 s, 4,9 GB). En 200 mosaicos de S-reservado: F1 0,982 y texto exacto 90,2 %. Conectado como canal `detector` de D; su ablación vale −0,011 [−0,023; −0,001]. [Tarea 2.4](PLATAFORMA.md).
 - [ ] **2.5 (Lectura)** **C · RAG**: biblioteca aprobada, recuperación visual ColQwen2/ColSmol + texto, adaptación de plantilla y parámetros (DEC-08). *Parcial:* C v1 con huella visual ligera + vocabulario, exclusión del mismo equipo y lectura de la región actual; ColQwen2/ColSmol no está integrado.
@@ -394,7 +394,7 @@ comprobar un segundo proveedor real; no se cuentan mocks como mediciones.
 - [x] **2.8 (Plataforma)** IFC rico: puertos, Psets de trazabilidad, `IfcDocumentReference`, `IfcApproval`, exportación IFC4X3 e IFC2X3, validación en CI (DEC-17, 18). *Verificado 28/10:* IFC4/IFC4X3/IFC2X3, puertos, trazabilidad, originales y aprobación; `test_plataforma_ifc.py` y validación EXPRESS en CI.
 - [x] **2.9 (E/I)** Espacio de revisión: PDF + 3D + campos enlazados, cola por riesgo, atajos, deshacer.
 - [x] **2.10 (I)** Visor 3D: selección, aislar, corte, explosionado, cotas 3D, rosa de orientación.
-- [ ] **2.11 (Lectura)** **Primer estudio A/B/C/D** en S-dev. *Hecho:* tabla con intervalos. *Parcial 30/10:* B, C y D medidos con IC 95 % en S-dev, S-reservado y S-adversarial. D 0,642 [0,607; 0,678], C 0,558 y B 0,536. Falta A (visión), que tarda unos 129 s por página. [Estudio 2](ESTUDIO.md).
+- [x] **2.11 (Lectura)** **Primer estudio A/B/C/D** en S-dev. *Hecho:* tabla con intervalos. *Hecho 31/10:* A, B, C y D medidos con IC 95 % en S-dev, S-reservado y S-adversarial. D con fusión aprendida 0,670 [0,638; 0,702], D 0,640, C 0,567, B 0,536 y A sin modelo 0,488. A con Qwen3-VL local, en un subconjunto declarado de 6 equipos: 0,445 frente a 0,543 de A sin modelo, con un 7,3 % de alucinación y 172 s por revisión. [Estudio 3](ESTUDIO.md).
 
 ### Fase 3 · Diferenciales (15 – 21 nov)
 
@@ -403,8 +403,12 @@ agente de Fase 2; no se editan las estrategias ni sus carpetas.
 
 - [x] **3.1 (Plataforma)** Cambios en **tres capas** (diferencia visual, campos emparejados, geometría por GUID) + nubes Δ + BCF 2.1 (DEC-19, 20). *Verificado:* API, comparación y BCF en la batería Python; marcadores heurísticos y sin nuevas ediciones del visor.
 - [x] **3.2 (Lectura)** **Memoria de revisión** en D: la rev1 aprobada guía la lectura de la rev2. *Hecho 30/10:* D solo usa la memoria si la revisión anterior está aprobada y su huella cuadra; si no, la omite con aviso. Medida con ablación: +0,009 [−0,002; 0,020], sin efecto medible (H5 rechazada).
-- [ ] **3.3 (Lectura)** Calibración isotónica + **intervalos conformes** + curva riesgo-cobertura (DEC-12). *Hecho:* ECE < 0,05 y cobertura empírica ≥ nominal en S-reservado. *Parcial 30/10:* implementada y conectada como etapa `calibrate`, con abstención. En S-reservado, B cumple (ECE 0,035; cobertura 100 %). C y D no: ECE 0,210 y 0,270, y cobertura de D 94,1 %. [Detalle](BENCH.md).
-- [ ] **3.4 (Lectura)** **Fusión aprendida y selector** por tipo de documento; **ablaciones** de D; estudio completo con S-reservado (H1–H6 de [ESTUDIO.md](ESTUDIO.md)). *Parcial 30/10:* selector, ablaciones y estudio con S-reservado hechos. El selector fijado en S-dev pierde frente a D solo (0,372 frente a 0,525), así que se recomienda D para todo. Ablaciones: RAG −0,076, geometría −0,045, detector −0,011 y memoria +0,009. Falta la fusión aprendida.
+- [ ] **3.3 (Lectura)** Calibración isotónica + **intervalos conformes** + curva riesgo-cobertura (DEC-12). *Hecho:* ECE < 0,05 y cobertura empírica ≥ nominal en S-reservado. *Parcial 30/10:* implementada y conectada como etapa `calibrate`, con abstención. En S-reservado, B cumple (ECE 0,035; cobertura 100 %). C y D no: ECE 0,210 y 0,270, y cobertura de D 94,1 %. [Detalle](BENCH.md). *Avance 31/10:*
+  - Un intervalo que no informa ya no se da, y el campo se abstiene.
+  - C va sin curva, elegido dejando fuera un proveedor de S-dev; con ello cumple la ECE (0,023), pero no la cobertura (53 %).
+  - D con fusión aprendida cumple la cobertura (96,4 %) y baja la ECE de 0,270 a 0,072, aún por encima de 0,05. Con abstención se queda el 64 % de los campos con un riesgo del 4,7 %.
+  - [Revisión 31/10](BENCH.md).
+- [x] **3.4 (Lectura)** **Fusión aprendida y selector** por tipo de documento; **ablaciones** de D; estudio completo con S-reservado (H1–H6 de [ESTUDIO.md](ESTUDIO.md)). *Parcial 30/10:* selector, ablaciones y estudio con S-reservado hechos. El selector fijado en S-dev pierde frente a D solo (0,372 frente a 0,525), así que se recomienda D para todo. Ablaciones: RAG −0,076, geometría −0,045, detector −0,011 y memoria +0,009. *Hecho 31/10:* fusión aprendida (`d_hibrido+fusion`, regresión logística entrenada en S-dev con canales apagados). Dejando fuera un proveedor de S-dev, acierta el 93,2 % de los campos frente al 92,5 % de la heurística. En el estudio sube a 0,670 frente a 0,640 (McNemar p ≈ 10⁻⁷), y en S-reservado a 0,570 frente a 0,524. El selector sigue perdiendo: se recomienda la fusión aprendida para todo.
 - [x] **3.5 (Plataforma)** Pantalla **Estudio** en la web (DEC-28) y conexión de la pantalla Bench al estudio. *Hecho:* misma fuente/query, variante y rúbrica con IC; bench v1 separado, errores/vacío explícitos y pruebas en ambos transportes.
 - [x] **3.6 (Plataforma)** **Copiloto con modelo local**, herramientas de solo lectura y citas (DEC-26). *Verificado:* Ollama local, evidencia por hash, sin herramientas de escritura y pruebas de citas/concurrencia.
 - [ ] **3.7 (Plataforma)** Escala: perfil Redis + workers, lote de todo el conjunto, coste y tiempo medidos por equipo (DEC-23, 25). *Parcial:* corpus completo de 336 revisiones medido con 1/4 workers, 221,4/65,4 s; 20 done y 316 errores en ambos. Coste desconocido conservado como null. *Avance 30/10:* lote CPU de 336 revisiones con B, Redis/arq/Postgres: 72 done y 264 errores, 352,5 s con 1 worker y 97,3 s con 4 (3,62×). Coste de proveedores 0 €. Falta que el lote salga sin errores para dar un tiempo defendible. [Resultados](FASE3.md#37--medición-real-de-la-cola-parcial).
@@ -643,9 +647,12 @@ dependa solo de la extracción, no de la familia.
 - [x] **E.4** Aprobación ligada a la huella (existe) + idempotencia + bloqueo si hay `conflict` sin resolver. *Verificado 28/10:* Aprobación vinculada al fingerprint, bloqueo de conflictos y cambios que invalidan aprobación; `test_pipeline.py` y `test_api_base.py`.
 - [ ] **E.5** Medir **tiempo de revisión por equipo** con el propio log → cifra de impacto del pitch.
 - [ ] **E.6** Aprendizaje activo (DEC-27): corrección aprobada → ejemplo few-shot + recalibración + ajuste de prioridad de fuentes.
-- [ ] **E.7** Intervalo conforme visible por campo («2.000 mm ± 3 mm, 90 %») y umbral de revisión
-  obligatoria fijado con la curva riesgo-cobertura (DEC-12). *Parcial 30/10:* el backend ya rellena
-  `interval` al 90 % y marca `abstained` según el umbral de riesgo. Falta mostrarlo en la revisión.
+- [x] **E.7** Intervalo conforme visible por campo («2.000 mm ± 3 mm, 90 %») y umbral de revisión
+  obligatoria fijado con la curva riesgo-cobertura (DEC-12). *Hecho 31/10:* la cola de revisión
+  muestra el intervalo («± 0,5° · 90 %») y marca «Confírmelo» en los campos abstenidos. Estos van
+  primero, y la explicación sale al seleccionarlos. El umbral es el de riesgo 5 % ajustado en S-dev.
+  Comprobado con la API y D sobre la demo V-101; prueba en `web/src/lib/mock/fields.test.ts`. La
+  demo sin conexión no trae intervalos.
 
 ### F. Revisiones y delta (20 %)
 
@@ -698,9 +705,9 @@ Es nuestra arma principal: **llegamos al jurado con su propia rúbrica ya medida
 - [x] **G.0** Bench v0 y generador v1 hechos ([BENCH.md](BENCH.md)).
 - [x] **G.7** **Generador v2** (DEC-21): 8 o más estilos de proveedor (2 reservados), niveles de
   degradación, multipágina, paquetes de proveedor, mecánicos y corpus adversarial. *Verificado 28/10:* Coincide con 1.10: generador v2/v2.1 implementado; semillas, separación de proveedores reservados y degradaciones verificadas en `test_lectura_synthetic.py`.
-- [ ] **G.8** **Estudio comparativo** ([ESTUDIO.md](ESTUDIO.md)): variantes A/B/C/D y ablaciones,
+- [x] **G.8** **Estudio comparativo** ([ESTUDIO.md](ESTUDIO.md)): variantes A/B/C/D y ablaciones,
   bootstrap del 95 %, McNemar, **Puntuación GA2MODEL** (DEC-22), frontera de Pareto coste-acierto y
-  recomendación del selector. *Parcial 30/10:* todo hecho para B, C y D (ver 2.11 y 3.4); falta A.
+  recomendación del selector. *Hecho 31/10:* A, B, C y D, ablaciones, McNemar, Pareto y selector en el estudio 3 (ver 2.11 y 3.4).
 - [x] **G.9** Métricas nuevas: tasa de alucinación, cobertura de cita, cobertura de intervalos
   conformes, curva riesgo-cobertura y coste por equipo. *Hecho 30/10:* las cinco salen en
   `estudio.json`; la curva riesgo-cobertura sale de `python -m bench.calibrar` ([BENCH.md](BENCH.md)).

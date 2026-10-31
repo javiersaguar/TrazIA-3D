@@ -92,6 +92,7 @@ VARIANTS = (
     VariantSpec("b_reglas+ocr", "b_reglas+ocr", (), None, "B sobre líneas de OCR"),
     VariantSpec("c_rag", "c_rag", (), None, "C: recuperación y adaptación de plantilla"),
     VariantSpec("d_hibrido", "d_hibrido", (), None, "D: cascada B, C, memoria y geometría"),
+    VariantSpec("d_hibrido+fusion", "d_hibrido+fusion", (), None, "D con fusión aprendida"),
     VariantSpec("b_reglas-tablas", "b_reglas-tablas", (), "b_reglas", "B sin tablas ni cotas"),
     VariantSpec("b_reglas-hdm", "b_reglas-hdm", (), "b_reglas", "B sin hoja de datos"),
     *(
