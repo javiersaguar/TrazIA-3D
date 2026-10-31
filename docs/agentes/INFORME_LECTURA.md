@@ -13,7 +13,7 @@ medido usa **datos sintéticos**: ninguna cifra es precisión sobre planos de TR
 | 4 | **3.4** Selector y ablaciones | Hecho; sin fusión aprendida | El selector por tipo pierde en S-reservado (0,372 frente a 0,525 de D solo) |
 | 5 | **2.2 / 0.10** PaddleOCR-VL | Medido y descartado | No acaba una página A3 en 25 min en la RTX 5070 |
 | 6 | **2.4** Detector propio Florence-2 | Hecho | F1 0,982 en S-reservado; aporte a D +0,011 [0,001; 0,023] |
-| 7 | **2.1** VESOR y **2.5** ColQwen2/ColSmol | No empezadas | — |
+| 7 | **2.1** VESOR y **2.5** ColQwen2/ColSmol | Hechas el 1/11 (ver «Sesión del 1/11/2026») | B lee el VESOR completo; ColQwen2 baja C de 0,600 a 0,562 y queda apagado |
 
 ## Qué se ha hecho
 
@@ -135,7 +135,7 @@ Ninguno rompe la firma de `pipeline.process`, el contrato ni la CLI del estudio.
   sí aguanta. Se podría arreglar con más variedad de proveedores en S-dev o recalibrando con las
   correcciones humanas (3.8) cuando haya.
 - **A (visión) sin medir** en el estudio, por coste de GPU (unos 129 s por página).
-- **2.1 y 2.5** no empezadas.
+- **2.1 y 2.5** hechas el 1/11: ver «Sesión del 1/11/2026».
 - **S-reservado se ha abierto más de una vez:** ver la nota del final de «Estudio 2».
 - **Lectura de `correcciones.jsonl` (3.8)** para recalibrar: pendiente.
 
@@ -352,5 +352,25 @@ limpio, rev1 y rev2; calibración v5; `generated/proveedores-r1b/`). **Datos sin
 
 - 2.2 cerrada: sin Mistral (decisión del equipo), RapidOCR con comprobación de cita y el detector
   propio. PaddleOCR-VL sigue descartado con lo medido el 30/10.
-- 2.5 sin empezar: ColQwen2 necesita bajar unos 4,4 GB de modelo (`vidore/colqwen2-v1.0-hf`).
-  `torch` ya está en la caché de uv.
+- 2.5 cerrada: ColQwen2 integrado en C y medido; queda apagado porque empeora a C.
+  - **Qué hay:** `src/trazia/rag/visual.py` (vectores por página con caché por sha256 y MaxSim).
+    C lo usa con `TRAZIA_RAG_RETRIEVAL=colqwen2`; sin torch, sin modelo o con una biblioteca
+    antigua vuelve a la huella ligera con un evento `rag · error`. La biblioteca guarda ahora el
+    sha256 y la ruta de cada PDF. La confianza sale siempre de la huella del par elegido, así que
+    la curva de calibración de C no cambia.
+  - **Umbral:** 0,63 de MaxSim, fijado en S-dev quitando de la biblioteca el proveedor del caso
+    (índice de Youden). Separa «hay caso parecido» casi igual que la huella: AUC 0,81 frente a 0,79.
+  - **Resultado de C** (`bench.rag_visual`, misma biblioteca y calibración v6):
+
+    | Recuperación | Total | S-dev | S-reservado |
+    | --- | --- | ---: | ---: |
+    | Huella | 0,600 [0,556; 0,644] | 0,686 | 0,454 |
+    | ColQwen2 sin umbral | 0,572 [0,512; 0,629] | 0,693 | 0,321 |
+    | ColQwen2, umbral 0,63 | 0,562 [0,504; 0,616] | 0,670 | 0,349 |
+
+  - **Por qué:** ColQwen2 elige proveedores que se parecen por idioma y estilo, pero C copia
+    posiciones de campos, y eso lo mide mejor la rejilla de tinta.
+  - **Coste:** 0,4 s por página y 4,6 GB de VRAM en la RTX 5070, frente a 0,05 s de la huella.
+  - **Instalación:** el extra `train` con torch 2.11 cu128 (`uv pip install` desde
+    download.pytorch.org). Ojo: `uv sync --frozen --extra dev` lo desinstala.
+  - **Pendiente:** volver a medirlo con los GA reales (R-ref).

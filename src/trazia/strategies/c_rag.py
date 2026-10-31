@@ -1,7 +1,9 @@
 """Estrategia C · RAG (DEC-02 y DEC-08).
 
 1. Recupera de la biblioteca el GA aprobado más parecido (huella visual + vocabulario), nunca
-   el mismo equipo.
+   el mismo equipo. Con `TRAZIA_RAG_RETRIEVAL=colqwen2` lo elige ColQwen2 (`rag.visual`, 2.5);
+   si no se puede usar, vuelve a la huella. La confianza sale siempre de la huella del par
+   elegido, para que la curva de calibración de C siga valiendo.
 2. Hereda su plantilla de lectura: para cada campo, la región donde estaba.
 3. Lee el valor en la región equivalente del documento actual. Si allí no hay nada legible, el
    campo queda vacío: un valor de la biblioteca nunca entra sin evidencia del documento actual.
@@ -30,11 +32,13 @@ from ..extractors.units import (
     parse_temperature,
     parse_weight,
 )
+from ..rag import visual as colqwen
 from ..rag.fingerprint import similarity, visual, words
 from ..rag.library import load
 from .base import StageEvent, StrategyContext, StrategyOutput, tag_candidates
 
 MIN_SIMILARITY = 0.55
+MIN_VISUAL_SIMILARITY = 0.63  # MaxSim de ColQwen2: Youden en S-dev sin el proveedor (2.5)
 CELL = (0.012, 0.008)  # ventana (x, y) para celdas fijas: tabla, datos de diseño, cajetín
 MOVING = (0.05, 0.25)  # cotas y rótulos que se mueven con las proporciones del equipo
 LENGTH_TAIL = re.compile(
@@ -44,6 +48,42 @@ LENGTH_TAIL = re.compile(
 
 def library_path() -> Path:
     return Path(os.environ.get("TRAZIA_RAG_LIBRARY", "generated/rag/biblioteca.json"))
+
+
+def _page_words(lines, page) -> list[str]:
+    return words([line.text for line in lines if line.source.page == page])
+
+
+def light_score(data: bytes, page: int, lines, entry: dict) -> float:
+    """Similitud de la huella ligera entre una página y un caso de la biblioteca."""
+    return similarity(visual(data, page), _page_words(lines, page), entry["visual"], entry["words"])
+
+
+def light_best(data: bytes, pages: int, lines, entries: list[dict]):
+    """(similitud, página, caso) más parecido según la huella ligera."""
+    best = None
+    for page in range(1, pages + 1):
+        page_visual, page_words = visual(data, page), _page_words(lines, page)
+        for entry in entries:
+            score = similarity(page_visual, page_words, entry["visual"], entry["words"])
+            if best is None or score > best[0]:
+                best = (score, page, entry)
+    return best
+
+
+def visual_best(data: bytes, pages: int, entries: list[dict]):
+    """(MaxSim, página, caso) más parecido según ColQwen2. Lanza VisualUnavailable si no puede."""
+    library = [(e, colqwen.entry_vectors(e)) for e in entries]
+    if not library or any(vectors is None for _, vectors in library):
+        raise colqwen.VisualUnavailable("La biblioteca no tiene los PDF de sus casos")
+    best = None
+    for page in range(1, pages + 1):
+        page_vectors = colqwen.embed_page(data, page)
+        for entry, vectors in library:
+            score = colqwen.maxsim(page_vectors, vectors)
+            if best is None or score > best[0]:
+                best = (score, page, entry)
+    return best
 
 
 class RagStrategy:
@@ -88,17 +128,35 @@ class RagStrategy:
                 lines = ocr_pdf_lines(data, bundle.document.id)
             except OcrUnavailable:
                 lines = []
-        best = None
-        for page in range(1, pages + 1):
-            page_visual = visual(data, page)
-            page_words = words([line.text for line in lines if line.source.page == page])
-            for entry in library["entries"]:
-                if ctx.equipment_id and entry["equipment_id"] == ctx.equipment_id:
-                    continue  # el mismo equipo no es «otro caso parecido»
-                score = similarity(page_visual, page_words, entry["visual"], entry["words"])
-                if best is None or score > best[0]:
-                    best = (score, page, entry)
-        if best is None or best[0] < MIN_SIMILARITY:
+        candidates = [
+            e
+            for e in library["entries"]
+            if not (ctx.equipment_id and e["equipment_id"] == ctx.equipment_id)
+        ]  # el mismo equipo no es «otro caso parecido»
+
+        best, by_visual = None, False
+        if colqwen.enabled():
+            try:
+                best = visual_best(data, pages, candidates)
+            except colqwen.VisualUnavailable as exc:
+                ctx.emit(StageEvent("rag", "error", name, f"{exc}: se usa la huella ligera."))
+            if best is not None:
+                visual_score, page, entry = best
+                if visual_score < MIN_VISUAL_SIMILARITY:
+                    ctx.emit(
+                        StageEvent(
+                            "rag",
+                            "omitido",
+                            name,
+                            f"Ningún caso parecido según ColQwen2 (MaxSim {visual_score:.2f}).",
+                        )
+                    )
+                    return [], lines
+                # ColQwen2 ya decidió que hay caso parecido; la huella solo da la confianza.
+                best, by_visual = (light_score(data, page, lines, entry), page, entry), True
+        if best is None:
+            best = light_best(data, pages, lines, candidates)
+        if best is None or (not by_visual and best[0] < MIN_SIMILARITY):
             ctx.emit(
                 StageEvent(
                     "rag",
