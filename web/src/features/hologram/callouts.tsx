@@ -10,7 +10,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { type PerspectiveCamera as Camera, type Group, Vector3 } from "three";
 import { BRAND } from "@/lib/brand";
-import { SceneLabel } from "../viewer3d/stage";
+import { LIGHT_PAPER, SceneLabel, useLightPage } from "../viewer3d/stage";
 
 export type DetailAnchor = {
   name: string;
@@ -68,6 +68,7 @@ export function DetailCallouts({
 }) {
   const scene = useThree((s) => s.scene),
     invalidate = useThree((s) => s.invalidate);
+  const light = useLightPage();
   const group = useRef<Group>(null),
     enter = useRef(0);
   useFrame((_, delta) => {
@@ -103,7 +104,7 @@ export function DetailCallouts({
                     height={256}
                     frames={2}
                   >
-                    <color attach="background" args={[BRAND.black]} />
+                    <color attach="background" args={[light ? LIGHT_PAPER : BRAND.black]} />
                     <DetailCamera anchor={anchor} />
                     <EnvironmentLink scene={scene} />
                     <ambientLight intensity={0.5} color={BRAND.text} />

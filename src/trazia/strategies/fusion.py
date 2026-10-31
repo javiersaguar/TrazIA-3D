@@ -14,9 +14,11 @@ Si un campo tiene lecturas de un canal que no aparece en S-dev (p. ej. «texto»
 etiquetas de los planos antiguos), ese campo se fusiona con la heurística: el modelo no sabe nada
 de ese canal.
 
-Los coeficientes se ajustan con `uv run python -m bench.fusion` sobre S-dev y se guardan en
-`generated/fusion/fusion.json` (JSON, sin pickle). Otra ruta: `TRAZIA_FUSION`; `off` la desactiva.
-La inferencia es una suma ponderada: el producto no necesita scikit-learn para usarla.
+Desde el 31/10 es la fusión de D por defecto. Los coeficientes se ajustan con
+`uv run python -m bench.fusion` sobre S-dev (en `generated/fusion/`) y, con `--publicar`, se copian
+a `fusion_model.json`, junto a este módulo, que se versiona en Git: un clon limpio usa el mismo
+modelo. Es JSON, sin pickle, y solo contiene coeficientes. Otra ruta: `TRAZIA_FUSION`; `off`
+vuelve a la heurística. La inferencia es una suma ponderada: el producto no necesita scikit-learn.
 """
 
 import hashlib
@@ -27,7 +29,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 FORMAT = 1
-DEFAULT_PATH = "generated/fusion/fusion.json"
+PACKAGED_PATH = Path(__file__).with_name("fusion_model.json")
+DEFAULT_PATH = str(PACKAGED_PATH)
 
 SOURCE_CHANNELS = (
     "texto",

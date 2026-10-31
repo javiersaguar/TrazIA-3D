@@ -172,10 +172,10 @@ def test_passthrough_strategy_keeps_its_learned_probability():
         curves={"*|*": {"x": [0.0, 1.0], "y": [0.0, 0.1], "n": 100}},
         quantiles={},
         thresholds={},
-        passthrough=["d_hibrido+fusion"],
+        passthrough=["d_hibrido"],
     )
-    assert learned.calibrated("d_hibrido+fusion", "tabla", 0.83) == pytest.approx(0.83)
-    assert learned.calibrated("d_hibrido", "tabla", 0.83) == pytest.approx(0.083)
-    assert Calibration.from_dict(learned.to_dict()).passthrough == ["d_hibrido+fusion"]
+    assert learned.calibrated("d_hibrido", "tabla", 0.83) == pytest.approx(0.83)
+    assert learned.calibrated("d_hibrido+heuristica", "tabla", 0.83) == pytest.approx(0.083)
+    assert Calibration.from_dict(learned.to_dict()).passthrough == ["d_hibrido"]
     # Sin estrategias de paso, la huella de los parámetros antiguos no cambia.
     assert "passthrough" not in calibration().to_dict()

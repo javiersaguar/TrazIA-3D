@@ -30,8 +30,8 @@ incertidumbre? ¿Cómo cambia la respuesta según el tipo de documento?
 | `b_reglas` | B completo (texto, tablas, cotas, cajetín, hoja de datos, VESOR) |
 | `b_reglas+ocr` | B sobre líneas de OCR cuando no hay capa de texto |
 | `c_rag` | C con recuperación visual y adaptación de parámetros |
-| `d_hibrido` | D completo con el selector |
-| `d_hibrido+fusion` | D con fusión aprendida (regresión logística sobre las señales de los canales, tarea 3.4) |
+| `d_hibrido` | D completo con fusión aprendida (regresión logística sobre las señales de los canales, tarea 3.4; por defecto desde el 31/10) |
+| `d_hibrido+heuristica` | D con la fusión heurística de antes del 31/10. En los estudios 1 a 3, `d_hibrido` era esta variante y la aprendida se llamaba `d_hibrido+fusion` |
 | `d_hibrido−geometria`, `−memoria`, `−rag`, `−vision`, `−detector` | Ablaciones de D, quitando un canal cada vez |
 
 Todas pasan por el mismo postproceso: normalización, contrato 0.3, familia e IFC.

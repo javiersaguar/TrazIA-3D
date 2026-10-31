@@ -73,7 +73,7 @@ class HybridStrategy:
         *,
         without: set[str] | frozenset[str] = frozenset(),
         name: str = "d_hibrido",
-        fusion: str = "heuristica",
+        fusion: str = "aprendida",
     ):
         self.channels = [c for c in CHANNELS if c not in without]
         self.name = name
