@@ -9,6 +9,8 @@ export type Annotation = {
   value: number;
   unit: string;
   confidence: number;
+  source?: { document_id: string; page?: number | null; locator?: string; sheet?: string | null; cell?: string | null };
+  state?: string;
 };
 
 export type IfcViewerProps = {

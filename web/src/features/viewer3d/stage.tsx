@@ -49,7 +49,10 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { BRAND } from "@/lib/brand";
 import type { Bounds, Vec3 } from "@/workers/ifc-protocol";
 import styles from "./viewer.module.css";
-import type { CameraLink } from "./camera-link";
+import type { CameraLink, CameraPose } from "./camera-link";
+import { validPose } from "./saved-views";
+import { capturePng } from "./capture";
+import { toast } from "sonner";
 
 export type View = "iso" | "front" | "top" | "plan";
 export type CameraHandle = {
@@ -57,6 +60,9 @@ export type CameraHandle = {
   fit(bounds?: Bounds, normal?: Vec3): void;
   zoom(factor: number): void;
   capture(): void;
+  pose?(): CameraPose;
+  restore?(pose: CameraPose): void;
+  snapshot?(): Promise<{ blob: Blob; pose: CameraPose; up: Vec3; viewportHeight: number }>;
 };
 export type PerformanceSample = {
   fps: number;
@@ -194,6 +200,7 @@ export function CameraRig({
       Math.min(650, Math.max(5, zoom)),
       smooth && !reduce,
     );
+    if (!smooth || reduce) controls.current?.update(0);
     if (orbitCenter && !smooth && !focusBounds.current) {
       // El centro físico prevalece sobre el espacio reservado para rótulos y recortes.
       controls.current?.update(0);
@@ -202,6 +209,7 @@ export function CameraRig({
       lastPose.current = 0;
       publishPose();
     }
+    if (reduce) { lastPose.current = 0; publishPose(); }
     invalidate();
   };
   const show = (next: View, smooth: boolean) => {
@@ -251,7 +259,7 @@ export function CameraRig({
     ) {
       focusBounds.current = null;
       focusNormal.current = undefined;
-      show(view, false);
+      show(view, previous.initialized && previous.view !== view);
     } else if (
       previous.width !== viewport.width ||
       previous.height !== viewport.height
@@ -269,6 +277,24 @@ export function CameraRig({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view, boundsKey, viewport.width, viewport.height]);
   useImperativeHandle(handle, () => ({
+    snapshot: async () => {
+      gl.render(scene, camera);
+      const pose = { eye: camera.position.toArray() as Vec3,
+        target: (controls.current?.getTarget(new Vector3()) ?? new Vector3()).toArray() as Vec3,
+        zoom: (camera as OrthographicCamera).zoom };
+      const up = new Vector3(0, 1, 0).applyQuaternion(camera.quaternion).toArray() as Vec3;
+      return { blob: await capturePng(gl.domElement), pose, up, viewportHeight: viewport.height };
+    },
+    pose: () => ({ eye: camera.position.toArray() as Vec3,
+      target: (controls.current?.getTarget(new Vector3()) ?? new Vector3()).toArray() as Vec3,
+      zoom: (camera as OrthographicCamera).zoom }),
+    restore: (pose) => {
+      if (!validPose(pose)) return;
+      rotation.pause(); controls.current?.stop();
+      void controls.current?.setLookAt(...pose.eye, ...pose.target, !reduce);
+      void controls.current?.zoomTo(pose.zoom, !reduce);
+      invalidate();
+    },
     view: (next) => {
       rotation.pause();
       focusBounds.current = null;
@@ -312,15 +338,14 @@ export function CameraRig({
     },
     capture: () => {
       gl.render(scene, camera);
-      gl.domElement.toBlob((blob) => {
-        if (!blob) return;
+      void capturePng(gl.domElement).then((blob) => {
         const url = URL.createObjectURL(blob),
           link = document.createElement("a");
         link.href = url;
-        link.download = "trazia-ifc-sintetico.png";
+        link.download = "trazia-ifc.png";
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
-      });
+      }).catch(error => toast.error(error instanceof Error ? error.message : "No se pudo capturar el visor"));
     },
   }));
   useEffect(() => { invalidate(); }, [orbitEnabled, reduce, invalidate]);
@@ -377,7 +402,7 @@ export function CameraRig({
       ref={controls}
       enabled={interactive}
       makeDefault
-      smoothTime={reduce ? 0 : 0.4}
+      smoothTime={reduce ? 0 : 0.25}
       draggingSmoothTime={0.1}
       minZoom={5}
       maxZoom={650}

@@ -1,6 +1,8 @@
 "use client";
 
 import { BRAND } from "@/lib/brand";
+import { apiEnabled, apiURL } from "@/lib/api/config";
+import { toast } from "sonner";
 
 import { Grid } from "@react-three/drei";
 import {
@@ -22,8 +24,9 @@ import {
   type ElementState,
 } from "./product-mesh";
 import { IfcInspector } from "./inspector";
-import { elementLabel, parentElementId } from "./semantic";
-import { SectionCaps } from "./section";
+import { elementLabel, hasAssumption, parentElementId } from "./semantic";
+import { AnimatedSection } from "./section";
+import { ViewBookmarks } from "./view-bookmarks";
 import {
   CameraRig,
   CameraTools,
@@ -67,6 +70,7 @@ export function IfcViewer({
   const [selection, setSelection] = useState<string>();
   const [hover, setHover] = useState<string | null>(null);
   const [view, setView] = useState<View>("iso");
+  const [personalView, setPersonalView] = useState(false);
   const [mode, setMode] = useState<"solid" | "xray" | "exploded">("solid");
   const [tree, setTree] = useState(false),
     [cut, setCut] = useState(false),
@@ -74,6 +78,7 @@ export function IfcViewer({
   const [cutFraction, setCutFraction] = useState(0.55),
     [isolate, setIsolate] = useState(false);
   const [hidden, setHidden] = useState<Set<string>>(() => new Set());
+  const [exporting, setExporting] = useState(false);
   const container = useRef<HTMLDivElement>(null),
     camera = useRef<CameraHandle>(null);
   const activeId = selectedId ?? selection,
@@ -85,13 +90,8 @@ export function IfcViewer({
     ? model.bounds.min[1] +
       (model.bounds.max[1] - model.bounds.min[1]) * cutFraction
     : 0;
-  const planes = useMemo(
-    () =>
-      cut && activeMode !== "exploded"
-        ? [new Plane(new Vector3(0, -1, 0), cutHeight)]
-        : [],
-    [cut, cutHeight, activeMode],
-  );
+  const cutPlane = useMemo(() => new Plane(new Vector3(0, -1, 0), 0), []);
+  const planes = useMemo(() => cut && activeMode !== "exploded" ? [cutPlane] : [], [cut, activeMode, cutPlane]);
   const select = (id: string) => {
     setSelection(id);
     onSelect?.(id);
@@ -153,6 +153,8 @@ export function IfcViewer({
       data-triangles={model?.triangles}
       data-height={model?.bounds.max[1]}
       data-parse-ms={model?.parseMs.toFixed(2)}
+      data-provenance={model?.products.some(p => p.psets.TrazIA_Traceability?.Dataset === "real") ? "Datos reales" : model?.products.some(p => p.psets.TrazIA_Traceability?.Dataset === "synthetic") ? "Datos sintéticos" : "Procedencia sin declarar"}
+      data-approval={model?.products.some(p => p.psets.TrazIA_Traceability?.Draft === true) ? "DRAFT · requiere revisión" : "Consultar aprobación en IFC"}
     >
       {model ? (
         <SceneCanvas label="Modelo IFC sintético; usa el árbol para seleccionar componentes">
@@ -186,7 +188,7 @@ export function IfcViewer({
             const trace = product.psets.TrazIA_Traceability;
             const status =
               elementStates?.[product.semanticId] ??
-              (trace?.Draft === false && trace?.ApprovalJSON
+              (hasAssumption(product.semanticId, product.psets) ? "assumed" : trace?.Draft === false && trace?.ApprovalJSON
                 ? "approved"
                 : "draft");
             return (
@@ -211,7 +213,7 @@ export function IfcViewer({
             );
           })}
           {cut && activeMode !== "exploded" ? (
-            <SectionCaps products={visibleProducts} height={cutHeight} />
+            <AnimatedSection products={visibleProducts} height={cutHeight} plane={cutPlane} />
           ) : null}
           {activeMode !== "exploded" ? (
             <Dimensions
@@ -254,6 +256,7 @@ export function IfcViewer({
         handle={camera}
         container={container}
         onReset={() => {
+          setPersonalView(false);
           if (suppliedView) camera.current?.view(suppliedView);
           else {
             setView("iso");
@@ -275,8 +278,8 @@ export function IfcViewer({
               <button
                 key={key}
                 className={styles.button}
-                aria-pressed={activeView === key}
-                onClick={() => setView(key)}
+                aria-pressed={!personalView && activeView === key}
+                onClick={() => { setPersonalView(false); setView(key); camera.current?.view(key); }}
               >
                 {label}
               </button>
@@ -306,7 +309,28 @@ export function IfcViewer({
           </select>
         ) : null}
       </div>
+      {model ? <ViewBookmarks key={ifcUrl} url={ifcUrl} camera={camera} onRestore={() => setPersonalView(true)} /> : null}
       <div className={styles.secondary}>
+        <button type="button" className={styles.button} disabled={!apiEnabled || !selected || exporting}
+          title={!apiEnabled ? "Conecta la API para crear el BCF" : "PNG, cámara actual y GUID seleccionado"}
+          onClick={async () => {
+            setExporting(true);
+            try {
+              const capture = await camera.current?.snapshot?.();
+              if (!capture || !selected) throw new Error("Selecciona un elemento IFC");
+              const bytes = new Uint8Array(await capture.blob.arrayBuffer());
+              let binary = ""; for (const byte of bytes) binary += String.fromCharCode(byte);
+              const response = await fetch(apiURL("/viewer/bcf"), { method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ png_base64: btoa(binary), ...capture.pose, up: capture.up,
+                  viewport_height: capture.viewportHeight, guid: selected.globalId }) });
+              if (!response.ok) throw new Error("No se pudo crear el BCF; comprueba la API y reintenta");
+              const url = URL.createObjectURL(await response.blob());
+              const link = document.createElement("a"); link.href = url; link.download = "vista_DRAFT.bcfzip"; link.click();
+              setTimeout(() => URL.revokeObjectURL(url), 1000);
+            } catch (error) { toast.error(error instanceof Error ? error.message : "Error al exportar BCF"); }
+            finally { setExporting(false); }
+          }}>{exporting ? "Creando BCF…" : "Captura BCF"}</button>
         {onRequestMeasure ? (
           <button className={styles.button} onClick={onRequestMeasure}>
             Medir 5 s

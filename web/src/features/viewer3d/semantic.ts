@@ -36,6 +36,24 @@ export function parentElementId(id: string): string {
   return id.startsWith("detail:") ? id.slice(7).split("/")[0]! : id;
 }
 
+/** Un supuesto afecta solo a la pieza cuyos parámetros lo contienen. */
+export function hasAssumption(id: string, psets: PropertySets): boolean {
+  if (psets.Pset_TrazIA?.ClaseOrigen === "supuesto_visual") return true;
+  const raw = psets.TrazIA_Traceability?.FieldsJSON;
+  if (typeof raw !== "string") return false;
+  try {
+    const fields: unknown = JSON.parse(raw);
+    if (!fields || typeof fields !== "object" || Array.isArray(fields)) return false;
+    const parent = parentElementId(id);
+    const related = parent.startsWith("nozzle:") ? (path: string) => path.startsWith(`nozzles.${parent.slice(7)}.`)
+      : parent === "skirt" ? (path: string) => path.startsWith("skirt_")
+      : parent.startsWith("head-") ? (path: string) => path === "head_depth" || path === "diameter"
+      : (path: string) => path === "diameter" || path === "height";
+    return Object.entries(fields).some(([path, value]) => related(path) && value && typeof value === "object"
+      && "state" in value && value.state === "assumed");
+  } catch { return false; }
+}
+
 export function elementForField(path: string): string {
   if (path.startsWith("nozzles.")) return `nozzle:${path.split(".")[1]}`;
   if (path.startsWith("skirt")) return "skirt";

@@ -125,14 +125,17 @@ export function ProductMesh({
   const tint = color ?? STATE_COLORS[state];
   const activeColor = tint;
   const click = (event: ThreeEvent<MouseEvent>) => {
+    if (planes?.some(plane => plane.distanceToPoint(event.point) < 0)) return;
     event.stopPropagation();
     onSelect?.(product.semanticId);
   };
   const over = (event: ThreeEvent<PointerEvent>) => {
+    if (planes?.some(plane => plane.distanceToPoint(event.point) < 0)) return;
     event.stopPropagation();
     onHover?.(product.semanticId);
   };
   const focus = (event: ThreeEvent<MouseEvent>) => {
+    if (planes?.some(plane => plane.distanceToPoint(event.point) < 0)) return;
     event.stopPropagation();
     onFocus?.(product.semanticId);
   };

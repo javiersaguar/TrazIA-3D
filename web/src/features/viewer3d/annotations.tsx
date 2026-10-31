@@ -8,6 +8,7 @@ import { Vector3 } from "three";
 import type { IfcModel, Vec3 } from "@/workers/ifc-protocol";
 import type { PreparedProduct } from "./model-resource";
 import { elementForField } from "./semantic";
+import { ifcTraces } from "./ifc-trace";
 import type { Annotation } from "./types";
 import styles from "./viewer.module.css";
 import { SceneLabel as Html } from "./stage";
@@ -26,10 +27,20 @@ function Dimension({ from, to, anchorFrom, anchorTo, annotation }: {
     {[from, to].map((point, i) => <Line key={i} points={[
       point.map((v, j) => v - tick[j]!) as Vec3, point.map((v, j) => v + tick[j]!) as Vec3,
     ]} color={color} lineWidth={1.3} />)}
-    <Html position={midpoint} center style={{ pointerEvents: "none" }} zIndexRange={[8, 0]}>
-      <div className={styles.dimension} style={{ color }} title={`${annotation.label}. Valor JSON. Confianza ${annotation.confidence}`}>
+    <Html position={midpoint} center style={{ pointerEvents: "auto" }} zIndexRange={[8, 0]}>
+      <button type="button" className={`${styles.dimension} ${styles.dimensionInfo}`} style={{ color }}
+        data-capture-label
+        aria-label={`${annotation.label}: ${annotation.value} ${annotation.unit}. Ver fuente y confianza`}
+        onPointerDown={event => event.stopPropagation()}>
         {annotation.value.toLocaleString("es-ES")} {annotation.unit}
-      </div>
+        <span className={styles.dimensionDetails}>
+          <strong>{annotation.label}</strong><br />
+          Confianza: {(annotation.confidence * 100).toLocaleString("es-ES", { maximumFractionDigits: 1 })} %<br />
+          {annotation.source ? `${annotation.source.document_id}${annotation.source.page ? ` · pág. ${annotation.source.page}` : ""}${annotation.source.sheet ? ` · ${annotation.source.sheet}` : ""}${annotation.source.cell ? ` · ${annotation.source.cell}` : ""}${annotation.source.locator ? ` · ${annotation.source.locator}` : ""}` : "Fuente no proporcionada; consultar inspector IFC"}
+          {annotation.state ? <><br />Estado: {annotation.state}</> : null}
+          {annotation.id.startsWith("nozzles.") && annotation.id.endsWith("diameter") ? <><br />DN nominal; no mide el diámetro exterior.</> : null}
+        </span>
+      </button>
     </Html>
   </group>;
 }
@@ -72,7 +83,10 @@ export function Dimensions({ annotations, products }: { annotations: Annotation[
       anchorFrom = [min[0], min[1], center[2]]; anchorTo = [min[0], max[1], center[2]];
       from = [min[0] - offset, min[1], center[2]]; to = [min[0] - offset, max[1], center[2]];
     }
-    return <Dimension key={annotation.id} {...{ from, to, anchorFrom, anchorTo, annotation }} />;
+    const trace = ifcTraces(product.psets)[annotation.id];
+    const enriched = trace && !annotation.source ? { ...annotation, source: trace.source,
+      confidence: trace.source.confidence, state: trace.state } : annotation;
+    return <Dimension key={annotation.id} {...{ from, to, anchorFrom, anchorTo, annotation: enriched }} />;
   })}</>;
 }
 

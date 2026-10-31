@@ -73,6 +73,8 @@ export function ReviewWorkspace() {
           value: Number(f.correctedValue ?? f.value),
           unit: f.unit,
           confidence: f.confidence,
+          source: f.source,
+          state: f.status,
         })),
     [fields, selectedId],
   );

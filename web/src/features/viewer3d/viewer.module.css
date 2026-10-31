@@ -48,3 +48,9 @@
 @container (max-width:560px) { .selectors { max-width:calc(100% - 55px); top:53px; } .tools { top:10px; } .secondary { top:137px; } .badge { top:10px; left:12px; right:auto; max-width:calc(100% - 210px); } .cut { top:178px; width:135px; } .tree { top:178px; } .narration { width:calc(100% - 24px); bottom:48px; font-size:11px; } .legend { bottom:9px; padding:5px 8px; } .legend[open] { bottom:9px; } .caption { max-width:calc(100% - 115px); font-size:10px; bottom:9px; } .scrub { bottom:133px; right:12px; } }
 
 .orbit { position:absolute; z-index:3; top:12px; left:calc(50% - 34px); }
+.bookmarks { position: absolute; z-index: 3; left: 12px; bottom: 80px; display: flex; flex-wrap: wrap; gap: 5px; max-width: calc(100% - 24px); }
+.bookmarks input { width: 130px; }
+.dimensionInfo { position: relative; pointer-events: auto; cursor: help; font: inherit; }
+.dimensionDetails { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 240px; max-width: 70vw; white-space: normal; text-align: left; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font-size: 11px; }
+.dimensionInfo:hover .dimensionDetails, .dimensionInfo:focus-visible .dimensionDetails { display: block; }
+.dimensionInfo:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }

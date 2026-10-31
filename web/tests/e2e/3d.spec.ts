@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { flattenRevision } from "../../src/lib/mock/fields";
+import { readFile } from "node:fs/promises";
 
 // Dos páginas sintéticas en memoria para verificar la navegación PDF sin originales privados.
 function twoPagePdf() {
@@ -348,4 +349,58 @@ test("el holograma IFC con tres recortes cumple el presupuesto de triángulos", 
   const measurement = JSON.parse((await output.textContent())!);
   expect(measurement.triangles).toBeGreaterThan(0);
   expect(measurement.triangles).toBeLessThanOrEqual(200000);
+});
+
+test("el visor conserva vistas, consulta cotas y descarga el PNG compuesto", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/lab/3d");
+  const viewer = page.getByTestId("ifc-viewer");
+  await expect(viewer).toHaveAttribute("data-phase", "ready", { timeout: 30000 });
+  const dimension = viewer.getByRole("button", { name: /Longitud de virola:.*Ver fuente/ });
+  await expect(dimension).toBeVisible();
+  await dimension.focus();
+  await expect(dimension).toContainText("Confianza:");
+  await expect(dimension).toContainText("GA-V101");
+  await viewer.getByRole("button", { name: "Corte", exact: true }).click();
+  await viewer.getByRole("slider", { name: "Altura del plano de corte" }).fill("0.4");
+  await expect(viewer.getByRole("button", { name: "Corte", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await viewer.getByRole("button", { name: "Alzado", exact: true }).click();
+  const canvas = viewer.locator("canvas");
+  const horizontalOffset = async () => {
+    const p = (await canvas.getAttribute("data-camera-position"))!.split(",").map(Number);
+    const target = (await canvas.getAttribute("data-camera-target"))!.split(",").map(Number);
+    return Math.abs(p[0]! - target[0]!);
+  };
+  await expect.poll(horizontalOffset).toBeLessThan(.01);
+  await viewer.getByRole("textbox", { name: "Nombre de la vista" }).fill("Alzado revisión");
+  await viewer.getByRole("button", { name: "Guardar vista", exact: true }).click();
+  await page.reload();
+  await expect(viewer).toHaveAttribute("data-phase", "ready", { timeout: 30000 });
+  await viewer.getByRole("combobox", { name: "Recuperar vista guardada" }).selectOption({ label: "Alzado revisión" });
+  await expect(viewer.getByRole("button", { name: "Iso", exact: true })).toHaveAttribute("aria-pressed", "false");
+  await expect(canvas).toHaveAttribute("data-camera-position", /,/);
+  await expect.poll(horizontalOffset).toBeLessThan(.01);
+  const downloaded = page.waitForEvent("download");
+  await viewer.getByRole("button", { name: "Capturar PNG", exact: true }).click();
+  const png = await downloaded;
+  expect(png.suggestedFilename()).toBe("trazia-ifc.png");
+  const bytes = await readFile((await png.path())!);
+  expect(bytes.subarray(0, 8).toString("hex")).toBe("89504e470d0a1a0a");
+  expect(bytes.length).toBeGreaterThan(1000);
+  await png.saveAs("../docs/capturas/visor-exportado-01nov.png");
+  await page.screenshot({ path: "../docs/capturas/visor-mejoras-01nov.png", fullPage: true });
+});
+
+test("la captura BCF conectada empaqueta la cámara y la selección del visor", async ({ page }) => {
+  test.skip(!process.env.NEXT_PUBLIC_API_URL, "Conversión BCF mediante la API");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/lab/3d");
+  const viewer = page.getByTestId("ifc-viewer");
+  await expect(viewer).toHaveAttribute("data-phase", "ready", { timeout: 30000 });
+  const downloaded = page.waitForEvent("download");
+  await viewer.getByRole("button", { name: "Captura BCF", exact: true }).click();
+  const bcf = await downloaded;
+  expect(bcf.suggestedFilename()).toBe("vista_DRAFT.bcfzip");
+  const bytes = await readFile((await bcf.path())!);
+  expect(bytes.subarray(0, 2).toString()).toBe("PK");
 });

@@ -1,35 +1,12 @@
 "use client";
 import type { PreparedProduct } from "./model-resource";
 import { elementLabel } from "./semantic";
+import { ifcTraces } from "./ifc-trace";
 function tracedFields(product?: PreparedProduct) {
-  const raw = product?.psets.TrazIA_Traceability?.FieldsJSON;
-  if (typeof raw !== "string") return [];
-  try {
-    const fields: unknown = JSON.parse(raw);
-    if (!fields || typeof fields !== "object" || Array.isArray(fields))
-      return [];
-    return Object.entries(fields).flatMap(([path, field]) => {
-      if (
-        !field ||
-        typeof field !== "object" ||
-        typeof field.confidence !== "number"
-      )
-        return [];
-      const source =
-        field.source && typeof field.source === "object" ? field.source : null;
-      return [
-        {
-          path,
-          confidence: field.confidence,
-          source: source
-            ? `${source.document_id ?? "—"}${source.page ? ` · pág. ${source.page}` : ""}${source.locator ? ` · ${source.locator}` : ""}`
-            : "Sin fuente en el IFC",
-        },
-      ];
-    });
-  } catch {
-    return [];
-  }
+  return Object.entries(product ? ifcTraces(product.psets) : {}).map(([path, field]) => ({
+    path, confidence: field.source.confidence,
+    source: `${field.source.document_id}${field.source.page ? ` · pág. ${field.source.page}` : ""}${field.source.locator ? ` · ${field.source.locator}` : ""}${field.source.sheet ? ` · ${field.source.sheet}` : ""}${field.source.cell ? ` · ${field.source.cell}` : ""}`,
+  }));
 }
 export function IfcInspector({
   product,

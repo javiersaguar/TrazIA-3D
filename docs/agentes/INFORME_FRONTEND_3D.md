@@ -139,3 +139,13 @@ No se para 8010/3100 ni el servicio de Lectura en 8020. Capturas oscuras en
 `docs/capturas/31oct-{revision,cambios,modelo,holograma-ifc}.png`.
 Medidas exactas en `docs/evidencias/frontend/31oct/`. El techo de triángulos está
 comprobado en la escena de referencia; queda medir el objetivo en otro portátil normal.
+
+
+## Sesión 01/11 · mejoras I.5
+
+- Cámara con presets interrumpibles y retorno correcto tras recuperar una vista personal; hasta ocho vistas por URL de IFC, persistidas y validadas antes de aplicar. Se conservan órbita, enfoque y outline/hit slop existentes. El picking ignora los puntos recortados.
+- Corte animado con refs/uniforms y estado final estático con movimiento reducido. La tapa se reconstruye al asentarse; triangulación distingue lazos separados y agujeros reales (prueba con dos sólidos). No se sustituye el IFC por geometría aproximada.
+- Cotas enfocables con unidad, confianza, estado y fuente de la anotación o del Pset IFC. El inspector lee confidence dentro de source. Se mantiene la advertencia DN nominal. Material de supuesto según campo/componente: un supuesto de faldón no pinta toda la virola.
+- PNG compuesto desde el canvas real y los rótulos visibles; procedencia, DRAFT, UTC y triángulos dentro del viewport. BCF conectado empaqueta esa imagen, cámara ortográfica convertida web→IFC y GUID. Errores recuperables; deshabilitado sin API.
+- Typecheck, lint (aviso TanStack previo), 42 pruebas unitarias y build en verde. E2E final: API 33 pasadas/una omitida (2,8 min), sin API 26 pasadas/ocho omitidas por depender de API (2,3 min). El guardado espera a que el preset sea observable; movimiento reducido aplica cámara inmediatamente. Capturas sintéticas: [visor](../capturas/visor-mejoras-01nov.png) y [PNG exportado](../capturas/visor-exportado-01nov.png), ambas inspeccionadas visualmente.
+- Navegador con SwiftShader en CPU: no es una nueva medición de FPS en la RTX. El presupuesto de 200.000 triángulos sigue comprobado por la prueba del holograma IFC. Falta otro portátil y calibrar cámara para superponer un GA arbitrario; las vistas personales no hacen esa calibración automáticamente.
