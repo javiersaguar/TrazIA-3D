@@ -91,7 +91,21 @@ class AuditRecord(SQLModel, table=True):
     before_json: str
     after_json: str
     seconds: float | None = None
+    review_session_id: str | None = Field(default=None, index=True)
+    undo_of: int | None = None
     created_at: float = Field(default_factory=time.time)
+
+
+class ReviewSessionRecord(SQLModel, table=True):
+    __tablename__ = "review_sessions"
+    id: str = Field(primary_key=True)
+    revision_id: str = Field(foreign_key="revisions.id", index=True)
+    actor: str
+    kind: str
+    dataset: str
+    started_at: float = Field(default_factory=time.time)
+    finished_at: float | None = None
+    active_seconds: float | None = None
 
 
 class CorrectionRecord(SQLModel, table=True):

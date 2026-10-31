@@ -30,6 +30,19 @@ def calibration_fingerprint() -> str | None:
         return "invalid:unreadable"
 
 
+def fusion_fingerprint() -> str | None:
+    from trazia.strategies.fusion import fusion_path, load_fusion
+
+    try:
+        model = load_fusion()
+        return model.sha256 if model else None
+    except (OSError, ValueError, KeyError, TypeError):
+        path = fusion_path()
+        if path and path.is_file():
+            return "invalid:" + hashlib.sha256(path.read_bytes()).hexdigest()
+        return "invalid:unreadable"
+
+
 def key_for(session: Session, request: dict) -> str:
     documents = []
     for identity in request["documents"]:
@@ -51,8 +64,9 @@ def key_for(session: Session, request: dict) -> str:
             raise CacheMiss("No existe la revisión anterior")
         previous = hashlib.sha256(record.payload.encode()).hexdigest()
     content = {
-        "version": 2,
+        "version": 3,
         "calibration": request.get("_cache_calibration", calibration_fingerprint()),
+        "fusion": request.get("_cache_fusion", fusion_fingerprint()),
         "documents": documents,
         "strategy": request["strategy"],
         "providers": request["providers"],
@@ -110,6 +124,8 @@ def restore(store: Store, job_id: str, request: dict):
 def remember(store: Store, session: Session, request: dict, revision: Revision, warnings: list):
     if request.get("_cache_calibration") != calibration_fingerprint():
         # Los parámetros cambiaron durante la ejecución: no asociar el resultado a otra curva.
+        return None
+    if request.get("_cache_fusion", fusion_fingerprint()) != fusion_fingerprint():
         return None
     digest = store.put(
         json.dumps(

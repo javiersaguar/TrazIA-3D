@@ -1,0 +1,98 @@
+{
+  "synthetic": true,
+  "strategy": "d_hibrido",
+  "run_id": "29ea02a845",
+  "input_sha256": "d8ab4b2dde471d3bf601e1ae00f617f567da3ea7f479af0959f7a3e73f241ead",
+  "complete": true,
+  "planned_revisions": 2,
+  "rows": [
+    {
+      "dataset": "s-reservado",
+      "tag": "D-712",
+      "degradation": "vectorial",
+      "revision": "1",
+      "job_id": "418b5d46-1e9f-4ab5-aba3-c7290319eb83",
+      "status": "error",
+      "error": "El recipiente vertical de nivel 2/3 necesita al menos tres boquillas",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 0.782841099993675,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 0.8490290000045206
+    },
+    {
+      "dataset": "s-reservado",
+      "tag": "D-712",
+      "degradation": "vectorial",
+      "revision": "2",
+      "job_id": "49dda0dd-0b50-43cb-8158-8c4e0f1231f1",
+      "status": "error",
+      "error": "El recipiente vertical de nivel 2/3 necesita al menos tres boquillas",
+      "run": {
+        "strategy": "d_hibrido",
+        "providers": [],
+        "seconds": 0.4840254000009736,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "seconds_turnaround": 0.5906258000031812
+    }
+  ],
+  "summary": {
+    "revisions": 2,
+    "equipment": 1,
+    "conditions": 1,
+    "statuses": {
+      "error": 2
+    },
+    "successful_lods": {},
+    "errors_by_message": {
+      "El recipiente vertical de nivel 2/3 necesita al menos tres boquillas": 2
+    },
+    "seconds_batch": 0.9309534000058193,
+    "seconds_upload": 0.0660797000018647,
+    "throughput_terminal_per_second": 2.148335244264104,
+    "seconds_turnaround_mean": 0.7198274000038509,
+    "seconds_turnaround_p95": 0.8490290000045206,
+    "cost_eur": 0.0,
+    "jobs_without_cost": 0,
+    "external_calls_known": 0,
+    "jobs_with_incomplete_accounting": 0,
+    "projection_400x4": {
+      "measured": false,
+      "seconds_for_1600_terminal_jobs": 744.7627200046555,
+      "seconds_for_1600_valid_ifc": null,
+      "seconds_for_1600_draft_ifc": null,
+      "cost_eur": 0.0,
+      "limitation": "Extrapolación de este lote y estrategia. Las terminaciones incluyen errores; no prueban 1600 modelos válidos."
+    },
+    "per_equipment_condition": [
+      {
+        "dataset": "s-reservado",
+        "tag": "D-712",
+        "degradation": "vectorial",
+        "revisions": 2,
+        "done": 0,
+        "seconds_turnaround_sum": 1.4396548000077019,
+        "cost_eur": 0.0
+      }
+    ]
+  },
+  "acceptance": {
+    "all_revisions_have_draft_ifc": false,
+    "draft_ifc": 0,
+    "missing_or_failed": 2,
+    "engineering_accuracy_verified": false
+  }
+}

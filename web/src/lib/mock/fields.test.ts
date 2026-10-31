@@ -28,4 +28,19 @@ describe("intervalo y abstención en la revisión (E.7)", () => {
     expect(height.explanation).toContain("confírmelo");
     expect(fields.find((f) => f.path === "diameter")!.interval).toMatchObject({ low: 1997, high: 2003 });
   });
+
+  it("incluye coordenadas y prioriza conflictos sin confundir raw con calibrado", () => {
+    const copy = structuredClone(revision);
+    const dimension = copy.equipment.diameter;
+    dimension.source.confidence_raw = dimension.source.confidence;
+    const point = (value: number) => ({ ...dimension, value });
+    copy.equipment.envelope = { origin: { x: point(-400), y: point(0), z: point(0) }, size: { x: point(2000), y: point(2000), z: point(6000) } };
+    copy.equipment.height.state = "conflict";
+    const fields = flattenRevision(copy);
+    expect(fields[0]?.path).toBe("height");
+    expect(fields[0]?.conflict).toBe(true);
+    expect(fields.find((f) => f.path === "envelope.origin.x")?.value).toBe(-400);
+    expect(fields.find((f) => f.path === "diameter")?.calibrated).toBe(false);
+    expect(new Set(fields.map((f) => f.path)).size).toBe(fields.length);
+  });
 });

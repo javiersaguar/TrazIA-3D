@@ -26,6 +26,7 @@ def key_for(revision, question, options):
         "revision": revision.model_dump(mode="json"),
         "previous": previous.model_dump(mode="json") if previous else None,
         "question": question,
+        "review_examples": options.get("examples"),
         "revision_id": options["revision_id"],
         "revision_version": options["revision_version"],
         "path": options.get("path"),

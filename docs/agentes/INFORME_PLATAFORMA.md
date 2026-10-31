@@ -547,3 +547,59 @@ Quedan 161 errores de escaneados y D-712 rev1/2 vectoriales por boquillas incomp
 estuvo dedicada y Lectura ejecutaba estudios paralelos. 3.8 no se cierra completo:
 falta few-shot y una muestra de correcciones de uso representativa. El candidato del
 ensayo sintético se conserva sin activar. El visor y el giro se describen en el informe 3D.
+
+
+## Sesión 31/10 · revisión humana y material de escala
+
+Base main 8713f7a; rama feat/cierre-plataforma-visor. Se conserva model.py 0.3 y el reparto de
+COORDINACION-BACKEND.md. Sin cambios en lectores, OCR, estrategias, entrenamiento ni visor 3D.
+
+Cerrados E.1–E.3: validación accionable, diagnóstico de coherencia/solape como cribado, cola
+existente auditada y ampliada a campos trazados, rechazo explícito y deshacer completo con
+concurrencia, idempotencia y auditoría inversa. La web preserva los errores recuperables, las
+instantáneas vistas y la escritura SQL si falla solo exportar JSONL. Migración de almacén 0006.
+
+E.5 instrumentado: sesión declarada por persona o prueba, tiempo activo, límites de reloj,
+agrupación por proyecto/equipo/dataset y métricas desconocidas a null. Piloto A/B preparado
+por pipeline B/CPU (22/26 campos con score bruto), sin simular actividad humana. API 8022 y
+web 3120 sobre generated/piloto-manual-31; API en offline para evitar inferencias nuevas.
+[Protocolo](../MUESTRA_REVISION_MANUAL.md), [captura](../capturas/revision-sesion-manual-31.png).
+
+E.6/3.8 parcial: ejemplos aprobados con hash, retiro al revocar, filtro por campo/estrategia,
+exclusión del equipo/documentos y recorte PDF verificado; contexto del Copiloto y su caché
+con manifiesto. Caché de trabajos v3 con SHA de fusión/calibración y protección de cambios
+mientras se ejecuta. No se activa una propuesta ni se afirma integración del few-shot en
+extracción: esa conexión/prioridad de fuentes es de Lectura. Falta muestra humana representativa.
+
+C.4 documentado y probado internamente: +Z, 0°=+X, 90°=+Y, mm→m, matriz web-ifc (X,Z,-Y).
+Norte/TR sin verificar. [Evidencia](../evidencias/fase3/31oct/referencia-local.json).
+
+3.7/H.7: diagrama exportable y presupuesto paramétrico; inventario de 163 fallos (84 boquillas,
+63 campos ausentes, 16 geometría), --tags y --exigir-todos. Continúan 173/336 DRAFT del lote
+anterior; no se reinterpreta como 1600 válidos. Reproducción D-712: 2 errores / 0,9310 s,
+sin GPU ni coste de proveedores; no es una medida de escala. El coste humano/infraestructura
+y total de IFC válidos siguen sin estimar. [Pitch](../PITCH_ESCALA.md).
+
+Validación final: Ruff check y format (167 archivos); pytest 303 passed / 1 skipped (298,21 s);
+web typecheck, lint sin errores (aviso anterior de TanStack), 38 unitarias y build; Playwright
+con API: 31 passed / 1 skipped (modo alternativo) en 2,1 min, Chrome/SwiftShader sin inferencia
+GPU. Se corrigió el retorno vacío al cerrar sesión y una etiqueta accesible duplicada que
+interfería con el diálogo de aprobación. En CPU se amplían las esperas, no se rebajan los
+criterios de triángulos. No se añaden dependencias.
+
+ROADMAP: E.1–E.3 marcados; E.5/E.6/3.7/3.8/C.4/H.7 conservan el trabajo pendiente explícito.
+Detalle de interfaces y límites: [auditoría](../AUDITORIA_REVISION.md) y [API](../API.md).
+
+
+### Integración posterior con main e46573d
+
+Al preparar la subida, main incorporó el modelo de fusión versionado de Lectura y cambió D
+para usarlo por defecto. Los resultados 173/336 y la reproducción D-712 de esta sesión siguen
+correspondiendo a D heurístico sobre la base 8713f7a; no se atribuyen al nuevo D aprendido.
+La variante actual para reproducir la fusión anterior es `d_hibrido+heuristica`. El modelo
+empaquetado sí participa en la huella de caché v3. Se conserva el trabajo de ambos equipos.
+
+Verificación del resultado integrado antes del push: Ruff check/format (168 archivos),
+304 pruebas Python correctas y una omisión en 267,28 s; 38 unitarias web, typecheck,
+lint sin errores y build correctos. Revisión cargada con 22 campos y cero errores JS,
+mediante Chrome/SwiftShader y sin modificar la sesión manual.

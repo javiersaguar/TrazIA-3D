@@ -24,6 +24,8 @@ def main():
     )
     p.add_argument("--casos", type=int, default=None)
     p.add_argument("--degradaciones", nargs="+", default=None)
+    p.add_argument("--tags", nargs="+", default=None)
+    p.add_argument("--exigir-todos", action="store_true")
     p.add_argument(
         "--eur-worker-hora", type=float, default=None, help="Tarifa hipotética, no coste medido"
     )
@@ -133,6 +135,8 @@ def main():
                 command += ["--casos", str(args.casos)]
             if args.degradaciones:
                 command += ["--degradaciones", *args.degradaciones]
+            if args.tags:
+                command += ["--tags", *args.tags]
             process = subprocess.run(command, cwd=ROOT)
             if process.returncode:
                 raise RuntimeError("El lote no terminó; conserva el resultado parcial")
@@ -170,6 +174,7 @@ def main():
                     "input_sha256": report["input_sha256"],
                     "complete": report["complete"],
                     "summary": report["summary"],
+                    "acceptance": report.get("acceptance"),
                 }
             )
         finally:
@@ -178,7 +183,8 @@ def main():
         (output / f"comparison-{args.estrategia}.json").write_text(
             json.dumps(results, ensure_ascii=False, indent=2) + "\n", encoding="utf8"
         )
-    return 0
+    failed = any(not r["acceptance"]["all_revisions_have_draft_ifc"] for r in results)
+    return 2 if args.exigir_todos and failed else 0
 
 
 if __name__ == "__main__":

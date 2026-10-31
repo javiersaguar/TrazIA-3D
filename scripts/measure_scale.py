@@ -18,7 +18,7 @@ from pathlib import Path
 TERMINAL = {"done", "error", "cancelled", "timeout"}
 
 
-def tasks(data, sets, *, cases_limit=None, degradations=None):
+def tasks(data, sets, *, cases_limit=None, degradations=None, tags=None):
     output = []
     for name in sets:
         root = data / name
@@ -26,6 +26,8 @@ def tasks(data, sets, *, cases_limit=None, degradations=None):
         if manifest.get("synthetic") is not True:
             raise ValueError("El lote de escala solo acepta manifiestos sintéticos")
         for case in manifest["cases"][:cases_limit]:
+            if tags and case["tag"] not in tags:
+                continue
             for level in manifest["styles"]:
                 if degradations and level not in degradations:
                     continue
@@ -109,9 +111,10 @@ def summarise(rows, seconds, upload_seconds):
         "projection_400x4": {
             "measured": False,
             "seconds_for_1600_terminal_jobs": 1600 / throughput if throughput else None,
-            "seconds_for_1600_valid_ifc": 1600 / throughput
-            if throughput and states.get("done") == total
-            else None,
+            "seconds_for_1600_valid_ifc": None,
+            "seconds_for_1600_draft_ifc": (
+                1600 / throughput if throughput and states.get("done") == total else None
+            ),
             "cost_eur": sum(known_cost) / total * 1600
             if total and len(known_cost) == total
             else None,
@@ -135,6 +138,7 @@ def run(
     strategy: str = "d_hibrido",
     cases_limit=None,
     degradations=None,
+    tags=None,
 ):
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
@@ -150,7 +154,7 @@ def run(
             {"Content-Type": "application/json", "Idempotency-Key": str(uuid.uuid4())},
         )
 
-    plan = tasks(data, sets, cases_limit=cases_limit, degradations=degradations)
+    plan = tasks(data, sets, cases_limit=cases_limit, degradations=degradations, tags=tags)
     if not plan:
         raise ValueError("Lote vacío")
     run_id = uuid.uuid4().hex[:10]
@@ -269,6 +273,18 @@ def run(
             "rows": rows,
             "summary": summarise(rows, time.perf_counter() - started, uploaded),
         }
+        done = sum(r["status"] == "done" and not r.get("inspection_error") for r in rows)
+        report["acceptance"] = {
+            "all_revisions_have_draft_ifc": report["complete"] and done == len(plan),
+            "draft_ifc": done,
+            "missing_or_failed": len(plan) - done,
+            "engineering_accuracy_verified": False,
+        }
+        if not report["complete"]:
+            projection = report["summary"]["projection_400x4"]
+            projection["seconds_for_1600_terminal_jobs"] = None
+            projection["seconds_for_1600_draft_ifc"] = None
+            projection["cost_eur"] = None
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf8")
         if pending:
@@ -299,11 +315,15 @@ def main():
     p.add_argument("--estrategia", default="d_hibrido", help="Estrategia de lectura del lote")
     p.add_argument("--casos", type=int, default=None, help="Primeros N equipos por conjunto")
     p.add_argument("--degradaciones", nargs="+", default=None)
+    p.add_argument("--tags", nargs="+", help="Reproducir solo los tags indicados")
+    p.add_argument(
+        "--exigir-todos", action="store_true", help="Salir con código 2 si falta algún IFC DRAFT"
+    )
     p.add_argument("--limite-segundos", type=int, default=7200, help="Tiempo máximo del lote")
     args = p.parse_args()
     if args.casos is not None and args.casos < 1:
         p.error("casos debe ser positivo")
-    run(
+    report = run(
         args.api.rstrip("/"),
         args.data,
         args.sets,
@@ -312,8 +332,12 @@ def main():
         timeout=args.limite_segundos,
         cases_limit=args.casos,
         degradations=args.degradaciones,
+        tags=args.tags,
+    )
+    return (
+        2 if args.exigir_todos and not report["acceptance"]["all_revisions_have_draft_ifc"] else 0
     )
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

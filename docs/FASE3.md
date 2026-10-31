@@ -378,3 +378,56 @@ TanStack), 32 unitarias, builds offline/conectado y humo en ambos modos: 25 + 6 
 offline y 30 + 1 omitida con API. Los puertos de prueba final fueron API 8022/web 3120,
 con TRAZIA_CORS_ORIGINS explícito. La prueba de estudio ya usa una raíz temporal para
 que generated/estudio de otra sesión no afecte a su estado vacío.
+
+
+## Cierre de revisión y preparación del pitch (31/10)
+
+[Auditoría E/C](AUDITORIA_REVISION.md): E.1–E.3 implementados y comprobados. E.5 tiene registro
+por acción/sesión y agrupación por equipo, pero aún carece de muestra humana. El piloto se
+preparó ejecutando B en CPU sobre los documentos sintéticos V-101: 22 campos A y 26 B, todos
+con score bruto. No se simuló su revisión ni se aprobó ningún campo. Tiempos de pipeline
+registrados: 0,2133 y 0,0900 s; no son tiempos de revisión humana.
+[Evidencia de preparación](evidencias/fase3/31oct/piloto-preparacion.json).
+
+Los pares few-shot aprobados se seleccionan/retiran por la API y se incorporan al contexto del
+Copiloto, con exclusión del equipo y documentos consultados. La extracción y el ajuste de
+prioridad de fuentes siguen coordinados con Lectura. La caché de trabajos incorpora SHA de
+fusión y calibración. No se ha entrenado ni llamado a modelos GPU en esta sesión.
+
+[Pitch listo para reutilizar](PITCH_ESCALA.md): diagrama en Mermaid y SVG/PNG, presupuesto
+paramétrico, partidas desconocidas a null y control de cobertura. El inventario conserva los
+163 errores del lote anterior. `--exigir-todos` devuelve código 2 para ese lote; `complete`
+no se confunde con producir todos los DRAFT. No se ha repetido el lote completo ni se
+presentan sus cifras antiguas como medición de esta revisión de código.
+
+Se reprodujeron D-712/1 y D-712/2, vectoriales de S-reservado, con D/CPU: **dos errores en
+0,9310 s de lote**, sin llamadas externas y sin correcciones inventadas. Los eventos de
+geometry2d declaran dos boquillas en alzado y tres/cuatro muñones en planta, respectivamente;
+el ensamblado sigue sin tres boquillas completas. Es diagnóstico, no verdad de ingeniería.
+La velocidad de esta comprobación de dos fallos no se usa para extrapolar producción.
+[Resultado completo](evidencias/fase3/31oct/triage-d712.json). No se ajusta el lector con
+S-reservado. El artefacto de fusión aprendida no estaba en el generated/ del checkout principal;
+no se presentó una ejecución sin pesos como medida de D+fusión aprendida.
+
+Verificación del código final: Ruff check/format correctos (167 archivos), **303 pruebas Python
+correctas y una omisión OCR opcional en 298,21 s**; typecheck, lint (aviso previo TanStack),
+38 unitarias web y build correctos; **31 pruebas de navegador correctas y una no aplicable al
+modo API en 2,1 min**. El navegador usó SwiftShader (`PW_CPU_ONLY=1`): comprueba funcionamiento
+y presupuesto de triángulos, no FPS de la RTX. Las esperas del modo CPU son de 15 s y los
+criterios geométricos se conservan. Se añadieron pruebas de restauración completa, concurrencia,
+reloj/sesiones, retirada de ejemplos aprobados y huellas de caché.
+
+Preview: API 8022 y web 3120, ambas locales. El almacén del piloto usa TRAZIA_OFFLINE=1 para
+revisión/edición sin inferencia nueva: el Copiloto sin respuesta cacheada explica su indisponibilidad.
+La [captura oscura](capturas/revision-sesion-manual-31.png) muestra la sesión preparada; la
+[comprobación de interfaz](evidencias/fase3/31oct/piloto-interfaz.json) registra cero errores JS,
+cero sesiones humanas y tiempo humano null. La muestra real sigue pendiente de una persona.
+
+
+### Integración posterior con main e46573d
+
+Al preparar la subida, main incorporó el modelo de fusión versionado de Lectura y cambió D
+para usarlo por defecto. Los resultados 173/336 y la reproducción D-712 de esta sesión siguen
+correspondiendo a D heurístico sobre la base 8713f7a; no se atribuyen al nuevo D aprendido.
+La variante actual para reproducir la fusión anterior es `d_hibrido+heuristica`. El modelo
+empaquetado sí participa en la huella de caché v3. Se conserva el trabajo de ambos equipos.

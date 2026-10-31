@@ -294,6 +294,18 @@ class Nozzle(Model):
         return self
 
 
+def nozzle_misfit(
+    diameter: float, elevation: float, vessel_diameter: float, shell_bottom: float, height: float
+) -> str | None:
+    """Por qué una boquilla radial no cabe en la virola, o None si cabe (mm)."""
+    radius = diameter / 2
+    if not shell_bottom + radius <= elevation <= shell_bottom + height - radius:
+        return "debe quedar dentro de la virola"
+    if diameter >= vessel_diameter:
+        return "diámetro incompatible con la virola"
+    return None
+
+
 class Equipment(Model):
     id: Identifier
     tag: Tag
@@ -386,8 +398,6 @@ class Equipment(Model):
             return self
         if any(getattr(self, key) is None for key in GEOMETRY_FIELDS):
             raise ValueError("El recipiente vertical de nivel 2/3 necesita sus cinco dimensiones")
-        if len(self.nozzles) < 3:
-            raise ValueError("El recipiente vertical de nivel 2/3 necesita al menos tres boquillas")
         if self.skirt_thickness.value >= self.diameter.value / 2:
             raise ValueError("El espesor del faldón debe ser menor que el radio")
         if self.skirt_height.value <= self.head_depth.value:
@@ -399,13 +409,15 @@ class Equipment(Model):
                 continue
             if nozzle.nozzle_type not in (None, "radial"):
                 raise ValueError("Una boquilla no radial requiere posición y dirección explícitas")
-            radius = nozzle.diameter.value / 2
-            low = self.shell_bottom + radius
-            high = self.shell_bottom + self.height.value - radius
-            if not low <= nozzle.elevation.value <= high:
-                raise ValueError(f"Boquilla {nozzle.id}: debe quedar dentro de la virola")
-            if nozzle.diameter.value >= self.diameter.value:
-                raise ValueError(f"Boquilla {nozzle.id}: diámetro incompatible con la virola")
+            problem = nozzle_misfit(
+                nozzle.diameter.value,
+                nozzle.elevation.value,
+                self.diameter.value,
+                self.shell_bottom,
+                self.height.value,
+            )
+            if problem:
+                raise ValueError(f"Boquilla {nozzle.id}: {problem}")
         return self
 
 
@@ -442,6 +454,9 @@ class Revision(Model):
     equipment: Equipment
     approval: Approval | None = None
     run: RunInfo | None = None
+    # Boquillas leídas que no entraron en el modelo (incompletas o fuera de la virola): no se han
+    # eliminado, y compare no las informa como bajas ni altas.
+    unplaced_nozzles: list[Identifier] = Field(default_factory=list)
 
     @model_validator(mode="before")
     @classmethod
@@ -466,6 +481,16 @@ class Revision(Model):
         if self.approval:
             if self.pending_review():
                 raise ValueError("La aprobación requiere revisar todos los campos")
+            # Un DRAFT con menos sí existe: sin modelo no habría nada que revisar ni completar.
+            equipment = self.equipment
+            if (
+                equipment.kind == "vertical_vessel"
+                and equipment.lod >= 2
+                and len(equipment.nozzles) < 3
+            ):
+                raise ValueError(
+                    "El recipiente vertical de nivel 2/3 necesita al menos tres boquillas"
+                )
             if self.approval.input_sha256 != self.fingerprint():
                 raise ValueError("La aprobación no corresponde a estos datos; vuelva a revisar")
         return self
@@ -476,8 +501,10 @@ class Revision(Model):
         ]
 
     def fingerprint(self) -> str:
+        # Vacío no cuenta: las huellas ya aprobadas siguen siendo válidas.
+        exclude = {"approval"} if self.unplaced_nozzles else {"approval", "unplaced_nozzles"}
         content = json.dumps(
-            self.model_dump(mode="json", exclude={"approval"}),
+            self.model_dump(mode="json", exclude=exclude),
             sort_keys=True,
             ensure_ascii=False,
             separators=(",", ":"),

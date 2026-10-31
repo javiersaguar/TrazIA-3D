@@ -11,6 +11,7 @@ import { flattenRevision, type ReviewField } from "@/lib/mock/fields";
 import type { RevisionId } from "@/lib/mock/api";
 import { qk } from "@/lib/queries";
 import { approveRevision } from "./approval";
+import { settleTiming, useManualReview } from "./review-session";
 
 export function ApprovalButton({
   revision,
@@ -21,6 +22,7 @@ export function ApprovalButton({
 }) {
   const qc = useQueryClient(),
     writes = useIsMutating();
+  const reviewing = useManualReview((s) => s.busy);
   const dialog = useRef<HTMLDialogElement>(null),
     key = useRef<string | null>(null);
   const [reviewer, setReviewer] = useState(""),
@@ -31,6 +33,9 @@ export function ApprovalButton({
     fields?.filter((f) => f.status !== "accepted" && f.status !== "corrected")
       .length ?? 0;
   const submit = async () => {
+    if (useManualReview.getState().busy) return;
+    useManualReview.getState().setBusy(true);
+    useManualReview.getState().session?.clock.block();
     setBusy(true);
     setError(null);
     try {
@@ -58,13 +63,15 @@ export function ApprovalButton({
         );
     } finally {
       setBusy(false);
+      settleTiming(undefined, false);
+      useManualReview.getState().setBusy(false);
     }
   };
   return (
     <>
       <Button
         variant="primary"
-        disabled={!fields || pending > 0 || writes > 0 || busy}
+        disabled={!fields || pending > 0 || writes > 0 || busy || reviewing}
         title={
           pending
             ? `Faltan ${pending} campos por aceptar o corregir`

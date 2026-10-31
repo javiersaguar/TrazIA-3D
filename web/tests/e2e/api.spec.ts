@@ -3,6 +3,43 @@ import { expect, test } from "@playwright/test";
 const base = process.env.NEXT_PUBLIC_API_URL;
 test.skip(!base, "Requiere modo API; la demo offline se comprueba en humo.spec.ts");
 
+test("sesión manual: conserva un error recuperable y deshace valor y evidencia", async ({ page, request }) => {
+  const originalResponse = await request.get(`${base}/equipment/V-101/revisions/A`);
+  const original = (await originalResponse.json()).equipment.diameter;
+  await page.goto("/revision");
+  const row = page.locator('[data-row="diameter"]');
+  await expect(row).toBeVisible();
+  await row.click();
+  await page.getByRole("textbox", { name: "Revisor de la sesión", exact: true }).fill("Prueba de sesión Playwright");
+  const started = page.waitForResponse((r) => r.url().endsWith("/review-sessions") && r.request().method() === "POST");
+  await page.getByRole("button", { name: "Iniciar sesión manual", exact: true }).click();
+  const session = await (await started).json();
+  expect(session.kind).toBe("test");
+  await row.getByRole("button", { name: "Corregir", exact: true }).click();
+  const input = row.getByRole("textbox", { name: /Nuevo valor/ });
+  await input.fill("-1");
+  await row.getByRole("button", { name: "Guardar", exact: true }).click();
+  await expect(page.getByText(/No se ha guardado el cambio/)).toBeVisible();
+  await expect(input).toBeVisible();
+  await input.fill(String(original.value + 10));
+  await row.getByRole("checkbox", { name: "Cambiar evidencia (opcional)", exact: true }).check();
+  await row.getByRole("textbox", { name: "Localizador", exact: true }).fill("Ensayo automatizado de la interfaz");
+  await row.getByRole("button", { name: "Guardar", exact: true }).click();
+  await expect.poll(async () => (await (await request.get(`${base}/equipment/V-101/revisions/A`)).json()).equipment.diameter.value).toBe(original.value + 10);
+  await expect(input).toHaveCount(0);
+  await page.keyboard.press("Control+z");
+  await expect.poll(async () => (await (await request.get(`${base}/equipment/V-101/revisions/A`)).json()).equipment.diameter).toEqual(original);
+  await page.getByRole("button", { name: "Finalizar sesión", exact: true }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Sesión guardada" })).toBeVisible();
+  const metrics = await (await request.get(`${base}/revisions/A/review-metrics`)).json();
+  expect(metrics.test_sessions).toBeGreaterThan(0);
+  expect(metrics.completed_human_sessions).toBe(0);
+  const audits = (await (await request.get(`${base}/revisions/A/audit`)).json()).actions;
+  const actions = audits.filter((a: { review_session_id: string }) => a.review_session_id === session.id);
+  expect(actions).toHaveLength(2);
+  expect(actions[1].undo_of).toBe(actions[0].id);
+});
+
 test("la revisión persiste al recargar y se puede devolver a candidate", async ({ page, request }) => {
   await page.goto("/revision");
   await expect(page.getByRole("listbox", { name: "Campos por revisar" }).getByRole("option").first()).toBeVisible();

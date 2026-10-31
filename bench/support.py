@@ -19,6 +19,7 @@ from fractions import Fraction
 
 from trazia.extraction import Candidate
 from trazia.ingest import Bundle
+from trazia.pipeline import FILENAME_LOCATOR
 
 MARGIN = 0.004
 NUMBER = re.compile(r"\d[\d.,\s]*\d|\d")
@@ -107,9 +108,17 @@ def region_text(candidate: Candidate, bundle: Bundle) -> str | None:
     return " ".join(hits)
 
 
+def _from_filename(candidate: Candidate) -> bool:
+    return candidate.source.locator.startswith(FILENAME_LOCATOR)
+
+
 def is_cited(candidate: Candidate) -> bool:
     source = candidate.source
-    return bool(source.cell) or (source.page is not None and source.bbox is not None)
+    return (
+        bool(source.cell)
+        or (source.page is not None and source.bbox is not None)
+        or _from_filename(candidate)
+    )
 
 
 def is_supported(candidate: Candidate, bundle: Bundle | None) -> bool | None:
@@ -119,6 +128,8 @@ def is_supported(candidate: Candidate, bundle: Bundle | None) -> bool | None:
         return None  # medida sobre los trazos: no se puede verificar con texto
     if bundle is None:
         return False
+    if _from_filename(candidate):
+        return _norm(str(candidate.value)) in _norm(bundle.document.filename)
     text = region_text(candidate, bundle)
     if text is None:
         return None

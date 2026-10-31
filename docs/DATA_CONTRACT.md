@@ -22,12 +22,16 @@ Se conservan los nombres de todos los campos de 0.2. Se añaden:
 - `alternatives`: valores/unidades con su propia evidencia; `explanation` explica la incertidumbre.
 - `Source`: confidence_raw, channel, strategy, model, prompt_sha256, grounded,
   text_original y unit_original. Son opcionales: ausencia significa desconocido.
-- `Equipment`: siete tipologías, lod 1/2/3, support y envelope. Las cinco dimensiones y las
-  tres boquillas siguen siendo obligatorias para vertical_vessel con lod >= 2.
+- `Equipment`: siete tipologías, lod 1/2/3, support y envelope. Las cinco dimensiones siguen
+  siendo obligatorias para vertical_vessel con lod >= 2. Las tres boquillas se exigen al aprobar:
+  un DRAFT con menos existe para que se pueda revisar y completar.
 - `Envelope`: origin y size con componentes x/y/z en mm y evidencia por componente. El origen
   puede ser cero o negativo; las dimensiones físicas y los tamaños deben ser positivos.
 - `Nozzle`: service, rating y nozzle_type opcionales.
 - `Revision.run`: estrategia, proveedores, segundos totales/GPU, tokens, coste y llamadas externas.
+- `Revision.unplaced_nozzles`: marcas leídas que no entraron en el modelo (incompletas o fuera de
+  la virola). `compare` no las informa como altas ni bajas y las devuelve en `unplaced_nozzles`.
+  Vacío no cuenta para la huella: las aprobaciones anteriores siguen siendo válidas.
   Un coste desconocido es null; no se transforma en cero.
 
 `source.reviewed` se sincroniza con `state in (accepted, corrected)`; un supuesto no equivale a
@@ -67,7 +71,7 @@ SKIRT_THICKNESS = 20 mm
 NOZZLE N1: DIAMETER=200 mm; PROJECTION=400 mm; ELEVATION=2500 mm; AZIMUTH=0 deg
 ```
 
-La familia vertical de nivel 2/3 necesita al menos tres boquillas completas. Se normalizan longitudes `mm`, `cm`, `m`
+Para aprobarse, la familia vertical de nivel 2/3 necesita al menos tres boquillas completas. Se normalizan longitudes `mm`, `cm`, `m`
 e `in` a milímetros. Solo se reconocen decimales con punto; no se interpretan separadores
 de miles, unidades implícitas, cotas gráficas o ángulos sin referencia.
 
@@ -158,8 +162,8 @@ los empates cercanos quedan ambiguos y no reciben identidad automáticamente. Su
 es heurístico, no una probabilidad de acierto calibrada.
 
 La comparación separa equivalencia física y tolerancia de la huella: ignorar una diferencia
-menor de 0,1 mm para el informe no conserva una aprobación si el dato fue modificado.
-Tolerancia angular por defecto: 0,01 grados con distancia circular. Los atributos numéricos
+menor de 1 mm para el informe no conserva una aprobación si el dato fue modificado.
+Tolerancia angular por defecto: 0,5 grados con distancia circular. Los atributos numéricos
 usan equivalencia de unidades con Pint; las temperaturas con C se interpretan como degC
 solo en campos de temperatura. Las tolerancias se pueden pasar por ruta al comparador.
 
@@ -182,3 +186,24 @@ conservan sus validaciones, incluido el mínimo de tres boquillas completas.
 La lectura alternativa de un tag aislado no utiliza el nombre del archivo ni la verdad
 sintética. Solo acepta un identificador único cuando no ha encontrado uno rotulado;
 si hay identificadores contradictorios, conserva la falta de datos como error.
+
+
+## Sistema de referencia interno (C.4, 31/10)
+
+El IFC usa un sistema local dextrógiro, con Z vertical positiva y origen en el centro del equipo
+en planta a nivel del suelo local; no implica georreferenciación ni Norte de planta. Las longitudes
+del contrato se expresan en mm y se convierten una vez a metros en el IFC.
+
+Para las boquillas radiales del recipiente vertical, azimut 0° apunta a +X y 90° a +Y:
+`(x, y, z) = (R cos(a), R sin(a), elevación)`. El giro es antihorario visto desde +Z.
+Los elementos con posición/dirección explícitas usan esos vectores trazados. Cambiar este
+convenio silenciosamente a Norte/horario desplazaría la geometría existente.
+
+En la web, web-ifc incorpora `(X,Y,Z) → (X,Z,-Y)` en `flatTransformation`; el worker aplica
+esa matriz una vez. Se comprobó su base con el IFC sintético, sin render ni inferencia GPU.
+`GET /reference-system` declara unidades, ejes y límites. Las pruebas cardinales y de unidades
+IFC están en `tests/test_plataforma_pitch.py`.
+
+La orientación del Norte de planta y la equivalencia con el IFC de referencia TR **no están
+verificadas**. C.4 permanece parcial hasta disponer de una referencia autorizada. No se ha
+abierto `data/private/` ni se atribuye este convenio matemático a VESOR o a TR.

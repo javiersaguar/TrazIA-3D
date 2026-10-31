@@ -12,6 +12,7 @@ from urllib.parse import quote
 from uuid import uuid4
 
 from fastapi import FastAPI, File, Form, Header, HTTPException, Query, Request, UploadFile
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from pydantic import Field, ValidationError
@@ -37,7 +38,7 @@ from trazia.store import (
     Store,
 )
 
-from . import corrections
+from . import corrections, review_sessions
 from .cors import origins
 from .jobs import TERMINAL, recover_jobs, run_job
 from .repository import check_match, get_revision, read_report, save_revision, seed_demo
@@ -82,6 +83,15 @@ class FieldInput(Model):
     explanation: str | None = Field(default=None, max_length=2000)
     actor: str = Field(min_length=2, max_length=100)
     seconds: float | None = Field(default=None, ge=0, le=3600)
+    review_session_id: str | None = None
+    action: Literal["accept", "correct", "assume", "reject"] | None = None
+    expected: dict | None = None
+
+
+class UndoInput(Model):
+    actor: str = Field(min_length=2, max_length=100)
+    seconds: float | None = Field(default=None, ge=0, le=3600)
+    review_session_id: str | None = None
 
 
 class ApprovalInput(Model):
@@ -103,7 +113,21 @@ def require_key(value: str | None) -> str:
 
 def reply(result: dict):
     headers = {"ETag": f'"{result["version"]}"'} if "version" in result else {}
+    if result.get("audit_id") is not None:
+        headers["X-Audit-Id"] = str(result["audit_id"])
     return JSONResponse(result["data"], status_code=result.get("status", 200), headers=headers)
+
+
+def pending_corrections(result: dict):
+    return JSONResponse(
+        {
+            "detail": "Cambio guardado; la exportación JSONL está pendiente. Reintenta exportar.",
+            "persisted": True,
+            "revision": result["data"],
+        },
+        status_code=503,
+        headers={"ETag": f'"{result["version"]}"', "X-Audit-Id": str(result["audit_id"])},
+    )
 
 
 def create_app(
@@ -162,16 +186,81 @@ def create_app(
         allow_origins=origins(),
         allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
         allow_headers=["Content-Type", "Idempotency-Key", "If-Match", "Last-Event-ID"],
-        expose_headers=["ETag"],
+        expose_headers=["ETag", "X-Audit-Id"],
     )
 
     @app.exception_handler(IdempotencyConflict)
     async def conflict(_, error):
         return JSONResponse({"detail": str(error)}, status_code=409)
 
+    @app.exception_handler(RequestValidationError)
     @app.exception_handler(ValidationError)
     async def invalid(_, error):
-        return JSONResponse({"detail": str(error)}, status_code=422)
+        from .validation import issues_for
+
+        issues = issues_for(error, _.path_params.get("path"))
+        return JSONResponse(
+            {
+                "detail": "No se ha guardado el cambio. "
+                + "; ".join(f"{i['path']}: {i['message']} {i['action']}" for i in issues),
+                "issues": issues,
+            },
+            status_code=422,
+        )
+
+    @app.get("/reference-system")
+    def reference_system():
+        from .validation import REFERENCE_SYSTEM
+
+        return REFERENCE_SYSTEM
+
+    @app.post("/review-sessions", status_code=201)
+    def start_review_session(
+        request: Request,
+        body: review_sessions.SessionInput,
+        idempotency_key: str | None = Header(None),
+    ):
+        def action(session):
+            record = get_revision(session, body.revision_id)
+            return {"data": review_sessions.start(session, record, body), "status": 201}
+
+        return reply(
+            request.app.state.store.perform(
+                "POST review-sessions", require_key(idempotency_key), body.model_dump(), action
+            )
+        )
+
+    @app.post("/review-sessions/{session_id}/finish")
+    def finish_review_session(request: Request, session_id: str, body: review_sessions.FinishInput):
+        with Session(request.app.state.store.engine) as session:
+            return review_sessions.finish(session, session_id, body.active_seconds)
+
+    @app.get("/revisions/{identity}/review-metrics")
+    def review_metrics(request: Request, identity: str):
+        with Session(request.app.state.store.engine) as session:
+            record = get_revision(session, identity)
+            result = review_sessions.metrics(session, record.id)
+            model = Revision.model_validate_json(record.payload)
+            return {
+                **result,
+                "equipment_tag": record.tag,
+                "dataset": model.dataset,
+                "pending_fields": len(model.pending_review()),
+                "approved": model.approval is not None,
+            }
+
+    @app.get("/revisions/{identity}/validation")
+    def review_validation(request: Request, identity: str):
+        from .validation import diagnostics
+
+        with Session(request.app.state.store.engine) as session:
+            record = get_revision(session, identity)
+            return diagnostics(Revision.model_validate_json(record.payload))
+
+    @app.get("/equipment/{tag}/review-metrics")
+    def equipment_review_metrics(request: Request, tag: str, project_id: str | None = None):
+        with Session(request.app.state.store.engine) as session:
+            return review_sessions.equipment_metrics(session, tag, project_id)
 
     @app.get("/health")
     def health():
@@ -302,8 +391,24 @@ def create_app(
             target = fields(model.equipment).get(path)
             if target is None:
                 raise HTTPException(404, "No existe ese campo")
+            if body.expected is not None and type(target).model_validate(body.expected) != target:
+                raise HTTPException(
+                    412, "El campo ha cambiado; recarga y revisa su evidencia antes de editar"
+                )
             if body.state == "corrected" and body.value is None:
                 raise HTTPException(422, "Corregir requiere un valor")
+            expected = {
+                "accept": "accepted",
+                "correct": "corrected",
+                "assume": "assumed",
+                "reject": "abstained",
+            }
+            if body.action and expected[body.action] != body.state:
+                raise HTTPException(422, "La acción no corresponde al estado solicitado")
+            if body.review_session_id:
+                review_sessions.validate_clock(
+                    session, body.review_session_id, record.id, body.actor, body.seconds
+                )
             if body.value is not None:
                 target.value = body.value
                 target.interval = None
@@ -323,11 +428,22 @@ def create_app(
             if body.source is not None:
                 target.source = body.source
             target.state = body.state
-            target.explanation = body.explanation
+            if "explanation" in body.model_fields_set:
+                target.explanation = body.explanation
+            if body.action == "reject":
+                target.explanation = "Rechazado por el revisor. " + (
+                    body.explanation or "Hace falta una lectura nueva."
+                )
             model.approval = None
             model = Revision.model_validate_json(model.model_dump_json())
             return save_revision(
-                session, record, model, path=path, actor=body.actor, seconds=body.seconds
+                session,
+                record,
+                model,
+                path=path,
+                actor=body.actor,
+                seconds=body.seconds,
+                review_session_id=body.review_session_id,
             )
 
         fingerprint = {**body.model_dump(mode="json"), "if_match": if_match}
@@ -336,12 +452,77 @@ def create_app(
         )
         try:
             corrections.flush(request.app.state.store, request.app.state.corrections_file)
+        except (OSError, SQLAlchemyError):
+            return pending_corrections(result)
+        return reply(result)
+
+    @app.post("/revisions/{identity}/audit/{audit_id}/undo", response_model=Revision)
+    def undo_field(
+        request: Request,
+        identity: str,
+        audit_id: int,
+        body: UndoInput,
+        if_match: str | None = Header(None),
+        idempotency_key: str | None = Header(None),
+    ):
+        def action(session):
+            record = get_revision(session, identity)
+            check_match(record, if_match)
+            original = session.get(AuditRecord, audit_id)
+            if not original or original.revision_id != record.id or original.path.startswith("$"):
+                raise HTTPException(404, "No existe esa acción de campo en esta revisión")
+            if session.exec(select(AuditRecord).where(AuditRecord.undo_of == audit_id)).first():
+                raise HTTPException(409, "Esta acción ya se ha deshecho")
+            model = Revision.model_validate_json(record.payload)
+            before = Revision.model_validate_json(original.before_json)
+            after = Revision.model_validate_json(original.after_json)
+            target = fields(model.equipment).get(original.path)
+            old = fields(before.equipment).get(original.path)
+            changed = fields(after.equipment).get(original.path)
+            if target is None or old is None or changed is None or target != changed:
+                raise HTTPException(
+                    409, "El campo ha cambiado después de esta acción; recárgalo antes de deshacer"
+                )
+            if body.review_session_id:
+                review_sessions.validate_clock(
+                    session, body.review_session_id, record.id, body.actor, body.seconds
+                )
+            for key in type(old).model_fields:
+                setattr(target, key, getattr(old, key))
+            model.approval = None
+            model = Revision.model_validate_json(model.model_dump_json())
+            return save_revision(
+                session,
+                record,
+                model,
+                path=original.path,
+                actor=body.actor,
+                seconds=body.seconds,
+                review_session_id=body.review_session_id,
+                undo_of=audit_id,
+            )
+
+        result = request.app.state.store.perform(
+            f"POST undo/{identity}/{audit_id}",
+            require_key(idempotency_key),
+            {**body.model_dump(), "if_match": if_match},
+            action,
+        )
+        try:
+            corrections.flush(request.app.state.store, request.app.state.corrections_file)
+        except (OSError, SQLAlchemyError):
+            return pending_corrections(result)
+        return reply(result)
+
+    @app.post("/correcciones/export")
+    def export_corrections(request: Request):
+        try:
+            corrections.flush(request.app.state.store, request.app.state.corrections_file)
         except (OSError, SQLAlchemyError) as failure:
             raise HTTPException(
-                503,
-                "Campo guardado; falta exportar el JSONL. Reintente con la misma Idempotency-Key",
+                503, "El registro SQL sigue guardado; no se pudo exportar el JSONL"
             ) from failure
-        return reply(result)
+        return {"status": "ok", "detail": "JSONL actualizado"}
 
     @app.get("/correcciones")
     def correction_log(request: Request, desde: datetime | None = None):
@@ -390,8 +571,14 @@ def create_app(
             ).all()
             return {
                 "actions": [a.model_dump() for a in actions],
-                "review_seconds": sum(a.seconds or 0 for a in actions),
+                "review_seconds": (
+                    sum(a.seconds or 0 for a in actions)
+                    if any(a.seconds is not None for a in actions)
+                    else None
+                ),
                 "timed_actions": sum(a.seconds is not None for a in actions),
+                "untimed_actions": sum(a.seconds is None for a in actions),
+                "measurement": "sum_reported_action_seconds",
             }
 
     @app.get("/revisions/{identity}/ifc")
@@ -723,15 +910,62 @@ def create_app(
         await request.app.state.queue.enqueue(result["data"]["job_id"])
         return reply(result)
 
+    @app.get("/learning/few-shot")
+    def few_shot(
+        request: Request,
+        path: str | None = None,
+        strategy: str | None = None,
+        target_revision_id: str | None = None,
+        limit: int = Query(3, ge=1, le=5),
+    ):
+        from .few_shot import select_examples
+
+        target = None
+        if target_revision_id:
+            with Session(request.app.state.store.engine) as session:
+                target = Revision.model_validate_json(
+                    get_revision(session, target_revision_id).payload
+                )
+        return select_examples(
+            request.app.state.store, path=path, strategy=strategy, target=target, limit=limit
+        )
+
+    @app.get("/learning/few-shot/{example_id}/evidence")
+    def few_shot_evidence(request: Request, example_id: str):
+        from .learning import approved_examples
+
+        store = request.app.state.store
+        cursor = 0
+        for _ in range(50):
+            page = approved_examples(store, after=cursor, limit=200)
+            match = next((e for e in page["examples"] if e["id"] == example_id), None)
+            if match:
+                if not match["document"]["filename"].lower().endswith(".pdf"):
+                    raise HTTPException(422, "Este ejemplo no tiene una evidencia PDF renderizable")
+                from .few_shot import render_evidence
+
+                return Response(
+                    render_evidence(store, match),
+                    media_type="image/png",
+                    headers={"Cache-Control": "no-store"},
+                )
+            cursor = page["next_cursor"]
+            if cursor is None:
+                break
+        raise HTTPException(404, "El ejemplo no existe o su aprobación ya no es vigente")
+
     @app.post("/copiloto", response_model=CopilotAnswer)
     async def copilot(request: Request, body: CopilotInput):
         if not body.question.strip():
             raise HTTPException(422, "Escribe una pregunta")
         store = request.app.state.store
+        from .few_shot import select_examples
+
         with Session(store.engine) as session:
             record = get_revision(session, body.revision_id)
             revision = Revision.model_validate_json(record.payload)
             identity, version = record.id, record.version
+            examples = select_examples(store, path=body.path, target=revision, limit=2)
             previous = None
             previous_version = None
             if body.previous_id:
@@ -756,6 +990,7 @@ def create_app(
                         path=body.path,
                         previous=previous,
                         read_document=store.read,
+                        examples=examples,
                     )
         except CopilotUnavailable as error:
             raise HTTPException(503, str(error)) from error

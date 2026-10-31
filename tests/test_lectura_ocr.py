@@ -87,7 +87,7 @@ def test_b_with_ocr_reads_a_scanned_drawing(scanned_case, monkeypatch, tmp_path)
         strategy="b_reglas+ocr",
         on_event=events.append,
     )
-    assert not plain.candidates
+    assert [c.channel for c in plain.candidates] == ["nombre_archivo"]
     assert any(e.stage == "ocr" and e.status == "ok" for e in events)
     truth = json.loads((scanned_case / "truth" / f"{tag}.json").read_text(encoding="utf-8"))
     found = {c.path: c for c in ocr.candidates}
