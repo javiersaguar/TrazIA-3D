@@ -270,6 +270,26 @@ def test_a_draft_with_two_nozzles_can_be_reviewed_but_not_approved(revision):
         approve(draft, "Revisora", {"GA-V101": originals(revision)["GA-V101"]})
 
 
+def test_a_draft_with_an_unplaced_nozzle_cannot_be_approved(revision):
+    """Tres boquillas colocadas y una cuarta leída fuera de la virola: nadie la ha revisado."""
+    bundle = ingest_bytes(originals(revision)["GA-V101"], "drawing.pdf", "GA-V101", "A")
+    candidates = LabelExtractor().extract([bundle])
+    copies = [
+        c.model_copy(update={"path": c.path.replace("N1", "N9")}, deep=True)
+        for c in candidates
+        if c.path.startswith("nozzles.N1.")
+    ]
+    next(c for c in copies if c.path.endswith(".elevation")).value = 90000.0
+    draft = assemble(
+        [bundle], candidates + copies, project_id="DEMO", equipment_id="V101", revision="A"
+    )
+    assert len(draft.equipment.nozzles) == 3 and draft.unplaced_nozzles == ["N9"]
+    for traced in fields(draft.equipment).values():
+        traced.state = "accepted"
+    with pytest.raises(ValueError, match="sin colocar"):
+        approve(draft, "Revisora", {"GA-V101": originals(revision)["GA-V101"]})
+
+
 def test_an_empty_unplaced_list_does_not_change_approved_fingerprints(revision):
     data = revision.model_dump(mode="json")
     data.pop("unplaced_nozzles")

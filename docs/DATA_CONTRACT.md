@@ -32,6 +32,7 @@ Se conservan los nombres de todos los campos de 0.2. Se añaden:
 - `Revision.unplaced_nozzles`: marcas leídas que no entraron en el modelo (incompletas o fuera de
   la virola). `compare` no las informa como altas ni bajas y las devuelve en `unplaced_nozzles`.
   Vacío no cuenta para la huella: las aprobaciones anteriores siguen siendo válidas.
+  Una revisión con boquillas sin colocar no se puede aprobar: nadie las ha revisado.
   Un coste desconocido es null; no se transforma en cero.
 
 `source.reviewed` se sincroniza con `state in (accepted, corrected)`; un supuesto no equivale a

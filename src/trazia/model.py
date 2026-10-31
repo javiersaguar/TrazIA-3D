@@ -491,6 +491,14 @@ class Revision(Model):
                 raise ValueError(
                     "El recipiente vertical de nivel 2/3 necesita al menos tres boquillas"
                 )
+            # Una boquilla leída que no entró en el modelo no la ha visto nadie en la revisión:
+            # aprobar así dejaría fuera del IFC aprobado un dato del plano sin decisión humana.
+            if self.unplaced_nozzles:
+                raise ValueError(
+                    "Hay boquillas leídas sin colocar en el modelo ("
+                    + ", ".join(self.unplaced_nozzles)
+                    + "): hay que resolverlas antes de aprobar"
+                )
             if self.approval.input_sha256 != self.fingerprint():
                 raise ValueError("La aprobación no corresponde a estos datos; vuelva a revisar")
         return self

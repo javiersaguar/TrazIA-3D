@@ -84,6 +84,9 @@ def test_default_strategy_falls_back_to_b_with_a_warning_until_d_exists():
 
 
 def test_the_tag_falls_back_to_the_filename_when_no_document_has_it(monkeypatch):
+    # Sin la calibración local de generated/: con ella, el tag del nombre (confianza 0,6) queda
+    # «abstenido» en vez de «candidato». Los dos piden revisión; la prueba no depende de la máquina.
+    monkeypatch.setenv("TRAZIA_CALIBRATION", "off")
     original = pipeline._ground
 
     def without_tag(*args, **kwargs):  # como un plano sin cajetín
