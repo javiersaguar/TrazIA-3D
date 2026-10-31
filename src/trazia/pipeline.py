@@ -181,7 +181,8 @@ def process(
             "family",
             "ok",
             equipment_id,
-            f"Recipiente vertical · {len(model.equipment.nozzles)} boquillas.",
+            f"{model.equipment.kind} · LOD {model.equipment.lod} · "
+            f"{len(model.equipment.nozzles)} boquillas.",
         )
     )
     try:

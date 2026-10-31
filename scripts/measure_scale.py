@@ -85,6 +85,12 @@ def summarise(rows, seconds, upload_seconds):
         "equipment": len({(r["dataset"], r["tag"]) for r in rows}),
         "conditions": len(groups),
         "statuses": dict(states),
+        "successful_lods": dict(
+            Counter(str(row.get("lod", "unknown")) for row in rows if row["status"] == "done")
+        ),
+        "errors_by_message": dict(
+            Counter(row.get("error") or row["status"] for row in rows if row["status"] != "done")
+        ),
         "seconds_batch": seconds,
         "seconds_upload": upload_seconds,
         "throughput_terminal_per_second": throughput,
@@ -220,8 +226,28 @@ def run(
         for identity, (task, stamp) in list(pending.items()):
             job = request("/jobs/" + identity)
             if job["status"] in TERMINAL:
+                model_info = {}
+                if job["status"] == "done":
+                    project = f"S-{run_id}-{task['dataset']}-{task['degradation']}"
+                    try:
+                        model = request(
+                            f"/equipment/{urllib.parse.quote(task['tag'])}/revisions/{task['revision']}?"
+                            + urllib.parse.urlencode({"project_id": project})
+                        )
+                        model_info = {
+                            "lod": model["equipment"]["lod"],
+                            "equipment_kind": model["equipment"]["kind"],
+                        }
+                    except urllib.error.HTTPError as error:
+                        model_info = {
+                            "inspection_error": (
+                                f"HTTP {error.code}: no se pudo inspeccionar "
+                                "el modelo con el tag solicitado"
+                            )
+                        }
                 rows.append(
                     {k: v for k, v in task.items() if k != "files"}
+                    | model_info
                     | {
                         "job_id": identity,
                         "status": job["status"],

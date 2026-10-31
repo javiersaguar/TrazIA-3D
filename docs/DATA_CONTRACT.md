@@ -162,3 +162,23 @@ menor de 0,1 mm para el informe no conserva una aprobación si el dato fue modif
 Tolerancia angular por defecto: 0,01 grados con distancia circular. Los atributos numéricos
 usan equivalencia de unidades con Pint; las temperaturas con C se interpretan como degC
 solo en campos de temperatura. Las tolerancias se pueden pasar por ruta al comparador.
+
+
+## Entrada de envolventes LOD 1 (31/10)
+
+El ensamblador acepta candidatos trazados `envelope.origin.{x,y,z}` y
+`envelope.size.{x,y,z}` en mm. Las seis componentes y el tag deben estar presentes;
+no se rellenan dimensiones ausentes. Se conserva el contrato 0.3 sin renombrar campos.
+`attributes.equipment_type="pump"` identifica una bomba; sin esa clasificación la
+familia es `generic`, siempre LOD 1.
+
+El lector de bombas reconoce un alzado lateral, una planta y su nota de datum, y lee
+las tres cotas exteriores. La esquina inferior local de representación se declara
+explícitamente `assumed`: requiere confirmar su alineación con la planta. No se modelan
+el motor ni salientes de boquillas que el lector no haya determinado. El IFC contiene
+la envolvente declarada; el visor representa ese IFC. Los recipientes de LOD 2/3
+conservan sus validaciones, incluido el mínimo de tres boquillas completas.
+
+La lectura alternativa de un tag aislado no utiliza el nombre del archivo ni la verdad
+sintética. Solo acepta un identificador único cuando no ha encontrado uno rotulado;
+si hay identificadores contradictorios, conserva la falta de datos como error.

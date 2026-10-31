@@ -122,6 +122,13 @@ class DrawingExtractor:
                 pages[line.source.page].append(line)
             found: list[Candidate] = []
             for page_lines in pages.values():
+                from .mechanical import pump_envelope
+
+                mechanical = pump_envelope(page_lines, ctx.decimal)
+                if mechanical is not None:
+                    found += mechanical
+                    found += self._design_data(_rows(page_lines), ctx)
+                    continue
                 rows = _rows(page_lines)
                 table, region = self._nozzle_table(rows, ctx)
                 found += table
@@ -310,6 +317,20 @@ class DrawingExtractor:
                         out.append(
                             _candidate("tag", tag.text.strip(), "1", tag, 0.85, "Cajetín · equipo")
                         )
+        if not any(candidate.path == "tag" for candidate in out):
+            # Un identificador aislado se puede leer sin conocer el rótulo del proveedor.
+            # No usar el nombre del fichero ni escoger uno entre varios tags contradictorios.
+            identifiers = {}
+            for line in lines:
+                text = line.text.strip().upper()
+                if re.fullmatch(r"[A-Z]{1,4}\s*[-–]\s*\d{2,}(?:\s*[A-Z])?", text):
+                    value = re.sub(r"\s", "", text).replace("–", "-")
+                    identifiers.setdefault(value, line)
+            if len(identifiers) == 1:
+                value, line = next(iter(identifiers.items()))
+                out.append(
+                    _candidate("tag", value, "1", line, 0.75, "Identificador de equipo aislado")
+                )
         return out
 
     # Cotas verticales del alzado ------------------------------------------------------------
