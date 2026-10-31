@@ -136,7 +136,9 @@ def _value_kind(row: dict) -> str | None:
     """Clase del valor emitido; las filas antiguas no la guardan y se deduce del campo."""
     if "value_kind" in row:
         return row["value_kind"]
-    path = row["path"]
+    path = row.get("path")
+    if path is None:  # filas de correcciones aprobadas (bench.recalibrar): solo traen la clase
+        return row.get("kind")
     if path == "tag" or path.endswith(".material") or path.endswith(".service"):
         return None
     if path.endswith(".azimuth"):
