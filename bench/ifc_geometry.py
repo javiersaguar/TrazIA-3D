@@ -24,7 +24,10 @@ def element_boxes(model: ifcopenshell.file) -> dict[str, tuple]:
         verts = shape.geometry.verts
         xs, ys, zs = verts[0::3], verts[1::3], verts[2::3]
         name = product.Name or product.GlobalId
-        key = name.split("/", 1)[1] if "/" in name else "shell"
+        # Sin «TAG/», solo el tanque es la virola: un IFC externo no puede colapsar en una clave.
+        key = name.split("/", 1)[1] if "/" in name else name
+        if "/" not in name and product.is_a("IfcTank"):
+            key = "shell"
         boxes[key] = (
             (min(xs) * 1000, min(ys) * 1000, min(zs) * 1000),
             (max(xs) * 1000, max(ys) * 1000, max(zs) * 1000),

@@ -228,7 +228,11 @@ Resultados en `docs/ESTUDIO.md`, «Estudio 3». Puntuación GA2MODEL con IC 95 %
   3 usan los nombres de antes: allí `d_hibrido` es la heurística y `d_hibrido+fusion` la aprendida.
 - Calibración v5: D sin curva isotónica e intervalos recalculados. En S-reservado, ECE 0,066 y
   cobertura del intervalo 91,5 %; con abstención se queda el 69 % de los campos con un riesgo del
-  8,3 %. El estudio 4, con la D nueva, está en curso.
+  8,3 %. Medida en el estudio 5 de `docs/ESTUDIO.md`.
+- Estudio 6, sobre `main` `b3c3ebf` (fusión aprendida + PR de Alejandro): D 0,703 [0,671; 0,736],
+  ECE 0,036, F1 de cambios 56,0 %, 82,3 % de modelos y 0,614 en S-reservado. La heurística queda en
+  0,691 (McNemar 78/25, p ≈ 2·10⁻⁷). Son las cifras de D que hay que citar a partir de ahora;
+  `generated/estudio/` ya las tiene (el estudio 5 queda en `generated/estudio-5/`).
 
 ### Proveedores de visión (31/10, tarde)
 
@@ -246,7 +250,33 @@ Resultados en `docs/ESTUDIO.md`, «Estudio 3». Puntuación GA2MODEL con IC 95 %
     (429), Llama 4 Scout en Cloudflare (JSON roto) y Moondream (otro formato de entrada).
 - `python -m bench.proveedores` mide cada modelo como lector de A junto a Qwen3-VL local y A sin
   visión, y cuenta las teselas fallidas por cuota: un modelo con fallos no está medido del todo.
-  Primera ronda en curso.
+- **Fallo encontrado y corregido en el adaptador de Gemini** (anterior a esta sesión): Gemini da
+  las cajas como `[y1, x1, y2, x2]` aunque se le pidan en `[x1, y1, x2, y2]`. Comparado con otros
+  cinco modelos sobre la misma tesela. Cada texto quedaba en otro sitio del plano y de ahí salía
+  un 50 % de alucinación. El adaptador las gira y no reutiliza las respuestas guardadas antes.
+
+**Primera ronda** (4 revisiones escaneadas: 1 equipo de S-dev y 1 de S-reservado, escaneado
+limpio, rev1 y rev2; calibración v5; `generated/proveedores-r1b/`). **Datos sintéticos.**
+
+| Lector de A | Puntuación | Alucinación | s/rev | Teselas fallidas |
+| --- | ---: | ---: | ---: | ---: |
+| OpenRouter `nvidia/nemotron-3.5-super-vl:free` | 0,363 | 9,7 % | 32 | 0 |
+| NVIDIA `nvidia/nemotron-3.5-super-vl-120b-a12b` | 0,359 | 8,6 % | 25 | 0 |
+| Gemini `gemini-3.5-flash-lite` | 0,355 | 11,4 % | 32 | 0 |
+| *A sin visión (`a_geometria`)* | *0,352* | *0 %* | *3* | — |
+| Cloudflare `@cf/qwen/qwen3.8-27b` | 0,334 | 6,7 % | 245 | 7 |
+| *Qwen3-VL 4B local* | *0,295* | *3,5 %* | *103* | — |
+| Groq `qwen/qwen3.8-27b` | 0,150 | 0 % | 169 | 2 |
+
+- `gemini-3.8-flash` no está medido: sus 24 teselas fallaron (503 por saturación y luego 429 por
+  cuota). Los segundos incluyen esperas por límite de tasa y, en las filas con caché, no son el
+  tiempo real del modelo.
+- **Conclusión.** Ningún modelo externo mejora a A sin visión y todos los que empatan alucinan
+  muy por encima del 1 %. Con 4 revisiones los intervalos son anchos: es una indicación, no un
+  resultado cerrado. No se hace la segunda ronda de 20 revisiones: las cuotas gratuitas de
+  OpenRouter, Groq y Cloudflare no llegan y no hay señal de mejora que justifique gastarlas.
+- **1.9:** segundo proveedor real comprobado con seis modelos sobre la misma página. Falta el de
+  la plataforma IndesIA. **2.2:** Mistral sigue sin clave.
 
 ### 1.9 y 2.2 · Mistral
 

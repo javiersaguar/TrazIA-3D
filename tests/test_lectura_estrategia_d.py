@@ -7,9 +7,11 @@ import pytest
 from bench.estudio import reviewed_by_oracle
 from synthetic.sets import generate_set
 from trazia.extraction import Candidate
+from trazia.ingest import ingest_bytes
 from trazia.model import Source
 from trazia.pipeline import InputDocument, process
-from trazia.strategies.d_hibrido import fuse
+from trazia.strategies.base import StrategyContext
+from trazia.strategies.d_hibrido import HybridStrategy, fuse
 
 
 def cand(value, channel, conf=0.8, bbox=(0.1, 0.1, 0.2, 0.12), text=None, path="height"):
@@ -114,6 +116,39 @@ def test_hybrid_ignores_a_draft_previous_revision(dev_set, monkeypatch, tmp_path
     assert "borrador" in skipped[0].detail
     assert not any(c.channel == "memoria_revision" for c in result.candidates)
     assert any("Memoria de revisión omitida" in w for w in result.warnings)
+
+
+def test_memory_does_not_bring_back_a_nozzle_whose_row_is_gone(dev_set, monkeypatch, tmp_path):
+    monkeypatch.setenv("TRAZIA_RAG_LIBRARY", str(tmp_path / "sin-biblioteca.json"))
+    approved = []
+
+    def review(revision, truth, docs):
+        approved.append(reviewed_by_oracle(revision, truth, docs))
+        return approved[-1]
+
+    _run_case(dev_set, review)
+    previous = approved[0]
+    gone = previous.equipment.nozzles[0].id
+    tag = previous.equipment.id.upper()
+    path = dev_set / "vectorial" / tag / f"GAD_{tag}_rev1.pdf"
+    bundle = ingest_bytes(path.read_bytes(), path.name, f"GA-{tag}", "1")
+    # El mismo plano, con la fila de esa boquilla ocupada por otra: el valor sigue en su región.
+    lines = [
+        line.model_copy(update={"text": "N99"}) if line.text.strip() == gone else line
+        for line in bundle.lines
+    ]
+    ctx = StrategyContext(
+        bundles=[bundle.model_copy(update={"lines": lines})],
+        dataset="synthetic",
+        previous=previous,
+        providers=None,
+        emit=lambda event: None,
+        raw={},
+        equipment_id=previous.equipment.id,
+    )
+    found = {c.path for c in HybridStrategy()._memory(ctx, {}).candidates}
+    assert not any(p.startswith(f"nozzles.{gone}.") for p in found)
+    assert any(p.startswith("nozzles.") for p in found)
 
 
 def test_memory_is_refused_when_data_changed_after_approval(dev_set, monkeypatch, tmp_path):

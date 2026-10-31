@@ -333,3 +333,167 @@ limpio, 10 condiciones, 6 equipos. Salida en `generated/estudio-avision/`.
   fallo visto en la demo V-101.
 - **Excepción.** Los canales apagados al entrenar la fusión responden al diagnóstico del 30/10, que
   salió de S-reservado.
+
+### Estudio 4 · correcciones de delta y DRAFT revisable (31/10/2026)
+
+> **Base de estas cifras:** `a4dd9a7`, antes de integrar la fusión aprendida del estudio 3. Sobre
+> `origin/main` solo se ha comprobado que pasan las 317 pruebas y el recorrido por la API; la
+> comparación medida con esa fusión sigue pendiente. No citar estas cifras como resultado de D con
+> fusión aprendida.
+
+Mismos conjuntos, semillas y 1.000 remuestreos que el estudio 2. **Datos sintéticos.** Calibración
+reajustada solo con S-dev, sha256 `585563fae0d9…`. No es comparable al céntimo con el estudio 2:
+esta máquina no tiene la caché del detector propio. La línea base se repitió aquí con el mismo
+arnés y da 0,633, frente a 0,642 publicado, una diferencia que coincide con el aporte del detector.
+
+| Variante | Puntuación | IC 95 % | Geometría | Atributos | ECE | F1 cambios | Cobertura 90 % | Modelos |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `d_hibrido` | **0,678** | [0,645; 0,710] | 47,7 % | 89,5 % | 0,112 | 57,7 % | 96,9 % | 82,5 % |
+| `d_hibrido` antes | 0,633 | [0,601; 0,665] | 42,0 % | 89,5 % | 0,107 | 44,5 % | 95,2 % | 45,0 % |
+| `d_hibrido-memoria` | 0,673 | [0,639; 0,706] | 47,5 % | 89,5 % | 0,125 | 57,0 % | 97,1 % | 82,5 % |
+| `c_rag` | 0,591 | [0,542; 0,634] | 33,9 % | 82,6 % | 0,136 | 46,8 % | 93,7 % | 67,1 % |
+| `b_reglas` | 0,548 | [0,509; 0,588] | 20,6 % | 80,8 % | 0,006 | 37,4 % | 100 % | 33,3 % |
+
+Alucinación 0 % y cita 100 % en todas.
+
+| D, antes → después | Puntuación | F1 cambios |
+| --- | --- | --- |
+| Vectorial | 0,893 → 0,919 | 82,2 % → 93,4 % |
+| Escaneado limpio | 0,527 → 0,632 | 14,1 % → 49,2 % |
+| Escaneado pobre | 0,414 → 0,468 | 6,6 % → 25,1 % |
+| S-dev | 0,702 → 0,750 | 48,2 % → 63,2 % |
+| S-reservado | 0,526 → 0,566 | 38,9 % → 48,4 % |
+| S-adversarial (aparte) | 0,942 → 0,999 | 71,4 % → 100 % |
+
+Por pasos, en una pasada sin calibrar sobre S-dev y S-reservado (F1 de cambios):
+
+| Paso | F1 | Lectura |
+| --- | --- | --- |
+| Línea base | 44,5 % | 74 de 120 casos sin modelo en alguna revisión; 73 son escaneados |
+| Memoria comprueba la marca en la fila + boquilla que no cabe fuera del modelo | 50,1 % | Las 12 boquillas eliminadas que la memoria resucitaba desaparecen |
+| Tolerancias de ROADMAP F.2 (±1 mm, ±0,5°) | 51,3 % | 17 falsos cambios de 0,1 a 0,3 mm |
+| Tag desde el nombre del archivo | 51,3 % | Sin efecto medible aquí; necesario porque el dataset llega sin cajetines |
+| DRAFT con menos de 3 boquillas | 44,8 % | Muchos más modelos, pero 341 falsos altas y bajas |
+| `unplaced_nozzles`: leída y sin colocar no es alta ni baja | 57,7 % | Precisión 0,61 y recall 0,55, frente a 0,71 y 0,32 en la línea base |
+
+Lo que cambia respecto al estudio 2:
+
+- **H5 sigue rechazada, pero la memoria ya no resta.** Quitarla vale ahora −0,005 [−0,009; −0,002]
+  y baja el F1 de 57,7 % a 57,0 %. El 45,9 % frente a 51,3 % del estudio 2 era un fallo: la memoria
+  heredaba la región sin comprobar la marca y mantenía viva una boquilla eliminada.
+- **Alucinación 0 % no detectó ese fallo:** el número estaba en la región citada, pero era de otra
+  boquilla. Esa cifra mide si el valor existe en la cita, no si es del campo correcto.
+- **La media esconde el reparto.** Dos de cada tres condiciones son escaneados porque así lo decidió
+  el generador. Con planos vectoriales, D ya está en 93,4 % de F1; la proporción real se desconoce
+  hasta resolver la tarea 0.9.
+- **La calibración no mejora.** En S-reservado, D pasa de ECE bruta 0,142 a 0,267 calibrada, igual
+  que antes. Sigue siendo el reparto de `geometria|vector`: 593 campos con 95 % de acierto que la
+  curva deja en 0,36.
+
+Límites de esta medición:
+
+- Se midió con `bench.estudio.run_case` en lotes cortos, no con `python -m bench.estudio`. Ese
+  proceso largo cayó tres veces en esta máquina con una violación de acceso en
+  `ifcopenshell.create_shape`. En lotes no cayó ninguno de los 528 casos, y las 198 revisiones
+  guardadas pasan aisladas; la causa exacta queda sin confirmar.
+- Sin detector propio, y sin repetir las ablaciones de geometría y RAG.
+- El diagnóstico miró resultados de S-reservado, que ya no era una medida a ciegas.
+- El F1 de esta sección usa las tolerancias nuevas, más próximas a las de la verdad del bench; la
+  línea base usa las antiguas.
+
+### Estudio 5 · D con fusión aprendida por defecto (31/10/2026, tarde)
+
+**Datos.** Mismos conjuntos, degradaciones, oráculo y remuestreos que el estudio 3, sobre `main`
+`e46573d` (sin las correcciones del estudio 4). **Datos sintéticos.** Cambian dos cosas:
+
+- `d_hibrido` es ya D con fusión aprendida (el modelo versionado en
+  `src/trazia/strategies/fusion_model.json`, el mismo del estudio 3). La heurística pasa a
+  `d_hibrido+heuristica`. Las ablaciones de D usan ahora la fusión aprendida.
+- Calibración v5 (sha256 `dd2f98c238da…`): D sin curva isotónica. Las curvas generales, que usan
+  las variantes sin curva propia (A, por ejemplo), ya no incluyen las lecturas de D. Por eso A y B
+  no puntúan igual que en el estudio 3: se comparan solo dentro de este estudio.
+
+Puntuación GA2MODEL sobre el conjunto puntuado (S-dev + S-reservado):
+
+| Variante | Puntuación | IC95 | ECE | Cobertura del intervalo | S-reservado | s/rev |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| `d_hibrido` | **0,670** | [0,639; 0,703] | **0,038** | 96,9 % | **0,571** | 1,9 |
+| `d_hibrido+heuristica` | 0,653 | [0,621; 0,686] | 0,058 | 93,7 % | 0,567 | 1,9 |
+| `b_reglas+ocr` | 0,588 | [0,535; 0,642] | 0,038 | 98,7 % | 0,380 | 0,4 |
+| `c_rag` | 0,567 | [0,516; 0,618] | 0,088 | 77,7 % | 0,386 | 0,4 |
+| `a_geometria` | 0,563 | [0,528; 0,595] | 0,116 | 95,3 % | 0,551 | 1,5 |
+| `b_reglas` | 0,536 | [0,494; 0,579] | 0,007 | 100 % | 0,386 | 0,03 |
+
+- **Fusión aprendida frente a heurística.** McNemar sobre 7.452 campos: 83 que solo acierta la
+  aprendida y 28 que solo acierta la heurística (p ≈ 2·10⁻⁷). Δ de puntuación −0,018 al volver a
+  la heurística, IC95 [−0,032; −0,005].
+- **Ablaciones de D con la fusión aprendida** (Δ de puntuación al quitar el canal, IC95):
+
+  | Canal quitado | Δ | IC95 | Campos que solo acierta D / solo la ablación |
+  | --- | ---: | --- | --- |
+  | Geometría | −0,077 | [−0,109; −0,045] | 675 / 8 |
+  | RAG | −0,017 | [−0,029; −0,007] | 259 / 3 |
+  | Memoria | +0,002 | [−0,012; +0,016] | 23 / 0 |
+  | Detector | +0,001 | [−0,018; +0,016] | 166 / 43 |
+
+  Con la fusión aprendida, el RAG pesa menos que con la heurística (−0,017 frente a −0,075): la
+  fusión aprende cuándo fiarse de las tablas y del dibujo sin él. Memoria y detector aciertan
+  campos (23 y 166 que solo acierta D), pero su efecto en la puntuación no se distingue de cero.
+- **Recomendación** (S-dev): `b_reglas` en vectorial y `d_hibrido` en escaneado. El selector
+  fijado en S-dev sigue perdiendo en S-reservado: 0,388 frente a 0,571 de `d_hibrido` solo.
+
+### Estudio 6 · fusión aprendida con las correcciones del estudio 4 (31/10/2026, noche)
+
+**Datos.** Mismos conjuntos, degradaciones, oráculo y 1.000 remuestreos que el estudio 5, sobre
+`main` `b3c3ebf`: fusión aprendida por defecto (estudio 5) más las correcciones de delta, memoria,
+tag desde el nombre y `unplaced_nozzles` (estudio 4). Calibración v5 (sha256 `dd2f98c238da…`),
+con detector propio. **Datos sintéticos.** Es la primera medida de D con todo junto: sustituye a
+las cifras de D de los estudios 4 y 5.
+
+Se lanzó con `python -m bench.estudio` en un solo proceso largo y terminó sin la caída de
+`ifcopenshell.create_shape` que vio el estudio 4.
+
+| Variante | Puntuación | IC95 | ECE | Cobertura del intervalo | F1 cambios | Modelos (S-reservado) | S-reservado | s/rev |
+| --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `d_hibrido` | **0,703** | [0,671; 0,736] | **0,036** | 96,9 % | 56,0 % | **82,3 %** | **0,614** | 1,6 |
+| `d_hibrido+heuristica` | 0,691 | [0,659; 0,725] | 0,057 | 93,9 % | 57,0 % | 78,1 % | 0,606 | 1,6 |
+| `b_reglas+ocr` | 0,609 | [0,562; 0,656] | 0,038 | 98,7 % | 43,3 % | 64,6 % | 0,435 | 0,3 |
+| `c_rag` | 0,600 | [0,556; 0,644] | 0,092 | 77,7 % | 46,8 % | 53,1 % | 0,454 | 0,3 |
+| `a_geometria` | 0,581 | [0,544; 0,615] | 0,117 | 95,3 % | 47,9 % | 80,2 % | 0,573 | 2,2 |
+| `b_reglas` | 0,545 | [0,507; 0,584] | 0,019 | 100 % | 37,4 % | 33,3 % | 0,420 | 0,02 |
+
+Alucinación 0 % y cita 100 % en todas salvo `a_detector` (3,7 %, no elegible).
+
+D por degradación: vectorial 0,946, escaneado limpio 0,643 y escaneado pobre 0,480.
+
+Frente a los estudios anteriores:
+
+- **D sube a 0,703**, desde 0,670 (estudio 5, fusión aprendida sin las correcciones) y 0,678
+  (estudio 4, correcciones sin la fusión aprendida). En S-reservado pasa a 0,614, frente a 0,571
+  y 0,566. Las dos mejoras se suman; los intervalos de 0,703 y 0,670 se solapan, así que la cifra
+  que cuenta es la pareada de abajo.
+- **La ECE se mantiene en 0,036**, frente a 0,112 del estudio 4: la calibración v5 sin curva
+  isotónica para D sigue funcionando con las correcciones.
+- **El F1 de cambios queda en 56,0 %**, algo por debajo del 57,7 % del estudio 4 y del 57,0 % de
+  la heurística. La fusión aprendida gana en atributos (92,5 % frente a 90,3 %) y en modelos
+  construidos, y cede algo en detección de cambios. No se ha medido si esa diferencia de F1 es
+  significativa.
+- **Fusión aprendida frente a heurística.** McNemar sobre 7.452 campos: 78 que solo acierta la
+  aprendida y 25 que solo acierta la heurística (p ≈ 2·10⁻⁷). Δ de puntuación al volver a la
+  heurística −0,013, IC95 [−0,025; −0,000]: la ventaja se reduce respecto al estudio 5 (−0,018)
+  porque las correcciones también ayudan a la heurística.
+- **Ablaciones de D** (Δ de puntuación al quitar el canal, IC95):
+
+  | Canal quitado | Δ | IC95 | Campos que solo acierta D / solo la ablación |
+  | --- | ---: | --- | --- |
+  | Geometría | −0,067 | [−0,096; −0,038] | 670 / 10 |
+  | RAG | −0,014 | [−0,020; −0,008] | 251 / 4 |
+  | Memoria | −0,003 | [−0,007; 0,000] | 0 / 0 |
+  | Detector | +0,001 | [−0,013; +0,018] | 176 / 40 |
+
+  La memoria ya no cambia ningún campo: su efecto llega solo por los modelos y los cambios entre
+  revisiones (S-reservado 0,614 con ella, 0,609 sin ella). El detector acierta 136 campos más de
+  los que falla, pero su efecto en la puntuación sigue sin distinguirse de cero.
+- **Recomendación** (S-dev): `b_reglas` en vectorial y `d_hibrido` en escaneado. El selector
+  fijado en S-dev sigue perdiendo en S-reservado: 0,472 frente a 0,614 de `d_hibrido` solo. Se
+  mantiene D para todo.

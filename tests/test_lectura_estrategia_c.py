@@ -58,4 +58,5 @@ def test_c_abstains_without_library(tmp_path, monkeypatch, library):
     monkeypatch.setenv("TRAZIA_RAG_LIBRARY", str(tmp_path / "no-existe.json"))
     manifest = json.loads((dataset / "manifest.json").read_text(encoding="utf-8"))
     result = _run(dataset, manifest["cases"][0]["tag"])
-    assert not result.candidates and result.revision is None
+    assert [c.channel for c in result.candidates] == ["nombre_archivo"]
+    assert result.revision is None

@@ -67,6 +67,24 @@ def memory_blocker(previous: Revision) -> str | None:
 POOL_SINK: list | None = None
 
 
+def _mark_on_row(lines, line, mark: str) -> bool:
+    """La marca de la boquilla sigue en la fila del valor leído, en el documento actual.
+
+    Heredar la región no prueba que la boquilla exista: si se quitó o cambió de fila, en esa región
+    hay los datos de otra, y el número sí está en la cita.
+    """
+    from .c_rag import CELL, _mark_text
+
+    y = (line.source.bbox[1] + line.source.bbox[3]) / 2
+    return any(
+        other.source.page == line.source.page
+        and other.source.bbox is not None
+        and _mark_text(other.text) == mark
+        and abs((other.source.bbox[1] + other.source.bbox[3]) / 2 - y) <= CELL[1]
+        for other in lines
+    )
+
+
 class HybridStrategy:
     def __init__(
         self,
@@ -189,7 +207,7 @@ class HybridStrategy:
 
     # Memoria de revisión ---------------------------------------------------------------------
     def _memory(self, ctx: StrategyContext, evidence) -> StrategyOutput:
-        from .c_rag import CELL, MOVING, _mark_text, _nearest, _parser
+        from .c_rag import CELL, MOVING, _nearest, _parser
 
         previous = fields(ctx.previous.equipment)
         out: list[Candidate] = []
@@ -215,7 +233,9 @@ class HybridStrategy:
                     line = _nearest(lines, source.page, source.bbox, window, parser)
                     if line is None:
                         continue
-                    if path.startswith("nozzles.") and _mark_text(path.split(".")[1]) is None:
+                    if path.startswith("nozzles.") and not _mark_on_row(
+                        lines, line, path.split(".")[1]
+                    ):
                         continue
                 value, unit = parser(line.text.split("=")[-1].strip() if source.cell else line.text)
                 previous_value = field.value

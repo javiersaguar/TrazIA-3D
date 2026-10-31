@@ -22,12 +22,17 @@ Se conservan los nombres de todos los campos de 0.2. Se añaden:
 - `alternatives`: valores/unidades con su propia evidencia; `explanation` explica la incertidumbre.
 - `Source`: confidence_raw, channel, strategy, model, prompt_sha256, grounded,
   text_original y unit_original. Son opcionales: ausencia significa desconocido.
-- `Equipment`: siete tipologías, lod 1/2/3, support y envelope. Las cinco dimensiones y las
-  tres boquillas siguen siendo obligatorias para vertical_vessel con lod >= 2.
+- `Equipment`: siete tipologías, lod 1/2/3, support y envelope. Las cinco dimensiones siguen
+  siendo obligatorias para vertical_vessel con lod >= 2. Las tres boquillas se exigen al aprobar:
+  un DRAFT con menos existe para que se pueda revisar y completar.
 - `Envelope`: origin y size con componentes x/y/z en mm y evidencia por componente. El origen
   puede ser cero o negativo; las dimensiones físicas y los tamaños deben ser positivos.
 - `Nozzle`: service, rating y nozzle_type opcionales.
 - `Revision.run`: estrategia, proveedores, segundos totales/GPU, tokens, coste y llamadas externas.
+- `Revision.unplaced_nozzles`: marcas leídas que no entraron en el modelo (incompletas o fuera de
+  la virola). `compare` no las informa como altas ni bajas y las devuelve en `unplaced_nozzles`.
+  Vacío no cuenta para la huella: las aprobaciones anteriores siguen siendo válidas.
+  Una revisión con boquillas sin colocar no se puede aprobar: nadie las ha revisado.
   Un coste desconocido es null; no se transforma en cero.
 
 `source.reviewed` se sincroniza con `state in (accepted, corrected)`; un supuesto no equivale a
@@ -67,7 +72,7 @@ SKIRT_THICKNESS = 20 mm
 NOZZLE N1: DIAMETER=200 mm; PROJECTION=400 mm; ELEVATION=2500 mm; AZIMUTH=0 deg
 ```
 
-La familia vertical de nivel 2/3 necesita al menos tres boquillas completas. Se normalizan longitudes `mm`, `cm`, `m`
+Para aprobarse, la familia vertical de nivel 2/3 necesita al menos tres boquillas completas. Se normalizan longitudes `mm`, `cm`, `m`
 e `in` a milímetros. Solo se reconocen decimales con punto; no se interpretan separadores
 de miles, unidades implícitas, cotas gráficas o ángulos sin referencia.
 
@@ -158,8 +163,8 @@ los empates cercanos quedan ambiguos y no reciben identidad automáticamente. Su
 es heurístico, no una probabilidad de acierto calibrada.
 
 La comparación separa equivalencia física y tolerancia de la huella: ignorar una diferencia
-menor de 0,1 mm para el informe no conserva una aprobación si el dato fue modificado.
-Tolerancia angular por defecto: 0,01 grados con distancia circular. Los atributos numéricos
+menor de 1 mm para el informe no conserva una aprobación si el dato fue modificado.
+Tolerancia angular por defecto: 0,5 grados con distancia circular. Los atributos numéricos
 usan equivalencia de unidades con Pint; las temperaturas con C se interpretan como degC
 solo en campos de temperatura. Las tolerancias se pueden pasar por ruta al comparador.
 

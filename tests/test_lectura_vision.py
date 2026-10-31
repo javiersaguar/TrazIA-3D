@@ -167,7 +167,8 @@ def test_real_adapters_share_schema_and_replay_without_credentials(isolated, mon
                                     "text": json.dumps(
                                         {
                                             "items": [
-                                                {"text": "ID 2000", "bbox": [100, 200, 300, 260]}
+                                                # Gemini: [y1, x1, y2, x2]
+                                                {"text": "ID 2000", "bbox": [200, 100, 260, 300]}
                                             ]
                                         }
                                     )

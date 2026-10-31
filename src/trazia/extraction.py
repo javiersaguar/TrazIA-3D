@@ -7,7 +7,7 @@ from typing import Literal, Protocol, get_args
 from pydantic import Field
 
 from .ingest import Bundle
-from .model import GEOMETRY_FIELDS, Channel, FieldState, Model, Revision, Source
+from .model import GEOMETRY_FIELDS, Channel, FieldState, Model, Revision, Source, nozzle_misfit
 
 CHANNELS = set(get_args(Channel))
 
@@ -160,6 +160,19 @@ def _traced_source(source: Source, reading: "Candidate | Alternative") -> dict:
     return data
 
 
+def _misfit(equipment: dict, nozzle: dict) -> str | None:
+    values = [
+        nozzle["diameter"]["value"],
+        nozzle["elevation"]["value"],
+        equipment["diameter"]["value"],
+        equipment["skirt_height"]["value"],
+        equipment["height"]["value"],
+    ]
+    if not all(isinstance(v, int | float) for v in values):
+        return None  # lo rechaza el contrato, con su propio mensaje
+    return nozzle_misfit(*values)
+
+
 def assemble(
     bundles: list[Bundle],
     candidates: list[Candidate],
@@ -231,7 +244,17 @@ def assemble(
         warnings.append(
             "Boquillas incompletas fuera del modelo (faltan datos): " + ", ".join(incomplete)
         )
-    equipment["nozzles"] = [data for n, data in nozzles.items() if n not in incomplete]
+    # Igual con la que no cabe en la virola leída: una lectura mal hecha no deja sin modelo a todo
+    # el equipo.
+    misfits = sorted(
+        n
+        for n, data in nozzles.items()
+        if n not in incomplete and _misfit(equipment, data) is not None
+    )
+    if misfits and warnings is not None:
+        warnings.append("Boquillas fuera del modelo (no caben en la virola): " + ", ".join(misfits))
+    excluded = {*incomplete, *misfits}
+    equipment["nozzles"] = [data for n, data in nozzles.items() if n not in excluded]
     content = {
         "schema_version": "0.3",
         "approval": None,
@@ -240,5 +263,6 @@ def assemble(
         "dataset": dataset,
         "documents": [b.document.model_dump(mode="json") for b in bundles],
         "equipment": equipment,
+        "unplaced_nozzles": sorted(excluded),
     }
     return Revision.model_validate_json(json.dumps(content))

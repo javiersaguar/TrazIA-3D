@@ -8,6 +8,11 @@ import numpy as np
 from ..model import Revision
 from . import nozzle_frame
 
+# Por debajo de esto es ruido de lectura, no cambio de diseño (ROADMAP F.2): medir sobre los trazos
+# o convertir pulgadas deja diferencias de décimas de milímetro entre revisiones.
+LENGTH_TOLERANCE_MM = 1.0
+ANGLE_TOLERANCE_DEG = 0.5
+
 
 def equal_value(left, right, path, *, tolerances=None):
     if left is None or right is None:
@@ -32,7 +37,12 @@ def equal_value(left, right, path, *, tolerances=None):
         except (ImportError, ValueError, TypeError, AttributeError):
             return False
     tolerance = (tolerances or {}).get(
-        path, 0.1 if left.unit == "mm" else 0.01 if left.unit == "deg" else 0.0
+        path,
+        LENGTH_TOLERANCE_MM
+        if left.unit == "mm"
+        else ANGLE_TOLERANCE_DEG
+        if left.unit == "deg"
+        else 0.0,
     )
     distance = abs(left.value - value)
     if left.unit == "deg":
