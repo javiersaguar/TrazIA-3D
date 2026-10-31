@@ -246,7 +246,33 @@ Resultados en `docs/ESTUDIO.md`, «Estudio 3». Puntuación GA2MODEL con IC 95 %
     (429), Llama 4 Scout en Cloudflare (JSON roto) y Moondream (otro formato de entrada).
 - `python -m bench.proveedores` mide cada modelo como lector de A junto a Qwen3-VL local y A sin
   visión, y cuenta las teselas fallidas por cuota: un modelo con fallos no está medido del todo.
-  Primera ronda en curso.
+- **Fallo encontrado y corregido en el adaptador de Gemini** (anterior a esta sesión): Gemini da
+  las cajas como `[y1, x1, y2, x2]` aunque se le pidan en `[x1, y1, x2, y2]`. Comparado con otros
+  cinco modelos sobre la misma tesela. Cada texto quedaba en otro sitio del plano y de ahí salía
+  un 50 % de alucinación. El adaptador las gira y no reutiliza las respuestas guardadas antes.
+
+**Primera ronda** (4 revisiones escaneadas: 1 equipo de S-dev y 1 de S-reservado, escaneado
+limpio, rev1 y rev2; calibración v5; `generated/proveedores-r1b/`). **Datos sintéticos.**
+
+| Lector de A | Puntuación | Alucinación | s/rev | Teselas fallidas |
+| --- | ---: | ---: | ---: | ---: |
+| OpenRouter `nvidia/nemotron-3.5-super-vl:free` | 0,363 | 9,7 % | 32 | 0 |
+| NVIDIA `nvidia/nemotron-3.5-super-vl-120b-a12b` | 0,359 | 8,6 % | 25 | 0 |
+| Gemini `gemini-3.5-flash-lite` | 0,355 | 11,4 % | 32 | 0 |
+| *A sin visión (`a_geometria`)* | *0,352* | *0 %* | *3* | — |
+| Cloudflare `@cf/qwen/qwen3.8-27b` | 0,334 | 6,7 % | 245 | 7 |
+| *Qwen3-VL 4B local* | *0,295* | *3,5 %* | *103* | — |
+| Groq `qwen/qwen3.8-27b` | 0,150 | 0 % | 169 | 2 |
+
+- `gemini-3.8-flash` no está medido: sus 24 teselas fallaron (503 por saturación y luego 429 por
+  cuota). Los segundos incluyen esperas por límite de tasa y, en las filas con caché, no son el
+  tiempo real del modelo.
+- **Conclusión.** Ningún modelo externo mejora a A sin visión y todos los que empatan alucinan
+  muy por encima del 1 %. Con 4 revisiones los intervalos son anchos: es una indicación, no un
+  resultado cerrado. No se hace la segunda ronda de 20 revisiones: las cuotas gratuitas de
+  OpenRouter, Groq y Cloudflare no llegan y no hay señal de mejora que justifique gastarlas.
+- **1.9:** segundo proveedor real comprobado con seis modelos sobre la misma página. Falta el de
+  la plataforma IndesIA. **2.2:** Mistral sigue sin clave.
 
 ### 1.9 y 2.2 · Mistral
 

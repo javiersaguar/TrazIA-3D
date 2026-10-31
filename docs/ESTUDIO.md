@@ -333,3 +333,44 @@ limpio, 10 condiciones, 6 equipos. Salida en `generated/estudio-avision/`.
   fallo visto en la demo V-101.
 - **Excepción.** Los canales apagados al entrenar la fusión responden al diagnóstico del 30/10, que
   salió de S-reservado.
+
+### Estudio 5 · D con fusión aprendida por defecto (31/10/2026, tarde)
+
+**Datos.** Mismos conjuntos, degradaciones, oráculo y remuestreos que el estudio 3, sobre `main`
+`e46573d` (sin las correcciones del estudio 4). **Datos sintéticos.** Cambian dos cosas:
+
+- `d_hibrido` es ya D con fusión aprendida (el modelo versionado en
+  `src/trazia/strategies/fusion_model.json`, el mismo del estudio 3). La heurística pasa a
+  `d_hibrido+heuristica`. Las ablaciones de D usan ahora la fusión aprendida.
+- Calibración v5 (sha256 `dd2f98c238da…`): D sin curva isotónica. Las curvas generales, que usan
+  las variantes sin curva propia (A, por ejemplo), ya no incluyen las lecturas de D. Por eso A y B
+  no puntúan igual que en el estudio 3: se comparan solo dentro de este estudio.
+
+Puntuación GA2MODEL sobre el conjunto puntuado (S-dev + S-reservado):
+
+| Variante | Puntuación | IC95 | ECE | Cobertura del intervalo | S-reservado | s/rev |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| `d_hibrido` | **0,670** | [0,639; 0,703] | **0,038** | 96,9 % | **0,571** | 1,9 |
+| `d_hibrido+heuristica` | 0,653 | [0,621; 0,686] | 0,058 | 93,7 % | 0,567 | 1,9 |
+| `b_reglas+ocr` | 0,588 | [0,535; 0,642] | 0,038 | 98,7 % | 0,380 | 0,4 |
+| `c_rag` | 0,567 | [0,516; 0,618] | 0,088 | 77,7 % | 0,386 | 0,4 |
+| `a_geometria` | 0,563 | [0,528; 0,595] | 0,116 | 95,3 % | 0,551 | 1,5 |
+| `b_reglas` | 0,536 | [0,494; 0,579] | 0,007 | 100 % | 0,386 | 0,03 |
+
+- **Fusión aprendida frente a heurística.** McNemar sobre 7.452 campos: 83 que solo acierta la
+  aprendida y 28 que solo acierta la heurística (p ≈ 2·10⁻⁷). Δ de puntuación −0,018 al volver a
+  la heurística, IC95 [−0,032; −0,005].
+- **Ablaciones de D con la fusión aprendida** (Δ de puntuación al quitar el canal, IC95):
+
+  | Canal quitado | Δ | IC95 | Campos que solo acierta D / solo la ablación |
+  | --- | ---: | --- | --- |
+  | Geometría | −0,077 | [−0,109; −0,045] | 675 / 8 |
+  | RAG | −0,017 | [−0,029; −0,007] | 259 / 3 |
+  | Memoria | +0,002 | [−0,012; +0,016] | 23 / 0 |
+  | Detector | +0,001 | [−0,018; +0,016] | 166 / 43 |
+
+  Con la fusión aprendida, el RAG pesa menos que con la heurística (−0,017 frente a −0,075): la
+  fusión aprende cuándo fiarse de las tablas y del dibujo sin él. Memoria y detector aciertan
+  campos (23 y 166 que solo acierta D), pero su efecto en la puntuación no se distingue de cero.
+- **Recomendación** (S-dev): `b_reglas` en vectorial y `d_hibrido` en escaneado. El selector
+  fijado en S-dev sigue perdiendo en S-reservado: 0,388 frente a 0,571 de `d_hibrido` solo.

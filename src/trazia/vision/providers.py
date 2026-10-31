@@ -224,6 +224,8 @@ class GeminiProvider(_Provider):
         super().__init__(dataset=dataset)
         self.model = model or os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
         self.name = f"gemini:{self.model}"
+        # Las respuestas guardadas antes del 31/10 tenían las cajas sin girar: no se reutilizan.
+        self.cache_identity = f"{self.name}|cajas-yx"
         self.key = os.environ.get("GEMINI_API_KEY")
         if not self.key and not cache.offline():
             raise VisionUnavailable("Gemini: falta GEMINI_API_KEY en .env")
@@ -257,7 +259,7 @@ class GeminiProvider(_Provider):
         response = _post_retry(url, payload, {"x-goog-api-key": self.key})
         try:
             text = response["candidates"][0]["content"]["parts"][0]["text"]
-            data = json.loads(text)
+            data = _yx_to_xy(json.loads(text))
         except (KeyError, IndexError, json.JSONDecodeError) as exc:
             raise VisionError(f"{self.name}: respuesta inesperada ({exc})") from None
         usage = response.get("usageMetadata", {})
@@ -266,6 +268,20 @@ class GeminiProvider(_Provider):
             tokens_out or 0
         ) / 1e6 * _price("GEMINI_EUR_PER_MTOK_OUT", 2.30)
         return data, {"tokens_in": tokens_in, "tokens_out": tokens_out, "cost_eur": cost}
+
+
+def _yx_to_xy(data):
+    """Gemini da las cajas como [y1, x1, y2, x2] (su convenio `box_2d`) aunque se le pidan en
+    [x1, y1, x2, y2]: medido el 31/10 frente a otros cinco modelos sobre la misma tesela."""
+    if isinstance(data, dict):
+        out = {k: _yx_to_xy(v) for k, v in data.items()}
+        box = data.get("bbox")
+        if isinstance(box, list) and len(box) == 4:
+            out["bbox"] = [box[1], box[0], box[3], box[2]]
+        return out
+    if isinstance(data, list):
+        return [_yx_to_xy(item) for item in data]
+    return data
 
 
 def _gemini_schema(schema: dict) -> dict:
