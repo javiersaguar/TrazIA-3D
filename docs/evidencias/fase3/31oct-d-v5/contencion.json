@@ -1,0 +1,12 @@
+{
+  "synthetic_benchmark": true,
+  "host_shared": true,
+  "samples": 68,
+  "from": "2026-10-31T16:23:39.3034508+00:00",
+  "to": "2026-10-31T16:57:27.8859535+00:00",
+  "samples_with_reading_comparison": 14,
+  "quiet_repeat": false,
+  "quiet_repeat_reason": "No se realizó una repetición con host aislado. La comparación de Lectura se detectó en parte de las muestras; siguieron otros procesos activos. La ausencia de ese PID no certifica ausencia de cargas pesadas en WSL o GPU.",
+  "limits": "CPU por proceso de Windows normalizada a 32 lógicos; WSL no queda completamente representado. No demuestra aislamiento ni ausencia de carga GPU.",
+  "last_reading_comparison_detected": "2026-10-31T16:30:11.9747964+00:00"
+}

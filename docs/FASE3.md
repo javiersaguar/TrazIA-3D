@@ -431,3 +431,10 @@ para usarlo por defecto. Los resultados 173/336 y la reproducción D-712 de esta
 correspondiendo a D heurístico sobre la base 8713f7a; no se atribuyen al nuevo D aprendido.
 La variante actual para reproducir la fusión anterior es `d_hibrido+heuristica`. El modelo
 empaquetado sí participa en la huella de caché v3. Se conserva el trabajo de ambos equipos.
+
+
+## Nueva medición: D aprendido y calibración v5 (31/10)
+
+336 revisiones, 64 equipos: **174 DRAFT (134 LOD 2, 40 LOD 1) y 162 errores**, idénticos con 1/4 workers. Tiempos: **1.434,28 / 877,69 s; 1,6341× observado** en host compartido. Proveedores: cero llamadas y 0 EUR declarados; caché de trabajos: 0/336 en cada despliegue nuevo. El histórico heurístico conserva su identidad: 173 éxitos se mantienen, un fallo pasa a DRAFT y 162 siguen fallando. No se aísla causalidad ni precisión de ingeniería.
+
+[Resultados, errores, tiempos por equipo y reproducción](evidencias/fase3/31oct-d-v5/resumen.md). La prueba real de OCR reconoce 2/1/0/2 páginas en frío/cambio/repetición/control; el render sigue recorriendo todo el PDF. No se da por resuelta la incrementalidad completa. Extrapolación a 1.600 terminaciones con cuatro workers: 69,66 min; tiempo y coste total de 1.600 IFC válidos siguen en null. 3.7/H.7 permanecen abiertas.

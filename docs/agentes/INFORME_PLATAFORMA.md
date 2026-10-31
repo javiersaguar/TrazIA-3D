@@ -603,3 +603,24 @@ Verificación del resultado integrado antes del push: Ruff check/format (168 arc
 304 pruebas Python correctas y una omisión en 267,28 s; 38 unitarias web, typecheck,
 lint sin errores y build correctos. Revisión cargada con 22 campos y cero errores JS,
 mediante Chrome/SwiftShader y sin modificar la sesión manual.
+
+
+## Sesión 31/10 · D aprendido / v5 y kit E.5
+
+### 3.7 / H.7: medición y límites
+
+Rama feat/plataforma desde origin/main 8717c41. La caché v3 ya incluía la huella de fusión; se añade prueba de modificación real de pesos y de cambio entre búsqueda/guardado. Variables de proveedores nuevas vacías en .env.example. Calibración v5 copiada sin editar Lectura, montada read-only y verificada en cada contenedor. Sin nuevas dependencias ni cambio de contrato/API.
+
+Lote nuevo CPU/Redis/arq/Postgres: **336 revisiones, 64 equipos; 174 done (134 LOD 2, 40 LOD 1), 162 error**, iguales con uno/cuatro workers. **1.434,2816 / 877,6943 s; 1,6341× observado**. Cero llamadas externas, 0 EUR de proveedores, contabilidad completa; cero aciertos de caché de trabajos sobre 336 observaciones por despliegue fresco. Los JSON y CSV conservan tiempos por equipo, pipeline y ejecutor separados.
+
+Comparación con D heurístico: 173 done→done, 1 error→done (C-201 limpio/1), 162 error→error. D-220 limpio/1 conserva el error y cambia N1 por N2 en el mensaje. Código y calibración también cambiaron; no se atribuye causalidad a pesos ni precisión industrial. [Evidencias y reproducción](../evidencias/fase3/31oct-d-v5/resumen.md).
+
+Prueba OCR real sin red/GPU: 2/1/0/2 llamadas al reconocedor para frío/cambio/repetición/control; B cambiante 0,6758 s frente a control frío 1,6364 s. Render todavía recorre ambas páginas: no es un pipeline enteramente incremental. La traza de host tiene 68 muestras de mayor precisión, 14 con la CLI de comparación de Lectura detectada; no certifica toda la carga WSL/GPU. No se realizó otra pasada con host aislado.
+
+Extrapolación explícita: 69,66 min para 1.600 terminaciones con cuatro workers, incluidos errores. Cómputo hipotético 1,1610 EUR a 0,25 EUR/worker-h. Total del proyecto, tiempo/coste de IFC válidos, energía y revisión humana sin medir. Control --exigir-todos devuelve 2. 3.7/H.7 siguen abiertas. Se limpiaron solo los despliegues propios; portal y servicios ajenos preservados.
+
+### Necesidades para Lectura
+
+Quedan 84 errores por boquillas incompletas, 63 por campos ausentes y 15 geométricos; [inventario exacto](../evidencias/fase3/31oct-d-v5/revisiones-pendientes.jsonl). D-200 limpio/1: falta skirt_thickness; D-200 limpio/2 y pobre/1: menos de tres boquillas. D-220 limpio/1: N2 fuera de virola. D-712 vectorial/1 y /2, en S-reservado: siguen faltando tres boquillas completas. Usar los reservados solo como diagnóstico y evaluar ajustes con separación por equipo. No se modifica ningún lector ni se rellena un fallo para producir IFC. La incrementalidad completa necesita coordinación con el dueño de ingestión/OCR.
+
+Validación previa al commit de medición: Ruff check y format completos correctos; suite Python completa en verde con API, incluida la exportación E.5 que se publicará en el siguiente commit. El build conectado de la web también pasa.

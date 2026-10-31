@@ -1,0 +1,89 @@
+{
+  "synthetic": true,
+  "component": "OCR CPU",
+  "engine": "rapidocr-3",
+  "onnx_available_providers": [
+    "AzureExecutionProvider",
+    "CPUExecutionProvider"
+  ],
+  "engine_initialization_seconds": 0.7776507920000029,
+  "document_sha256": [
+    "9a60bfc7c7f2b3de54444b5b08009762999b85d4476cde64c01f71163e61a23e",
+    "28f7db457464cbac144f6beabe4c63a3be4f13ff0627f593694e2037bc2e409e"
+  ],
+  "page_pixels_sha256": {
+    "A": [
+      "ce8e5a649bb2a14d5ffe55047de0186b04561c79f01801a5eae721c6cf6d898b",
+      "785f2967f703782aeb5cf577983678c15f7feaed6ed5a8ddab906466cc7ffd55"
+    ],
+    "B": [
+      "ce8e5a649bb2a14d5ffe55047de0186b04561c79f01801a5eae721c6cf6d898b",
+      "f2831a24f5243f6d05f11dd2b0a00dc1f3db86012adc594ed991a4525b83850b"
+    ]
+  },
+  "phases": [
+    {
+      "name": "A_frio",
+      "seconds": 2.4175287780000048,
+      "recognizer_calls": [
+        {
+          "pixels_sha256": "ce8e5a649bb2a14d5ffe55047de0186b04561c79f01801a5eae721c6cf6d898b",
+          "seconds": 1.437602959000003
+        },
+        {
+          "pixels_sha256": "785f2967f703782aeb5cf577983678c15f7feaed6ed5a8ddab906466cc7ffd55",
+          "seconds": 0.6515740810000068
+        }
+      ],
+      "lines_per_page": {
+        "1": 27,
+        "2": 4
+      }
+    },
+    {
+      "name": "B_una_pagina_cambiada",
+      "seconds": 0.6757893540000026,
+      "recognizer_calls": [
+        {
+          "pixels_sha256": "f2831a24f5243f6d05f11dd2b0a00dc1f3db86012adc594ed991a4525b83850b",
+          "seconds": 0.41871696200000486
+        }
+      ],
+      "lines_per_page": {
+        "1": 27,
+        "2": 4
+      }
+    },
+    {
+      "name": "B_repetido",
+      "seconds": 0.24765028500000597,
+      "recognizer_calls": [],
+      "lines_per_page": {
+        "1": 27,
+        "2": 4
+      }
+    },
+    {
+      "name": "B_frio_control",
+      "seconds": 1.6363853000000006,
+      "recognizer_calls": [
+        {
+          "pixels_sha256": "ce8e5a649bb2a14d5ffe55047de0186b04561c79f01801a5eae721c6cf6d898b",
+          "seconds": 0.929575297999989
+        },
+        {
+          "pixels_sha256": "f2831a24f5243f6d05f11dd2b0a00dc1f3db86012adc594ed991a4525b83850b",
+          "seconds": 0.449179634999993
+        }
+      ],
+      "lines_per_page": {
+        "1": 27,
+        "2": 4
+      }
+    }
+  ],
+  "only_changed_page_recognized": true,
+  "warm_vs_cold_seconds_saved": 0.960595945999998,
+  "whole_pipeline_incremental": false,
+  "limit": "El OCR se reutiliza por imagen; se renderizan todas las páginas para obtener su hash."
+}

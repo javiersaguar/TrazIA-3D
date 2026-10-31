@@ -22,7 +22,7 @@ do {
         if ($null -eq $processRow.CPU) { continue }
         $usage = $null
         if ($previousCpu.ContainsKey($processRow.Id) -and $interval -gt 0) {
-            $usage = [Math]::Max(0, ($processRow.CPU - $previousCpu[$processRow.Id]) / $interval / $logical * 100)
+            $usage = [Math]::Max([double]0, [double](($processRow.CPU - $previousCpu[$processRow.Id]) / $interval / $logical * 100))
         }
         $rows += [pscustomobject]@{pid=$processRow.Id;name=$processRow.ProcessName;
             cpu_percent_host=$usage;memory_mb=[Math]::Round($processRow.WorkingSet64 / 1MB, 1)}
