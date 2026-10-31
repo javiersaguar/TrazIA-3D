@@ -87,6 +87,21 @@ def test_offline_miss_is_explicit_and_does_not_enqueue(client, monkeypatch):
         assert not session.exec(select(JobRecord)).all()
 
 
+def test_recalibration_invalidates_cached_results(client, monkeypatch, tmp_path):
+    from trazia.calibration import Calibration
+
+    monkeypatch.setenv("TRAZIA_CALIBRATION", "off")
+    assert finished(client, submit(client, body_for(client)))["status"] == "done"
+    path = tmp_path / "calibration.json"
+    import json
+
+    path.write_text(json.dumps(Calibration({}, {}, {}).to_dict()), encoding="utf-8")
+    monkeypatch.setenv("TRAZIA_CALIBRATION", str(path))
+    monkeypatch.setenv("TRAZIA_OFFLINE", "1")
+    response = submit(client, body_for(client, "RECALIBRATED"))
+    assert response.status_code == 409
+
+
 def test_key_distinguishes_documents_strategy_and_providers(client, monkeypatch):
     assert finished(client, submit(client, body_for(client)))["status"] == "done"
     monkeypatch.setenv("TRAZIA_OFFLINE", "1")

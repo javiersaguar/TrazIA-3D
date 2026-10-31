@@ -190,6 +190,9 @@ async def run_job(store: Store, job_id: str):
                         result, revision = await asyncio.to_thread(restore, store, job_id, request)
                         cache_hit = True
                     else:
+                        from .job_cache import calibration_fingerprint
+
+                        request["_cache_calibration"] = calibration_fingerprint()
                         result, revision = await asyncio.to_thread(
                             execute_pipeline, store, job_id, request
                         )

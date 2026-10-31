@@ -215,6 +215,9 @@ def _calibrate(
             StageEvent("calibrate", "omitido", equipment_id, "Parámetros de calibración ilegibles.")
         )
         return candidates
+    from .calibration.scope import for_strategy
+
+    calibration = for_strategy(calibration, strategy)
     if calibration is None:
         emit(
             StageEvent(

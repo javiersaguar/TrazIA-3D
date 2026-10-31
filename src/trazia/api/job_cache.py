@@ -8,6 +8,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlmodel import Session
 
+from trazia.calibration import calibration_path, load_calibration
 from trazia.model import Revision, RunInfo
 from trazia.store import DocumentRecord, JobCacheRecord, RevisionRecord, Store
 
@@ -16,6 +17,17 @@ from .pipeline_adapter import PipelineResult
 
 class CacheMiss(ValueError):
     pass
+
+
+def calibration_fingerprint() -> str | None:
+    try:
+        calibration = load_calibration()
+        return calibration.sha256 if calibration else None
+    except (OSError, ValueError, KeyError):
+        path = calibration_path()
+        if path and path.is_file():
+            return "invalid:" + hashlib.sha256(path.read_bytes()).hexdigest()
+        return "invalid:unreadable"
 
 
 def key_for(session: Session, request: dict) -> str:
@@ -39,7 +51,8 @@ def key_for(session: Session, request: dict) -> str:
             raise CacheMiss("No existe la revisión anterior")
         previous = hashlib.sha256(record.payload.encode()).hexdigest()
     content = {
-        "version": 1,
+        "version": 2,
+        "calibration": request.get("_cache_calibration", calibration_fingerprint()),
         "documents": documents,
         "strategy": request["strategy"],
         "providers": request["providers"],
@@ -95,6 +108,9 @@ def restore(store: Store, job_id: str, request: dict):
 
 
 def remember(store: Store, session: Session, request: dict, revision: Revision, warnings: list):
+    if request.get("_cache_calibration") != calibration_fingerprint():
+        # Los parámetros cambiaron durante la ejecución: no asociar el resultado a otra curva.
+        return None
     digest = store.put(
         json.dumps(
             {
