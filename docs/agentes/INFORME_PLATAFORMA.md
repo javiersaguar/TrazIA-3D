@@ -624,3 +624,18 @@ Extrapolación explícita: 69,66 min para 1.600 terminaciones con cuatro workers
 Quedan 84 errores por boquillas incompletas, 63 por campos ausentes y 15 geométricos; [inventario exacto](../evidencias/fase3/31oct-d-v5/revisiones-pendientes.jsonl). D-200 limpio/1: falta skirt_thickness; D-200 limpio/2 y pobre/1: menos de tres boquillas. D-220 limpio/1: N2 fuera de virola. D-712 vectorial/1 y /2, en S-reservado: siguen faltando tres boquillas completas. Usar los reservados solo como diagnóstico y evaluar ajustes con separación por equipo. No se modifica ningún lector ni se rellena un fallo para producir IFC. La incrementalidad completa necesita coordinación con el dueño de ingestión/OCR.
 
 Validación previa al commit de medición: Ruff check y format completos correctos; suite Python completa en verde con API, incluida la exportación E.5 que se publicará en el siguiente commit. El build conectado de la web también pasa.
+
+
+### E.5: kit preparado; a la espera de Javier
+
+[Guion de sesión y exportación](../MUESTRA_REVISION_MANUAL_31OCT_V5.md). Almacén propio nuevo generated/piloto-manual-v5-31oct: V-101 A/B obtenidas por B/CPU, 22/26 campos candidatos, cero sesiones humanas y ninguna aprobación. No se usan oráculos ni se simulan tiempos humanos. Originales GAD/HDM servidos por la API, con procedencia por campo.
+
+Nuevo scripts/export_review_session.py: lectura de métricas, auditoría y campos; admite solo sintéticos, excluye test/abiertas/sin acciones. Agrupa por identidad de equipo/revisión/campo, suma trabajo de deshacer sin duplicar campos, distingue activo y duración total con interrupciones y conserva desconocidos a null. Tiempo por campo es el atribuido a acciones, no permanencia visual. Compleción exige todos los campos con acciones cronometradas, revisión aprobada y sin sesiones abiertas. No declara ahorro causal ni representatividad. Destino nuevo para conservar la fuente original.
+
+Prueba de ausencia real de muestra contra API 8030: código 2, cero equipos con muestra, tiempos null, ninguna acción humana. [Preparación](../evidencias/fase3/31oct-d-v5/piloto-preparacion.json) y [estado sin muestra](../evidencias/fase3/31oct-d-v5/piloto-sin-muestra.json). La prueba unitaria solo usa tiempos automatizados etiquetados test para verificar su exclusión.
+
+API del piloto en 127.0.0.1:8030, modo offline, CORS 3130, SQL/JSONL separados. Build web conectado correcto. Arranque del frontend 3130 rechazado por revisión automática de aprobación con motivo «blocked by policy»: no hay pantalla ni captura validada en esta entrega. El kit contiene el comando para que Javier arranque su web compilada; no hace falta reiniciar API. No se editaron archivos web ni el lector. 3.8/E.6 queda fuera de esta sesión.
+
+Pendiente: que Javier inicie la web y haga la sesión real; después exportar el registro y publicar tiempos activos/totales por equipo y atribuidos por campo, tamaño de muestra e interrupciones. No hay cifra de impacto medida ni se marca E.5 terminada. Se detiene el trabajo del kit para pedir esa participación.
+
+Validación final: Ruff check/format completos correctos (173 archivos). Dos pasadas completas con `uv run --extra api pytest -q`: **311 passed / 1 skipped**, en **278,68 s** y **238,83 s**; aviso de deprecación preexistente de Starlette/httpx. Build Next conectado en verde. Cuatro originales del piloto verificados por SHA contra la API, cero sesiones/acciones; [comprobación de solo lectura](../evidencias/fase3/31oct-d-v5/piloto-verificacion.json). Sin cambios web, dependencias nuevas, contrato model.py, extractores ni datos privados.

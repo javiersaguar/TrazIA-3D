@@ -1,0 +1,81 @@
+{
+  "dataset": "synthetic",
+  "strategy": "b_reglas",
+  "cpu_only": true,
+  "human_sessions": 0,
+  "human_review_seconds": null,
+  "revisions": [
+    {
+      "revision": "A",
+      "revision_id": "DEMO-PLANT:vessel-001:A",
+      "job_id": "6aa8a8b9-de02-4f8d-9917-c762c5e2f73f",
+      "strategy": "b_reglas",
+      "fields": 22,
+      "fields_with_raw_confidence": 22,
+      "documents": [
+        {
+          "id": "GA-V101",
+          "filename": "GAD_V-101_revA.pdf",
+          "revision": "A",
+          "sha256": "468bb29a7c64e8a9e391e648250328f6e20ab7b44c004e10db4ebb9f2fa0a1b1",
+          "page_count": 1
+        },
+        {
+          "id": "HDM-V101",
+          "filename": "HDM_V-101_revA.xlsx",
+          "revision": "A",
+          "sha256": "1a2eedf7f63f66fecccb2a78bf1997093a9d572e22f80bedb97d74161bd72d2b",
+          "page_count": null
+        }
+      ],
+      "run": {
+        "strategy": "b_reglas",
+        "providers": [],
+        "seconds": 0.24896589999843854,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "approved": false
+    },
+    {
+      "revision": "B",
+      "revision_id": "DEMO-PLANT:vessel-001:B",
+      "job_id": "614f3e53-672e-4d23-9ed8-5f90e9dbc10e",
+      "strategy": "b_reglas",
+      "fields": 26,
+      "fields_with_raw_confidence": 26,
+      "documents": [
+        {
+          "id": "GA-V101",
+          "filename": "GAD_V-101_revB.pdf",
+          "revision": "B",
+          "sha256": "832e8cd6e467a0e8cc5147b697950c1285506f6b94836157793b7950c2882cd0",
+          "page_count": 1
+        },
+        {
+          "id": "HDM-V101",
+          "filename": "HDM_V-101_revB.xlsx",
+          "revision": "B",
+          "sha256": "c4b62987f748c164c77e2d83c432892a47414a13e6dd6f620b1421dea1e6f887",
+          "page_count": null
+        }
+      ],
+      "run": {
+        "strategy": "b_reglas",
+        "providers": [],
+        "seconds": 0.10958329999994021,
+        "gpu_seconds": null,
+        "tokens_in": null,
+        "tokens_out": null,
+        "cost_eur": 0.0,
+        "external_calls": 0,
+        "accounting_complete": true
+      },
+      "approved": false
+    }
+  ]
+}

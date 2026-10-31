@@ -1,0 +1,68 @@
+{
+  "exported_at": "2026-10-31T17:02:35.673817+00:00",
+  "synthetic": true,
+  "equipment_with_sample": 0,
+  "active_seconds": null,
+  "revisions": [
+    {
+      "revision_id": "DEMO-PLANT:vessel-001:A",
+      "equipment_tag": "V-101",
+      "equipment_identity": "DEMO-PLANT:vessel-001",
+      "dataset": "synthetic",
+      "completed_human_sessions_with_actions": 0,
+      "active_seconds": null,
+      "wall_seconds_including_interruptions": null,
+      "action_seconds": null,
+      "unassigned_active_seconds": null,
+      "fields_with_actions": 0,
+      "fields_total": 22,
+      "field_times": [],
+      "resolved_fields_with_actions": 0,
+      "mean_action_seconds_per_distinct_field": null,
+      "approved": false,
+      "pending_fields": 22,
+      "open_sessions": 0,
+      "test_sessions": 0,
+      "source": "active_client_reported; human participation self-declared",
+      "field_time_scope": "Tiempo activo atribuido a acciones, no permanencia visual en cada campo."
+    },
+    {
+      "revision_id": "DEMO-PLANT:vessel-001:B",
+      "equipment_tag": "V-101",
+      "equipment_identity": "DEMO-PLANT:vessel-001",
+      "dataset": "synthetic",
+      "completed_human_sessions_with_actions": 0,
+      "active_seconds": null,
+      "wall_seconds_including_interruptions": null,
+      "action_seconds": null,
+      "unassigned_active_seconds": null,
+      "fields_with_actions": 0,
+      "fields_total": 26,
+      "field_times": [],
+      "resolved_fields_with_actions": 0,
+      "mean_action_seconds_per_distinct_field": null,
+      "approved": false,
+      "pending_fields": 26,
+      "open_sessions": 0,
+      "test_sessions": 0,
+      "source": "active_client_reported; human participation self-declared",
+      "field_time_scope": "Tiempo activo atribuido a acciones, no permanencia visual en cada campo."
+    }
+  ],
+  "all_revisions_approved": false,
+  "equipment": [
+    {
+      "equipment_identity": "DEMO-PLANT:vessel-001",
+      "tags": [
+        "V-101"
+      ],
+      "revisions": 2,
+      "timed_revisions": 0,
+      "active_seconds": null,
+      "wall_seconds_including_interruptions": null
+    }
+  ],
+  "sample_complete_for_review_time": false,
+  "causal_impact_measured": false,
+  "limit": "Piloto de uso humano sobre sintéticos; no demuestra representatividad industrial."
+}
