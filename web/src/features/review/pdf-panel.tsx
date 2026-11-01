@@ -7,6 +7,7 @@ import { Tip } from "@/components/ui/controls";
 import { Code, EmptyState, Icon, Skeleton } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 import type { ReviewField } from "@/lib/mock/fields";
+import type { RevisionMark } from "./revision-marks";
 
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 type Props = {
@@ -17,6 +18,9 @@ type Props = {
   hoveredId: string | null;
   onSelect(field: ReviewField): void;
   onHover(field: ReviewField | null): void;
+  marks?: RevisionMark[];
+  focusedMark?: RevisionMark;
+  onMark?(mark: RevisionMark): void;
 };
 
 export function PdfPanel({
@@ -27,6 +31,9 @@ export function PdfPanel({
   hoveredId,
   onSelect,
   onHover,
+  marks = [],
+  focusedMark,
+  onMark,
 }: Props) {
   const frame = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0),
@@ -38,13 +45,14 @@ export function PdfPanel({
     page: number;
   } | null>(null);
   const selected = fields.find((f) => f.path === selectedPath);
+  const anchor = focusedMark?.id ?? selectedPath;
   const page = Math.min(
     pages || 1,
     Math.max(
       1,
-      override?.path === selectedPath
+      override?.path === anchor
         ? override.page
-        : (selected?.source.page ?? 1),
+        : (focusedMark?.page ?? selected?.source.page ?? 1),
     ),
   );
   const boxes = useMemo(
@@ -64,9 +72,9 @@ export function PdfPanel({
     return () => ro.disconnect();
   }, []);
   useEffect(() => {
-    if (!selectedPath || !frame.current) return;
+    if ((!selectedPath && !focusedMark) || !frame.current) return;
     const box = frame.current.querySelector<HTMLElement>(
-      `[data-path="${CSS.escape(selectedPath)}"]`,
+      focusedMark ? `[data-mark-id="${CSS.escape(focusedMark.id)}"]` : `[data-path="${CSS.escape(selectedPath!)}"]`,
     );
     box?.scrollIntoView({
       block: "center",
@@ -75,7 +83,7 @@ export function PdfPanel({
         ? "auto"
         : "smooth",
     });
-  }, [selectedPath, zoom, page, width]);
+  }, [selectedPath, focusedMark, zoom, page, width]);
   return (
     <div
       className="flex h-full min-h-0 flex-col"
@@ -146,7 +154,7 @@ export function PdfPanel({
                     aria-label={`Ver página ${i + 1}`}
                     aria-current={page === i + 1 ? "page" : undefined}
                     onClick={() =>
-                      setOverride({ path: selectedPath, page: i + 1 })
+                      setOverride({ path: anchor, page: i + 1 })
                     }
                     className={cn(
                       "shrink-0 rounded-md border p-1 text-xs",
@@ -220,6 +228,17 @@ export function PdfPanel({
                       />
                     </button>
                   );
+                })}
+                {marks.filter(mark => mark.page === page).map(mark => {
+                  const [x0, y0, x1, y1] = mark.bbox;
+                  return <button type="button" key={mark.id} data-mark-id={mark.id}
+                    aria-label={`Marca candidata ${mark.kind === "delta" ? "Δ" : "nube"} · página ${mark.page}`}
+                    title="Marca candidata de revisión; no confirma un cambio"
+                    onClick={() => onMark?.(mark)}
+                    className={cn("absolute border-2 border-warning bg-warning/10 text-[10px] text-warning", focusedMark?.id === mark.id && "ring-2 ring-warning ring-offset-2")}
+                    style={{ left: `${x0 * 100}%`, top: `${y0 * 100}%`, width: `${(x1 - x0) * 100}%`, height: `${(y1 - y0) * 100}%` }}>
+                    <span className="sr-only">{mark.kind === "delta" ? "Triángulo" : "Nube"} {mark.label}</span>
+                  </button>;
                 })}
               </div>
             ) : null}

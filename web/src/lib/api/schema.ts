@@ -1,5 +1,22 @@
 /* Tipos del contrato HTTP. Actualizar con pnpm gen:api. */
 export interface paths {
+    "/viewer/bcf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Bcf */
+        post: operations["bcf_viewer_bcf_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reference-system": {
         parameters: {
             query?: never;
@@ -887,6 +904,8 @@ export interface components {
             value?: number | string | null;
             /** Unit */
             unit?: string | null;
+            /** Decimal Separator */
+            decimal_separator?: ("." | ",") | null;
             source?: components["schemas"]["Source"] | null;
             /** Explanation */
             explanation?: string | null;
@@ -969,6 +988,11 @@ export interface components {
              * @default b_reglas
              */
             strategy?: string;
+            /**
+             * Use Learning
+             * @default true
+             */
+            use_learning?: boolean;
             /** Providers */
             providers?: string[];
             /**
@@ -1075,6 +1099,8 @@ export interface components {
             equipment: components["schemas"]["Equipment"];
             approval?: components["schemas"]["Approval"] | null;
             run?: components["schemas"]["RunInfo"] | null;
+            /** Unplaced Nozzles */
+            unplaced_nozzles?: string[];
         };
         /** RunInfo */
         RunInfo: {
@@ -1111,6 +1137,28 @@ export interface components {
              * @default human
              */
             kind?: string;
+        };
+        /** Snapshot */
+        Snapshot: {
+            /** Png Base64 */
+            png_base64: string;
+            /** Eye */
+            eye: number[];
+            /** Target */
+            target: number[];
+            /** Up */
+            up: number[];
+            /** Zoom */
+            zoom: number;
+            /** Viewport Height */
+            viewport_height: number;
+            /** Guid */
+            guid: string;
+            /**
+             * Actor
+             * @default Revisor sin identificar
+             */
+            actor?: string;
         };
         /** Source */
         Source: {
@@ -1259,6 +1307,39 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    bcf_viewer_bcf_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Snapshot"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     reference_system_reference_system_get: {
         parameters: {
             query?: never;
@@ -1988,6 +2069,7 @@ export interface operations {
                 from?: string;
                 to?: string;
                 layers?: boolean;
+                marks?: boolean;
             };
             header?: never;
             path?: never;

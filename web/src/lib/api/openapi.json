@@ -5,6 +5,42 @@
     "version": "0.3"
   },
   "paths": {
+    "/viewer/bcf": {
+      "post": {
+        "summary": "Bcf",
+        "operationId": "bcf_viewer_bcf_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Snapshot"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/reference-system": {
       "get": {
         "summary": "Reference System",
@@ -1131,6 +1167,16 @@
               "type": "boolean",
               "default": false,
               "title": "Layers"
+            }
+          },
+          {
+            "name": "marks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Marks"
             }
           }
         ],
@@ -2720,6 +2766,21 @@
             ],
             "title": "Unit"
           },
+          "decimal_separator": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  ".",
+                  ","
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decimal Separator"
+          },
           "source": {
             "anyOf": [
               {
@@ -2968,6 +3029,11 @@
             "minLength": 1,
             "title": "Strategy",
             "default": "b_reglas"
+          },
+          "use_learning": {
+            "type": "boolean",
+            "title": "Use Learning",
+            "default": true
           },
           "providers": {
             "items": {
@@ -3322,6 +3388,15 @@
                 "type": "null"
               }
             ]
+          },
+          "unplaced_nozzles": {
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "type": "array",
+            "title": "Unplaced Nozzles"
           }
         },
         "additionalProperties": false,
@@ -3447,6 +3522,78 @@
           "actor"
         ],
         "title": "SessionInput"
+      },
+      "Snapshot": {
+        "properties": {
+          "png_base64": {
+            "type": "string",
+            "maxLength": 7000000,
+            "title": "Png Base64"
+          },
+          "eye": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Eye"
+          },
+          "target": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Target"
+          },
+          "up": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Up"
+          },
+          "zoom": {
+            "type": "number",
+            "maximum": 650,
+            "minimum": 5,
+            "title": "Zoom"
+          },
+          "viewport_height": {
+            "type": "number",
+            "maximum": 10000,
+            "exclusiveMinimum": 0,
+            "title": "Viewport Height"
+          },
+          "guid": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_$]{22}$",
+            "title": "Guid"
+          },
+          "actor": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Actor",
+            "default": "Revisor sin identificar"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "png_base64",
+          "eye",
+          "target",
+          "up",
+          "zoom",
+          "viewport_height",
+          "guid"
+        ],
+        "title": "Snapshot"
       },
       "Source": {
         "properties": {

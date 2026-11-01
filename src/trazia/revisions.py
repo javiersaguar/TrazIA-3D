@@ -178,6 +178,7 @@ def compare(
     tolerances=None,
     include_geometry=False,
     originals: dict[str, bytes] | None = None,
+    include_visual=True,
 ) -> dict:
     if (before.project_id, before.equipment.id) != (after.project_id, after.equipment.id):
         raise ValueError("Solo se pueden comparar revisiones del mismo proyecto y equipo")
@@ -310,19 +311,22 @@ def compare(
         )
     visual = (
         visual_delta(before, after, originals)
-        if originals is not None
-        else {"status": "missing_originals", "pages": []}
+        if originals is not None and include_visual
+        else {"status": "missing_originals" if include_visual else "not_requested", "pages": []}
     )
     geometry = (
         geometry_delta(before, after)
         if include_geometry
         else {"status": "not_requested", "elements": []}
     )
+    from .families.revision_marks import analyse
+
     return {
         "layers": {
             "visual": visual,
             "geometry": geometry,
             "crosschecks": crosscheck(changes, visual),
+            "revision_marks": analyse(after, changes, originals),
         },
         "nozzle_matching": {
             "status": matching_status,

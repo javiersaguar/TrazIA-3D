@@ -753,20 +753,35 @@ def create_app(
         before: str = Query("A", alias="from"),
         after: str = Query("B", alias="to"),
         layers: bool = False,
+        marks: bool = False,
     ):
         with Session(request.app.state.store.engine) as session:
             a = Revision.model_validate_json(get_revision(session, before).payload)
             b = Revision.model_validate_json(get_revision(session, after).payload)
         try:
-            originals = (
-                {
+            originals = None
+            if layers:
+                originals = {
                     d.sha256: request.app.state.store.read(d.sha256)
                     for d in a.documents + b.documents
                 }
-                if layers
-                else None
+            elif marks:
+                originals = {}
+                for document in b.documents:
+                    if not document.filename.lower().endswith(".pdf"):
+                        continue
+                    try:
+                        originals[document.sha256] = request.app.state.store.read(document.sha256)
+                    except (OSError, ValueError):
+                        # Un original perdido o no verificable no impide leer los demás.
+                        continue
+            return compare(
+                a,
+                b,
+                include_geometry=layers,
+                originals=originals,
+                include_visual=layers or not marks,
             )
-            return compare(a, b, include_geometry=layers, originals=originals)
         except ValueError as error:
             raise HTTPException(422, str(error)) from error
 

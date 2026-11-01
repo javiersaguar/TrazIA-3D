@@ -405,3 +405,34 @@ test("la captura BCF conectada empaqueta la cámara y la selección del visor", 
   const bytes = await readFile((await bcf.path())!);
   expect(bytes.subarray(0, 2).toString()).toBe("PK");
 });
+
+
+test("Revisión cruza marcas por documento, enfoca la página y vuelve al campo", async ({ page }) => {
+  test.skip(!process.env.NEXT_PUBLIC_API_URL, "Las marcas se leen contra originales de la API");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const mark = { id: "synthetic-test-cloud", document_id: "OTHER", kind: "cloud", page: 2,
+    bbox: [.2, .2, .4, .4], label: null, method: "vector", candidate: true };
+  await page.route(/\/diff\?.*marks=true/, route => route.fulfill({ json: {
+    layers: { revision_marks: { status: "partial", coordinate_frame: "after-page", is_design_validation: false,
+      documents: [{ document_id: "GA-V101", filename: "GAD_V-101_revB.pdf", status: "sin_marcas", marks: [], unread_pages: [] },
+        { document_id: "OTHER", filename: "synthetic-other.pdf", status: "parcial", marks: [mark], unread_pages: [1] }],
+      unmarked_changes: [{ path: "height", document_id: "GA-V101" }], marks_without_change: [mark], unlocated_changes: [],
+    } },
+  } }));
+  await page.route(/documents\/OTHER/, route => route.fulfill({ contentType: "application/pdf", body: twoPagePdf() }));
+  await page.goto("/revision");
+  await page.getByRole("radio", { name: "rev B", exact: true }).click();
+  const panel = page.getByTestId("revision-mark-checks");
+  await expect(panel).toContainText("2 discrepancias");
+  await panel.locator("summary").click();
+  await expect(panel).toContainText("Sin lectura de marcas en páginas 1");
+  await panel.getByRole("button", { name: "height · GA-V101", exact: true }).click();
+  await expect(page.getByRole("listbox", { name: "Campos por revisar" }).getByRole("option", { selected: true })).toContainText("Longitud");
+  await panel.getByRole("button", { name: "Nube · OTHER, página 2", exact: true }).click();
+  await expect(page.getByTestId("pdf-panel")).toHaveAttribute("data-pdf-page", "2");
+  await expect(page.getByRole("button", { name: "Marca candidata nube · página 2", exact: true })).toBeVisible();
+  await expect(page.getByTestId("pdf-panel")).toContainText("OTHER");
+  await page.getByRole("listbox", { name: "Campos por revisar" }).getByRole("option", { selected: true }).click();
+  await expect(page.getByTestId("pdf-panel")).toContainText("GA-V101");
+  await expect(page.getByTestId("pdf-panel")).toHaveAttribute("data-pdf-page", "1");
+});

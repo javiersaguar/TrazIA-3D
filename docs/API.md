@@ -519,3 +519,21 @@ nuevas ni cambios del contrato `model.py` 0.3.
 - POST de trabajo admite `use_learning: boolean` (por defecto true): ejemplos y prioridades solo desde revisiones aprobadas con sesión humana finalizada; exclusión de equipo/documentos y verificación de originales. Caché v4 incluye estado de feedback. [Condiciones y límites](APRENDIZAJE_APROBADO.md).
 - `POST /viewer/bcf` convierte una captura del navegador en BCF 2.1: `png_base64`, `eye`, `target`, `up` (triples de coordenadas web), `zoom`, `viewport_height`, `guid` IFC seleccionado y `actor` opcional. Devuelve application/zip con ZIP BCF, snapshot PNG y cámara ortográfica convertida a IFC; no modifica revisiones ni aprueba. Rechaza PNG inválido/demasiado grande, cámara degenerada, coordenadas no finitas y GUID inválido con 422. Es una conversión de datos aportados; no certifica su procedencia ni sus rótulos. El visor adjunta DRAFT y procedencia de su IFC real.
 - `TRAZIA_PAGE_CACHE` es opcional; por defecto, las etapas de texto, raster y geometría usan `TRAZIA_OCR_CACHE/page-stages`. La caché OCR por página tiene huella propia de contenido/recursos/geometría PDF más DPI y motor; se regenera si falla la integridad. Una página reutilizada recibe el document_id actual, no el de la revisión anterior. Sin huella segura se procesa normalmente.
+
+
+## Marcas de revisión · F.5 (01/11)
+
+`GET /diff?from=A&to=B&marks=true` incorpora `layers.revision_marks`. Con `layers=false`
+(predeterminado), este modo solo lee los originales de B y no ejecuta ECC ni genera IFC.
+Con `layers=true` se mantienen las capas completas y sus límites anteriores.
+
+El cruce verifica SHA y separa documentos y páginas; una marca del documento X nunca cubre
+un campo del Y. Coordenadas normalizadas respecto a la página de B (`coordinate_frame=after-page`).
+Devuelve `documents` (marcas candidatas, estado, páginas sin lectura), `unmarked_changes`,
+`marks_without_change` y `unlocated_changes`. `is_design_validation=false`: nunca aprueba ni altera
+ETag/revisiones. Los identificadores de marca son estables por documento y contenido detectado.
+
+Hasta 100 páginas por original; las restantes se declaran truncadas. Páginas dominadas por
+raster quedan sin lectura aunque incluyan una cabecera vectorial. Campos eliminados sin caja
+en B quedan sin localizar; no se proyecta su caja antigua sobre el plano nuevo. Ausencia de
+original, SHA diferente o error de lectura se declara explícitamente. [Detalle](MARCAS_REVISION.md).

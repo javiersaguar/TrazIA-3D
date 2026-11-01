@@ -18,6 +18,9 @@ import { FieldQueue } from "./field-queue";
 import { ApprovalButton } from "./approval-button";
 import { ManualSession } from "./manual-session";
 import { ValidationNotice } from "./validation-notice";
+import { useRevisionMarks, type RevisionMark } from "./revision-marks";
+import { RevisionMarksNotice } from "./revision-marks-notice";
+import { apiEnabled, apiURL, revisionVersion } from "@/lib/api/config";
 
 import { EvidenceLink } from "./evidence-link";
 import { useFieldAction } from "./use-field-action";
@@ -36,22 +39,29 @@ const PdfPanel = dynamic(() => import("./pdf-panel").then((m) => m.PdfPanel), {
 export function ReviewWorkspace() {
   const revision = useUi((s) => s.revision);
   const setRevision = useUi((s) => s.setRevision);
-  const { data: fields } = useReviewFields(revision);
+  const { data: fields, dataUpdatedAt } = useReviewFields(revision);
+  const marks = useRevisionMarks(revision, dataUpdatedAt);
+  const [markFocus, setMarkFocus] = useState<{ revision: RevisionId; mark: RevisionMark } | null>(null);
+  const focusedMark = markFocus?.revision === revision ? markFocus.mark : undefined;
   const { selectedId, hoveredId, selectedPath, setSelected, setHovered } =
     useSelection();
+  const source = fields?.find(f => f.path === selectedPath)?.source;
+  const pdfDocument = focusedMark?.document_id ?? (apiEnabled && source?.page ? source.document_id : "GA-V101");
+  const pdfUrl = apiEnabled ? apiURL(`/revisions/${encodeURIComponent(revisionVersion(revision)?.identity ?? revision)}/documents/${encodeURIComponent(pdfDocument)}`) : DEMO.revisions[revision].pdf;
   const { apply, undoLast, busy } = useFieldAction(revision);
   const [editingPath, setEditingPath] = useState<string | null>(null);
   const [view, setView] = useState<"iso" | "front" | "top">("iso");
   const [mode, setMode] = useState<"solid" | "xray" | "exploded">("solid");
 
   const selectField = useCallback(
-    (f: ReviewField) => setSelected(f.elementId, f.path),
+    (f: ReviewField) => { setMarkFocus(null); setSelected(f.elementId, f.path); },
     [setSelected],
   );
 
   // Al elegir un elemento en 3D se selecciona su campo de mayor riesgo.
   const onSelectElement = useCallback(
     (id: string) => {
+      setMarkFocus(null);
       const first = fields?.find((f) => f.elementId === parentElementId(id));
       if (first) setSelected(id, first.path);
       else setSelected(id);
@@ -138,6 +148,11 @@ export function ReviewWorkspace() {
       </SyntheticNotice>
 
       <ManualSession revision={revision} />
+      <RevisionMarksNotice revision={revision} data={marks.data} error={marks.error} loading={marks.isFetching && !marks.data}
+        onRetry={() => { void marks.refetch(); }} onSelect={path => {
+          const field = fields?.find(f => f.path === path);
+          if (field) selectField(field);
+        }} onMark={mark => setMarkFocus({ revision, mark })} />
       <ValidationNotice revision={revision} onSelect={(path) => {
         const field = fields?.find((f) => f.path === path);
         if (field) selectField(field);
@@ -185,9 +200,12 @@ export function ReviewWorkspace() {
         pdf={
           fields ? (
             <PdfPanel
-              key={revision}
-              url={DEMO.revisions[revision].pdf}
-              fields={fields}
+              key={`${revision}:${pdfDocument}`}
+              url={pdfUrl}
+              fields={fields.filter(f => f.source.document_id === pdfDocument)}
+              marks={marks.data?.documents.find(d => d.document_id === pdfDocument)?.marks}
+              focusedMark={focusedMark}
+              onMark={mark => setMarkFocus({ revision, mark })}
               selectedPath={selectedPath}
               selectedId={selectedId}
               hoveredId={hoveredId}
