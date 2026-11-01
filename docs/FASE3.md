@@ -449,3 +449,16 @@ Mismo SHA de 336 revisiones: 251 DRAFT/85 errores (211 LOD 2, 40 LOD 1), idénti
 La reutilización medida ahora cubre render, texto, OCR y geometría por página (2/1/0/2); reconciliación e IFC son globales. Diagrama [SVG](evidencias/fase3/01nov/arquitectura-escala.svg) / [PNG](evidencias/fase3/01nov/arquitectura-escala.png). Proyección 400×4: 72,96 min con cuatro workers para terminaciones, incluidas fallidas; 0,4864 € solo de cómputo si se supone 0,10 €/worker-h. Total y presupuesto de IFC correctos null; revisión humana pospuesta. [Pitch actualizado](PITCH_ESCALA.md).
 
 C.1/C.2 implementadas con Pint y evidencia original; C.4 interno documentado y Norte explícito opcional, referencia TR pendiente. [Normalización](NORMALIZACION.md). 3.8/E.6 conectadas a extracción/fusión con aprobación vigente y sesión humana finalizada, caché invalidada al revocar; falta muestra/evaluación real y no se activa nueva calibración con datos inventados. [Feedback](APRENDIZAJE_APROBADO.md). E.5 no se realiza por indicación de Javier.
+
+
+## Diagnóstico CPU posterior · 01/11
+
+Reproducidos los 85 errores con fuente actual y calibración v6: 85 errores, 0 recuperados;
+290,244 s acumulados de pipeline, sin red/GPU/proveedores. Persisten 63 campos ausentes y 22
+geometrías incoherentes. No se vuelven a medir las 251 exportaciones ni el escalado. El diagnóstico
+incluye candidatos, alternativas, fuentes y GT consultada únicamente después de extraer.
+[Inventario y reproducción para Lectura](evidencias/fase3/01nov-triage/resumen.md).
+
+3.7/H.7 no se cierran: faltan cobertura y precisión suficientes y un coste defendible de 1.600 IFC
+correctos. El diagrama y la extrapolación previos siguen identificados como hipótesis de cómputo,
+no gasto de proyecto medido. No se debilitan los validadores para aumentar la tasa de exportación.
