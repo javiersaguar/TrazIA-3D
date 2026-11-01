@@ -8,7 +8,7 @@ medido usa **datos sintéticos**: ninguna cifra es precisión sobre planos de TR
 | # | Tarea | Estado | Cifra principal |
 | --- | --- | --- | --- |
 | 1 | **3.2** Memoria solo con revisión aprobada | Hecha | D omite la memoria (con aviso) si la anterior es DRAFT o su huella no cuadra |
-| 2 | **3.3** Calibración, intervalos conformes y abstención | Hecha; el criterio de ECE no se cumple en S-reservado | D: ECE 0,017 en S-dev y 0,279 en S-reservado; cobertura del intervalo al 90 %: 94,1 % |
+| 2 | **3.3** Calibración, intervalos conformes y abstención | Hecha; D cumple la ECE desde la v6 (1/11) | Estudio 7: ECE de D 0,027 en S-reservado (antes 0,279) y cobertura del intervalo al 90 % del 91,4 % |
 | 3 | **2.11** Estudio A/B/C/D | Hecho sin A | D 0,642 [0,607; 0,678], C 0,558, B 0,536 |
 | 4 | **3.4** Selector y ablaciones | Hecho; sin fusión aprendida | El selector por tipo pierde en S-reservado (0,372 frente a 0,525 de D solo) |
 | 5 | **2.2 / 0.10** PaddleOCR-VL | Medido y descartado | No acaba una página A3 en 25 min en la RTX 5070 |
@@ -314,6 +314,10 @@ limpio, rev1 y rev2; calibración v5; `generated/proveedores-r1b/`). **Datos sin
 - Límites: cobertura de ángulos de D 63 %; el riesgo con abstención de D (8,5 %) sigue por encima
   del 5 % buscado; las filas de la fusión son de antes del PR de Alejandro. Miré tres variantes de
   curva en S-reservado; la elegida es también la de menor ECE en S-dev, que es la regla escrita.
+- **Estudio 7** (todo el estudio con la v6, `generated/estudio/`; el 6 queda en
+  `generated/estudio-6/`): D 0,708 [0,676; 0,740], ECE 0,014 (0,027 en S-reservado), 0,625 en
+  S-reservado. Aciertan los mismos campos que en el estudio 6; la subida es solo de calibración.
+  Son las cifras de D que hay que citar a partir de ahora. [Estudio 7](../ESTUDIO.md).
 - **Para Plataforma:** la huella de calibración cambia. Hay que volver a fijarla en el contenedor
   (escala, 3.7) y la caché de trabajos la invalida sola si usa el sha de la calibración.
 

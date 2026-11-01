@@ -497,3 +497,56 @@ Frente a los estudios anteriores:
 - **Recomendación** (S-dev): `b_reglas` en vectorial y `d_hibrido` en escaneado. El selector
   fijado en S-dev sigue perdiendo en S-reservado: 0,472 frente a 0,614 de `d_hibrido` solo. Se
   mantiene D para todo.
+
+### Estudio 7 · calibración v6 (1/11/2026)
+
+**Datos.** Mismos conjuntos, degradaciones, oráculo y 1.000 remuestreos que el estudio 6. Se lanzó
+el 1/11 a las 00:00 en `feat/lectura`, con el árbol que quedó en `85a48dd`: calibración v6
+(sha256 `5496cf49cbe4…`), VESOR en B, marcas de revisión e ingesta más estricta. **Datos
+sintéticos.** Un solo proceso de `python -m bench.estudio`, unas 2 h, sin caídas.
+
+| Variante | Puntuación | IC95 | ECE | Cobertura del intervalo | F1 cambios | Modelos (S-reservado) | S-reservado | s/rev |
+| --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `d_hibrido` | **0,708** | [0,676; 0,740] | **0,014** | 96,8 % | 56,0 % | **82,3 %** | **0,625** | 2,5 |
+| `d_hibrido+heuristica` | 0,690 | [0,659; 0,724] | 0,057 | 93,6 % | 57,0 % | 78,1 % | 0,606 | 2,1 |
+| `b_reglas+ocr` | 0,609 | [0,561; 0,656] | 0,039 | 98,7 % | 43,3 % | 64,6 % | 0,435 | 0,4 |
+| `c_rag` | 0,600 | [0,556; 0,644] | 0,092 | 96,3 % | 46,8 % | 53,1 % | 0,454 | 0,5 |
+| `a_geometria` | 0,578 | [0,542; 0,612] | 0,133 | 89,5 % | 47,9 % | 80,2 % | 0,570 | 1,7 |
+| `b_reglas` | 0,548 | [0,509; 0,587] | 0,007 | 100 % | 37,4 % | 33,3 % | 0,424 | 0,03 |
+
+Alucinación 0 % y cita 100 % en todas salvo `a_detector` (3,7 %, no elegible).
+
+D por degradación: vectorial 0,951, escaneado limpio 0,648 y escaneado pobre 0,478.
+
+Frente al estudio 6:
+
+- **Los aciertos por campo son los mismos.** McNemar da los mismos recuentos que en el estudio 6
+  (D frente a la heurística 78/25; frente a cada ablación, igual). Lo que cambia es la confianza:
+  la calibración v6 da a D una curva propia sacada de su fusión con canales apagados.
+- **La ECE de D baja de 0,036 a 0,014**, y en S-reservado de 0,080 a 0,027. Es la primera vez que D
+  cumple ECE < 0,05 en S-reservado dentro del estudio. La cobertura del intervalo en S-reservado
+  queda en 91,4 % (nominal 90 %).
+- **D sube a 0,708** (desde 0,703) y a 0,625 en S-reservado (desde 0,614), solo por la ECE, que
+  entra en la puntuación. Los intervalos se solapan casi enteros: no es una mejora de lectura.
+- **C** gana cobertura del intervalo (77,7 % → 96,3 %) con la misma ECE. **A** empeora algo
+  (ECE 0,117 → 0,133, cobertura 95,3 % → 89,5 %), porque las curvas generales que usa cambian en
+  la v6. A no es candidata, así que no se ha corregido.
+- **Fusión aprendida frente a heurística:** Δ al volver a la heurística −0,017, IC95
+  [−0,029; −0,005].
+- **Ablaciones de D** (Δ de puntuación al quitar el canal, IC95):
+
+  | Canal quitado | Δ | IC95 | Campos que solo acierta D / solo la ablación |
+  | --- | ---: | --- | --- |
+  | Geometría | −0,066 | [−0,095; −0,038] | 670 / 10 |
+  | RAG | −0,009 | [−0,015; −0,003] | 251 / 4 |
+  | Memoria | +0,001 | [−0,000; +0,002] | 0 / 0 |
+  | Detector | +0,006 | [−0,010; +0,021] | 176 / 40 |
+
+  Memoria y detector siguen sin efecto distinguible de cero en la puntuación. El detector acierta
+  136 campos más de los que falla, pero su variante tiene peor ECE en S-reservado (0,047 frente a
+  0,027), y eso se lo come.
+- **Recomendación** (S-dev): `b_reglas` en vectorial y `d_hibrido` en escaneado. El selector
+  fijado en S-dev pierde en S-reservado: 0,476 frente a 0,625 de `d_hibrido` solo. Se mantiene D
+  para todo.
+
+`generated/estudio/` tiene ya el estudio 7; el 6 queda en `generated/estudio-6/`.
