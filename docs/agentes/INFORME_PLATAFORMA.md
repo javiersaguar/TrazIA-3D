@@ -687,7 +687,8 @@ Pruebas finales: Python 348/una omitida, 266,67 s; Ruff check/format verdes. Web
   No se usan GT para predecir ni se relajan validadores. [Evidencias](../evidencias/fase3/01nov-triage/resumen.md).
 - D.4: IFC4 sintético DRAFT validado con reglas EXPRESS (cero incidencias), abierto en Bonsai
   y visor web con SHA idéntico. Capturas y archivo en [ifc-checks](../ifc-checks/01nov/README.md).
-  BIMvision está instalado según Javier, pero todavía no ofrece ventana controlable; tercera captura pendiente.
+  Actualización posterior: Javier abrió manualmente el IFC en BIMvision y aportó su captura;
+  la apertura visual en tres visores queda documentada. La herramienta no pudo controlar esa ventana.
 - Documentado el estado real de C.4/D.5 y E.6: sin referencia de TR ni muestra humana aportada,
   no se declara fidelidad externa ni mejora de extracción. E.5 permanece pospuesta.
 
@@ -710,4 +711,15 @@ F.5 conserva el límite de detección en raster. 3.7/H.7 conserva 63 casos sin c
 geometrías incoherentes; las 251 exportaciones anteriores no se han reevaluado con v6, ni se ha
 medido nuevo escalado o precisión. El coste de 1.600 IFC correctos sigue desconocido. C.4/D.5
 requieren el IFC autorizado de TR; E.6 requiere correcciones humanas representativas. No se
-inicia E.5 ni se simula participación humana. D.4 necesita la tercera apertura y captura, no solo instalar.
+inicia E.5 ni se simula participación humana. D.4 ya tiene las tres aperturas/capturas de esta muestra;
+falta contrastar unidades, cotas y propiedades del recipiente en BIMvision y ampliar la validación.
+
+
+### Evidencia manual BIMvision · 01/11
+
+Javier aporta captura sin editar con el IFC V-101 B DRAFT abierto en BIMvision 3.2.1 [31/12/2024].
+Se ven la ruta completa, el recipiente con boquillas, la jerarquía espacial y propiedades del proyecto.
+Archivada en `docs/ifc-checks/01nov/bimvision.png`, con SHA de captura en el manifiesto; se verifica
+que el IFC de la ruta conserva la huella registrada. Se marca completada la apertura visual 3/3,
+no una validación dimensional ni de Pset del recipiente en ese visor. No cambia código ni se
+repite la batería de Python/web: esta actualización solo añade evidencia y documentación.

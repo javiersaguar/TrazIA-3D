@@ -634,7 +634,9 @@ malla con `trimesh` contra la referencia (DEC-18); abrir en ≥ 3 visores
 Anywhere/BIMvision) y guardar capturas en `docs/ifc-checks/`. El validador online de buildingSMART
 solo con sintéticos.
 
-*Comprobación 01/11:* IFC4 sintético DRAFT con 15 productos y cero incidencias del validador de esquema/reglas EXPRESS; abierto e inspeccionado en Bonsai Viewer 0.9.0post1. [Evidencias e interoperabilidad](ifc-checks/01nov/README.md). La tercera captura y la referencia real se consignan allí por separado.
+*Comprobación 01/11:* IFC4 sintético DRAFT con 15 productos y cero incidencias del validador de esquema/reglas EXPRESS; abierto e inspeccionado en Bonsai Viewer 0.9.0post1. [Evidencias e interoperabilidad](ifc-checks/01nov/README.md). Javier abrió el mismo archivo en BIMvision 3.2.1 y aportó la tercera captura: apertura visual 3/3 documentada. Pendientes contraste de unidades/cotas/propiedades del recipiente en BIMvision y referencia real; no se cierra toda D.4 por esta sola muestra.
+
+- [x] **D.4 · Apertura visual en tres visores:** Bonsai Viewer, web-ifc y BIMvision, con las tres capturas del IFC4 sintético archivadas. La captura de BIMvision es aportada por Javier.
 
 **D.5 Fidelidad contra referencia:** función que alinea nuestro IFC con el de TR (por bounding box del
 equipo y eje) y calcula error por componente (ver G). Iterar familias hasta que el error de forma

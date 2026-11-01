@@ -42,7 +42,7 @@
     }
   ],
   "tr_reference_available": false,
-  "cross_viewer_check": "pendiente de tercera captura",
+  "cross_viewer_check": "apertura visual 3/3 del mismo IFC4 sintético; no es validación dimensional",
   "viewer_evidence": [
     {
       "viewer": "Bonsai Viewer",
@@ -59,12 +59,27 @@
     {
       "viewer": "BIMvision",
       "package": "3.2.1",
-      "status": "installed_no_targetable_window",
-      "screenshot": null
+      "status": "opened_visual_user_evidence",
+      "screenshot": "bimvision.png",
+      "screenshot_source": "Captura aportada por Javier tras abrir manualmente el IFC indicado",
+      "application_build_displayed": "3.2.1[31/12/2024]",
+      "evidence_recorded_at": "2026-11-01T13:14:20.294314+00:00",
+      "observed": [
+        "ruta del IFC en el título",
+        "recipiente vertical y boquillas renderizados",
+        "jerarquía DEMO-PLANT / Unidad de proceso / Equipos",
+        "FileName=V-101_B_DRAFT.ifc",
+        "IfcEntity=IfcProject",
+        "Name=DEMO-PLANT"
+      ],
+      "component_properties_verified_in_viewer": false,
+      "dimensions_verified_in_viewer": false,
+      "units_verified_in_viewer": false
     }
   ],
   "capture_sha256": {
     "bonsai-viewer.png": "5101246c2d921f0d21b6e7c00419f79c803f7b0085d0e63cd142bfbaa3cebb88",
-    "web-ifc.png": "994d85ea81de7f544b2700c16791ec4c8e0e9ccd45155c0165d6e7af1aeb1d6e"
+    "web-ifc.png": "994d85ea81de7f544b2700c16791ec4c8e0e9ccd45155c0165d6e7af1aeb1d6e",
+    "bimvision.png": "5f97716a47770f9cf79648f3ac7555dcd0ed978bd8fbb9fddf677c7fc24af329"
   }
 }
