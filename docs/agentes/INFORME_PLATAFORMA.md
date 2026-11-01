@@ -723,3 +723,14 @@ Archivada en `docs/ifc-checks/01nov/bimvision.png`, con SHA de captura en el man
 que el IFC de la ruta conserva la huella registrada. Se marca completada la apertura visual 3/3,
 no una validación dimensional ni de Pset del recipiente en ese visor. No cambia código ni se
 repite la batería de Python/web: esta actualización solo añade evidencia y documentación.
+
+
+### Referencia para contraste BIMvision · 01/11
+
+Solicitud posterior: contrastar unidades, cotas y propiedades y subir a main. La detección de
+BIMvision sigue devolviendo cero ventanas aunque el proceso consta en ejecución. Se prepara
+`docs/ifc-checks/01nov/referencia-contraste.json` mediante lectura de propiedades y geometría IFC
+en CPU, junto con una tabla de contraste que distingue referencia y lectura observada. Virola:
+2×2×6,5 m, Z=1,35…7,85 m; faldón de 1,35 m, fondos de 0,5 m. Unidad IFC METRE y unidad de entrada mm.
+Estas son comprobaciones internas del archivo; no se marcan verificadas en BIMvision. Solicitada
+lectura manual para cerrar el contraste. No cambia el archivo IFC ni se da por completada D.4.

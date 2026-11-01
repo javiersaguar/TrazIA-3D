@@ -1,0 +1,346 @@
+{
+  "kind": "reference_extracted_from_ifc_not_measured_in_bimvision",
+  "at": "2026-11-01T13:20:41.965915+00:00",
+  "synthetic": true,
+  "draft": true,
+  "ifc_sha256": "9ca68e1230d7c4ca62668786ed95308d8c20c229151b2d2945930422c451472c",
+  "geometry_reader": "IfcOpenShell 0.8.5",
+  "units": [
+    {
+      "unit_type": "LENGTHUNIT",
+      "name": "METRE",
+      "prefix": null
+    },
+    {
+      "unit_type": "AREAUNIT",
+      "name": "SQUARE_METRE",
+      "prefix": null
+    },
+    {
+      "unit_type": "VOLUMEUNIT",
+      "name": "CUBIC_METRE",
+      "prefix": null
+    }
+  ],
+  "method": "world-coordinate geometry bounding boxes; native IFC unit is metre",
+  "bimvision_measurements": null,
+  "bimvision_comparison_complete": false,
+  "components": [
+    {
+      "component_id": "bottom_head",
+      "ifc_entity": "IfcBuildingElementProxy",
+      "guid": "1fCbNYLIXJpBJdap_2s_Ir",
+      "name": "V-101/bottom_head",
+      "bbox_world_m": [
+        [
+          -1.0,
+          1.0
+        ],
+        [
+          -1.0,
+          1.0
+        ],
+        [
+          0.8500000000000001,
+          1.35
+        ]
+      ],
+      "bbox_span_m": [
+        2.0,
+        2.0,
+        0.5
+      ],
+      "properties": {
+        "TrazIA_Identity": {
+          "ComponentId": "bottom_head",
+          "EquipmentId": "vessel-001",
+          "ParentComponentId": ""
+        }
+      }
+    },
+    {
+      "component_id": "top_head",
+      "ifc_entity": "IfcBuildingElementProxy",
+      "guid": "0ZHCZByc9OYQCjqCOEKVlG",
+      "name": "V-101/top_head",
+      "bbox_world_m": [
+        [
+          -1.0,
+          1.0
+        ],
+        [
+          -1.0,
+          1.0
+        ],
+        [
+          7.85,
+          8.35
+        ]
+      ],
+      "bbox_span_m": [
+        2.0,
+        2.0,
+        0.5
+      ],
+      "properties": {
+        "TrazIA_Identity": {
+          "ComponentId": "top_head",
+          "EquipmentId": "vessel-001",
+          "ParentComponentId": ""
+        }
+      }
+    },
+    {
+      "component_id": "skirt",
+      "ifc_entity": "IfcBuildingElementProxy",
+      "guid": "0iFPiPfwjTHwyaW0VA6qeq",
+      "name": "V-101/skirt",
+      "bbox_world_m": [
+        [
+          -1.0,
+          1.0
+        ],
+        [
+          -1.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.35
+        ]
+      ],
+      "bbox_span_m": [
+        2.0,
+        2.0,
+        1.35
+      ],
+      "properties": {
+        "TrazIA_Identity": {
+          "ComponentId": "skirt",
+          "EquipmentId": "vessel-001",
+          "ParentComponentId": ""
+        }
+      }
+    },
+    {
+      "component_id": "N1",
+      "ifc_entity": "IfcPipeSegment",
+      "guid": "1fYIjtO2jHVvWoC_Gze6x9",
+      "name": "V-101/N1",
+      "bbox_world_m": [
+        [
+          1.0,
+          1.4
+        ],
+        [
+          -0.1,
+          0.1
+        ],
+        [
+          2.4,
+          2.6
+        ]
+      ],
+      "bbox_span_m": [
+        0.3999999999999999,
+        0.2,
+        0.20000000000000018
+      ],
+      "properties": {
+        "TrazIA_Identity": {
+          "ComponentId": "N1",
+          "EquipmentId": "vessel-001",
+          "ParentComponentId": ""
+        },
+        "TrazIA_Provenance": {
+          "PortGUID": "1$Z_fHhNrV6xRcnNV1iv2n",
+          "InputSHA256": "353a20673af5900cae47107222dbdf46c1718408bccff86527900f3f6a357f05",
+          "Draft": true,
+          "Service": "",
+          "Rating": ""
+        }
+      }
+    },
+    {
+      "component_id": "N2",
+      "ifc_entity": "IfcPipeSegment",
+      "guid": "1puBiiXiTSwf9bAr72pY$U",
+      "name": "V-101/N2",
+      "bbox_world_m": [
+        [
+          -0.04963544370490266,
+          0.04963544370490278
+        ],
+        [
+          1.0,
+          1.3
+        ],
+        [
+          5.45,
+          5.55
+        ]
+      ],
+      "bbox_span_m": [
+        0.09927088740980544,
+        0.30000000000000004,
+        0.09999999999999964
+      ],
+      "properties": {
+        "TrazIA_Identity": {
+          "ComponentId": "N2",
+          "EquipmentId": "vessel-001",
+          "ParentComponentId": ""
+        },
+        "TrazIA_Provenance": {
+          "PortGUID": "1Ad8XurPfGDOT44ac1Ouw1",
+          "InputSHA256": "353a20673af5900cae47107222dbdf46c1718408bccff86527900f3f6a357f05",
+          "Draft": true,
+          "Service": "",
+          "Rating": ""
+        }
+      }
+    },
+    {
+      "component_id": "N3",
+      "ifc_entity": "IfcPipeSegment",
+      "guid": "1Ia_o6VBPG4v$3H9Pu27rb",
+      "name": "V-101/N3",
+      "bbox_world_m": [
+        [
+          -1.35,
+          -1.0
+        ],
+        [
+          -0.07499999999999987,
+          0.07500000000000016
+        ],
+        [
+          3.625,
+          3.7750000000000004
+        ]
+      ],
+      "bbox_span_m": [
+        0.3500000000000001,
+        0.15000000000000002,
+        0.15000000000000036
+      ],
+      "properties": {
+        "TrazIA_Identity": {
+          "ComponentId": "N3",
+          "EquipmentId": "vessel-001",
+          "ParentComponentId": ""
+        },
+        "TrazIA_Provenance": {
+          "PortGUID": "3Dq46QwxHVRwHkeiRax1iX",
+          "InputSHA256": "353a20673af5900cae47107222dbdf46c1718408bccff86527900f3f6a357f05",
+          "Draft": true,
+          "Service": "",
+          "Rating": ""
+        }
+      }
+    },
+    {
+      "component_id": "N4",
+      "ifc_entity": "IfcPipeSegment",
+      "guid": "3f5r8B8nrK6Bgpa7eqqWZK",
+      "name": "V-101/N4",
+      "bbox_world_m": [
+        [
+          -0.049635443704902936,
+          0.04963544370490254
+        ],
+        [
+          -1.3,
+          -1.0
+        ],
+        [
+          6.1499999999999995,
+          6.249999999999999
+        ]
+      ],
+      "bbox_span_m": [
+        0.09927088740980547,
+        0.30000000000000004,
+        0.09999999999999964
+      ],
+      "properties": {
+        "TrazIA_Identity": {
+          "ComponentId": "N4",
+          "EquipmentId": "vessel-001",
+          "ParentComponentId": ""
+        },
+        "TrazIA_Provenance": {
+          "PortGUID": "08OitNGUzTHAaDNwtxlTy6",
+          "InputSHA256": "353a20673af5900cae47107222dbdf46c1718408bccff86527900f3f6a357f05",
+          "Draft": true,
+          "Service": "",
+          "Rating": ""
+        }
+      }
+    },
+    {
+      "component_id": "shell",
+      "ifc_entity": "IfcTank",
+      "guid": "2LWeWJOpTHLgKbI2kTXlHK",
+      "name": "V-101",
+      "bbox_world_m": [
+        [
+          -1.0,
+          1.0
+        ],
+        [
+          -1.0,
+          1.0
+        ],
+        [
+          1.35,
+          7.85
+        ]
+      ],
+      "bbox_span_m": [
+        2.0,
+        2.0,
+        6.5
+      ],
+      "properties": {
+        "TrazIA_ReferenceFrame": {
+          "OriginInputMM": "[0,0,0] · centro del equipo en cota de apoyo",
+          "VerticalAxis": "+Z",
+          "AzimuthZero": "+X",
+          "AzimuthSense": "CCW viewed from +Z",
+          "InputLengthUnit": "mm",
+          "IFCLengthUnit": "m",
+          "WebAxes": "(x,z,-y), m",
+          "PlantNorthDeclared": false,
+          "TRReferenceVerified": false
+        },
+        "TrazIA_Identity": {
+          "ComponentId": "shell",
+          "EquipmentId": "vessel-001",
+          "ParentComponentId": ""
+        },
+        "TrazIA_Technical": {
+          "design_pressure": "16.0 bar",
+          "design_temperature": "180.0 C",
+          "material": "SA-516-70 1",
+          "operating_weight": "12800.0 kg"
+        },
+        "Pset_TankTypeCommon": {
+          "Reference": "V-101"
+        },
+        "TrazIA_Provenance": {
+          "InputSHA256": "353a20673af5900cae47107222dbdf46c1718408bccff86527900f3f6a357f05",
+          "SchemaVersion": "0.3",
+          "Revision": "B",
+          "Dataset": "synthetic",
+          "Draft": true,
+          "LOD": 2,
+          "Family": "vertical_vessel",
+          "RunJSON": "",
+          "DocumentsSHA256": "{\"GA-V101\": \"832e8cd6e467a0e8cc5147b697950c1285506f6b94836157793b7950c2882cd0\", \"HDM-V101\": \"c4b62987f748c164c77e2d83c432892a47414a13e6dd6f620b1421dea1e6f887\"}",
+          "SourcesJSON": "{\"tag\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.1786145882750926, 0.4874784868518863, 0.19286823524884145], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"diameter\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.2166243135384228, 0.5339544463025944, 0.23087796051217163], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"height\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.24869501922935766, 0.51995420607769, 0.2629486662031065], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"head_depth\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.2807657249202925, 0.5440338129151964, 0.2950193718940413], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"skirt_height\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.31283643061122735, 0.55524206858841, 0.32709007758497616], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"skirt_thickness\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.3449071363021622, 0.5636381809767075, 0.359160783275911], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"attributes.design_pressure\": {\"document_id\": \"HDM-V101\", \"page\": null, \"sheet\": \"HDM\", \"cell\": \"A2:C2\", \"locator\": \"HDM!A2:C2\", \"bbox\": null, \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"attributes.design_temperature\": {\"document_id\": \"HDM-V101\", \"page\": null, \"sheet\": \"HDM\", \"cell\": \"A3:C3\", \"locator\": \"HDM!A3:C3\", \"bbox\": null, \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"attributes.material\": {\"document_id\": \"HDM-V101\", \"page\": null, \"sheet\": \"HDM\", \"cell\": \"A4:C4\", \"locator\": \"HDM!A4:C4\", \"bbox\": null, \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"attributes.operating_weight\": {\"document_id\": \"HDM-V101\", \"page\": null, \"sheet\": \"HDM\", \"cell\": \"A5:C5\", \"locator\": \"HDM!A5:C5\", \"bbox\": null, \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N1.diameter\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.4653255093481356, 0.7732688477856053, 0.4760157445784472], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N1.projection\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.4653255093481356, 0.7732688477856053, 0.4760157445784472], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N1.elevation\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.4653255093481356, 0.7732688477856053, 0.4760157445784472], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N1.azimuth\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.4653255093481356, 0.7732688477856053, 0.4760157445784472], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N2.diameter\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.5033352346114658, 0.7774719436630605, 0.5140254698417774], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N2.projection\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.5033352346114658, 0.7774719436630605, 0.5140254698417774], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N2.elevation\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.5033352346114658, 0.7774719436630605, 0.5140254698417774], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N2.azimuth\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.5033352346114658, 0.7774719436630605, 0.5140254698417774], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N3.diameter\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.541344959874796, 0.7816750395405155, 0.5520351951051076], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N3.projection\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.541344959874796, 0.7816750395405155, 0.5520351951051076], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N3.elevation\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.541344959874796, 0.7816750395405155, 0.5520351951051076], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N3.azimuth\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.541344959874796, 0.7816750395405155, 0.5520351951051076], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N4.diameter\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.5793546851381262, 0.7816750395405155, 0.5900449203684378], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N4.projection\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.5793546851381262, 0.7816750395405155, 0.5900449203684378], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N4.elevation\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.5793546851381262, 0.7816750395405155, 0.5900449203684378], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}, \"nozzles.N4.azimuth\": {\"document_id\": \"GA-V101\", \"page\": 1, \"sheet\": null, \"cell\": null, \"locator\": \"Texto de página 1\", \"bbox\": [0.42837308103558774, 0.5793546851381262, 0.7816750395405155, 0.5900449203684378], \"confidence\": 0.75, \"reviewed\": false, \"confidence_raw\": 0.75, \"channel\": null, \"strategy\": null, \"model\": null, \"prompt_sha256\": null, \"grounded\": null, \"text_original\": null, \"unit_original\": null}}"
+        }
+      }
+    }
+  ]
+}

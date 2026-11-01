@@ -56,3 +56,11 @@ unidades, dimensiones y propiedades del recipiente; la captura aportada solo acr
 y visualización con propiedades de proyecto visibles. No se declara equivalencia de mallas,
 fidelidad contra TR, validación de todas las familias/esquemas ni rendimiento medido.
 La herramienta de automatización no llegó a detectar esa ventana: la apertura fue manual.
+
+
+## Contraste solicitado después de la apertura
+
+[Tabla de unidades, cotas y propiedades](CONTRASTE_BIMVISION.md), con referencias extraídas del
+mismo IFC mediante IfcOpenShell en CPU. **No son mediciones de BIMvision**: las columnas del visor
+siguen pendientes mientras no se obtenga su lectura manual. El proceso continúa sin exponer
+ventana al controlador. El archivo y las tres capturas previas conservan sus huellas.
