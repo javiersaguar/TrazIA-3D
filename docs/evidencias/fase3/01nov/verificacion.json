@@ -1,0 +1,33 @@
+{
+  "synthetic_only": true,
+  "gpu_used": false,
+  "python": {
+    "passed": 348,
+    "skipped": 1,
+    "seconds": 266.67
+  },
+  "scale_scripts_after_metrics_extension": {
+    "passed": 14,
+    "seconds": 0.74
+  },
+  "web": {
+    "typecheck": "passed",
+    "lint": "passed; aviso TanStack preexistente",
+    "unit_passed": 42,
+    "offline_e2e": {
+      "passed": 26,
+      "skipped": 8,
+      "minutes_rounded": 2.3
+    },
+    "connected_e2e": {
+      "passed": 33,
+      "skipped": 1,
+      "minutes_rounded": 2.8
+    }
+  },
+  "browser_renderer": "SwiftShader CPU",
+  "limits": [
+    "No es medición de FPS en otro portátil",
+    "E.5 pospuesta; sin muestra humana nueva"
+  ]
+}

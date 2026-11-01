@@ -1,0 +1,12 @@
+{
+  "source_commit": "c0668640e0046d1013de50e418f147be5b266a1a",
+  "scale_image": "sha256:c51fb5b0341a27a35fa1f615f221436c929386c2976675db869d56558a7e3402",
+  "probe_base_image": "sha256:6f8d02f4760cb4c464803e60f90b6f7fa49410db64689c63b718308149778d37",
+  "probe_current_source_mounted_readonly": true,
+  "probe_network": "none",
+  "gpu_used": false,
+  "incremental_sha256": "6d06442712d04478e3cc9df959fbb7e86fc7dc052e9690535002e44419187aea",
+  "limit": "La imagen del probe aporta dependencias y pesos; el código src/trazia y probe_incremental.py fue montado desde el árbol que quedó en source_commit. Escala usa la imagen nueva completa.",
+  "scale_source_commit": "63e6c213182b18c0237ec2b9f75d536ddc8356d0",
+  "page_cache_source_sha256": "e4862746bc5b1200f2a311f9ccc47f224b8dad0622398cf38ef37864843cfdb2"
+}

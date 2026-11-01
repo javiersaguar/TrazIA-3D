@@ -1,0 +1,158 @@
+{
+  "format": 1,
+  "level": 0.9,
+  "fitted_on": "S-dev",
+  "curves": {
+    "*|*": {
+      "x": [
+        0.5,
+        0.75,
+        0.95
+      ],
+      "y": [
+        0.6666666666666666,
+        1.0,
+        1.0
+      ],
+      "n": 916
+    },
+    "b_reglas|*": {
+      "x": [
+        0.5,
+        0.75,
+        0.95
+      ],
+      "y": [
+        0.6666666666666666,
+        1.0,
+        1.0
+      ],
+      "n": 916
+    },
+    "b_reglas|cota": {
+      "x": [
+        0.5,
+        0.95
+      ],
+      "y": [
+        0.6666666666666666,
+        1.0
+      ],
+      "n": 72
+    },
+    "b_reglas|cota|vector": {
+      "x": [
+        0.5,
+        0.95
+      ],
+      "y": [
+        0.6666666666666666,
+        1.0
+      ],
+      "n": 72
+    },
+    "b_reglas|hoja_datos": {
+      "x": [
+        0.75
+      ],
+      "y": [
+        1.0
+      ],
+      "n": 128
+    },
+    "b_reglas|hoja_datos|vector": {
+      "x": [
+        0.75
+      ],
+      "y": [
+        1.0
+      ],
+      "n": 128
+    },
+    "b_reglas|tabla": {
+      "x": [
+        0.85,
+        0.9
+      ],
+      "y": [
+        1.0,
+        1.0
+      ],
+      "n": 692
+    },
+    "b_reglas|tabla|vector": {
+      "x": [
+        0.85,
+        0.9
+      ],
+      "y": [
+        1.0,
+        1.0
+      ],
+      "n": 692
+    }
+  },
+  "quantiles": {
+    "b_reglas|deg|*": 0.0,
+    "b_reglas|deg|3": 0.0,
+    "b_reglas|mm|*": 0.0,
+    "b_reglas|mm|3": 0.0,
+    "b_reglas|num|*": 0.0,
+    "b_reglas|num|3": 0.0,
+    "c_rag|mm|*": 65.50833333333333,
+    "c_rag|mm|1": 296.79850746268653,
+    "c_rag|mm|2": 0.46497538811056416,
+    "c_rag|num|*": 0.0,
+    "c_rag|num|1": 0.0,
+    "c_rag|num|2": 0.0,
+    "d_hibrido|deg|*": 0.0,
+    "d_hibrido|deg|3": 0.0,
+    "d_hibrido|mm|*": 0.0,
+    "d_hibrido|mm|0": 46.32478827611261,
+    "d_hibrido|mm|1": 1.3448130150010564,
+    "d_hibrido|mm|2": 0.0,
+    "d_hibrido|mm|3": 0.0,
+    "d_hibrido|num|*": 0.0,
+    "d_hibrido|num|3": 0.0,
+    "deg|*": 0.0,
+    "deg|2": 159.5,
+    "deg|3": 0.0,
+    "mm|*": 0.0,
+    "mm|0": 46.32478827611261,
+    "mm|1": 198.5,
+    "mm|2": 0.0,
+    "mm|3": 0.0,
+    "num|*": 0.0,
+    "num|1": 0.0,
+    "num|2": 0.0,
+    "num|3": 0.0
+  },
+  "thresholds": {
+    "b_reglas": 1.0,
+    "c_rag": 0.842,
+    "d_hibrido": 0.1276
+  },
+  "meta": {
+    "target_risk": 0.05,
+    "min_group": 30,
+    "fields_curves": 3950,
+    "fields_conformal": 3388,
+    "calibrator_choice": {
+      "b_reglas": {
+        "ece_raw_lovo": 0.1253,
+        "ece_isotonic_lovo": 0.0006,
+        "choice": "isotonica"
+      },
+      "c_rag": {
+        "ece_raw_lovo": 0.0226,
+        "ece_isotonic_lovo": 0.0723,
+        "choice": "sin_curva"
+      }
+    },
+    "fitted_at": "2026-10-31T13:57:52+00:00"
+  },
+  "passthrough": [
+    "c_rag",
+    "d_hibrido"
+  ]
+}

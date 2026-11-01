@@ -412,8 +412,8 @@ agente de Fase 2; no se editan las estrategias ni sus carpetas.
 - [x] **3.4 (Lectura)** **Fusión aprendida y selector** por tipo de documento; **ablaciones** de D; estudio completo con S-reservado (H1–H6 de [ESTUDIO.md](ESTUDIO.md)). *Parcial 30/10:* selector, ablaciones y estudio con S-reservado hechos. El selector fijado en S-dev pierde frente a D solo (0,372 frente a 0,525), así que se recomienda D para todo. Ablaciones: RAG −0,076, geometría −0,045, detector −0,011 y memoria +0,009. *Hecho 31/10:* fusión aprendida (`d_hibrido+fusion`, regresión logística entrenada en S-dev con canales apagados). Dejando fuera un proveedor de S-dev, acierta el 93,2 % de los campos frente al 92,5 % de la heurística. En el estudio sube a 0,670 frente a 0,640 (McNemar p ≈ 10⁻⁷), y en S-reservado a 0,570 frente a 0,524. El selector sigue perdiendo: se recomienda la fusión aprendida para todo. *31/10 noche:* con las correcciones del estudio 4, D sube a 0,703 [0,671; 0,736] y a 0,614 en S-reservado; la heurística, a 0,691. Ablaciones: geometría −0,067, RAG −0,014, memoria −0,003 y detector +0,001. El selector pierde 0,472 frente a 0,614. [Estudio 6](ESTUDIO.md).
 - [x] **3.5 (Plataforma)** Pantalla **Estudio** en la web (DEC-28) y conexión de la pantalla Bench al estudio. *Hecho:* misma fuente/query, variante y rúbrica con IC; bench v1 separado, errores/vacío explícitos y pruebas en ambos transportes.
 - [x] **3.6 (Plataforma)** **Copiloto con modelo local**, herramientas de solo lectura y citas (DEC-26). *Verificado:* Ollama local, evidencia por hash, sin herramientas de escritura y pruebas de citas/concurrencia.
-- [ ] **3.7 (Plataforma)** Escala: perfil Redis + workers, lote de todo el conjunto, coste y tiempo medidos por equipo (DEC-23, 25). *Parcial:* B dio 72 done/264 errores y 3,62× con 1/4 workers. *31/10:* D/CPU sobre las mismas 336 revisiones: 173 done (133 LOD 2 y 40 envolventes LOD 1), 163 errores; 1.823,1/1.035,2 s (1,76×) en host compartido, mismos estados por revisión. No equivale a una mejora causal frente a B. No se proyectan 1600 IFC válidos con esa cobertura. [Evidencias](FASE3.md). *Cierre de Plataforma:* inventario de los 163 fallos, reproducción por `--tags` y control `--exigir-todos` (salida 2 si falta algún DRAFT); no resuelve la lectura de escaneados. [Material de pitch](PITCH_ESCALA.md). *D aprendido/v5:* 174 DRAFT (134 LOD 2/40 LOD 1), 162 errores; 1.434,28/877,69 s (1,63×), mismos estados con 1/4 workers y 0/336 aciertos de caché de trabajos. [Comparación por revisión](evidencias/fase3/31oct-d-v5/resumen.md); sigue abierta por cobertura y presupuesto de IFC válidos.
-- [ ] **3.8 (E)** Aprendizaje activo: las correcciones recalibran y se usan como few-shot (DEC-27). *31/10:* JSONL trazado y GET /correcciones; recalibración CPU implementada contra auditoría SQL y revisiones aprobadas, con separación por equipo, mínimos por estrategia y propuesta sin activar. Ensayo de nueve equipos/544 etiquetas de revisión simulada sintética. Huella de calibración en caché offline. Pares few-shot aprobados servidos por API y utilizados en el contexto del Copiloto; huella de fusión añadida a caché. Pendientes su consumo en extracción/ajuste de fuentes con Lectura y validación con correcciones de uso representativas; piloto manual preparado. [Detalle](API.md#recalibración-desde-las-correcciones-3110).
+- [ ] **3.7 (Plataforma)** Escala: Redis + workers, lote y coste/tiempo por equipo. *01/11:* 336 revisiones D/CPU, 251 DRAFT (211 LOD 2/40 LOD 1) y 85 errores; 1.714,18/919,26 s con 1/4 workers (**1,86×**), mismos estados por revisión, 0/336 aciertos de caché y cero llamadas externas. 77 errores del registro anterior pasan a DRAFT, sin transición inversa; no es efecto causal aislado ni precisión de ingeniería. Pendientes 63 casos con campos ausentes y 22 con geometría incoherente; presupuesto de 1.600 IFC correctos desconocido. [Evidencias](evidencias/fase3/01nov/resumen.md) / [pitch](PITCH_ESCALA.md).
+- [ ] **3.8 (E)** Aprendizaje activo: las correcciones recalibran y se usan como few-shot (DEC-27). *31/10:* JSONL trazado y GET /correcciones; recalibración CPU implementada contra auditoría SQL y revisiones aprobadas, con separación por equipo, mínimos por estrategia y propuesta sin activar. Ensayo de nueve equipos/544 etiquetas de revisión simulada sintética. Huella de calibración en caché offline. Pares few-shot aprobados servidos por API y utilizados en el contexto del Copiloto; huella de fusión añadida a caché. Pendiente validación con correcciones de uso representativas; piloto manual preparado y pospuesto. [Detalle](API.md#recalibración-desde-las-correcciones-3110). *01/11:* feedback aprobado conectado a prompts de extracción y prioridad acotada por canal, con exclusión de equipo/documentos, sesiones humanas finalizadas y caché invalidada al revocar; sin muestra humana ni validación de mejora representativa.
 - [x] **3.9 (I)** Vista Cambios con morph 3D por GUID, fantasma rev1, marcadores Δ y grafo de impacto.
 - [x] **3.10 (I)** Momento firma «del plano al modelo» (`/lab/firma`).
 - [ ] **3.11 (J)** Guion de 6 min v1 + `.pptx` v0 con la diapositiva «Elegimos con datos».
@@ -575,10 +575,10 @@ precios versionada, segundos de GPU y segundos totales. Objetivo para D: < 60 s 
 
 ### C. Normalización y contrato de datos
 
-- [ ] **C.1** Unidades con `pint`: mm, cm, m, in, ft-in (`5'-6"`), bar(g), barg/bara, kPa, MPa, psi,
+- [x] **C.1** Unidades con `pint`: mm, cm, m, in, ft-in (`5'-6"`), bar(g), barg/bara, kPa, MPa, psi,
   kg/cm², °C, °F, kg, t, lb. Separadores de miles y decimales en español e inglés (`2.000,5` / `2,000.5`)
-  decididos por contexto del documento y marcados si son ambiguos.
-- [ ] **C.2** Unidad canónica por magnitud y **unidad original conservada** en la evidencia.
+  decididos por contexto del documento y marcados si son ambiguos. *01/11:* Pint en normalizador/extracción/API; fracciones, unidades y ambigüedad probadas. [Detalle](NORMALIZACION.md).
+- [x] **C.2** Unidad canónica por magnitud y **unidad original conservada** en la evidencia. *01/11:* normalizador compartido, extracción B y PATCH de campo conectados; unidades originales en Source y auditoría. Separadores ambiguos requieren contexto; presión absoluta no se equipara a manométrica. [Contrato](NORMALIZACION.md).
 - [x] **C.3** Equivalencias en el delta: 10 bar = 1 MPa no es un cambio; 10 bar → 10 MPa sí. *Verificado 28/10:* Equivalencias con Pint y pruebas de cambios equivalentes/incompatibles en `test_plataforma_changes.py`.
 - [ ] **C.4** Sistema de referencia documentado: origen, eje Z vertical, azimut (Norte de planta =
   0°, sentido horario como en VESOR **o** el convenio que use TR — confirmar con el IFC de referencia). *31/10:* documentado y probado el convenio interno actual (+Z, 0°=+X, 90°=+Y, antihorario desde +Z; mm→m y conversión web-ifc). Norte/TR todavía sin verificar; permanece parcial. [Contrato](DATA_CONTRACT.md#sistema-de-referencia-interno-c4-3110).
@@ -647,8 +647,8 @@ dependa solo de la extracción, no de la familia.
 - [x] **E.3** Acciones por campo: aceptar, corregir (con nueva evidencia opcional), marcar como
   supuesto, rechazar. Todo con **deshacer** y registro de auditoría (quién, cuándo, antes/después). *31/10:* evidencia opcional, rechazo como abstención humana, deshacer completo por auditoría inversa, ETag/instantánea e idempotencia; errores recuperables y exportación JSONL separada. [Detalle](AUDITORIA_REVISION.md).
 - [x] **E.4** Aprobación ligada a la huella (existe) + idempotencia + bloqueo si hay `conflict` sin resolver. *Verificado 28/10:* Aprobación vinculada al fingerprint, bloqueo de conflictos y cambios que invalidan aprobación; `test_pipeline.py` y `test_api_base.py`.
-- [ ] **E.5** Medir **tiempo de revisión por equipo** con el propio log → cifra de impacto del pitch. *31/10:* sesiones y reloj activo conectados a acciones/auditoría, métricas por revisión y equipo y separación de pruebas. [Piloto manual preparado](MUESTRA_REVISION_MANUAL.md), todavía sin muestra humana ni cifra medida de impacto. *Kit v5:* [guion y exportación por campo/equipo](MUESTRA_REVISION_MANUAL_31OCT_V5.md), V-101 A/B B/CPU sin aceptar ni aprobar; API 8030, web compilada para 3130 con arranque manual pendiente. Exportación vacía verificada con tiempos null; falta que Javier realice y confirme la sesión.
-- [ ] **E.6** Aprendizaje activo (DEC-27): corrección aprobada → ejemplo few-shot + recalibración + ajuste de prioridad de fuentes. *31/10:* pares aprobados/recortes por API y contexto del Copiloto, retirada al revocar y exclusión del equipo/documentos consultados; recalibración CPU existente. Pendientes consumo por extractores, evaluación del ajuste de fuentes con Lectura y muestra humana representativa.
+- [ ] **E.5** Medir **tiempo de revisión por equipo** con el propio log → cifra de impacto del pitch. *31/10:* sesiones y reloj activo conectados a acciones/auditoría, métricas por revisión y equipo y separación de pruebas. [Piloto manual preparado](MUESTRA_REVISION_MANUAL.md), todavía sin muestra humana ni cifra medida de impacto. *Kit v5:* [guion y exportación por campo/equipo](MUESTRA_REVISION_MANUAL_31OCT_V5.md), V-101 A/B B/CPU sin aceptar ni aprobar; API 8030, web compilada para 3130 con arranque manual pendiente. Exportación vacía verificada con tiempos null; falta que Javier realice y confirme la sesión. *01/11:* pospuesta por Javier; no se ejecuta ni se simula una sesión humana.
+- [ ] **E.6** Aprendizaje activo (DEC-27): corrección aprobada → ejemplo few-shot + recalibración + ajuste de prioridad de fuentes. *31/10:* pares aprobados/recortes por API y contexto del Copiloto, retirada al revocar y exclusión del equipo/documentos consultados; recalibración CPU existente. Pendientes evaluación del ajuste de fuentes y muestra humana representativa. *01/11:* feedback aprobado conectado a prompts de extracción y prioridad acotada por canal, con exclusión de equipo/documentos, sesiones humanas finalizadas y caché invalidada al revocar; sin muestra humana ni validación de mejora representativa.
 - [x] **E.7** Intervalo conforme visible por campo («2.000 mm ± 3 mm, 90 %») y umbral de revisión
   obligatoria fijado con la curva riesgo-cobertura (DEC-12). *Hecho 31/10:* la cola de revisión
   muestra el intervalo («± 0,5° · 90 %») y marca «Confírmelo» en los campos abstenidos. Estos van
@@ -738,14 +738,10 @@ Es nuestra arma principal: **llegamos al jurado con su propia rúbrica ya medida
 - [x] **H.5 Observabilidad:** logs estructurados (JSON), traza por job, métricas de coste y latencia. *Verificado 28/10:* Eventos estructurados por trabajo y RunInfo con tiempos, intentos, llamadas y coste; `api/jobs.py` y `test_api_queue.py`. Coste desconocido no se convierte en cero.
 - [x] **H.6 Seguridad básica:** CORS restringido, límites de tamaño, sin claves en el repo (`.env.example`),
   documentos tratados como datos. *Verificado 28/10:* CORS, límite de subida, hashes y separación documento/instrucción verificados en las pruebas API; no se afirma una auditoría de seguridad completa.
-- [ ] **H.7 Escala (para el pitch):** diagrama con cola, workers horizontales, caché por hash (una
-  revisión que solo cambia una página solo reprocesa esa página), coste estimado de un proyecto de
-  400 equipos × 4 revisiones. *Parcial 30/10:* diagrama, caché de trabajos por hash y extrapolación
-  a 400 × 4 en [FASE3.md](FASE3.md). *31/10:* D/CPU completa 336 trabajos con 173 IFC DRAFT
-  válidos y 163 errores, idénticos con 1/4 workers (1,76× en máquina compartida). Se conserva
-  el desglose LOD 1/2. Todavía no hay un tiempo defendible para 1.600 IFC válidos. *D aprendido/v5:* 174/162 y 1,63×; OCR incremental comprobado por página, render/pipeline completo pendiente. [Medición nueva](evidencias/fase3/31oct-d-v5/resumen.md).
+- [ ] **H.7 Escala (para el pitch):** cola, workers horizontales, caché por hash y proyecto 400 × 4. *01/11:* diagrama SVG/PNG actualizado y etapas por página medidas (texto, render, OCR y geometría 2/1/0/2); reconciliación e IFC siguen globales. Lote D/v5 251 DRAFT/85 errores, 1,86× con cuatro workers. Escenario: 72,96 min para 1.600 terminaciones (incluye fallidas), 0,4864 € solo de cómputo si se supone 0,10 €/worker-h; no es gasto medido ni presupuesto de IFC correctos. [Resultado y límites](evidencias/fase3/01nov/resumen.md).
   - [x] Diagrama reutilizable y calculador de coste paramétrico para 400 × 4: [pitch](PITCH_ESCALA.md).
-  - [ ] Medición del ahorro incremental de extremo a extremo por página y presupuesto de IFC válidos; cobertura y muestra humana pendientes.
+  - [x] Medición de etapas incrementales por página en CPU/sin red: [prueba y límites](evidencias/fase3/01nov/incremental-etapas.json); no equivale a edición incremental de mallas.
+  - [ ] Presupuesto de IFC válidos; cobertura de lectura, precisión de ingeniería y muestra humana pendientes.
 
 ### I. Frontend: diseño, 3D y animación
 
@@ -940,18 +936,18 @@ el estilo.
 #### I.5 3D: todo lo que debe poder hacer el visor
 
 - [x] Carga del IFC en Worker con barra/skeleton; nunca congela la UI. *Hecho:* ver 1.7.
-- [ ] Órbita, paneo y zoom suaves e **interrumpibles**; "fly-to" a un elemento con muelle; doble clic = encuadrar.
-- [ ] Selección con resaltado (outline) y **hit slop**: zona de picking ampliada para boquillas pequeñas.
+- [x] Órbita, paneo y zoom suaves e **interrumpibles**; "fly-to" a un elemento con muelle; doble clic = encuadrar.
+- [x] Selección con resaltado (outline) y **hit slop**: zona de picking ampliada para boquillas pequeñas.
 - [x] Aislar / ocultar / transparentar componentes; árbol IFC (proyecto → equipo → componentes → puertos).
-- [ ] **Plano de corte** animado (ver interior, espesores) con relleno de sección rayado (hatch).
+- [x] **Plano de corte** animado (ver interior, espesores) con relleno de sección rayado (hatch).
 - [x] **Vista explosionada** animada (virola, fondos, faldón y boquillas se separan a lo largo de su eje).
-- [ ] **Cotas 3D** generadas a partir de los parámetros y ancladas a la geometría IFC, con la misma
+- [x] **Cotas 3D** generadas a partir de los parámetros y ancladas a la geometría IFC, con la misma
   estética que el plano; al pasar el ratón muestran valor, unidad, confianza y fuente.
 - [x] **Rosa de orientación** (anillo de azimut 0–360° en planta) con las boquillas proyectadas: cruza
   con el VESOR.
-- [ ] Vistas guardadas: isométrica, alzado, planta, "como el plano" (cámara ortográfica alineada con la
-  vista del GA para poder superponer plano y modelo).
-- [ ] Supuestos (valores por defecto de familia) dibujados con material distinto (rayado o translúcido).
+- [x] Vistas guardadas: isométrica, alzado, planta, "como el plano" (cámara ortográfica alineada con la
+  vista del GA para poder superponer plano y modelo). *01/11:* presets iso/alzado/planta/Como el plano (alzado ortográfico) y hasta ocho vistas personales por IFC, persistidas en el navegador. Para otro ángulo de GA se ajusta y guarda la cámara manualmente; no se infiere la orientación del PDF.
+- [x] Supuestos (valores por defecto de familia) dibujados con material distinto (rayado o translúcido).
 - [ ] Rendimiento: `frameloop="demand"`, instancing para elementos repetidos, BVH, ≤ 200 k triángulos a
   60 fps en un portátil normal; DPR adaptativo. *31/10:* escena IFC con tres recortes en
   **157.538 triángulos y 235.3 fps** (RTX 5070, DPR 1): techo de 200 k cumplido. Render a
@@ -959,7 +955,7 @@ el estilo.
 - [x] Giro automático de cámara **360°** alrededor del eje del modelo, una vuelta por minuto,
   con pausa manual, pausa por interacción, sincronización A | B y movimiento reducido.
   Comprobado: 385.7° en 64.2 s, radio estable; capturas y medidas en el informe 3D.
-- [ ] Captura de pantalla del visor en PNG para el informe y el BCF.
+- [x] Captura de pantalla del visor en PNG para el informe y el BCF. *01/11:* PNG con rótulos/procedencia y BCF 2.1 con snapshot, cámara actual y GUID; pruebas API/navegador. [Informe](agentes/INFORME_FRONTEND_3D.md).
 
 #### I.6 Momentos firma (lo que el jurado recordará)
 

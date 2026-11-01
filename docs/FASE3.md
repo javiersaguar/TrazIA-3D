@@ -1,5 +1,7 @@
 # Fase 3 · Avance de Plataforma, 27/10/2026
 
+**Actualización 01/11:** [251 DRAFT/85 errores, 1,86× con cuatro workers y etapas por página](evidencias/fase3/01nov/resumen.md). Las secciones fechadas anteriores conservan las cifras y límites de cada sesión.
+
 Trabajo en feat/plataforma, separado del worktree feat/lectura donde se desarrolla Fase 2.
 No se editan estrategias, proveedores, generador, calibración, geometría 2D ni bench Python.
 No se integra el trabajo sin terminar del otro agente. El visor 3D permanece intacto.
@@ -438,3 +440,12 @@ empaquetado sí participa en la huella de caché v3. Se conserva el trabajo de a
 336 revisiones, 64 equipos: **174 DRAFT (134 LOD 2, 40 LOD 1) y 162 errores**, idénticos con 1/4 workers. Tiempos: **1.434,28 / 877,69 s; 1,6341× observado** en host compartido. Proveedores: cero llamadas y 0 EUR declarados; caché de trabajos: 0/336 en cada despliegue nuevo. El histórico heurístico conserva su identidad: 173 éxitos se mantienen, un fallo pasa a DRAFT y 162 siguen fallando. No se aísla causalidad ni precisión de ingeniería.
 
 [Resultados, errores, tiempos por equipo y reproducción](evidencias/fase3/31oct-d-v5/resumen.md). La prueba real de OCR reconoce 2/1/0/2 páginas en frío/cambio/repetición/control; el render sigue recorriendo todo el PDF. No se da por resuelta la incrementalidad completa. Extrapolación a 1.600 terminaciones con cuatro workers: 69,66 min; tiempo y coste total de 1.600 IFC válidos siguen en null. 3.7/H.7 permanecen abiertas.
+
+
+## 3.7 / H.7 · repetición CPU y páginas incrementales (01/11)
+
+Mismo SHA de 336 revisiones: 251 DRAFT/85 errores (211 LOD 2, 40 LOD 1), idénticos por revisión con 1/4 workers; 1.714,18/919,26 s, **1,8647×**. 77 errores históricos pasan a DRAFT, sin transición inversa. Calidad de ingeniería sin verificar: 63 errores por campos ausentes, 22 por geometría. Caché de trabajos 0/336 y llamadas externas cero. [Inventario y medición](evidencias/fase3/01nov/resumen.md).
+
+La reutilización medida ahora cubre render, texto, OCR y geometría por página (2/1/0/2); reconciliación e IFC son globales. Diagrama [SVG](evidencias/fase3/01nov/arquitectura-escala.svg) / [PNG](evidencias/fase3/01nov/arquitectura-escala.png). Proyección 400×4: 72,96 min con cuatro workers para terminaciones, incluidas fallidas; 0,4864 € solo de cómputo si se supone 0,10 €/worker-h. Total y presupuesto de IFC correctos null; revisión humana pospuesta. [Pitch actualizado](PITCH_ESCALA.md).
+
+C.1/C.2 implementadas con Pint y evidencia original; C.4 interno documentado y Norte explícito opcional, referencia TR pendiente. [Normalización](NORMALIZACION.md). 3.8/E.6 conectadas a extracción/fusión con aprobación vigente y sesión humana finalizada, caché invalidada al revocar; falta muestra/evaluación real y no se activa nueva calibración con datos inventados. [Feedback](APRENDIZAJE_APROBADO.md). E.5 no se realiza por indicación de Javier.

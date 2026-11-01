@@ -639,3 +639,36 @@ API del piloto en 127.0.0.1:8030, modo offline, CORS 3130, SQL/JSONL separados. 
 Pendiente: que Javier inicie la web y haga la sesión real; después exportar el registro y publicar tiempos activos/totales por equipo y atribuidos por campo, tamaño de muestra e interrupciones. No hay cifra de impacto medida ni se marca E.5 terminada. Se detiene el trabajo del kit para pedir esa participación.
 
 Validación final: Ruff check/format completos correctos (173 archivos). Dos pasadas completas con `uv run --extra api pytest -q`: **311 passed / 1 skipped**, en **278,68 s** y **238,83 s**; aviso de deprecación preexistente de Starlette/httpx. Build Next conectado en verde. Cuatro originales del piloto verificados por SHA contra la API, cero sesiones/acciones; [comprobación de solo lectura](../evidencias/fase3/31oct-d-v5/piloto-verificacion.json). Sin cambios web, dependencias nuevas, contrato model.py, extractores ni datos privados.
+
+
+## Sesión 01/11 · unidades, feedback, página incremental y visor
+
+### Implementado
+
+C.1/C.2: Pint compartido en extracción y revisión, unidad/texto originales, separadores ambiguos y base de presión explícita, rechazo atómico 422. C.4: utilidades internas, Norte opcional explícito y Pset de referencia en IFC sin cambiar model.py; falta contrastar el convenio externo de TR. [Contrato](../NORMALIZACION.md).
+
+3.8/E.6: feedback aprobado con sesión humana finalizada conectado a prompt real y prioridad acotada de canal; exclusión de equipo/documentos, mínimo de grupos independientes y campos, confianza bruta conservada e invalidación de caché al revocar. No hay entrenamiento ni activación con una sesión ficticia. [Diseño y límites](../APRENDIZAJE_APROBADO.md).
+
+H.7: huella conservadora de página PDF antes de render/OCR; cachés verificadas y atómicas de texto, raster y geometría vectorial/raster. La fuente de una página reutilizada se vincula al documento actual. Si no puede obtenerse una huella segura, se procesa normalmente. Reconciliación global e IFC siguen completos. La prueba real RapidOCR en CPU/sin red dio patrón 2/1/0/2 páginas en todas las etapas, revisión B caliente 0,86 s y control B frío 3,25 s (una secuencia, no un benchmark estadístico). [Datos](../evidencias/fase3/01nov/incremental-etapas.json).
+
+POST /viewer/bcf: conversión sin mutación de PNG/cámara/GUID reales a BCF; validación de tamaño, imagen y cámara. [API](../API.md#ampliaciones-0111).
+
+### Comprobado
+
+Ruff check y format verdes. Suite Python final tras la regresión NumPy: 348 pasadas, una omitida, 266,67 s (la pasada anterior dio 346/1 en 302,25 s). Tras ampliar el inventario de escala, 14 pruebas focalizadas verdes. Web: typecheck, lint, build y 42 unitarias. No se añadieron dependencias ni cambió uv.lock. Datos exclusivamente sintéticos, sin GPU ni proveedores externos.
+
+### Pendientes y coordinación con Lectura
+
+E.5 pospuesta expresamente por Javier el 01/11: no se ha iniciado ni simulado una sesión humana. Faltan muestra humana representativa y evaluación separada del feedback; C.4 requiere el convenio de referencia de TR. Los cambios del lote de escala con unidades/lectores/cachés nuevos no deben atribuirse causalmente a una sola pieza. Se conserva un inventario por revisión para entregar a Lectura sin ocultar los errores ni considerar un DRAFT como ingeniería validada. Las métricas nuevas del lote se incorporan tras ejecutarlo con imagen fijada.
+
+
+Incidencia de la primera ejecución 01/11: detenida tras detectar escalares NumPy float32 no serializables en la caché de geometría. Se conservan los datos de diagnóstico en generated/mejoras-01nov/escala/; no se utilizan como medición final. Corregida serialización a números JSON nativos y persistencia opcional (un fallo de disco/codificación no invalida la computación). Regresión con geometría raster positiva y lectura posterior de caché; prueba de ruta no escribible.
+
+
+### Resultado final del lote 01/11
+
+251 DRAFT/85 errores en ambas pasadas (211 LOD 2/40 LOD 1); 1.714,18/919,26 s, 1,8647×. Mismos estados/LOD/errores en las 336 revisiones. Frente al 31/10: 77 error→DRAFT y ninguna pérdida de exportación; no valida precisión ni efecto causal de una pieza. 63 casos con campos ausentes, 22 con geometría incoherente: [inventario](../evidencias/fase3/01nov/pendientes-lectura.jsonl). Fuente/imagen fijadas y parámetros archivados, volúmenes nuevos en cada pasada, GPU oculta y proveedores vacíos. 0/336 aciertos de caché de trabajo; cero llamadas externas.
+
+[Resumen y reproducción](../evidencias/fase3/01nov/resumen.md). Proyecto 400×4: extrapolación 72,96 min para terminaciones, también fallidas; hipótesis 0,10 €/worker-h → 0,4864 € solo de cómputo. No se da presupuesto total ni de IFC correctos. Diagrama actualizado SVG/PNG para el pitch; H.7 mantiene abiertas cobertura/precisión y presupuesto válido. ROADMAP marca C.1/C.2 y siete mejoras del visor; rendimiento en otro portátil sigue pendiente. E.5 pospuesta; 3.8/E.6 sin muestra humana representativa y C.4 externo sin verificar.
+
+Pruebas finales: Python 348/una omitida, 266,67 s; Ruff check/format verdes. Web typecheck/lint/build, 42 unitarias, API 33/una omitida y offline 26/ocho omitidas. Sin nuevas dependencias. No se han integrado ramas ajenas ni modificado main.

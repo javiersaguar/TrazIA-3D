@@ -1,0 +1,44 @@
+{
+  "synthetic": true,
+  "strategy": "d_hibrido",
+  "input_sha256": "da9ea85b70734d8ccdb0d63aef882b1d488667f08e52495a5a9b6c28a951e170",
+  "measured": {
+    "planned": 336,
+    "terminal": 336,
+    "draft_ifc": 251,
+    "errors": 85,
+    "batch_seconds": 919.2622970509999,
+    "workers": 4,
+    "error_categories": {
+      "campos_ausentes": 63,
+      "geometria_incoherente": 22
+    }
+  },
+  "acceptance": {
+    "all_revisions_have_draft_ifc": false,
+    "engineering_accuracy_verified": false
+  },
+  "project_scenario": {
+    "measured": false,
+    "equipment": 400,
+    "revisions_each": 4,
+    "terminal_jobs": 1600,
+    "terminal_seconds": 4377.439509766667,
+    "valid_ifc_seconds": null,
+    "valid_ifc_total_cost_eur": null,
+    "assumptions": {
+      "eur_worker_hour": 0.1,
+      "human_minutes_per_equipment_all_revisions": null,
+      "eur_human_hour": null,
+      "fixed_infrastructure_eur": null
+    },
+    "components": {
+      "compute_eur": 0.48638216775185183,
+      "providers_eur": 0.0,
+      "human_eur": null,
+      "fixed_infrastructure_eur": null
+    },
+    "total_scenario_eur": null,
+    "limit": "Extrapolación de terminaciones, incluidas fallidas; no presupuesto de IFC válidos. CPU compartida. Tiempo humano sin medir."
+  }
+}

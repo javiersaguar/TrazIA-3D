@@ -1,0 +1,139 @@
+{
+  "synthetic": true,
+  "component": "Texto, render, OCR y geometría por página · CPU",
+  "engine": "rapidocr-3",
+  "onnx_available_providers": [
+    "AzureExecutionProvider",
+    "CPUExecutionProvider"
+  ],
+  "engine_initialization_seconds": 0.838365649,
+  "document_sha256": [
+    "d14a602e4e647e1f9ca1b48e6a7966b450a187b43753e2386afe8ae05605ea2b",
+    "80c9022bab65a6c49f3d5fad4b414c92183878eed6176007c189a11d00ac6208"
+  ],
+  "page_pixels_sha256": {
+    "A": [
+      "ce8e5a649bb2a14d5ffe55047de0186b04561c79f01801a5eae721c6cf6d898b",
+      "785f2967f703782aeb5cf577983678c15f7feaed6ed5a8ddab906466cc7ffd55"
+    ],
+    "B": [
+      "ce8e5a649bb2a14d5ffe55047de0186b04561c79f01801a5eae721c6cf6d898b",
+      "f2831a24f5243f6d05f11dd2b0a00dc1f3db86012adc594ed991a4525b83850b"
+    ]
+  },
+  "phases": [
+    {
+      "name": "A_frio",
+      "seconds": 4.175766439,
+      "recognizer_calls": [
+        {
+          "pixels_sha256": "ce8e5a649bb2a14d5ffe55047de0186b04561c79f01801a5eae721c6cf6d898b",
+          "seconds": 1.4782542999999997
+        },
+        {
+          "pixels_sha256": "785f2967f703782aeb5cf577983678c15f7feaed6ed5a8ddab906466cc7ffd55",
+          "seconds": 0.6712149609999987
+        }
+      ],
+      "rendered_pages": [
+        1,
+        2
+      ],
+      "text_extraction_pages": [
+        1,
+        2
+      ],
+      "vector_analysis_pages": [
+        1,
+        2
+      ],
+      "raster_analysis_pages": [
+        1,
+        2
+      ],
+      "lines_per_page": {
+        "1": 27,
+        "2": 4
+      }
+    },
+    {
+      "name": "B_una_pagina_cambiada",
+      "seconds": 0.8598331249999998,
+      "recognizer_calls": [
+        {
+          "pixels_sha256": "f2831a24f5243f6d05f11dd2b0a00dc1f3db86012adc594ed991a4525b83850b",
+          "seconds": 0.48293034499999976
+        }
+      ],
+      "rendered_pages": [
+        2
+      ],
+      "text_extraction_pages": [
+        2
+      ],
+      "vector_analysis_pages": [
+        2
+      ],
+      "raster_analysis_pages": [
+        2
+      ],
+      "lines_per_page": {
+        "1": 27,
+        "2": 4
+      }
+    },
+    {
+      "name": "B_repetido",
+      "seconds": 0.025752767999998483,
+      "recognizer_calls": [],
+      "rendered_pages": [],
+      "text_extraction_pages": [],
+      "vector_analysis_pages": [],
+      "raster_analysis_pages": [],
+      "lines_per_page": {
+        "1": 27,
+        "2": 4
+      }
+    },
+    {
+      "name": "B_frio_control",
+      "seconds": 3.2521202869999986,
+      "recognizer_calls": [
+        {
+          "pixels_sha256": "ce8e5a649bb2a14d5ffe55047de0186b04561c79f01801a5eae721c6cf6d898b",
+          "seconds": 0.9004626789999985
+        },
+        {
+          "pixels_sha256": "f2831a24f5243f6d05f11dd2b0a00dc1f3db86012adc594ed991a4525b83850b",
+          "seconds": 0.4188931469999986
+        }
+      ],
+      "rendered_pages": [
+        1,
+        2
+      ],
+      "text_extraction_pages": [
+        1,
+        2
+      ],
+      "vector_analysis_pages": [
+        1,
+        2
+      ],
+      "raster_analysis_pages": [
+        1,
+        2
+      ],
+      "lines_per_page": {
+        "1": 27,
+        "2": 4
+      }
+    }
+  ],
+  "only_changed_page_recognized": true,
+  "page_stages_incremental": true,
+  "only_changed_page_rendered": true,
+  "warm_vs_cold_seconds_saved": 2.392287161999999,
+  "whole_pipeline_incremental": false,
+  "limit": "Se ejercitan las etapas reales por página, incluida geometría, en una sola secuencia. Se sigue leyendo la estructura PDF para huellas; la reconciliación global y el IFC no son una edición incremental de mallas. No es precisión industrial."
+}
