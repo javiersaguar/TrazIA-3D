@@ -672,3 +672,42 @@ Incidencia de la primera ejecución 01/11: detenida tras detectar escalares NumP
 [Resumen y reproducción](../evidencias/fase3/01nov/resumen.md). Proyecto 400×4: extrapolación 72,96 min para terminaciones, también fallidas; hipótesis 0,10 €/worker-h → 0,4864 € solo de cómputo. No se da presupuesto total ni de IFC correctos. Diagrama actualizado SVG/PNG para el pitch; H.7 mantiene abiertas cobertura/precisión y presupuesto válido. ROADMAP marca C.1/C.2 y siete mejoras del visor; rendimiento en otro portátil sigue pendiente. E.5 pospuesta; 3.8/E.6 sin muestra humana representativa y C.4 externo sin verificar.
 
 Pruebas finales: Python 348/una omitida, 266,67 s; Ruff check/format verdes. Web typecheck/lint/build, 42 unitarias, API 33/una omitida y offline 26/ocho omitidas. Sin nuevas dependencias. No se han integrado ramas ajenas ni modificado main.
+
+
+## Sesión 01/11 · F.5, diagnóstico y evidencias pendientes
+
+### Hecho
+
+- F.5: cruce del detector vectorial de Lectura en `revisions.compare`, por documento/página y SHA.
+  API `marks=true` evita ECC/IFC; Revisión enfoca marca/PDF y retorna al campo. Escaneados,
+  originales no verificables, páginas truncadas y eliminaciones sin caja nueva se declaran sin lectura.
+  No se cambia `model.py` ni el detector de Lectura, ni se aprueba/modifica la revisión.
+- Reproducidos en CPU los 85 errores con código actual y calibración v6: 85 errores, cero recuperados,
+  290,244 s acumulados. Candidatos/alternativas/fuentes y GT posterior archivados para Lectura.
+  No se usan GT para predecir ni se relajan validadores. [Evidencias](../evidencias/fase3/01nov-triage/resumen.md).
+- D.4: IFC4 sintético DRAFT validado con reglas EXPRESS (cero incidencias), abierto en Bonsai
+  y visor web con SHA idéntico. Capturas y archivo en [ifc-checks](../ifc-checks/01nov/README.md).
+  BIMvision está instalado según Javier, pero todavía no ofrece ventana controlable; tercera captura pendiente.
+- Documentado el estado real de C.4/D.5 y E.6: sin referencia de TR ni muestra humana aportada,
+  no se declara fidelidad externa ni mejora de extracción. E.5 permanece pospuesta.
+
+### Comprobado
+
+- Ruff check y format verdes, 206 archivos.
+- Suite completa Python final: 389 pasadas/una omitida, 207,50 s; trece pruebas específicas
+  pasan (2,15 s), incluidas originales perdidos/no verificables y GT solo posterior a extracción.
+- Web: typecheck/lint/build verdes (aviso existente de TanStack); 42 unitarias.
+- E2E conectado: 34 pasadas/una omitida en la pasada completa; el nuevo caso opcional D.4
+  se corrigió para reconocer el ID compuesto de B y pasó después por separado (2,8 s).
+  Sin API: 26 pasadas/nueve omitidas (2,2 min).
+  La primera ejecución web se interrumpió por configurar mi puerto fuera de CORS; al autorizar
+  el origen del test las comprobaciones de API/IFC volvieron a pasar. No se cambiaron límites de tiempo.
+- No dependencias nuevas, no GPU de inferencia, no datos privados, no integración de ramas ajenas.
+
+### Pendiente y límites
+
+F.5 conserva el límite de detección en raster. 3.7/H.7 conserva 63 casos sin campos y 22
+geometrías incoherentes; las 251 exportaciones anteriores no se han reevaluado con v6, ni se ha
+medido nuevo escalado o precisión. El coste de 1.600 IFC correctos sigue desconocido. C.4/D.5
+requieren el IFC autorizado de TR; E.6 requiere correcciones humanas representativas. No se
+inicia E.5 ni se simula participación humana. D.4 necesita la tercera apertura y captura, no solo instalar.

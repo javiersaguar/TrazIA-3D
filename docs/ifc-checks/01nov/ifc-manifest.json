@@ -1,0 +1,70 @@
+{
+  "synthetic": true,
+  "draft": true,
+  "input_sha256": "9ca68e1230d7c4ca62668786ed95308d8c20c229151b2d2945930422c451472c",
+  "bytes": 238848,
+  "schema": "IFC4",
+  "express_rules": true,
+  "validation_statements": [],
+  "products": 15,
+  "units": [
+    {
+      "unit_type": "LENGTHUNIT",
+      "name": "METRE",
+      "prefix": null
+    },
+    {
+      "unit_type": "AREAUNIT",
+      "name": "SQUARE_METRE",
+      "prefix": null
+    },
+    {
+      "unit_type": "VOLUMEUNIT",
+      "name": "CUBIC_METRE",
+      "prefix": null
+    }
+  ],
+  "contexts": [
+    {
+      "type": "Model",
+      "dimension": 3,
+      "north": null,
+      "origin": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ]
+    }
+  ],
+  "tr_reference_available": false,
+  "cross_viewer_check": "pendiente de tercera captura",
+  "viewer_evidence": [
+    {
+      "viewer": "Bonsai Viewer",
+      "package": "0.9.0post1 portable",
+      "status": "opened_and_inspected",
+      "screenshot": "bonsai-viewer.png"
+    },
+    {
+      "viewer": "web-ifc",
+      "version": "0.0.78",
+      "status": "opened",
+      "screenshot": "web-ifc.png"
+    },
+    {
+      "viewer": "BIMvision",
+      "package": "3.2.1",
+      "status": "installed_no_targetable_window",
+      "screenshot": null
+    }
+  ],
+  "capture_sha256": {
+    "bonsai-viewer.png": "5101246c2d921f0d21b6e7c00419f79c803f7b0085d0e63cd142bfbaa3cebb88",
+    "web-ifc.png": "994d85ea81de7f544b2700c16791ec4c8e0e9ccd45155c0165d6e7af1aeb1d6e"
+  }
+}

@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 import { flattenRevision } from "../../src/lib/mock/fields";
-import { readFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { resolve } from "node:path";
 
 // Dos páginas sintéticas en memoria para verificar la navegación PDF sin originales privados.
 function twoPagePdf() {
@@ -436,3 +438,43 @@ test("Revisión cruza marcas por documento, enfoca la página y vuelve al campo"
   await expect(page.getByTestId("pdf-panel")).toContainText("GA-V101");
   await expect(page.getByTestId("pdf-panel")).toHaveAttribute("data-pdf-page", "1");
 });
+
+// Comprobación D.4 opcional: reproducir exactamente el archivo abierto en los visores de escritorio.
+if (process.env.PW_IFC_INTEROP) {
+  test("D.4 captura el IFC compartido en el visor web @interop", async ({ page }) => {
+    const path = process.env.PW_IFC_INTEROP!;
+    const body = await readFile(path);
+    expect(body.includes(Buffer.from("'synthetic'"))).toBe(true);
+    let requests = 0;
+    let deliver!: () => void;
+    const gate = new Promise<void>(done => { deliver = done; });
+    await page.route(/\/(?:demo\/ifc\/rev_b\.ifc|revisions\/(?:B|[^/?]*%3AB)\/ifc)(?:\?|$)/i, async route => {
+      requests++;
+      await gate;
+      await route.fulfill({ contentType: "application/x-step", body });
+    });
+    await page.emulateMedia({ reducedMotion: "reduce", colorScheme: "dark" });
+    await page.goto("/revision");
+    await page.getByRole("radio", { name: "rev B", exact: true }).click();
+    const viewer = page.getByTestId("ifc-viewer");
+    try {
+      await expect(viewer).toHaveAttribute("data-phase", "loading");
+    } finally {
+      deliver();
+    }
+    await expect(viewer).toHaveAttribute("data-phase", "ready", { timeout: 30000 });
+    await expect.poll(() => requests).toBeGreaterThan(0);
+    expect(Number(await viewer.getAttribute("data-products"))).toBeGreaterThan(0);
+    const directory = resolve("../docs/ifc-checks/01nov");
+    await mkdir(directory, { recursive: true });
+    await page.screenshot({ path: resolve(directory, "web-ifc.png"), fullPage: true });
+    await writeFile(resolve(directory, "web-ifc.json"), JSON.stringify({
+      at: new Date().toISOString(), synthetic: true, draft: true,
+      input_sha256: createHash("sha256").update(body).digest("hex"), bytes: body.length,
+      products: Number(await viewer.getAttribute("data-products")),
+      triangles: Number(await viewer.getAttribute("data-triangles")),
+      delivery: "Playwright sirve los bytes del IFC indicado; no modifica su geometría",
+      renderer: process.env.PW_CPU_ONLY === "1" ? "SwiftShader CPU" : "navegador",
+    }, null, 2) + "\n");
+  });
+}

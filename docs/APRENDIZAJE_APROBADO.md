@@ -13,3 +13,18 @@ Pruebas: `test_plataforma_extraction_feedback.py`, caché/offline, proveedores y
 ## Pendiente
 
 E.5 queda pospuesta por indicación de Javier (01/11). No hay muestra nueva de correcciones humanas ni evaluación separada que demuestre mejora de precisión. Por eso 3.8/E.6 conservan su parte de validación pendiente. Un experimento de eficacia deberá separar equipos/documentos, comparar extracción con/sin perfil y verificar riesgo-cobertura; no se atribuye al feedback el cambio de resultados del lote de escala sin una ablación.
+
+
+## Evaluación pendiente · 01/11
+
+Muestra humana aportada para esta sesión: **n=0** (confirmado por Javier). No hay una mejora de
+extracción/prioridad medida con correcciones humanas representativas; E.6 y 3.8 siguen parciales.
+E.5 está pospuesta y no se realiza una sesión manual ni se presentan pruebas sintéticas como uso real.
+
+Cuando haya evidencia autorizada, congelar documentos, modelos y correcciones aprobadas, separar
+por equipo/documentos el conjunto de ejemplos del de evaluación y comparar `use_learning=false`
+con `true` sobre las mismas entradas. Mantener proveedores/semilla/parámetros y contabilizar fuentes,
+abstenciones, aciertos/errores por campo, calibración, latencia y coste. Verificar exclusión de
+equipo/documento y retirada al revocar; no incorporar al contexto respuestas del equipo evaluado.
+Informar tamaño de muestra, diferencias pareadas e incertidumbre antes de atribuir mejora causal.
+No se publican originales reales ni correcciones sin autorización.

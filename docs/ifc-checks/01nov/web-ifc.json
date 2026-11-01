@@ -1,0 +1,11 @@
+{
+  "at": "2026-11-01T11:33:29.417Z",
+  "synthetic": true,
+  "draft": true,
+  "input_sha256": "9ca68e1230d7c4ca62668786ed95308d8c20c229151b2d2945930422c451472c",
+  "bytes": 238848,
+  "products": 8,
+  "triangles": 3696,
+  "delivery": "Playwright sirve los bytes del IFC indicado; no modifica su geometría",
+  "renderer": "SwiftShader CPU"
+}
