@@ -8,12 +8,12 @@ medido usa **datos sintéticos**: ninguna cifra es precisión sobre planos de TR
 | # | Tarea | Estado | Cifra principal |
 | --- | --- | --- | --- |
 | 1 | **3.2** Memoria solo con revisión aprobada | Hecha | D omite la memoria (con aviso) si la anterior es DRAFT o su huella no cuadra |
-| 2 | **3.3** Calibración, intervalos conformes y abstención | Hecha; el criterio de ECE no se cumple en S-reservado | D: ECE 0,017 en S-dev y 0,279 en S-reservado; cobertura del intervalo al 90 %: 94,1 % |
+| 2 | **3.3** Calibración, intervalos conformes y abstención | Hecha; D cumple la ECE desde la v6 (1/11) | Estudio 7: ECE de D 0,027 en S-reservado (antes 0,279) y cobertura del intervalo al 90 % del 91,4 % |
 | 3 | **2.11** Estudio A/B/C/D | Hecho sin A | D 0,642 [0,607; 0,678], C 0,558, B 0,536 |
 | 4 | **3.4** Selector y ablaciones | Hecho; sin fusión aprendida | El selector por tipo pierde en S-reservado (0,372 frente a 0,525 de D solo) |
 | 5 | **2.2 / 0.10** PaddleOCR-VL | Medido y descartado | No acaba una página A3 en 25 min en la RTX 5070 |
 | 6 | **2.4** Detector propio Florence-2 | Hecho | F1 0,982 en S-reservado; aporte a D +0,011 [0,001; 0,023] |
-| 7 | **2.1** VESOR y **2.5** ColQwen2/ColSmol | No empezadas | — |
+| 7 | **2.1** VESOR y **2.5** ColQwen2/ColSmol | Hechas el 1/11 (ver «Sesión del 1/11/2026») | B lee el VESOR completo; ColQwen2 baja C de 0,600 a 0,562 y queda apagado |
 
 ## Qué se ha hecho
 
@@ -135,7 +135,7 @@ Ninguno rompe la firma de `pipeline.process`, el contrato ni la CLI del estudio.
   sí aguanta. Se podría arreglar con más variedad de proveedores en S-dev o recalibrando con las
   correcciones humanas (3.8) cuando haya.
 - **A (visión) sin medir** en el estudio, por coste de GPU (unos 129 s por página).
-- **2.1 y 2.5** no empezadas.
+- **2.1 y 2.5** hechas el 1/11: ver «Sesión del 1/11/2026».
 - **S-reservado se ha abierto más de una vez:** ver la nota del final de «Estudio 2».
 - **Lectura de `correcciones.jsonl` (3.8)** para recalibrar: pendiente.
 
@@ -287,3 +287,94 @@ limpio, rev1 y rev2; calibración v5; `generated/proveedores-r1b/`). **Datos sin
     de A en el mismo subconjunto que Qwen3-VL local.
 - **Sin medir:** la cuenta de Mistral está en el plan Gratis, que ya no da acceso a la API. Hace
   falta pasar a «Pay-as-you-go» y poner `MISTRAL_API_KEY` en `.env`.
+
+## Sesión del 1/11/2026
+
+### 3.3 · Calibración v6: D cumple
+
+- Filas recogidas de nuevo sobre `main` `0d4d4dc` (fusión aprendida y PR de Alejandro), en
+  `generated/calibration-v6/` y promovidas a `generated/calibration/` (sha256 `5496cf49cbe4…`).
+  La v5 queda en `generated/calibration-v5/`.
+- Diagnóstico: en S-reservado, D da 0,79 de confianza a la medida del dibujo en vectorial y acierta
+  el 95 % (589 campos). En S-dev esa medida casi no gana (36 campos, 6 % de acierto), porque las
+  tablas se leen siempre. Una curva ajustada con S-dev tal cual empeora (ECE 0,28 en S-reservado).
+- Arreglo, solo con S-dev: `bench.calibrar` saca la curva de D de las elecciones de su fusión con
+  canales apagados (`generated/fusion/filas.json`, de `bench.fusion`), que simulan un proveedor
+  cuyas tablas no se leen. Con las tablas apagadas, el dibujo acierta el 100 % en S-dev y la fusión
+  le da 0,81–0,87. La curva solo se usa si baja la ECE de D en S-dev (0,018 → 0,012).
+  `--fusion-filas` cambia la ruta; sin ese fichero, D vuelve a ir sin curva.
+- En S-reservado:
+
+  | Estrategia | ECE calibrada | Cobertura 90 % | Se quedan con abstención | Riesgo de lo que se queda |
+  | --- | ---: | ---: | ---: | ---: |
+  | B | 0,029 | 100 % | 88,0 % | 0,0 % |
+  | C | 0,040 | 91,5 % | 0 % | — |
+  | D | **0,036** (antes 0,068) | 91,4 % | 68,6 % | 8,5 % |
+
+- Límites: cobertura de ángulos de D 63 %; el riesgo con abstención de D (8,5 %) sigue por encima
+  del 5 % buscado; las filas de la fusión son de antes del PR de Alejandro. Miré tres variantes de
+  curva en S-reservado; la elegida es también la de menor ECE en S-dev, que es la regla escrita.
+- **Estudio 7** (todo el estudio con la v6, `generated/estudio/`; el 6 queda en
+  `generated/estudio-6/`): D 0,708 [0,676; 0,740], ECE 0,014 (0,027 en S-reservado), 0,625 en
+  S-reservado. Aciertan los mismos campos que en el estudio 6; la subida es solo de calibración.
+  Son las cifras de D que hay que citar a partir de ahora. [Estudio 7](../ESTUDIO.md).
+- **Para Plataforma:** la huella de calibración cambia. Hay que volver a fijarla en el contenedor
+  (escala, 3.7) y la caché de trabajos la invalida sola si usa el sha de la calibración.
+
+### A · Ingesta
+
+- `ingest_bytes` comprueba la firma de los primeros bytes contra la extensión, rechaza un PDF con
+  contraseña con su motivo, avisa de uno cifrado sin contraseña, acepta TIFF y rechaza `.xls` y
+  `.xlsm` pidiendo `.xlsx`.
+- `pipeline.process` convierte PNG, JPEG y TIFF (también de varias páginas) en un PDF escaneado a
+  200 ppp, así que B, C y D les pasan OCR y visión. El documento conserva el nombre y el SHA-256
+  del original. Un documento idéntico a otro de la misma llamada se lee una sola vez, con aviso y
+  evento `ingest` «omitido».
+- ROADMAP: A.7 cerrada; A.1–A.6 y G.1–G.5 anotadas con lo que hay y lo que falta.
+
+### 2.1 · VESOR en B
+
+- B reconoce un VESOR por el nombre (`VESOR_…`) o el id. Lee su tabla de orientación (sin exigir
+  columna de elevación y sin buscar cotas verticales) y los rótulos de planta «N3 135°». Canal
+  `vesor`, que la fusión de D no ha visto: en esos campos D decide con la heurística, como ya hacía
+  con cualquier canal nuevo.
+- Generador `synthetic/vesor.py` (fuera de los conjuntos S-*: no cambia el estudio).
+
+### F.5 · Marcas de revisión
+
+- `trazia.extractors.revision_marks.find_marks(pdf)` devuelve los Δ y las nubes de un PDF vectorial
+  y las páginas escaneadas que no ha podido leer; `check_changes(changes, reading)` señala los
+  cambios sin marca y las marcas sin cambio.
+- `python -m bench.marcas`: Δ 47/47 (S-dev) y 38/38 (S-reservado) en vectorial, sin falsos. El
+  91 % (S-dev) y el 65 % (S-reservado) de los cambios localizados caen junto a una marca.
+- **Necesito de Plataforma:** llamar a `check_changes` desde `revisions.compare` con las lecturas
+  de la revisión nueva (página y caja de cada cambio y de sus alternativas) y mostrar el resultado
+  en la revisión. `families/change_detection.py` ya cuelga marcadores heurísticos de cada cambio;
+  esto los sustituye en vectorial.
+
+### 2.2 y 2.5
+
+- 2.2 cerrada: sin Mistral (decisión del equipo), RapidOCR con comprobación de cita y el detector
+  propio. PaddleOCR-VL sigue descartado con lo medido el 30/10.
+- 2.5 cerrada: ColQwen2 integrado en C y medido; queda apagado porque empeora a C.
+  - **Qué hay:** `src/trazia/rag/visual.py` (vectores por página con caché por sha256 y MaxSim).
+    C lo usa con `TRAZIA_RAG_RETRIEVAL=colqwen2`; sin torch, sin modelo o con una biblioteca
+    antigua vuelve a la huella ligera con un evento `rag · error`. La biblioteca guarda ahora el
+    sha256 y la ruta de cada PDF. La confianza sale siempre de la huella del par elegido, así que
+    la curva de calibración de C no cambia.
+  - **Umbral:** 0,63 de MaxSim, fijado en S-dev quitando de la biblioteca el proveedor del caso
+    (índice de Youden). Separa «hay caso parecido» casi igual que la huella: AUC 0,81 frente a 0,79.
+  - **Resultado de C** (`bench.rag_visual`, misma biblioteca y calibración v6):
+
+    | Recuperación | Total | S-dev | S-reservado |
+    | --- | --- | ---: | ---: |
+    | Huella | 0,600 [0,556; 0,644] | 0,686 | 0,454 |
+    | ColQwen2 sin umbral | 0,572 [0,512; 0,629] | 0,693 | 0,321 |
+    | ColQwen2, umbral 0,63 | 0,562 [0,504; 0,616] | 0,670 | 0,349 |
+
+  - **Por qué:** ColQwen2 elige proveedores que se parecen por idioma y estilo, pero C copia
+    posiciones de campos, y eso lo mide mejor la rejilla de tinta.
+  - **Coste:** 0,4 s por página y 4,6 GB de VRAM en la RTX 5070, frente a 0,05 s de la huella.
+  - **Instalación:** el extra `train` con torch 2.11 cu128 (`uv pip install` desde
+    download.pytorch.org). Ojo: `uv sync --frozen --extra dev` lo desinstala.
+  - **Pendiente:** volver a medirlo con los GA reales (R-ref).

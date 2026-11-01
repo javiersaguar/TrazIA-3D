@@ -70,10 +70,14 @@ test("la intro del logo se puede saltar y el recorrido de la demo completa sus c
   await page.goto("/");
   await page.getByRole("button", { name: /Saltar intro/ }).click();
   await expect(page.getByRole("button", { name: /Saltar intro/ })).toHaveCount(0);
+  await page.clock.install();
   await page.getByRole("button", { name: "Ver el recorrido de la demo" }).click();
   const dialog = page.getByRole("dialog", { name: "Del plano al modelo, paso a paso" });
   await expect(dialog.getByText("Cambios de A a B")).toBeVisible();
-  await expect(dialog.getByText("hecho", { exact: true })).toHaveCount(5, { timeout: 10_000 });
+  for (let step = 1; step <= 5; step++) {
+    await page.clock.fastForward(1000);
+    await expect(dialog.getByText("hecho", { exact: true })).toHaveCount(step);
+  }
 });
 
 test("la barra lateral navega entre pantallas", async ({ page }) => {

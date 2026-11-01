@@ -3,7 +3,8 @@
     uv run python -m trazia.rag.library --conjunto generated/synthetic_v2/s-dev
 
 Por cada equipo aprobado (aquí, la rev1 de S-dev con su verdad) se guarda:
-- la huella de su página GA (`fingerprint.visual` y vocabulario);
+- la huella de su página GA (`fingerprint.visual` y vocabulario), y el sha256 y la ruta del PDF
+  para la recuperación visual con ColQwen2 (`rag.visual`, ROADMAP 2.5);
 - su plantilla de lectura: para cada campo verificado, la región donde se leyó, el tipo de valor,
   la celda de la marca si es una boquilla y las transformaciones aprendidas (cotas de boquilla
   desde la tangente inferior, separador decimal).
@@ -13,6 +14,7 @@ La biblioteca es sintética; el día 1 se construye con los equipos reales (excl
 """
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
@@ -88,6 +90,8 @@ def build_entry(tag: str, folder: Path, truth: dict, flatten) -> dict | None:
         "tag": tag,
         "equipment_id": tag.lower(),
         "page": ga_page,
+        "sha256": hashlib.sha256(data).hexdigest(),
+        "source": str(ga),
         "decimal": ctx.decimal,
         "visual": visual(data, ga_page),
         "words": words([line.text for line in bundle.lines if line.source.page == ga_page]),

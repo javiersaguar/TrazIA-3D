@@ -342,6 +342,7 @@ test("el holograma IFC con tres recortes cumple el presupuesto de triángulos", 
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/lab/holograma");
   await page.getByRole("button", { name: "ifc", exact: true }).click();
+  await page.getByRole("slider", { name: "Progreso de materialización" }).fill("100");
   await expect(page.getByText("Brida de boquilla · IFC", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Medir 5 s", exact: true }).click();
   const output = page.getByTestId("hologram-performance");

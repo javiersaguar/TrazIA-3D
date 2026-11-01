@@ -164,6 +164,11 @@ uv run python -m bench.calibrar --datos generated/synthetic_v2   # → generated
 uv run python -m bench.calibrar --reusar                         # reajusta sin volver a leer
 ```
 
+- **Curva de D (1/11).** D no lleva curvas por canal: se ajustarían a un S-dev donde las tablas se
+  leen siempre. Su curva sale de las elecciones de la fusión en S-dev con canales apagados
+  (`--fusion-filas`, por defecto `generated/fusion/filas.json`) y solo se usa si baja la ECE de D
+  en S-dev.
+
 - **Qué hace.** Pasa B, C y D por `trazia.pipeline.process` sin calibrar sobre S-dev y
   S-reservado. Después ajusta en S-dev y mide en S-reservado, que tiene dos proveedores que S-dev no
   tiene.
@@ -277,6 +282,63 @@ Resultado en **S-reservado**:
   - Con abstención, D con fusión aprendida se queda el 64 % de los campos con un riesgo del 4,7 %,
     por debajo del 5 % objetivo. D se queda el 51 %.
 - **S-reservado se ha abierto una vez más** para medir esta revisión.
+
+## Marcas de revisión (F.5, 1/11/2026)
+
+```bash
+uv run python -m bench.marcas --datos generated/synthetic_v2   # → generated/marcas/marcas.json
+```
+
+Δ dibujados (verdad sacada del PDF vectorial por su color) frente a los leídos por forma, y qué
+parte de los cambios de la verdad, localizados con la lectura de D, cae junto a una marca.
+
+| Conjunto (vectorial) | Δ leídos / dibujados | Marcas falsas | Cambios junto a una marca |
+| --- | ---: | ---: | ---: |
+| S-dev | 47 / 47 | 0 | 91 % |
+| S-reservado | 38 / 38 | 0 | 65 % |
+
+En escaneado no se buscan marcas: la línea naranja del Δ sale fina, tenue y cortada, y la
+detección en imagen daba 0 aciertos. Esas páginas se informan como «sin lectura».
+
+## Recuperación visual de C con ColQwen2 (2.5, 1/11/2026)
+
+```bash
+uv run --extra train python -m bench.rag_visual --datos generated/synthetic_v2
+# → generated/rag-visual/{recuperacion,informe}.json y estudio-<modo>/
+```
+
+ColQwen2 (`vidore/colqwen2-v1.0-hf`, unos 4,4 GB) frente a la huella ligera (rejilla de tinta y
+vocabulario), con la misma biblioteca de S-dev y la calibración v6. En el producto se activa con
+`TRAZIA_RAG_RETRIEVAL=colqwen2`. Por defecto sigue la huella.
+
+- **Coste.** Unos 0,4 s por página en la RTX 5070 y 4,6 GB de VRAM. Los vectores se guardan por
+  sha256 del PDF y página, así que cada página se procesa una sola vez. La huella cuesta 0,05 s.
+- **Elegir el proveedor correcto (S-dev, 144 GA).** Huella: 100 %. ColQwen2: 99,3 %; falla 1 GA
+  en `escaneado_pobre`.
+- **Saber si hay un caso parecido.** Se mide en S-dev quitando de la biblioteca el proveedor del
+  propio caso:
+
+  | Método | AUC | Umbral | Se aceptan (proveedor conocido) | Se aceptan (proveedor nuevo) | Se aceptan en S-reservado |
+  | --- | ---: | ---: | ---: | ---: | ---: |
+  | Huella, umbral actual | 0,79 | 0,55 | 96,5 % | 74,3 % | 53,1 % |
+  | ColQwen2, umbral de Youden | 0,81 | 0,63 | 91,0 % | 34,7 % | 30,2 % |
+
+- **Resultado de C.** Puntuación GA2MODEL, con IC95 en el total:
+
+  | Recuperación | Total | S-dev | S-reservado | ECE S-reservado |
+  | --- | --- | ---: | ---: | ---: |
+  | Huella (por defecto) | **0,600** [0,556; 0,644] | 0,686 | **0,454** | **0,040** |
+  | ColQwen2 sin umbral | 0,572 [0,512; 0,629] | **0,693** | 0,321 | 0,353 |
+  | ColQwen2, umbral 0,63 | 0,562 [0,504; 0,616] | 0,670 | 0,349 | 0,206 |
+
+  No hay alucinaciones en ningún caso.
+- **Por qué no mejora.** ColQwen2 elige proveedores que se parecen: para `meridian` (inglés)
+  elige gulf, nordic o atlas, y para `cantabrico` (español) elige levante o iberica. Pero C copia
+  posiciones: necesita que cada campo esté en el mismo sitio de la lámina, y eso es lo que mide la
+  rejilla de tinta. La huella elige iberica para meridian y prairie o nordic para cantabrico, y con
+  esas plantillas C lee más.
+- **Decisión.** Queda integrado y probado, pero apagado. Volver a medirlo con los GA reales
+  (R-ref), donde los proveedores no siguen plantillas sintéticas.
 
 ## Hallazgos para el núcleo
 

@@ -12,6 +12,48 @@ from .model import Document, Model, Source
 
 MAX_BYTES = 25 * 1024 * 1024
 MAX_PAGES = 100
+IMAGE_SUFFIXES = (".png", ".jpg", ".jpeg", ".tif", ".tiff")
+IMAGE_DPI = 200  # el mismo del OCR: el PDF de una imagen se reconoce a su tamaño original
+# Firma de los primeros bytes por extensión: la extensión sola no dice qué es el archivo.
+SIGNATURES = {
+    ".pdf": (b"%PDF-",),
+    ".xlsx": (b"PK\x03\x04",),
+    ".png": (b"\x89PNG\r\n\x1a\n",),
+    ".jpg": (b"\xff\xd8\xff",),
+    ".jpeg": (b"\xff\xd8\xff",),
+    ".tif": (b"II*\x00", b"MM\x00*"),
+    ".tiff": (b"II*\x00", b"MM\x00*"),
+}
+
+
+def _check_signature(data: bytes, suffix: str) -> None:
+    signatures = SIGNATURES.get(suffix)
+    if signatures is None:
+        return
+    # Un PDF puede llevar basura antes de la cabecera; los lectores la aceptan en el primer KB.
+    head = data[:1024] if suffix == ".pdf" else data[:16]
+    found = any(s in head for s in signatures) if suffix == ".pdf" else head.startswith(signatures)
+    if not found:
+        raise ValueError(
+            f"No es un {suffix.lstrip('.').upper()} válido: no corresponde a la extensión"
+        )
+
+
+def image_to_pdf(data: bytes) -> bytes:
+    """Una imagen (PNG, JPEG o TIFF de varias páginas) como PDF escaneado, para el OCR y la visión.
+
+    Cada píxel queda a `IMAGE_DPI`: al renderizar el PDF para el OCR sale la imagen original.
+    """
+    with Image.open(io.BytesIO(data)) as image:
+        frames = []
+        for index in range(getattr(image, "n_frames", 1)):
+            if index >= MAX_PAGES:
+                raise ValueError("Límite de la base: 100 páginas por documento")
+            image.seek(index)
+            frames.append(image.convert("RGB"))
+    buffer = io.BytesIO()
+    frames[0].save(buffer, "PDF", resolution=IMAGE_DPI, save_all=True, append_images=frames[1:])
+    return buffer.getvalue()
 
 
 class EvidenceLine(Model):
@@ -30,6 +72,7 @@ def ingest_bytes(data: bytes, filename: str, document_id: str, revision: str) ->
     if not data or len(data) > MAX_BYTES:
         raise ValueError("El documento debe ocupar entre 1 byte y 25 MB")
     suffix = Path(filename).suffix.lower()
+    _check_signature(data, suffix)
     document = Document(
         id=document_id,
         filename=Path(filename).name,
@@ -38,11 +81,19 @@ def ingest_bytes(data: bytes, filename: str, document_id: str, revision: str) ->
     )
     bundle = Bundle(document=document, media_type=suffix.lstrip("."))
     if suffix == ".pdf":
+        from pdfminer.pdfdocument import PDFPasswordIncorrect
+
         try:
             pdf = pdfplumber.open(io.BytesIO(data))
+        except PDFPasswordIncorrect:
+            raise ValueError("PDF cifrado con contraseña: hay que pedir el original sin cifrar")
         except Exception as exc:  # pdfminer lanza sus propias excepciones con bytes corruptos
             raise ValueError(f"No es un PDF válido: {exc}") from None
         with pdf:
+            if getattr(pdf.doc, "encryption", None):
+                bundle.warnings.append(
+                    "PDF cifrado sin contraseña de apertura: se lee, pero conviene el original"
+                )
             if len(pdf.pages) > MAX_PAGES:
                 raise ValueError("Límite de la base: 100 páginas por PDF")
             document.page_count = len(pdf.pages)
@@ -158,15 +209,20 @@ def ingest_bytes(data: bytes, filename: str, document_id: str, revision: str) ->
                     )
         finally:
             workbook.close()
-    elif suffix in (".png", ".jpg", ".jpeg"):
+    elif suffix in IMAGE_SUFFIXES:
         with Image.open(io.BytesIO(data)) as image:
             image.verify()
-        document.page_count = 1
+        with Image.open(io.BytesIO(data)) as image:
+            document.page_count = getattr(image, "n_frames", 1)
         bundle.warnings.append(
-            "Imagen recibida: la extracción necesita OCR/visión, aún no implementados"
+            "Imagen recibida: `trazia.pipeline.process` la convierte en PDF escaneado para el OCR"
+        )
+    elif suffix in (".xls", ".xlsm"):
+        raise ValueError(
+            f"{suffix} no se admite: hay que guardarlo como .xlsx (las macros no se ejecutan nunca)"
         )
     else:
-        raise ValueError("Formato admitido: PDF, XLSX, PNG o JPEG")
+        raise ValueError("Formato admitido: PDF, XLSX, PNG, JPEG o TIFF")
     return bundle
 
 

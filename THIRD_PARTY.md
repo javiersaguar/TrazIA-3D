@@ -92,6 +92,7 @@ Prohibido todo lo AGPL: Ultralytics/YOLO y PyMuPDF no se usan (DEC-30).
 | --- | --- | --- |
 | Qwen3-VL 4B Instruct (vía Ollama, Q4_K_M) | Apache-2.0 | Lectura visual local por mosaicos (tarea «lineas»); los pesos no se incluyen |
 | PP-OCRv6 det/rec small y clasificador de orientación (incluidos en rapidocr) | Apache-2.0 | Detección y reconocimiento de texto |
+| ColQwen2 v1.0 (`vidore/colqwen2-v1.0-hf`, sobre Qwen2-VL-2B, Apache-2.0) | Apache-2.0 | Recuperación visual opcional de C (`TRAZIA_RAG_RETRIEVAL=colqwen2`, extra `train`); los pesos no se incluyen |
 
 
 ## Modelo del Copiloto (Plataforma)

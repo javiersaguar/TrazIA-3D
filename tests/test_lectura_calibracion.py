@@ -179,3 +179,64 @@ def test_passthrough_strategy_keeps_its_learned_probability():
     assert Calibration.from_dict(learned.to_dict()).passthrough == ["d_hibrido"]
     # Sin estrategias de paso, la huella de los parámetros antiguos no cambia.
     assert "passthrough" not in calibration().to_dict()
+
+
+def _d_rows(confidence: float, accuracy: float, n: int = 200) -> list[dict]:
+    return [
+        {
+            "tag": f"T{i % 20}",
+            "strategy": "d_hibrido",
+            "channel": "geometria",
+            "media": "vector",
+            "raw": confidence,
+            "correct": i < accuracy * n,
+            "kind": "mm",
+            "residual": 0.0,
+        }
+        for i in range(n)
+    ]
+
+
+def _fusion_rows(confidence: float, accuracy: float, n: int = 200) -> list[dict]:
+    """Filas de bench.fusion: una opción por campo, con su probabilidad en `features`."""
+    return [
+        {
+            "set": "S-dev",
+            "degradation": "vectorial",
+            "tag": f"T{i % 20}",
+            "rev": "1",
+            "mask": "sin_tablas",
+            "path": f"campo{i}",
+            "expected": True,
+            "features": {"p": confidence},
+            "correct": i < accuracy * n,
+        }
+        for i in range(n)
+    ]
+
+
+class _FakeFusion:
+    def prob(self, features):
+        return features["p"]
+
+
+def test_d_takes_its_curve_from_the_masked_fusion_only_if_it_helps_on_s_dev(monkeypatch):
+    """La fusión se fía poco del dibujo; con tablas apagadas en S-dev acierta más de lo que dice."""
+    from trazia.strategies import fusion
+
+    monkeypatch.setattr(fusion, "load_fusion", lambda path=None: _FakeFusion())
+    # D dice 0,8 y en S-dev acierta el 95 %; con canales apagados también acierta el 95 %.
+    fitted = fit(_d_rows(0.8, 0.95), fusion_rows=_fusion_rows(0.8, 0.95))
+    assert "d_hibrido" not in fitted.passthrough
+    assert set(k for k in fitted.curves if k.startswith("d_hibrido")) == {"d_hibrido|*"}
+    assert fitted.calibrated("d_hibrido", "geometria", 0.8, "vector") == pytest.approx(0.95)
+    assert fitted.meta["masked_fusion_curve"]["d_hibrido"]["choice"] == "curva_mascaras"
+
+    # Si la curva empeora la ECE de D en S-dev, D sigue sin curva.
+    worse = fit(_d_rows(0.8, 0.8), fusion_rows=_fusion_rows(0.8, 0.3))
+    assert worse.passthrough == ["d_hibrido"]
+    assert not any(k.startswith("d_hibrido") for k in worse.curves)
+    assert worse.meta["masked_fusion_curve"]["d_hibrido"]["choice"] == "sin_curva"
+
+    # Sin filas de la fusión, como antes: sin curva.
+    assert fit(_d_rows(0.8, 0.95)).passthrough == ["d_hibrido"]

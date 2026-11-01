@@ -31,6 +31,7 @@ from .units import (
     parse_length_any_direction,
     parse_nominal_size,
 )
+from .vesor import is_vesor
 
 MARK = re.compile(r"^[A-Z]{1,2}\d{1,3}[A-Z]?$")
 MARK_HEADER = re.compile(r"^(MARK|MARCA|NOZ\.?|ITEM|POS\.?)$")
@@ -115,6 +116,7 @@ class DrawingExtractor:
                 continue
             lines = [line for line in bundle.lines if line.source.bbox is not None]
             ctx = document_context(lines)
+            orientation = is_vesor(bundle)
             pages = defaultdict(list)
             for line in lines:
                 pages[line.source.page].append(line)
@@ -128,9 +130,11 @@ class DrawingExtractor:
                     found += self._design_data(_rows(page_lines), ctx)
                     continue
                 rows = _rows(page_lines)
-                table, region = self._nozzle_table(rows, ctx)
+                table, region = self._nozzle_table(rows, ctx, orientation=orientation)
                 found += table
                 found += self._design_data(rows, ctx)
+                if orientation:  # un VESOR no tiene alzado: sus números no son cotas
+                    continue
                 labels = self._labels(page_lines, ctx)
                 found += labels
                 diameter = next((c.value for c in labels if c.path == "diameter"), None)
@@ -142,7 +146,8 @@ class DrawingExtractor:
         return result
 
     # Tabla de boquillas ---------------------------------------------------------------------
-    def _nozzle_table(self, rows, ctx: DocContext):
+    def _nozzle_table(self, rows, ctx: DocContext, *, orientation: bool = False):
+        """Tabla con marca y elevación; en un VESOR (`orientation`) basta con la orientación."""
         out: list[Candidate] = []
         region: list[tuple[float, float, float, float]] = []
         for index, row in enumerate(rows):
@@ -159,7 +164,8 @@ class DrawingExtractor:
                     break
                 header.append(cell)
             columns = self._columns(header)
-            if not any(key == "elevation" for _, key in columns):
+            needed = "azimuth" if orientation else "elevation"
+            if not any(key == needed for _, key in columns):
                 continue
             left = header[0].source.bbox[0] - 0.01
             right = max(c.source.bbox[2] for c in header) + 0.06

@@ -4,15 +4,17 @@
 reconciliación, contrato, familia e IFC. No lanza excepciones por datos malos: devuelve `error`.
 """
 
+import hashlib
 import re
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Literal
 
 from .calibration import load_calibration
 from .extraction import Candidate, assemble
-from .ingest import ingest_bytes
+from .ingest import IMAGE_SUFFIXES, image_to_pdf, ingest_bytes
 from .model import Revision, RunInfo, Source
 from .reconcile import resolve
 from .reconcile.grounding import is_grounded
@@ -122,14 +124,33 @@ def process(
         return finish(None, [], str(exc))
 
     bundles = []
+    raw: dict[str, bytes] = {}
+    seen: dict[str, str] = {}  # sha256 del original → nombre del primero que lo trajo
     for doc in documents:
+        digest = hashlib.sha256(doc.data).hexdigest()
+        if digest in seen:
+            warnings.append(f"{doc.filename} es idéntico a {seen[digest]}: se lee una sola vez.")
+            emit(StageEvent("ingest", "omitido", doc.filename, f"Duplicado de {seen[digest]}."))
+            continue
         try:
             bundle = ingest_bytes(doc.data, doc.filename, doc.document_id, revision)
+            data = doc.data
+            if Path(doc.filename).suffix.lower() in IMAGE_SUFFIXES:
+                # Una imagen se lee como un PDF escaneado; la huella sigue siendo la del original.
+                data = image_to_pdf(doc.data)
+                name = str(Path(doc.filename).with_suffix(".pdf"))
+                image_warnings = bundle.warnings[1:]  # el aviso de imagen ya no aplica
+                bundle = ingest_bytes(data, name, doc.document_id, revision)
+                bundle.document.filename = Path(doc.filename).name
+                bundle.document.sha256 = digest
+                bundle.warnings = image_warnings + bundle.warnings
         except Exception as exc:  # pdfminer lanza sus propias excepciones con bytes corruptos
             reason = str(exc).splitlines()[0] if str(exc) else type(exc).__name__
             warnings.append(f"Ingesta fallida de {doc.filename}: {reason}")
             emit(StageEvent("ingest", "error", doc.filename, f"No se pudo leer: {reason}"))
             continue
+        seen[digest] = doc.filename
+        raw[doc.document_id] = data
         warnings += bundle.warnings
         pages = bundle.document.page_count
         emit(
@@ -161,7 +182,7 @@ def process(
         previous=previous,
         providers=providers,
         emit=emit,
-        raw={doc.document_id: doc.data for doc in documents},
+        raw=raw,
         equipment_id=equipment_id,
     )
     try:
