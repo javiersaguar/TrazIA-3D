@@ -53,3 +53,47 @@ def test_new_revision_reuses_unchanged_page_before_raster_and_rebinds_evidence(
     cached.write_text("{broken", encoding="utf8")
     engine.ocr_pdf_lines(b, "GA-B")
     assert renders == [] and len(recognitions) == 1  # Se rehace OCR usando el raster íntegro.
+
+
+def test_positive_raster_geometry_with_numpy_scalars_roundtrips(tmp_path, monkeypatch):
+    import numpy as np
+    import pytest
+
+    from trazia.geometry2d.page_cache import raster_geometry
+    from trazia.geometry2d.vector import Elevation, ElevationStub, Plan, PlanStub
+
+    monkeypatch.setenv("TRAZIA_PAGE_CACHE", str(tmp_path))
+    data = document("GEOMETRY")
+    expected = (
+        Elevation(
+            tuple(np.float32(x) for x in (1, 2, 3, 4)),
+            np.float32(1),
+            np.float32(5),
+            np.float32(6),
+            [ElevationStub("left", np.float32(2.5), np.float32(0.1), (1, 2))],
+        ),
+        Plan(
+            (np.float32(1), np.float32(2)),
+            np.float32(3),
+            [PlanStub(np.float32(0.5), np.float32(1), np.float32(0.2), (4, 5))],
+        ),
+    )
+    first = raster_geometry(data, 1, lambda: expected, dpi=200)
+
+    def unexpected():
+        raise AssertionError("La geometría positiva debía reutilizarse")
+
+    second = raster_geometry(data, 1, unexpected, dpi=200)
+    assert second[0].shell == first[0].shell
+    assert second[0].stubs[0].neck == pytest.approx(0.1)
+    assert second[1].stubs[0].angle == 0.5
+    assert isinstance(second[1].radius, float)
+
+
+def test_unwritable_cache_does_not_break_computation(tmp_path, monkeypatch):
+    from trazia import page_cache
+
+    blocked = tmp_path / "file"
+    blocked.write_text("not a directory", encoding="utf8")
+    monkeypatch.setattr(page_cache, "path_for", lambda *args: blocked / "cache")
+    assert page_cache.memo_page(None, "fixture", lambda: {"value": 3}) == {"value": 3}

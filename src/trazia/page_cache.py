@@ -3,6 +3,7 @@
 import hashlib
 import json
 import os
+from numbers import Integral, Real
 from pathlib import Path
 from uuid import uuid4
 
@@ -23,6 +24,14 @@ def path_for(page, namespace, dpi):
     return root / namespace / key[:2] / key
 
 
+def json_number(value):
+    if isinstance(value, Integral):
+        return int(value)
+    if isinstance(value, Real):
+        return float(value)
+    raise TypeError(f"Tipo no serializable en caché: {type(value).__name__}")
+
+
 def memo_page(page, namespace, compute, *, dpi=1):
     path = path_for(page, namespace, dpi)
     if path:
@@ -35,15 +44,21 @@ def memo_page(page, namespace, compute, *, dpi=1):
             pass
     result = compute()
     if path:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        content = json.dumps(result, allow_nan=False, sort_keys=True)
-        envelope = {"json": content, "sha256": hashlib.sha256(content.encode()).hexdigest()}
         temporary = path.with_name(path.name + "." + uuid4().hex + ".tmp")
         try:
+            content = json.dumps(result, allow_nan=False, sort_keys=True, default=json_number)
+            envelope = {"json": content, "sha256": hashlib.sha256(content.encode()).hexdigest()}
+            path.parent.mkdir(parents=True, exist_ok=True)
             temporary.write_text(json.dumps(envelope), encoding="utf8")
             os.replace(temporary, path)
+        except (OSError, TypeError, ValueError):
+            # La persistencia opcional nunca invalida un resultado calculado correctamente.
+            pass
         finally:
-            temporary.unlink(missing_ok=True)
+            try:
+                temporary.unlink(missing_ok=True)
+            except OSError:
+                pass
     return result
 
 
@@ -57,11 +72,16 @@ def render_page(page, dpi):
             pass
     image = page.to_image(resolution=dpi).original.convert("RGB")
     if path:
-        path.parent.mkdir(parents=True, exist_ok=True)
         temporary = path.with_name(path.name + "." + uuid4().hex + ".tmp")
         try:
+            path.parent.mkdir(parents=True, exist_ok=True)
             image.save(temporary, format="PNG")
             os.replace(temporary, path)
+        except OSError:
+            pass
         finally:
-            temporary.unlink(missing_ok=True)
+            try:
+                temporary.unlink(missing_ok=True)
+            except OSError:
+                pass
     return image
