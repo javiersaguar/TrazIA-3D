@@ -106,3 +106,69 @@ def test_rotated_ocr_boxes_return_to_original_and_cache_rebinds_document(monkeyp
     rebound = engine.ocr_pdf_lines(buffer.getvalue(), "B", rotation=90)
     assert len(calls) == 2 and rebound[0].source.document_id == "B"
     assert rebound[0].source.bbox == rotated[0].source.bbox
+
+
+def test_mosaic_boxes_stay_on_the_original_page_and_reuse_cache(monkeypatch, tmp_path):
+    image = Image.new("RGB", (120, 80), "white")
+    buffer = io.BytesIO()
+    image.save(buffer, format="PDF")
+    calls = []
+
+    def recognize(image):
+        calls.append(image.size)
+        return [engine.OcrLine("750", (0.2, 0.1, 0.4, 0.3), 0.9)]
+
+    monkeypatch.setattr(engine, "ocr_image", recognize)
+    monkeypatch.setenv("TRAZIA_OCR_CACHE", str(tmp_path))
+    lines = engine.ocr_pdf_lines(buffer.getvalue(), "A", tiles=True)
+    assert len(lines) == 4 and len(calls) == 4
+    assert (
+        len({(round(item.source.bbox[0], 1), round(item.source.bbox[1], 1)) for item in lines}) == 4
+    )
+    assert all(
+        0 <= item.source.bbox[0] < item.source.bbox[2] <= 1
+        and 0 <= item.source.bbox[1] < item.source.bbox[3] <= 1
+        for item in lines
+    )
+    rebound = engine.ocr_pdf_lines(buffer.getvalue(), "B", tiles=True)
+    assert len(calls) == 4 and all(item.source.document_id == "B" for item in rebound)
+
+
+@pytest.mark.parametrize("old_diameter,expected", [(2100, 2100), (2000, 2000)])
+def test_mosaic_never_overrides_reliable_dimensions_or_existing_nozzles(
+    monkeypatch, old_diameter, expected
+):
+    import trazia.ocr
+    from trazia.extraction import Candidate
+    from trazia.ingest import Bundle
+    from trazia.model import Document
+    from trazia.strategies.b_reglas import ReglasStrategy
+
+    lines = [
+        line(text, 0.1, 0.1 + index * 0.04, width=0.5)
+        for index, text in enumerate(
+            [
+                "DIAMETER: 2000 mm",
+                "HEIGHT: 5000 mm",
+                "HEAD_DEPTH: 500 mm",
+                "SKIRT_HEIGHT: 1000 mm",
+                "SKIRT_THICKNESS: 12 mm",
+            ]
+        )
+    ]
+    monkeypatch.setattr(trazia.ocr, "ocr_pdf_lines", lambda *args, **kwargs: lines)
+    source = Source(
+        document_id="GA", page=1, locator="OCR", bbox=(0.1, 0.1, 0.5, 0.2), confidence=0.95
+    )
+    old = Candidate(path="diameter", value=old_diameter, unit="mm", source=source)
+    nozzle = Candidate(path="nozzles.N1.diameter", value=80, unit="mm", source=source)
+    bundle = Bundle(
+        document=Document(id="GA", filename="GAD_V-1_rev1.pdf", revision="1", sha256="0" * 64),
+        media_type="pdf",
+        lines=[],
+    )
+    ctx = SimpleNamespace(raw={"GA": b"fixture"}, emit=lambda event: None)
+    _, drawing, _ = ReglasStrategy()._tiled_dimensions(bundle, ctx, [old, nozzle], [])
+    result = {c.path: c.value for c in drawing}
+    assert result["diameter"] == expected and result["nozzles.N1.diameter"] == 80
+    assert ("height" in result) == (old_diameter == 2000)
