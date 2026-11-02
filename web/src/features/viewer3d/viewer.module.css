@@ -37,6 +37,7 @@
 .dimension { white-space:nowrap; font-size:11px; padding:4px 7px; color:#c0d6ee; background:#101a25ed; border:1px solid currentColor; border-radius:4px; pointer-events:none; font-variant-numeric:tabular-nums; }
 .delta { color:#ffbf8c; border:1px dashed #f5a35c; padding:5px 8px; border-radius:18px; background:#241c16ed; white-space:nowrap; font-size:11px; }
 .badge { position:absolute; z-index:2; top:94px; right:12px; border:1px solid var(--warning-border); background:var(--warning-bg); color:var(--warning-text); border-radius:5px; padding:4px 7px; font-size:10px; }
+.badge[data-scroll] { top:12px; right:12px; left:auto; max-width:none; }
 .scrub { position:absolute; z-index:3; left:12px; right:180px; bottom:92px; display:flex; align-items:center; gap:8px; padding:7px 10px; background:var(--surface); border:1px solid var(--border); border-radius:8px; font-size:11px; color:var(--text-muted); }
 .scrub input { min-width:30px; } .scrub output { min-width:37px; text-align:right; font-variant-numeric:tabular-nums; }
 .select { border:1px solid var(--border); background:var(--surface); color:var(--text); padding:6px; border-radius:6px; font-size:12px; max-width:180px; }

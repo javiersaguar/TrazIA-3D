@@ -9,7 +9,7 @@ import { useEffect } from "react";
 
 import { LogoMark, LogoWordmark } from "@/components/brand/logo";
 import { Tip } from "@/components/ui/controls";
-import { Icon, Kbd } from "@/components/ui/primitives";
+import { Icon } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 import { NAV, navItemFor } from "@/lib/nav";
 import { endDemoSession, initialsOf, useDemoUser } from "@/lib/session";
@@ -144,12 +144,6 @@ function SidebarBody({ collapsed, onNavigate }: { collapsed: boolean; onNavigate
             >
               <Icon icon={Search} size={16} />
               Buscar
-              {!mobile ? (
-                <span className="ml-auto flex gap-1">
-                  <Kbd>Ctrl</Kbd>
-                  <Kbd>K</Kbd>
-                </span>
-              ) : null}
             </button>
           )}
         </div>

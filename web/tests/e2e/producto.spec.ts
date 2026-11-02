@@ -134,15 +134,31 @@ test("Modelo conserva el holograma, la galería y la pantalla completa con F",as
  await expect(page.getByText(/Cada valor con su evidencia en el plano/)).toBeVisible();
 });
 
-test("el laboratorio está en la barra lateral y Del plano al modelo tiene pantalla completa",async({page})=>{
+test("la barra lateral lleva al Laboratorio 3D, sin Del plano al modelo ni texto de atajo en Buscar",async({page})=>{
  await page.goto("/proyecto");
  const nav=page.getByRole("navigation",{name:"Navegación principal"});
- await nav.getByRole("link",{name:"Del plano al modelo",exact:true}).click();
- await expect(page).toHaveURL(/\/lab\/firma/);
- await page.getByTestId("signature-frame").getByRole("button",{name:"Pantalla completa",exact:true}).first().click();
- await expect.poll(()=>page.evaluate(()=>(document.fullscreenElement as HTMLElement|null)?.dataset.testid??null)).toBe("signature-frame");
- await page.keyboard.press("f");
- await expect.poll(()=>page.evaluate(()=>document.fullscreenElement)).toBeNull();
+ await expect(nav.getByRole("link",{name:"Del plano al modelo",exact:true})).toHaveCount(0);
+ await expect(page.getByRole("button",{name:"Buscar",exact:true})).toHaveText("Buscar");
  await nav.getByRole("link",{name:"Laboratorio 3D",exact:true}).click();
  await expect(page.getByRole("heading",{level:1,name:"Laboratorio 3D"})).toBeVisible();
+ await page.goto("/lab/firma");
+ await expect(page).toHaveURL(/\/#del-plano$/);
+});
+
+test("en la portada, Del plano al modelo avanza con el scroll",async({page})=>{
+ await page.emulateMedia({reducedMotion:"no-preference"});
+ await page.goto("/");
+ const skip=page.getByRole("button",{name:/Saltar intro/});if(await skip.isVisible())await skip.click();
+ const section=page.locator("#del-plano");
+ const scrollTo=(f:number)=>section.evaluate((el,f)=>window.scrollTo(0,(el as HTMLElement).offsetTop+(el.clientHeight-innerHeight)*f),f);
+ await scrollTo(0);
+ const signature=page.getByTestId("landing-signature").getByTestId("signature");
+ await expect(signature).toHaveAttribute("data-phase","ready",{timeout:30_000});
+ await expect(signature).toHaveAttribute("data-step","0");
+ await expect(signature.getByRole("button",{name:/Reproducir firma/})).toHaveCount(0);
+ await scrollTo(.5);
+ await expect(signature).toHaveAttribute("data-step","1");
+ await scrollTo(.98);
+ await expect(signature).toHaveAttribute("data-step","2");
+ await expect(page.getByRole("heading",{name:"Modelo DRAFT listo para revisar"}).locator("xpath=ancestor::li")).toHaveAttribute("aria-current","step");
 });

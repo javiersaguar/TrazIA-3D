@@ -4,7 +4,7 @@ import { BRAND } from "@/lib/brand";
 
 import { useFrame, useThree } from "@react-three/fiber";
 import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
-import { cubicBezier, useReducedMotion } from "motion/react";
+import { cubicBezier, useReducedMotion, type MotionValue } from "motion/react";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { CanvasTexture, Group, Mesh, MeshStandardMaterial, SRGBColorSpace } from "three";
 import type { Bounds } from "@/workers/ifc-protocol";
@@ -12,6 +12,7 @@ import { useIfcModel, usePreparedModel, type PreparedProduct } from "./model-res
 import { CameraRig, CameraTools, Legend, LoadingState, SceneCanvas, Studio, type CameraHandle } from "./stage";
 import styles from "./viewer.module.css";
 import { SteelMaterial } from "./materials";
+import { SIGNATURE_PHASES } from "./signature-phases";
 
 type Evidence = { bbox: [number, number, number, number]; label: string };
 class Timeline {
@@ -19,9 +20,11 @@ class Timeline {
   playing = false;
   advance(delta: number, reduced: boolean) { this.progress = reduced ? 1 : Math.min(1, this.progress + Math.min(delta, .064) / 5); }
   pause() { this.playing = false; }
+  seek(value: number, reduced: boolean) { this.progress = reduced ? 1 : Math.min(1, Math.max(0, value)); }
 }
 const ease = cubicBezier(.65, 0, .35, 1);
 const SIGNATURE_BOUNDS: Bounds = { min: [-6.5, -.1, -4.8], max: [6.5, 8.2, 4.8] };
+
 
 function useDrawing() {
   const [drawing, setDrawing] = useState<{ texture: CanvasTexture; aspect: number; evidence: Evidence[] } | null>(null);
@@ -57,18 +60,22 @@ function useDrawing() {
   return { drawing, error };
 }
 
-function LiftScene({ products, drawing, timeline, onPhase, onFinish, reduced, playing }: {
+function LiftScene({ products, drawing, timeline, onPhase, onFinish, reduced, playing, progress: scroll }: {
   products: PreparedProduct[]; drawing: { texture: CanvasTexture; aspect: number; evidence: Evidence[] };
   timeline: RefObject<Timeline>; onPhase(phase: number): void; onFinish(): void; reduced: boolean; playing: boolean;
+  progress?: MotionValue<number>;
 }) {
   const model = useRef<Group>(null), steel = useRef<Group>(null), wire = useRef<Group>(null), lights = useRef<Group>(null);
   const phase = useRef(-1), { invalidate } = useThree();
   const paper = useRef<Mesh>(null);
   useEffect(() => { invalidate(); }, [playing, reduced, invalidate]);
+  // Con «progress», el scroll de la página es el avance de la secuencia: cada cambio pide un fotograma
+  useEffect(() => scroll?.on("change", () => invalidate()), [scroll, invalidate]);
   useFrame((_, delta) => {
     const t = timeline.current;
     if (reduced && t.progress < 1) { t.advance(0, true); t.pause(); onFinish(); }
-    if (t.playing) t.advance(delta, reduced);
+    if (scroll) t.seek(scroll.get(), reduced);
+    else if (t.playing) t.advance(delta, reduced);
     const progress = t.progress, q = ease(Math.max(0, (progress - .28) / .72));
     if (model.current) {
       model.current.rotation.x = -(1 - q) * Math.PI / 2;
@@ -83,7 +90,7 @@ function LiftScene({ products, drawing, timeline, onPhase, onFinish, reduced, pl
       material.opacity = active ? .55 : progress < .32 && index < progress / .32 * drawing.evidence.length ? .15 : .02;
     });
     if (paper.current) (paper.current.material as MeshStandardMaterial).opacity = 1 - q * .72;
-    const nextPhase = progress < .28 ? 0 : progress < .82 ? 1 : 2;
+    const nextPhase = progress < SIGNATURE_PHASES[1].at ? 0 : progress < SIGNATURE_PHASES[2].at ? 1 : 2;
     if (phase.current !== nextPhase) { phase.current = nextPhase; onPhase(nextPhase); }
     if (t.playing && progress >= 1) { t.pause(); onFinish(); }
     if (t.playing) invalidate();
@@ -109,7 +116,9 @@ function LiftScene({ products, drawing, timeline, onPhase, onFinish, reduced, pl
   </>;
 }
 
-export function Signature() {
+/** Sin «progress» se reproduce con sus botones; con él, avanza con el scroll y sin controles propios. */
+export function Signature({ progress }: { progress?: MotionValue<number> } = {}) {
+  const scroll = !!progress;
   const load = useIfcModel("/demo/ifc/rev_a.ifc"), products = usePreparedModel(load.model);
   const { drawing, error } = useDrawing();
   const container = useRef<HTMLDivElement>(null), camera = useRef<CameraHandle>(null);
@@ -117,17 +126,14 @@ export function Signature() {
   const [playing, setPlaying] = useState(false), [phase, setPhase] = useState(0);
   const [version, setVersion] = useState(0), reduced = useReducedMotion();
   const ready = !!load.model && !!drawing;
-  const titles = ["El plano conserva la evidencia", "La geometría del IFC se levanta", "Modelo DRAFT listo para revisar"];
-  const descriptions = ["Las cinco cotas se localizan en su región real del PDF.",
-    "Las mallas del IFC pasan de alambre a acero. La secuencia es ilustrativa.",
-    "La aprobación continúa en el espacio de revisión; esta secuencia no valida el equipo."];
   const pause = () => { timeline.current.playing = false; setPlaying(false); };
-  return <div className={styles.frame} ref={container} data-testid="signature" data-phase={ready ? "ready" : "loading"}>
-    {ready ? <SceneCanvas label="Secuencia sintética: evidencia del plano y geometría del IFC">
+  return <div className={styles.frame} ref={container} data-testid="signature" data-phase={ready ? "ready" : "loading"} data-step={phase}>
+    {ready ? <SceneCanvas label="Secuencia sintética: evidencia del plano y geometría del IFC" rotationControl={!scroll}>
       <Studio effects={false} />
-      <CameraRig bounds={SIGNATURE_BOUNDS} handle={camera} onUserControl={pause} />
-      <LiftScene key={version} products={products} drawing={drawing} timeline={timeline} onPhase={setPhase} onFinish={() => setPlaying(false)} reduced={!!reduced} playing={playing} />
+      <CameraRig bounds={SIGNATURE_BOUNDS} handle={camera} onUserControl={pause} interactive={!scroll} orbit={!scroll} />
+      <LiftScene key={version} products={products} drawing={drawing} timeline={timeline} onPhase={setPhase} onFinish={() => setPlaying(false)} reduced={!!reduced} playing={playing} progress={progress} />
     </SceneCanvas> : <LoadingState error={error ?? load.error} label="Leyendo el PDF y el IFC sintéticos" />}
+    {scroll ? <div className={styles.badge} data-scroll>Prototipo · datos sintéticos</div> : <>
     <CameraTools handle={camera} container={container} />
     <div className={styles.badge}>Prototipo · datos sintéticos · 5 s</div>
     <div className={styles.narration}>
@@ -136,7 +142,7 @@ export function Signature() {
         if (timeline.current.progress >= 1) timeline.current.progress = 0;
         timeline.current.playing = !timeline.current.playing; setPlaying(timeline.current.playing);
       }}>{playing ? <Pause /> : <Play />}</button>
-      <p><strong>{titles[phase]}</strong>{descriptions[phase]}</p>
+      <p><strong>{(SIGNATURE_PHASES[phase] ?? SIGNATURE_PHASES[0]).title}</strong>{(SIGNATURE_PHASES[phase] ?? SIGNATURE_PHASES[0]).text}</p>
       <button className={styles.button} disabled={!ready} aria-label="Saltar la secuencia" onClick={() => {
         pause(); timeline.current.progress = 1; setPhase(2); setVersion(v => v + 1);
       }}><SkipForward /></button>
@@ -145,5 +151,6 @@ export function Signature() {
       }}><RotateCcw /></button>
     </div>
     <Legend />
+    </>}
   </div>;
 }
