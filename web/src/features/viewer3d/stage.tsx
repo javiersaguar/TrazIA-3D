@@ -16,7 +16,7 @@ import {
   SSAO,
   Vignette,
 } from "@react-three/postprocessing";
-import { Camera, Maximize, Minus, Plus, RotateCcw, Pause, Play } from "lucide-react";
+import { Camera, Maximize, Minimize, Minus, Plus, RotateCcw, Pause, Play } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import {
   Component,
@@ -46,6 +46,7 @@ import {
   type DirectionalLight,
 } from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { toggleFullscreen, useFullscreenKey, useFullscreenScope, useIsFullscreen } from "@/components/shell/fullscreen";
 import { BRAND } from "@/lib/brand";
 import type { Bounds, Vec3 } from "@/workers/ifc-protocol";
 import styles from "./viewer.module.css";
@@ -707,6 +708,11 @@ export function CameraTools({
   container: RefObject<HTMLDivElement | null>;
   onReset?(): void;
 }) {
+  // Dentro de un marco (FullscreenFrame, presentación de Cambios) se amplía el marco entero
+  const scope = useFullscreenScope();
+  const own = useIsFullscreen(container);
+  useFullscreenKey(container, undefined, !scope);
+  const fullscreen = scope ? scope.active : own;
   return (
     <div className={styles.tools} role="group" aria-label="Controles de cámara">
       <button
@@ -743,14 +749,12 @@ export function CameraTools({
       </button>
       <button
         className={styles.button}
-        title="Pantalla completa"
-        aria-label="Pantalla completa"
-        onClick={() => {
-          if (document.fullscreenElement) void document.exitFullscreen();
-          else void container.current?.requestFullscreen();
-        }}
+        title={fullscreen ? "Salir de pantalla completa (F o Esc)" : "Pantalla completa (F)"}
+        aria-label={fullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+        aria-pressed={fullscreen}
+        onClick={() => (scope ? scope.toggle() : toggleFullscreen(container.current))}
       >
-        <Maximize />
+        {fullscreen ? <Minimize /> : <Maximize />}
       </button>
     </div>
   );

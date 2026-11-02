@@ -90,3 +90,59 @@ test("movimiento reducido muestra también los trazos de pasos fuera de pantalla
  const revisions=page.getByRole("img",{name:"Dos revisiones y una variación de altura",exact:true});
  await expect(revisions.locator("path").first()).toHaveCSS("opacity","1");
 });
+
+test("Documentos reúne documentos, proyectos y familias y acepta soltar archivos",async({page})=>{
+ await page.goto("/documentos");
+ await expect(page.getByText("Suelta aquí los planos GA y las hojas de datos")).toBeVisible();
+ await page.getByLabel("Familia de destino").selectOption({label:"Intercambiadores"});
+ await page.getByTestId("document-dropzone").evaluate(zone=>{
+  const dt=new DataTransfer();dt.items.add(new File(["synthetic"],"GAD_E-210_revA.pdf",{type:"application/pdf"}));
+  zone.dispatchEvent(new DragEvent("drop",{dataTransfer:dt,bubbles:true,cancelable:true}));
+ });
+ await expect(page.getByRole("button",{name:"GAD_E-210_revA.pdf",exact:true})).toBeVisible();
+ await expect(page.getByLabel("Familia de GAD_E-210_revA")).toHaveValue("exchanger");
+ await page.getByRole("button",{name:"elígelos en tu equipo"}).waitFor();
+ await page.getByLabel("Elegir documentos").setInputFiles({name:"DS_P-501_revA.pdf",mimeType:"application/pdf",buffer:Buffer.from("synthetic")});
+ await expect(page.getByRole("button",{name:"DS_P-501_revA.pdf",exact:true})).toBeVisible();
+ await page.getByRole("radio",{name:"Proyectos",exact:true}).click();
+ await expect(page).toHaveURL(/vista=proyectos/);
+ await expect(page.getByText("Unidad de hidrotratamiento",{exact:true})).toBeVisible();
+ await page.getByRole("navigation",{name:"Familias de documentos"}).getByRole("button",{name:/Tanques/}).click();
+ await expect(page.getByText("Terminal de GNL",{exact:true})).toBeVisible();
+ await expect(page.getByText("Unidad de hidrotratamiento",{exact:true})).toHaveCount(0);
+ await page.goto("/familias");
+ await expect(page).toHaveURL(/vista=familias/);
+ await expect(page.getByRole("heading",{name:"Recipientes verticales",level:3})).toBeVisible();
+ await expect(page.getByText("22 campos de revisión")).toBeVisible();
+});
+
+test("Modelo conserva el holograma, la galería y la pantalla completa con F",async({page})=>{
+ await page.emulateMedia({reducedMotion:"reduce"});
+ await page.goto("/modelo?vista=3d");
+ await expect(page.getByRole("heading",{name:"Del holograma al modelo",exact:true})).toBeVisible();
+ await expect(page.getByRole("heading",{name:"Familias ilustrativas",exact:true})).toBeVisible();
+ const hologram=page.getByTestId("model-hologram");
+ await hologram.scrollIntoViewIfNeeded();
+ await expect(hologram.locator("canvas").first()).toBeVisible({timeout:20_000});
+ await hologram.hover();
+ await page.keyboard.press("f");
+ await expect.poll(()=>page.evaluate(()=>(document.fullscreenElement as HTMLElement|null)?.dataset.testid??null),{timeout:10_000}).toBe("model-hologram");
+ await expect(hologram.getByRole("button",{name:/Salir de pantalla completa/})).toBeVisible();
+ await page.keyboard.press("f");
+ await expect.poll(()=>page.evaluate(()=>document.fullscreenElement)).toBeNull();
+ await page.goto("/modelo?vista=revision");
+ await expect(page.getByText(/Cada valor con su evidencia en el plano/)).toBeVisible();
+});
+
+test("el laboratorio está en la barra lateral y Del plano al modelo tiene pantalla completa",async({page})=>{
+ await page.goto("/proyecto");
+ const nav=page.getByRole("navigation",{name:"Navegación principal"});
+ await nav.getByRole("link",{name:"Del plano al modelo",exact:true}).click();
+ await expect(page).toHaveURL(/\/lab\/firma/);
+ await page.getByTestId("signature-frame").getByRole("button",{name:"Pantalla completa",exact:true}).first().click();
+ await expect.poll(()=>page.evaluate(()=>(document.fullscreenElement as HTMLElement|null)?.dataset.testid??null)).toBe("signature-frame");
+ await page.keyboard.press("f");
+ await expect.poll(()=>page.evaluate(()=>document.fullscreenElement)).toBeNull();
+ await nav.getByRole("link",{name:"Laboratorio 3D",exact:true}).click();
+ await expect(page.getByRole("heading",{level:1,name:"Laboratorio 3D"})).toBeVisible();
+});

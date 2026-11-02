@@ -12,11 +12,15 @@ export const SHORTCUTS: { group: string; items: { keys: string[]; label: string 
       { keys: ["Ctrl", "K"], label: "Menú de comandos" },
       { keys: ["?"], label: "Ver estos atajos" },
       { keys: ["["], label: "Plegar o desplegar la barra lateral" },
-      { keys: ["G", "1–7"], label: "Ir a Resumen, Pipeline, Revisión, Cambios, Bench, Impacto o Estudio" },
-      { keys: ["G", "P"], label: "Ir a Proyectos" },
+      { keys: ["G", "1 · 2"], label: "Ir a Resumen o Pipeline" },
       { keys: ["G", "D"], label: "Ir a Documentos" },
-      { keys: ["G", "M"], label: "Ir a Modelo 3D" },
-      { keys: ["G", "F · L · I · A · S"], label: "Ir a Familias, Lote, Informes, Auditoría o Ajustes" },
+      { keys: ["G", "P · F"], label: "Ir a Proyectos o Familias, dentro de Documentos" },
+      { keys: ["G", "M"], label: "Ir a Modelo" },
+      { keys: ["G", "3 · 4"], label: "Ir a Revisión o Cambios, dentro de Modelo" },
+      { keys: ["G", "L"], label: "Ir a Lotes e informes" },
+      { keys: ["G", "5 · 6"], label: "Ir a Bench o Impacto" },
+      { keys: ["G", "9 · 8"], label: "Ir a Del plano al modelo o al Laboratorio 3D" },
+      { keys: ["G", "S"], label: "Ir a Ajustes" },
     ],
   },
   {
@@ -31,8 +35,15 @@ export const SHORTCUTS: { group: string; items: { keys: string[]; label: string 
     ],
   },
   {
+    group: "Vistas 3D",
+    items: [{ keys: ["F"], label: "Pantalla completa de la vista bajo el cursor (Esc para salir)" }],
+  },
+  {
     group: "Cambios",
-    items: [{ keys: ["Espacio"], label: "Reproducir o pausar los cambios" }],
+    items: [
+      { keys: ["Espacio"], label: "Reproducir o pausar los cambios" },
+      { keys: ["F"], label: "Abrir o cerrar la presentación" },
+    ],
   },
 ];
 

@@ -10,6 +10,12 @@ export function isTyping(target: EventTarget | null): boolean {
   return target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
 }
 
+let lastG = 0;
+/** true justo después de pulsar G: la tecla siguiente es parte de la secuencia G + letra. */
+export function inGSequence() {
+  return performance.now() - lastG < 900;
+}
+
 /** Atajos globales: Ctrl+K, ?, [ y la secuencia G + número. */
 export function GlobalKeys() {
   const router = useRouter();
@@ -36,6 +42,7 @@ export function GlobalKeys() {
         return;
       }
       if (e.key.toLowerCase() === "g") {
+        lastG = performance.now();
         pendingG.current = window.setTimeout(() => (pendingG.current = null), 900);
         return;
       }
@@ -43,7 +50,7 @@ export function GlobalKeys() {
         const item = NAV_ITEMS.find((i) => i.shortcut === e.key.toLowerCase());
         window.clearTimeout(pendingG.current);
         pendingG.current = null;
-        const legacy: Record<string,string> = { "3":"/modelo?vista=revision", "4":"/modelo?vista=cambios", "7":"/bench?vista=estudio", "p":"/documentos", "f":"/documentos", "i":"/lote" };
+        const legacy: Record<string,string> = { "3":"/modelo?vista=revision", "4":"/modelo?vista=cambios", "7":"/bench?vista=estudio", "p":"/documentos?vista=proyectos", "f":"/documentos?vista=familias", "i":"/lote" };
         const href = item?.href ?? legacy[e.key.toLowerCase()];
         if (href) router.push(href);
       }

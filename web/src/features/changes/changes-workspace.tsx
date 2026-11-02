@@ -11,6 +11,7 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FullscreenScope, useFullscreenKey } from "@/components/shell/fullscreen";
 import { isTyping } from "@/components/shell/global-keys";
 import { RevisionMorph } from "@/components/three";
 import { Segmented, Tip } from "@/components/ui/controls";
@@ -86,6 +87,21 @@ export function ChangesWorkspace() {
     });
   }, []);
 
+  const togglePresentation = useCallback(() => {
+    if (presentation) {
+      setPresentation(false);
+      if (document.fullscreenElement) void document.exitFullscreen();
+    } else {
+      setPresentation(true);
+      setMode("delta");
+      setPlaying(true);
+      setActiveId(null);
+      void root.current?.requestFullscreen().catch(() => {});
+    }
+  }, [presentation]);
+  // La tecla F abre y cierra la presentación, como el botón
+  useFullscreenKey(root, togglePresentation);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (
@@ -129,6 +145,7 @@ export function ChangesWorkspace() {
   }, []);
 
   return (
+    <FullscreenScope value={{ toggle: togglePresentation, active: presentation }}>
     <div
       ref={root}
       className={cn(
@@ -241,21 +258,14 @@ export function ChangesWorkspace() {
               type="button"
               className="ml-auto rounded-md border border-border px-3 py-1.5 text-xs text-muted"
               aria-pressed={presentation}
-              onClick={() => {
-                if (presentation) {
-                  setPresentation(false);
-                  if (document.fullscreenElement)
-                    void document.exitFullscreen();
-                } else {
-                  setPresentation(true);
-                  setMode("delta");
-                  setPlaying(true);
-                  setActiveId(null);
-                  void root.current?.requestFullscreen().catch(() => {});
-                }
-              }}
+              aria-keyshortcuts="F"
+              title={presentation ? "Salir de presentación (F o Esc)" : "Presentación a pantalla completa (F)"}
+              onClick={togglePresentation}
             >
               {presentation ? "Salir de presentación" : "Presentación"}
+              <span aria-hidden>
+                <Kbd className="ml-2">F</Kbd>
+              </span>
             </button>
           </div>
           <div className="min-h-0 flex-1 px-2 pb-2">
@@ -330,6 +340,7 @@ export function ChangesWorkspace() {
         </div>
       </Panel>
     </div>
+    </FullscreenScope>
   );
 }
 
