@@ -50,7 +50,7 @@ criterio de "hecho". Si una tarea no tiene criterio de "hecho", no está bien de
 
 ## 0. TL;DR en 15 líneas
 
-1. Inscribirse los **4** antes del **23/11 23:59**; hacer la formación obligatoria en la plataforma IndesIA.
+1. Los **4 ya están inscritos** (confirmación del equipo, 02/11). El reto se elige allí; se trabaja en portátiles propios.
 2. El código previo **está permitido si se declara al inicio del hackatón** → etiqueta `pre-hackathon-baseline` + `PREVIOUS_WORK.md`.
 3. Commits **solo** de los 4 miembros. Cero `Co-authored-by`, cero firmas de IA. Hook local + check en CI.
 4. Núcleo Python (`src/trazia`, IfcOpenShell). Encima: **API FastAPI** + **frontend Next.js con 3D real** (hecho: 239 fps en ventana completa).
@@ -76,8 +76,8 @@ Fuentes: PDF del reto (17 págs.), `indesiahack.org`, `/bases-legales` y `/pregu
 | --- | --- | --- |
 | Fechas | 25, 26 y 27 nov 2026 · ETSIT-UPM, Edificio A, Av. Complutense 30 | 100 % presencial los 3 días; es requisito para optar a premio |
 | Inicio | Miércoles 25, 11:00 (presentación de retos, formación de equipos) | Llegar **antes de las 10:00**: plaza por orden de llegada |
-| Inscripción | 26 oct – 23 nov, 23:59 | Los 4 inscritos **esta semana** |
-| Compromiso previo | Formarse en la plataforma de desarrollo de IndesIA antes del evento | La plataforma ofrece servicios de IA generativa → averiguar qué modelos y límites hay |
+| Inscripción | 26 oct – 23 nov, 23:59 | Los 4 inscritos, confirmado el 02/11 |
+| Entorno de ejecución | Portátiles propios, sin entorno de cómputo IndesIA (confirmación del equipo, 02/11) | Preparar instalaciones, modelos y cachés locales |
 | Equipos | 3–5 personas; se puede ir con equipo formado | Vamos los 4 juntos |
 | Entrega | Viernes 27, **10:00**: código y presentación en el repositorio | Congelamos a las 08:00 |
 | Formato presentación | **.pptx** ante jurado (bases) + documentación fácil de entender | El pitch es un `.pptx`, no solo una demo |
@@ -336,32 +336,48 @@ Resumen. El análisis completo, con las opciones descartadas y cómo se valida c
 
 ## 7. Calendario por fases
 
+### Alcance previo confirmado · 02/11
+
+La [preparación revisada](PREPARACION_25NOV.md) distingue trabajo cerrado, bocetos útiles y tareas
+que dependen del evento. Confirmado por Javier: inscritos los cuatro; sin entorno IndesIA; dataset
+al inicio; acuerdo general con el roadmap. No se cuentan los trabajos del evento como retrasos previos.
+
+- **Ahora:** pulido del frontend, correcciones CPU viables de 3.7, bocetos de presentación y montaje,
+  PREVIOUS_WORK, respuestas del pitch y revisión de licencias. Preparar la instalación para los cuatro.
+- **En el evento:** consulta al mentor (0.9), lo que se entregue con el dataset/proveedores (1.9),
+  presentación/demo/vídeos finales (3.11/4.3/4.6), declaración y tag definitivos (4.4), kit (4.8).
+- **A su fecha:** congelación 4.1. **Por cada compañero:** instalación y comprobación de su portátil (4.5).
+- **3.8:** no basta con registrar una sesión humana: hay que evaluar mejoras en equipos/documentos
+  separados y revisar la recalibración de D y la regresión de prioridades. E.5 sigue pospuesta.
+
+
 Inicio del plan: **lunes 26/10/2026**. Revisión de estado: **28/10/2026**; actualizada el
-**31/10/2026** con lo que cerraron los agentes Lectura, Plataforma y 3D el 30/10
+**02/11/2026** con las mediciones CPU, la reorganización del producto y las aclaraciones del equipo; se conserva el historial de Lectura, Plataforma y 3D
 ([Lectura](agentes/INFORME_LECTURA.md), [Plataforma](agentes/INFORME_PLATAFORMA.md),
 [3D](agentes/INFORME_FRONTEND_3D.md)). Las casillas se cierran por evidencia, no por fecha prevista. Las tareas parciales permanecen abiertas; detalle en [REVISION_ROADMAP_2026-10-28.md](REVISION_ROADMAP_2026-10-28.md).
 
 | Fase | Fechas | Objetivo | Hito de salida |
 | --- | --- | --- | --- |
-| 0. Arranque | 26–28 oct | Equipo, reglas, repo, inscripción, plataforma | Inscritos; plataforma documentada; reglas de autoría activas |
+| 0. Arranque | 26–28 oct | Equipo, reglas, repo, inscripción, plataforma | Inscritos; entorno local confirmado; reglas de autoría activas |
 | 1. Cimientos | 29 oct – 4 nov | Contrato 0.3, `pipeline` + interfaz `Strategy`, proveedores de visión, generador v2, arnés del estudio, API base | El estudio corre con B sobre S-dev; la API sirve la demo |
 | 2. Estrategias | 5 – 14 nov | A, C y D v1; OCR; modelo local; detector propio entrenado; familias + IFC rico | Primer estudio A/B/C/D en S-dev |
-| 3. Diferenciales | 15 – 21 nov | Cambios en tres capas, calibración + conformal, ablaciones, selector, pantalla Estudio, copiloto local, escala | Estudio completo con S-reservado; demo de 6 min con la estrategia ganadora |
+| 3. Diferenciales | 15 – 21 nov | Cambios en tres capas, calibración + conformal, ablaciones, selector, comparativa dentro de Bench, copiloto local, escala | Estudio completo con S-reservado; demo de 6 min con la estrategia ganadora |
 | 4. Endurecer | 22 – 24 nov | Congelar alcance, ensayo, modo offline, `.pptx` v1, `PREVIOUS_WORK.md` | 2 ensayos cronometrados; todo reproducible en un portátil limpio |
 | 5. Hackatón | 25 – 27 nov | Dataset real → estudio real con exclusión de uno → pulido → pitch | Entrega 27/11 10:00 |
 | 6. Gala | dic | Versión pulida, vídeo, narrativa del gran premio | Presentación para el premio general |
 
 ### Fase 0 · Arranque (26–28 oct)
 
-- [ ] **0.1** Los 4 se inscriben en `indesiahack.org/registro` y eligen el reto de Técnicas Reunidas. *Hecho:* 4 confirmaciones.
-- [ ] **0.2** Hacer la formación en la plataforma IndesIA y anotar en `docs/PLATAFORMA.md`: qué es (¿JupyterHub, VS Code web, nube?), recursos (CPU/GPU/RAM), **qué modelos de IA generativa y de visión ofrece**, límites, si hay salida a internet, si se puede usar Docker, y **si sus modelos pueden procesar el dataset de TR**. *Hecho:* documento con respuestas.
-- [ ] **0.3** Comprobar si con la inscripción ya se accede al dataset o a muestras. Si sí: copiar a `data/private/` (fuera de Git) y priorizar la verdad de referencia. *Hecho:* respuesta registrada.
-- [ ] **0.4** Reunión 0 (1 h): leer este roadmap y [DECISIONES.md](DECISIONES.md), confirmar roles (5.5), canales y horario semanal. *Hecho:* roles en este documento.
+- [x] **0.1** Los cuatro miembros ya están registrados (confirmado por Javier el 02/11). El reto se elige presencialmente al llegar.
+- [x] **0.2** Confirmado por Javier el 02/11: no habrá entorno de cómputo IndesIA; se trabaja en los portátiles del equipo. La preparación se centra en instalación local y modelos descargados.
+- [x] **0.3** Confirmado por Javier el 02/11: el dataset se entrega al comenzar la hackatón. Se conoce el momento de acceso; recepción, inventario y validación real pertenecen al evento.
+- [x] **0.4** El equipo está de acuerdo a grandes rasgos con este roadmap (Javier, 02/11). La distribución fina del trabajo se adapta al evento.
 - [x] **0.5** Commit inicial de la base y push a `main`. *Pendiente:* protección de rama (PR + CI obligatorio).
 - [x] **0.6** Reglas de autoría: `.githooks/commit-msg`, `core.hooksPath`, workflow `authors.yml`, `.claude/settings.json`, regla en `AGENTS.md`. *Pendiente:* correos de Iria, Miguel y Alejandro en `.github/autores.txt`.
 - [x] **0.7** `LICENSE` MIT con los 4 nombres; `CONTRIBUTING.md`.
 - [x] **0.8** Skills de frontend instaladas en el repo.
 - [ ] **0.9** Pedir al mentor de TR (si hay canal): formato real de los GA (¿vectorial o escaneado?), unidades habituales, si las boquillas vienen en tabla, qué consideran "dimensiones principales" y con qué tolerancia comparan, y **si autorizan procesar el dataset con APIs externas** (DEC-31). *Hecho:* respuestas o pregunta enviada.
+  *Plan del equipo, 02/11:* preguntar presencialmente; [borrador de preguntas](../pitch/PREGUNTAS_BORRADOR.md) preparado.
 - [x] **0.10** Medir en la RTX 5070 Laptop (8 GB) qué modelos de visión caben con imágenes A3 en mosaico: `qwen3-vl:4b`, `qwen3-vl:8b` cuantizado y PaddleOCR-VL. Anotar VRAM y segundos por página en `docs/PLATAFORMA.md`. *Hecho:* tabla medida. *Medido:* 4B al 100 % en GPU (5,8 GB, 129 s/página); 8B no cabe (22 % CPU, 339 s/página); PaddleOCR-VL medido el 30/10: carga en 2,7 GB, pero no acaba una página A3 en 25 min, y se descarta. [Tabla](PLATAFORMA.md).
 
 ### Fase 1 · Cimientos (29 oct – 4 nov)
@@ -378,7 +394,7 @@ comprobar un segundo proveedor real; no se cuentan mocks como mediciones.
 - [x] **1.6 (Plataforma)** `docker compose` con perfiles `local`, `gpu` y `escala` (DEC-24). *Hecho:* imágenes construidas y tres perfiles comprobados en Docker/WSL con API, SSE, IFC, idempotencia y persistencia; Redis/Postgres reales y GPU visible. [Resultados](evidencias/fase1/compose-results.json).
 - [x] **1.7 (I)** Visor `web-ifc` en Worker a 239 fps en ventana completa.
 - [x] **1.8 (Lectura)** `trazia.pipeline` + interfaz `Strategy` (DEC-02) con B como primera estrategia. *Hecho:* `process(..., strategy="b_reglas")` en verde.
-- [ ] **1.9 (Lectura)** Adaptador `VisionProvider` con caché y modo offline: Ollama local, Gemini, Mistral y plataforma (cuando se sepa). Registro de envíos (DEC-31). *Pendiente de cierre:* Ollama real y su caché offline comprobados; Gemini/Mistral tienen adaptador y pruebas de contrato, pero falta una credencial para leer la misma página con un segundo proveedor real. Plataforma sigue pendiente de conocer su API. Véase [evidencia 1.9](FASE1.md#visión-caché-y-offline-19-parcial). *31/10, tarde:* adaptador común para Groq, OpenRouter, NVIDIA NIM y Cloudflare Workers AI (API de chat de OpenAI) con reintentos ante límites de tasa. Con las claves de Gemini, Groq, OpenRouter, NVIDIA y Cloudflare, seis modelos leen la misma tesela sintética. Comparación como lector de A con `python -m bench.proveedores` sobre 4 revisiones escaneadas: ninguno supera a A sin visión (0,352); los mejores empatan (OpenRouter Nemotron 3.5 Super VL 0,363, NVIDIA 0,359, Gemini 3.5 Flash-Lite 0,355) y alucinan entre el 8,6 % y el 11,4 %, así que no son elegibles. Segundo proveedor real comprobado; falta el de la plataforma IndesIA. [Detalle](agentes/INFORME_LECTURA.md). *31/10, noche:* el equipo descarta Mistral; su adaptador se queda, sin usarse. Para cerrar solo falta el proveedor de la plataforma IndesIA, que se conocerá en el evento.
+- [ ] **1.9 (Lectura)** Adaptador `VisionProvider` con caché y modo offline: Ollama local, Gemini, Mistral y plataforma (cuando se sepa). Registro de envíos (DEC-31). *Pendiente de cierre:* Ollama real y su caché offline comprobados; Gemini/Mistral tienen adaptador y pruebas de contrato, pero falta una credencial para leer la misma página con un segundo proveedor real. Plataforma sigue pendiente de conocer su API. Véase [evidencia 1.9](FASE1.md#visión-caché-y-offline-19-parcial). *31/10, tarde:* adaptador común para Groq, OpenRouter, NVIDIA NIM y Cloudflare Workers AI (API de chat de OpenAI) con reintentos ante límites de tasa. Con las claves de Gemini, Groq, OpenRouter, NVIDIA y Cloudflare, seis modelos leen la misma tesela sintética. Comparación como lector de A con `python -m bench.proveedores` sobre 4 revisiones escaneadas: ninguno supera a A sin visión (0,352); los mejores empatan (OpenRouter Nemotron 3.5 Super VL 0,363, NVIDIA 0,359, Gemini 3.5 Flash-Lite 0,355) y alucinan entre el 8,6 % y el 11,4 %, así que no son elegibles. Segundo proveedor real comprobado; falta el de la plataforma IndesIA. [Detalle](agentes/INFORME_LECTURA.md). *31/10, noche:* el equipo descarta Mistral; su adaptador se queda, sin usarse. *02/11:* el equipo confirma que no habrá entorno de cómputo IndesIA. No se presupone una API adicional: las condiciones y los recursos que se entreguen se confirmarán presencialmente; no bloquean la preparación local existente.
 - [x] **1.10 (Lectura)** Generador **v2**: 8 estilos de proveedor (2 reservados), niveles de degradación, multipágina, paquetes de proveedor, mecánicos y corpus adversarial (DEC-21). *Hecho:* cuatro conjuntos generados: 64 equipos, 336 PDF y 162 Excel, ocho estilos/dos reservados; [semillas y huellas](evidencias/fase1/conjuntos.json).
 - [x] **1.11 (Lectura)** Arnés del estudio (`python -m bench.estudio`): variantes, estadística (bootstrap, McNemar), Puntuación GA2MODEL y Pareto (DEC-22). *Hecho:* B y ablación sin HDM medidos en los 24 equipos de S-dev y sus tres degradaciones, bootstrap por equipo y Pareto; [informe](evidencias/fase1/estudio.md).
 
@@ -413,25 +429,31 @@ agente de Fase 2; no se editan las estrategias ni sus carpetas.
 - [x] **3.4 (Lectura)** **Fusión aprendida y selector** por tipo de documento; **ablaciones** de D; estudio completo con S-reservado (H1–H6 de [ESTUDIO.md](ESTUDIO.md)). *Parcial 30/10:* selector, ablaciones y estudio con S-reservado hechos. El selector fijado en S-dev pierde frente a D solo (0,372 frente a 0,525), así que se recomienda D para todo. Ablaciones: RAG −0,076, geometría −0,045, detector −0,011 y memoria +0,009. *Hecho 31/10:* fusión aprendida (`d_hibrido+fusion`, regresión logística entrenada en S-dev con canales apagados). Dejando fuera un proveedor de S-dev, acierta el 93,2 % de los campos frente al 92,5 % de la heurística. En el estudio sube a 0,670 frente a 0,640 (McNemar p ≈ 10⁻⁷), y en S-reservado a 0,570 frente a 0,524. El selector sigue perdiendo: se recomienda la fusión aprendida para todo. *31/10 noche:* con las correcciones del estudio 4, D sube a 0,703 [0,671; 0,736] y a 0,614 en S-reservado; la heurística, a 0,691. Ablaciones: geometría −0,067, RAG −0,014, memoria −0,003 y detector +0,001. El selector pierde 0,472 frente a 0,614. [Estudio 6](ESTUDIO.md). *1/11:* estudio 7 con la calibración v6: D 0,708 [0,676; 0,740] y 0,625 en S-reservado, con los mismos aciertos por campo; sube solo por la ECE. Ablaciones: geometría −0,066, RAG −0,009, memoria +0,001 y detector +0,006. El selector pierde 0,476 frente a 0,625. [Estudio 7](ESTUDIO.md).
 - [x] **3.5 (Plataforma)** Pantalla **Estudio** en la web (DEC-28) y conexión de la pantalla Bench al estudio. *Hecho:* misma fuente/query, variante y rúbrica con IC; bench v1 separado, errores/vacío explícitos y pruebas en ambos transportes.
 - [x] **3.6 (Plataforma)** **Copiloto con modelo local**, herramientas de solo lectura y citas (DEC-26). *Verificado:* Ollama local, evidencia por hash, sin herramientas de escritura y pruebas de citas/concurrencia.
-- [ ] **3.7 (Plataforma)** Escala: Redis + workers, lote y coste/tiempo por equipo. *01/11:* 336 revisiones D/CPU, 251 DRAFT (211 LOD 2/40 LOD 1) y 85 errores; 1.714,18/919,26 s con 1/4 workers (**1,86×**), mismos estados por revisión, 0/336 aciertos de caché y cero llamadas externas. 77 errores del registro anterior pasan a DRAFT, sin transición inversa; no es efecto causal aislado ni precisión de ingeniería. Pendientes 63 casos con campos ausentes y 22 con geometría incoherente; presupuesto de 1.600 IFC correctos desconocido. [Evidencias](evidencias/fase3/01nov/resumen.md) / [pitch](PITCH_ESCALA.md). *Diagnóstico posterior:* los 85 fallos se repiten con el código actual y calibración v6 (290,244 s acumulados), sin ninguna recuperación. No se han reevaluado las 251 exportaciones previas. [Candidatos y entrega a Lectura](evidencias/fase3/01nov-triage/resumen.md).
+- [ ] **3.7 (Plataforma)** Escala: Redis + workers, lote y coste/tiempo por equipo. *01/11:* 336 revisiones D/CPU, 251 DRAFT (211 LOD 2/40 LOD 1) y 85 errores; 1.714,18/919,26 s con 1/4 workers (**1,86×**), mismos estados por revisión, 0/336 aciertos de caché y cero llamadas externas. 77 errores del registro anterior pasan a DRAFT, sin transición inversa; no es efecto causal aislado ni precisión de ingeniería. Pendientes 63 casos con campos ausentes y 22 con geometría incoherente; presupuesto de 1.600 IFC correctos desconocido. [Evidencias](evidencias/fase3/01nov/resumen.md) / [pitch](PITCH_ESCALA.md). *Diagnóstico posterior:* los 85 fallos se repiten con el código actual y calibración v6 (290,244 s acumulados), sin ninguna recuperación. En aquel diagnóstico aún no se habían reevaluado las 251 exportaciones previas; el contraste completo se realizó el 02/11, como recoge la subtarea siguiente. [Candidatos y entrega a Lectura](evidencias/fase3/01nov-triage/resumen.md).
 - [x] **3.7 · Diagnóstico y repetición autónoma CPU (02/11):** 672 predicciones D/B+OCR contrastadas con verdad consultada después. Redis real 336 revisiones con 1/4 workers: 1.828,75/1.242,72 s, 1,4716× observado, 251 DRAFT/85 errores idénticos por revisión y sin diferencias de valores/unidades. Contador corregido: 95 DRAFT con boquillas sin colocar, 96 con campos evaluados correctos y solo 81 sin boquillas pendientes además de ese acierto. [Mediciones, calidad y coste](evidencias/fase3/02nov/README.md). Pendientes de Lectura los 63 casos con campos ausentes y 22 con geometría incoherente; no se promete 1.600 IFC correctos.
 - [ ] **3.8 (E)** Aprendizaje activo: las correcciones recalibran y se usan como few-shot (DEC-27). *31/10:* JSONL trazado y GET /correcciones; recalibración CPU implementada contra auditoría SQL y revisiones aprobadas, con separación por equipo, mínimos por estrategia y propuesta sin activar. Ensayo de nueve equipos/544 etiquetas de revisión simulada sintética. Huella de calibración en caché offline. Pares few-shot aprobados servidos por API y utilizados en el contexto del Copiloto; huella de fusión añadida a caché. Pendiente validación con correcciones de uso representativas; piloto manual preparado y pospuesto. [Detalle](API.md#recalibración-desde-las-correcciones-3110). *01/11:* feedback aprobado conectado a prompts de extracción y prioridad acotada por canal, con exclusión de equipo/documentos, sesiones humanas finalizadas y caché invalidada al revocar; sin muestra humana ni validación de mejora representativa.
   *02/11:* evaluación sintética adicional cerrada; prioridades empeoran el conjunto reservado y quedan rechazadas, recalibración B+OCR aislada mejora ECE externa sin alcanzar 0,05, D sin propuesta por su ruta de fusión. Cero sesiones humanas. [Ablaciones](evidencias/fase3/02nov-aprendizaje/README.md); no se cierra la evaluación representativa.
 - [x] **3.9 (I)** Vista Cambios con morph 3D por GUID, fantasma rev1, marcadores Δ y grafo de impacto.
 - [x] **3.10 (I)** Momento firma «del plano al modelo» (`/lab/firma`).
 - [ ] **3.11 (J)** Guion de 6 min v1 + `.pptx` v0 con la diapositiva «Elegimos con datos».
+  - [x] Boceto previo: [storyboard de seis minutos](../pitch/BOCETO_PRESENTACION.md) y plan de pantalla/Recordly, webcam, cámara, micros, vídeos ilustrativos y montaje. No es el `.pptx` ni la edición final.
 
 ### Fase 4 · Endurecer (22 – 24 nov)
 
 - [ ] **4.1** Congelar alcance el 22/11 a las 20:00: solo bugs, rendimiento y pulido.
 - [x] **4.2** **Modo offline:** `TRAZIA_OFFLINE=1` sirve resultados de modelos cacheados por hash. Si cae la red el viernes, la demo funciona igual. *Implementado 30/10:* caché de visión y copiloto, invalidación y errores recuperables; requiere preparar los cachés antes del ensayo. Además, la API guarda los trabajos validados y en offline los repite sin ejecutar el pipeline: 0,022 s frente a 3,192 s. [Alcance y pruebas](BACKEND_2026-10-30.md).
 - [ ] **4.3** Dos ensayos cronometrados del pitch (6:00 exactos) con alguien externo haciendo de jurado de TR.
+  - [x] Estructura preliminar para ensayar preparada en el storyboard. Los dos ensayos finales se harán con la demo del evento.
 - [ ] **4.4** `PREVIOUS_WORK.md` redactado; tag preparado.
+  - [x] [Declaración previa en borrador](../PREVIOUS_WORK.md); commit, tag e inventario definitivo se cerrarán allí.
 - [ ] **4.5** Instalación en limpio en **los 4 portátiles** (Windows y Linux) siguiendo solo el README, incluidos los modelos locales descargados de antemano.
+  - [x] [Checklist de instalación por compañero](PREPARACION_PORTATILES.md). Sigue pendiente ejecutarla en cada portátil.
 - [ ] **4.6** Vídeo de respaldo de la demo (1080p, 60 fps).
 - [ ] **4.7** Lista de preguntas difíciles y respuestas (J.5).
+  - [x] [Borrador de preguntas y respuestas](../pitch/PREGUNTAS_BORRADOR.md); respuestas con datos reales después del evento.
 - [ ] **4.8** Kit físico: cargadores, regleta, adaptador HDMI/USB-C, ratón, hotspot móvil.
 - [ ] **4.9** `THIRD_PARTY.md` con cada dependencia y modelo y su licencia (DEC-30).
+  - [x] [Checklist de licencias para la versión final](LICENCIAS_BORRADOR.md), a partir del inventario existente de THIRD_PARTY; no certifica dependencias futuras.
 
 ### Fase 5 · Hackatón (25 – 27 nov) — plan por horas
 
@@ -763,6 +785,29 @@ Es nuestra arma principal: **llegamos al jurado con su propia rúbrica ya medida
 > **Lo que queremos:** un diseño **muy profesional**, **cero "AI slop"**, **muchas animaciones con
 > propósito** y **mucho 3D**, para que sea lo más vistoso posible **sin dejar de ser una herramienta
 > seria de ingeniería**. El jurado debe pensar "esto lo usaría mañana", no "esto es una plantilla".
+
+#### I.0 Reorganización de producto · 02/11
+
+Implementación y capturas en [INFORME_PRODUCTO_02NOV.md](agentes/INFORME_PRODUCTO_02NOV.md).
+
+- [x] Ajustes en la rueda del pie; equipo con nombres sin responsabilidades.
+- [x] Auditoría fuera del frontend de producto; se conserva el registro del servidor.
+- [x] Navegación sin letras ni números de atajo a la derecha.
+- [x] Hologramas con azul más oscuro en tema claro.
+- [x] Lotes e informes en una pantalla; sus datos de ejemplo siguen identificados.
+- [x] Familias dentro de Documentos, con creación y asignación local de diseños.
+- [x] Comparativa de Estudio dentro de Bench, fuera del menú principal.
+- [x] Proyectos dentro de Documentos y filtrados por familia.
+- [x] Revisión, Cambios y geometría IFC agrupados bajo Modelo.
+- [x] Sin botón 360° en el plano ilustrativo de la portada.
+- [x] Dibujos de Cómo funciona rehechos, aparición por scroll y línea continua entre pasos.
+- [x] Holograma → modelo con cámara fija, sin giro automático ni por arrastre.
+- [x] Cuatro estrategias con cifras del estudio 7 y métricas al apuntar, enfocar o pulsar.
+- [x] Halo del cursor más oscuro en claro, fijo al viewport durante toda la portada.
+
+El catálogo guarda metadatos y archivos en este navegador, no en un servidor compartido.
+Los enlaces anteriores redirigen a las vistas agrupadas. No se cierra ninguna validación
+con datos TR ni una sesión humana por estos cambios de interfaz.
 
 #### I.1 Skills obligatorias para cualquier persona o agente que toque `web/`
 
