@@ -134,6 +134,18 @@ def summarise(rows, seconds, upload_seconds):
     }
 
 
+def save_model_artifact(output, task, model):
+    if model.get("dataset") != "synthetic":
+        raise ValueError("Solo se archivan modelos etiquetados como sintéticos")
+    identity = {key: task[key] for key in ("dataset", "tag", "degradation", "revision")}
+    key = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
+    directory = output.parent / (output.stem + "-models")
+    directory.mkdir(parents=True, exist_ok=True)
+    target = directory / (key + ".json")
+    target.write_text(json.dumps(model, ensure_ascii=False, indent=2) + "\n", encoding="utf8")
+    return target.relative_to(output.parent).as_posix()
+
+
 def run(
     api,
     data,
@@ -146,6 +158,7 @@ def run(
     cases_limit=None,
     degradations=None,
     tags=None,
+    save_models=False,
 ):
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
@@ -248,8 +261,10 @@ def run(
                         model_info = {
                             "lod": model["equipment"]["lod"],
                             "equipment_kind": model["equipment"]["kind"],
-                            "unplaced_nozzles": len(model["equipment"].get("unplaced_nozzles", [])),
+                            "unplaced_nozzles": len(model.get("unplaced_nozzles", [])),
                         }
+                        if save_models:
+                            model_info["model_artifact"] = save_model_artifact(output, task, model)
                     except urllib.error.HTTPError as error:
                         model_info = {
                             "inspection_error": (
@@ -332,6 +347,11 @@ def main():
     p.add_argument("--degradaciones", nargs="+", default=None)
     p.add_argument("--tags", nargs="+", help="Reproducir solo los tags indicados")
     p.add_argument(
+        "--guardar-modelos",
+        action="store_true",
+        help="Archivar el JSON sintético devuelto por la API para evaluar después",
+    )
+    p.add_argument(
         "--exigir-todos", action="store_true", help="Salir con código 2 si falta algún IFC DRAFT"
     )
     p.add_argument("--limite-segundos", type=int, default=7200, help="Tiempo máximo del lote")
@@ -348,6 +368,7 @@ def main():
         cases_limit=args.casos,
         degradations=args.degradaciones,
         tags=args.tags,
+        save_models=args.guardar_modelos,
     )
     return (
         2 if args.exigir_todos and not report["acceptance"]["all_revisions_have_draft_ifc"] else 0

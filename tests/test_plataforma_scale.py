@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from scripts.measure_scale import summarise, tasks
+from scripts.measure_scale import save_model_artifact, summarise, tasks
 from scripts.run_scale import deployment_override
 
 
@@ -44,6 +44,16 @@ def test_scale_report_preserves_failures_and_unknown_cost():
     rows[0]["cache_hit"], rows[1]["cache_hit"] = True, False
     observed = summarise(rows, 10, 1)
     assert observed["job_cache_hits"] == 1 and observed["job_cache_hit_rate"] == 0.5
+
+
+def test_scale_archives_exact_synthetic_response_without_trusting_tag_as_path(tmp_path):
+    task = {"dataset": "s-dev", "tag": "../../escape", "degradation": "vectorial", "revision": "1"}
+    model = {"dataset": "synthetic", "equipment": {"tag": "V-1"}}
+    relative = save_model_artifact(tmp_path / "workers-1.json", task, model)
+    path = (tmp_path / relative).resolve()
+    assert path.is_relative_to(tmp_path) and json.loads(path.read_text()) == model
+    with pytest.raises(ValueError, match="sintéticos"):
+        save_model_artifact(tmp_path / "workers-1.json", task, {"dataset": "real"})
 
 
 def test_scale_mounts_same_calibration_read_only_without_exposing_a_team_port():

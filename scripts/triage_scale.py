@@ -11,11 +11,24 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
+from cpu_quality import evaluate_prediction, summary
 from measure_scale import tasks
 
 
-def replay(report_path, data, output, *, sets=("s-dev",), category="all", limit=None):
+def replay(
+    report_path,
+    data,
+    output,
+    *,
+    sets=("s-dev",),
+    category="all",
+    limit=None,
+    strategy="d_hibrido",
+    all_cases=False,
+    feedback=None,
+):
     from trazia.calibration import load_calibration
+    from trazia.feedback import using
     from trazia.model import GEOMETRY_FIELDS
     from trazia.pipeline import InputDocument, process
     from trazia.strategies.fusion import load_fusion
@@ -45,7 +58,7 @@ def replay(report_path, data, output, *, sets=("s-dev",), category="all", limit=
     identities = {
         (r["dataset"], r["tag"], r["degradation"], r["revision"]): r
         for r in report["rows"]
-        if r["status"] == "error"
+        if (all_cases or r["status"] == "error")
         and r["dataset"] in sets
         and (category == "all" or ("Faltan datos" in r["error"]) == (category == "missing"))
     }
@@ -70,24 +83,28 @@ def replay(report_path, data, output, *, sets=("s-dev",), category="all", limit=
         "cuda_visible_devices": os.getenv("CUDA_VISIBLE_DEVICES"),
         "measurement_image": os.getenv("TRAZIA_MEASUREMENT_IMAGE"),
         "source_overridden_by_readonly_mount": os.getenv("TRAZIA_SOURCE_MOUNTED") == "1",
+        "feedback_sha256": feedback.sha256 if feedback else None,
+        "feedback_experimental_only": feedback is not None,
     }
     output.mkdir(parents=True, exist_ok=True)
     rows = []
     for index, task in enumerate(selected):
         old = identities[tuple(task[k] for k in ("dataset", "tag", "degradation", "revision"))]
         started = time.perf_counter()
-        result = process(
-            [InputDocument(p.name, p.read_bytes(), identity) for p, identity in task["files"]],
-            project_id="SYNTHETIC-TRIAGE",
-            equipment_id=task["tag"],
-            revision=task["revision"],
-            strategy="d_hibrido",
-            providers=[],
-            dataset="synthetic",
-        )
+        with using(feedback):
+            result = process(
+                [InputDocument(p.name, p.read_bytes(), identity) for p, identity in task["files"]],
+                project_id="SYNTHETIC-TRIAGE",
+                equipment_id=task["tag"],
+                revision=task["revision"],
+                strategy=strategy,
+                providers=[],
+                dataset="synthetic",
+            )
         # Verdad sintética usada exclusivamente como evaluación posterior, nunca como entrada.
         truth_path = data / task["dataset"] / "truth" / f"{task['tag']}.json"
-        truth = json.loads(truth_path.read_text(encoding="utf8"))[f"rev{task['revision']}"]
+        truth_bytes = truth_path.read_bytes()
+        truth = json.loads(truth_bytes)[f"rev{task['revision']}"]
         candidates = [
             c.model_dump(mode="json") for c in result.candidates if c.path in GEOMETRY_FIELDS
         ]
@@ -99,7 +116,7 @@ def replay(report_path, data, output, *, sets=("s-dev",), category="all", limit=
         rows.append(
             {
                 **{k: task[k] for k in ("dataset", "tag", "degradation", "revision")},
-                "previous_error": old["error"],
+                "previous_error": old.get("error"),
                 "error": result.error,
                 "status": "draft" if result.revision else "error",
                 "seconds": time.perf_counter() - started,
@@ -110,21 +127,36 @@ def replay(report_path, data, output, *, sets=("s-dev",), category="all", limit=
                 },
                 "warnings": result.warnings,
                 "run": result.run.model_dump(mode="json"),
+                "quality": evaluate_prediction(result.revision, result.candidates, truth),
+                "truth_sha256_after_prediction": hashlib.sha256(truth_bytes).hexdigest(),
             }
         )
+        if result.revision:
+            path = (
+                output
+                / "models"
+                / (
+                    "__".join(task[k] for k in ("dataset", "tag", "degradation", "revision"))
+                    + ".json"
+                )
+            )
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(result.revision.model_dump_json(indent=2), encoding="utf8")
         payload = {
             "metadata": metadata,
             "synthetic": True,
             "input_sha256": digest.hexdigest(),
             "planned": len(selected),
             "complete": len(rows) == len(selected),
-            "strategy": "d_hibrido",
+            "strategy": strategy,
+            "scope": "all" if all_cases else "previous_errors",
             "providers": [],
             "gt_used_for_prediction": False,
             "sets": list(sets),
             "category": category,
             "statuses": dict(Counter(r["status"] for r in rows)),
             "rows": rows,
+            "quality_summary": summary(rows),
         }
         (output / "triage.json").write_text(
             json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf8"
@@ -147,6 +179,19 @@ def main():
     parser.add_argument("--sets", nargs="+", default=["s-dev"])
     parser.add_argument("--category", choices=["all", "missing", "geometry"], default="all")
     parser.add_argument("--limit", type=int)
+    parser.add_argument(
+        "--strategy",
+        default="d_hibrido",
+        choices=[
+            "d_hibrido",
+            "b_reglas",
+            "b_reglas+ocr",
+            "d_hibrido-geometria",
+            "d_hibrido+heuristica",
+            "a_geometria",
+        ],
+    )
+    parser.add_argument("--all-cases", action="store_true")
     args = parser.parse_args()
     if args.limit is not None and args.limit < 1:
         parser.error("El límite debe ser positivo")
@@ -159,6 +204,8 @@ def main():
         sets=args.sets,
         category=args.category,
         limit=args.limit,
+        strategy=args.strategy,
+        all_cases=args.all_cases,
     )
 
 

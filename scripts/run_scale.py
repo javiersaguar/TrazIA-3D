@@ -64,6 +64,7 @@ def main():
     p.add_argument("--degradaciones", nargs="+", default=None)
     p.add_argument("--tags", nargs="+", default=None)
     p.add_argument("--exigir-todos", action="store_true")
+    p.add_argument("--guardar-modelos", action="store_true")
     p.add_argument(
         "--eur-worker-hora", type=float, default=None, help="Tarifa hipotética, no coste medido"
     )
@@ -188,6 +189,8 @@ def main():
                 command += ["--degradaciones", *args.degradaciones]
             if args.tags:
                 command += ["--tags", *args.tags]
+            if args.guardar_modelos:
+                command += ["--guardar-modelos"]
             process = subprocess.run(command, cwd=ROOT)
             if process.returncode:
                 raise RuntimeError("El lote no terminó; conserva el resultado parcial")
