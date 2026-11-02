@@ -19,7 +19,7 @@ export const SHORTCUTS: { group: string; items: { keys: string[]; label: string 
       { keys: ["G", "3 · 4"], label: "Ir a Revisión o Cambios, dentro de Modelo" },
       { keys: ["G", "L"], label: "Ir a Lotes e informes" },
       { keys: ["G", "5 · 6"], label: "Ir a Bench o Impacto" },
-      { keys: ["G", "9 · 8"], label: "Ir a Del plano al modelo o al Laboratorio 3D" },
+      { keys: ["G", "8"], label: "Ir al Laboratorio 3D" },
       { keys: ["G", "S"], label: "Ir a Ajustes" },
     ],
   },

@@ -16,10 +16,12 @@ import { HowItWorks } from "./how-it-works";
 import { IntroOverlay, useIntro } from "./intro";
 import { LandingFooter } from "./landing-footer";
 import { LoginCard } from "./login-card";
+import { PlanSection } from "./plan-section";
 import { RotatingLine } from "./rotating-line";
 import { Strategies } from "./strategies";
 
 const LINKS = [
+  { href: "#del-plano", label: "Del plano al modelo" },
   { href: "#como-funciona", label: "Cómo funciona" },
   { href: "#estrategias", label: "Estrategias" },
   { href: "#equipo", label: "Equipo" },
@@ -145,6 +147,7 @@ export function LandingPage({ fontClassName }: { fontClassName?: string }) {
           </div>
         </section>
 
+        <PlanSection />
         <HologramSection />
         <HowItWorks />
         <Strategies />

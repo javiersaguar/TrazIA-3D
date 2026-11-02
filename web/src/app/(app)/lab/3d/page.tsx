@@ -1,12 +1,9 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { FullscreenFrame } from "@/components/shell/fullscreen";
-import { Icon, Panel } from "@/components/ui/primitives";
 import type { Annotation, PlantEquipment } from "@/features/viewer3d/types";
 import type { PerformanceSample } from "@/features/viewer3d/stage";
 
@@ -61,15 +58,6 @@ export default function Lab3D() {
             tamaño completo. El modelo del equipo está en Modelo.
           </p>
         </div>
-        <Link href="/lab/firma" className="block">
-          <Panel className="lift flex items-center gap-3 px-4 py-3">
-            <Icon icon={Sparkles} className="text-accent" />
-            <span className="text-sm">
-              <span className="block font-medium text-strong">Del plano al modelo</span>
-              <span className="text-muted">El plano se levanta hasta el acero</span>
-            </span>
-          </Panel>
-        </Link>
       </header>
 
       <FullscreenFrame

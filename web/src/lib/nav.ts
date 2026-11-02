@@ -1,4 +1,4 @@
-import { Box, Calculator, FileStack, FlaskConical, Gauge, Layers, LayoutDashboard, Settings, Sparkles, Workflow, type LucideIcon } from "lucide-react";
+import { Box, Calculator, FileStack, FlaskConical, Gauge, Layers, LayoutDashboard, Settings, Workflow, type LucideIcon } from "lucide-react";
 export type NavItem = { href: string; label: string; icon: LucideIcon; description: string; shortcut?: string; soon?: string; sketch?: boolean };
 export type NavGroup = { label: string; items: NavItem[] };
 export const SETTINGS_ITEM: NavItem = { href: "/ajustes", label: "Ajustes", icon: Settings, shortcut: "s", description: "Apariencia, preferencias de lectura y equipo." };
@@ -15,7 +15,6 @@ export const NAV: NavGroup[] = [
   { href: "/impacto", label: "Impacto", icon: Calculator, shortcut: "6", description: "Escenario de ahorro por proyecto. El tiempo de revisión humana sigue sin medir." },
  ]},
  { label: "Laboratorio", items: [
-  { href: "/lab/firma", label: "Del plano al modelo", icon: Sparkles, shortcut: "9", description: "El plano de V-101 se levanta hasta el acero, con las regiones leídas iluminadas." },
   { href: "/lab/3d", label: "Laboratorio 3D", icon: FlaskConical, shortcut: "8", description: "Cotas y rendimiento del visor, planta y comparación de revisiones a tamaño completo." },
  ]},
 ];
