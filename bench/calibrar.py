@@ -233,6 +233,7 @@ def fit(
     vendors: dict[str, str] | None = None,
     *,
     fusion_rows: list[dict] | None = None,
+    feedback_curves: dict[str, dict] | None = None,
 ) -> Calibration:
     """Curvas con la primera mitad de S-dev; cuantiles y umbrales con la segunda.
 
@@ -263,6 +264,13 @@ def fit(
             if use:
                 masked[f"{strategy}|*"] = curve
                 passthrough.discard(strategy)
+    # Recalibrar correcciones es otro protocolo: una curva GLOBAL posterior a la fusión,
+    # ajustada en equipos distintos de conformal/validación. Nunca una curva por canal de D.
+    for strategy, curve in (feedback_curves or {}).items():
+        if strategy not in PASSTHROUGH:
+            raise ValueError("La curva de feedback posterior a fusión solo admite D")
+        masked[f"{strategy}|*"] = curve
+        passthrough.discard(strategy)
     skip = passthrough | set(PASSTHROUGH)  # D nunca lleva curvas por canal de S-dev sin máscaras
     passthrough = sorted(passthrough)
     curve_rows, conformal_rows = _halves(rows)

@@ -60,6 +60,7 @@ def test_ledger_requires_current_approval_and_deduplicates_predictions(tmp_path)
         assert response.status_code == 200, response.text
         etag = response.headers["etag"]
         rows, provenance = training_rows(store, ledger)
+        assert training_rows(store, ledger, require_human_sessions=True)[0] == []
         [diameter] = [r for r in rows if r["path"] == "diameter"]
         assert diameter["prediction"] == 2000 and diameter["value"] == 2200
         assert diameter["correct"] is False and diameter["residual"] > 0

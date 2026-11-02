@@ -9,12 +9,14 @@ from pathlib import Path
 from sqlmodel import Session, select
 
 from trazia.model import Revision, fields
-from trazia.store import AuditRecord, CorrectionRecord, RevisionRecord, Store
+from trazia.store import AuditRecord, CorrectionRecord, ReviewSessionRecord, RevisionRecord, Store
 
 from . import conformal
 
 
-def training_rows(store: Store, ledger: Path) -> tuple[list[dict], dict]:
+def training_rows(
+    store: Store, ledger: Path, *, require_human_sessions: bool = False
+) -> tuple[list[dict], dict]:
     """Una etiqueta por predicción original, nunca por cada clic repetido.
 
     El JSONL selecciona intervenciones; SQL acredita su autenticidad, la predicción previa y
@@ -66,6 +68,25 @@ def training_rows(store: Store, ledger: Path) -> tuple[list[dict], dict]:
             if not audits:
                 counts["missing_prediction"] += 1
                 continue
+            if require_human_sessions:
+                human = {
+                    review.id
+                    for review in session.exec(
+                        select(ReviewSessionRecord).where(
+                            ReviewSessionRecord.revision_id == identity
+                        )
+                    ).all()
+                    if review.kind == "human" and review.finished_at is not None
+                }
+                confirmed = any(
+                    audit.review_session_id in human
+                    and Revision.model_validate_json(audit.after_json).fingerprint()
+                    == last["data_sha256"]
+                    for audit in audits
+                )
+                if not confirmed:
+                    counts["without_completed_human_session"] += 1
+                    continue
             prediction = fields(Revision.model_validate_json(audits[0].before_json).equipment)[path]
             source = prediction.source
             if (
@@ -127,6 +148,7 @@ def training_rows(store: Store, ledger: Path) -> tuple[list[dict], dict]:
                     "prediction": prediction.value,
                     "value": final.value,
                     "unit": final.unit,
+                    "document_hashes": sorted(d.sha256 for d in current.documents),
                 }
             )
         counts["usable_fields"] = len(rows)
@@ -134,4 +156,5 @@ def training_rows(store: Store, ledger: Path) -> tuple[list[dict], dict]:
         return rows, {
             **dict(counts),
             "ledger_sha256": hashlib.sha256(snapshot).hexdigest(),
+            "human_sessions_required": require_human_sessions,
         }

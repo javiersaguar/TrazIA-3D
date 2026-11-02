@@ -91,6 +91,7 @@ def main():
     flush(store, ledger)
     recalibrate(
         [
+            "--simulacion-sintetica",
             "--almacen",
             str(store.root),
             "--correcciones",
