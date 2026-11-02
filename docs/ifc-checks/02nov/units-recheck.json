@@ -1,0 +1,6 @@
+{
+  "synthetic": true,
+  "cases": 48,
+  "passed": 48,
+  "check": "unidad de longitud explicita y escala 1 m en los 48 STEP archivados"
+}

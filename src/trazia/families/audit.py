@@ -78,6 +78,11 @@ def audit_ifc(revision, model, *, tolerance_m=0.002):
 
     schema_issues = validate_ifc(model)
     check(not schema_issues, "schema", f"{len(schema_issues)} incidencias estructurales/EXPRESS")
+    check(
+        ifcopenshell.util.unit.get_project_unit(model, "LENGTHUNIT") is not None,
+        "units",
+        "El proyecto debe declarar explícitamente la unidad de longitud",
+    )
     unit_scale = ifcopenshell.util.unit.calculate_unit_scale(model)
     check(
         abs(unit_scale - 1) < 1e-12, "units", "El exportador debe declarar longitud IFC en metros"

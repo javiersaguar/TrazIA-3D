@@ -14,7 +14,8 @@ GUID únicos, propiedades trazadas/huella de datos y valores técnicos, FieldsJS
 contrato, envolventes analíticas por componente y posición/dirección de cada puerto. Tolerancia
 geométrica 0,002 m y de colocación de puertos 1e-6 m. Los datos de origen se mantienen intactos.
 
-Las pruebas negativas alteran unidad, estado DRAFT, FieldsJSON, presión, posición y dirección:
+Las pruebas negativas alteran unidad, eliminan su declaración, cambian estado DRAFT, FieldsJSON,
+presión, posición y dirección:
 un IFC que abre y cumple su esquema todavía puede fallar estas comprobaciones. Los resultados
 no prueban ausencia de colisiones, resistencia mecánica ni todas las geometrías posibles.
 

@@ -31,6 +31,7 @@ def test_audit_reopened_step_checks_geometry_units_properties_and_ports(source, 
     "failure,code",
     [
         ("unit", "units"),
+        ("missing_unit", "units"),
         ("draft", "traceability"),
         ("fields", "fields_roundtrip"),
         ("technical", "technical_property"),
@@ -42,6 +43,8 @@ def test_audit_rejects_semantic_or_metric_corruption(source, failure, code):
     model = build_ifc(source)
     if failure == "unit":
         next(u for u in model.by_type("IfcSIUnit") if u.UnitType == "LENGTHUNIT").Prefix = "MILLI"
+    elif failure == "missing_unit":
+        model.by_type("IfcProject")[0].UnitsInContext = None
     elif failure == "placement":
         model.by_type("IfcTank")[0].ObjectPlacement.RelativePlacement.Location.Coordinates = (
             0.0,
