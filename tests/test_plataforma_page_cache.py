@@ -49,10 +49,12 @@ def test_new_revision_reuses_unchanged_page_before_raster_and_rebinds_evidence(
     recognitions.clear()
     engine.ocr_pdf_lines(b, "GA-B")
     assert renders == [] and recognitions == []
-    cached = next((tmp_path / "pages-v1").rglob("*.json"))
-    cached.write_text("{broken", encoding="utf8")
+    # No depender del orden del filesystem: el primer archivo podría ser la página
+    # sustituida de A, que B ya no consulta. Corromper todas las entradas de página.
+    for cached in (tmp_path / "pages-v1").rglob("*.json"):
+        cached.write_text("{broken", encoding="utf8")
     engine.ocr_pdf_lines(b, "GA-B")
-    assert renders == [] and len(recognitions) == 1  # Se rehace OCR usando el raster íntegro.
+    assert renders == [] and len(recognitions) == 2  # Ambas páginas usan el raster íntegro.
 
 
 def test_positive_raster_geometry_with_numpy_scalars_roundtrips(tmp_path, monkeypatch):
