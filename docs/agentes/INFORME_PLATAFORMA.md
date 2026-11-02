@@ -734,3 +734,22 @@ en CPU, junto con una tabla de contraste que distingue referencia y lectura obse
 2×2×6,5 m, Z=1,35…7,85 m; faldón de 1,35 m, fondos de 0,5 m. Unidad IFC METRE y unidad de entrada mm.
 Estas son comprobaciones internas del archivo; no se marcan verificadas en BIMvision. Solicitada
 lectura manual para cerrar el contraste. No cambia el archivo IFC ni se da por completada D.4.
+
+
+## Sesión 02/11 · tres tareas autónomas en CPU
+
+### D.4 · Ampliación automática cerrada
+
+Auditor de STEP reabierto contra Revision: esquema/EXPRESS, unidades, cotas analíticas por
+componente, propiedades/FieldsJSON/huella, puertos y GUID. Matriz 48/48 válida en ocho casos,
+tres esquemas y dos modos de detalle; además se construye B en cada caso (96 exportaciones).
+Pruebas con alteraciones deliberadas de unidad, DRAFT, campos, presión, posición y orientación.
+[Resultados y reproducción](../ifc-checks/02nov/README.md). No es una medición dentro de BIMvision,
+ni una comparación con TR o una certificación mecánica; esas partes siguen abiertas.
+
+Validación: Ruff y formato verdes; 16 pruebas específicas (incluye auditoría, métricas y triage)
+en Linux/CPU, 24,48 s. El baseline Linux previo tiene 389 pasadas y un fallo de OCR real de Lectura
+(`test_b_with_ocr_reads_a_scanned_drawing`, no recupera boquillas); Windows bloquea el lanzador
+pytest con error 4551. No se modifica su política ni se presenta el baseline como verde. El
+contenedor de pruebas deriva de la imagen CPU existente añadiendo solo reportlab 4.5.1, ya fijado
+en uv.lock; fuente y carpetas públicas se montan en lectura. Sin cambios de dependencias del repo.
