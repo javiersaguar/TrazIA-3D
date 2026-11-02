@@ -36,7 +36,7 @@ from .vesor import is_vesor
 MARK = re.compile(r"^[A-Z]{1,2}\d{1,3}[A-Z]?$")
 MARK_HEADER = re.compile(r"^(MARK|MARCA|NOZ\.?|ITEM|POS\.?)$")
 COLUMNS = (
-    ("diameter", re.compile(r"\b(SIZE|DN|NPS)\b")),
+    ("diameter", re.compile(r"\b(SIZE|DN|NPS)\b|DN$")),
     ("projection", re.compile(r"\b(PROJ|SALIENTE|STANDOUT|LENGTH)")),
     ("elevation", re.compile(r"\b(ELEV|COTA|LEVEL)")),
     ("azimuth", re.compile(r"\b(ORIENT|AZIM|ANGLE)")),
@@ -150,6 +150,7 @@ class DrawingExtractor:
         """Tabla con marca y elevación; en un VESOR (`orientation`) basta con la orientación."""
         out: list[Candidate] = []
         region: list[tuple[float, float, float, float]] = []
+        page_lines = [cell for row in rows for cell in row]
         for index, row in enumerate(rows):
             start = next(
                 (i for i, c in enumerate(row) if MARK_HEADER.match(_first_word(c.text))), None
@@ -158,8 +159,20 @@ class DrawingExtractor:
                 continue
             # La cabecera son celdas contiguas: lo que queda más allá de un hueco grande es otro
             # bloque del plano (notas, cajetín) que comparte la misma altura.
-            header = [row[start]]
-            for cell in row[start + 1 :]:
+            anchor = row[start]
+            # Una cota del dibujo, de otra fuente/tamaño, puede partir la cabecera al
+            # agrupar toda la página. Reconstruirla respecto a MARK, dentro de su banda.
+            aligned = sorted(
+                (
+                    cell
+                    for cell in page_lines
+                    if cell.source.bbox[0] >= anchor.source.bbox[0]
+                    and abs(_center_y(cell) - _center_y(anchor)) <= ROW_TOLERANCE
+                ),
+                key=lambda cell: cell.source.bbox[0],
+            )
+            header = [anchor]
+            for cell in aligned[1:]:
                 if cell.source.bbox[0] - header[-1].source.bbox[2] > 0.06:
                     break
                 header.append(cell)
@@ -217,12 +230,21 @@ class DrawingExtractor:
         for cell in header:
             text = cell.text.upper()
             x0, _, x1, _ = cell.source.bbox
-            for key, pattern in COLUMNS:
-                for match in pattern.finditer(text):
-                    x = x0 + (x1 - x0) * match.start() / max(1, len(text))
-                    if not any(k == key for _, k in columns):
-                        columns.append((x, key))
-                    break
+            recognized = [
+                (key, match)
+                for key, pattern in COLUMNS
+                if (match := pattern.search(text)) is not None
+            ]
+            for key, match in recognized:
+                # Si es una sola cabecera, la columna empieza en su caja, no en
+                # el sufijo DN que el OCR conserva tras caracteres deformados.
+                x = (
+                    x0
+                    if len(recognized) == 1
+                    else x0 + (x1 - x0) * match.start() / max(1, len(text))
+                )
+                if not any(k == key for _, k in columns):
+                    columns.append((x, key))
         return sorted(columns)
 
     @staticmethod

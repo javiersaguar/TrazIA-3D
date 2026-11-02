@@ -10,6 +10,7 @@ from sqlmodel import Session
 
 from trazia.calibration import calibration_path, load_calibration
 from trazia.model import Revision, RunInfo
+from trazia.ocr.engine import profile
 from trazia.store import DocumentRecord, JobCacheRecord, RevisionRecord, Store
 
 from .pipeline_adapter import PipelineResult
@@ -66,8 +67,12 @@ def key_for(session: Session, request: dict) -> str:
             raise CacheMiss("No existe la revisión anterior")
         previous = hashlib.sha256(record.payload.encode()).hexdigest()
     content = {
-        "version": 4,
-        "reading": "pint-v1/page-signature-v1/revisable-draft-v1",
+        "version": 5,
+        "reading": (
+            "pint-v1/page-signature-v1/revisable-draft-v1/"
+            "table-anchor-v2/rotated-dimensions-v1/tiled-missing-dimensions-v1"
+        ),
+        "ocr": profile(),
         "feedback": epoch(session) if request.get("use_learning", True) else None,
         "calibration": request.get("_cache_calibration", calibration_fingerprint()),
         "fusion": request.get("_cache_fusion", fusion_fingerprint()),

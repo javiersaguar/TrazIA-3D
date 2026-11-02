@@ -134,7 +134,19 @@ def build_feedback(store, request):
                 verified=False, stats={"reason": "No se verifican los originales del feedback"}
             )
     priorities, stats = channel_priorities(independent_channels(channels, documents_by_equipment))
-    return Feedback(tuple(sorted(pairs, key=lambda e: e["id"])[:3]), priorities, stats)
+    # Una tasa de acierto por canal no demuestra que reponderarlo mejore la fusión.
+    # El ensayo reservado encontró una regresión: conservar la propuesta para evaluar,
+    # sin alterar automáticamente la extracción al registrar una revisión humana.
+    return Feedback(
+        examples=tuple(sorted(pairs, key=lambda e: e["id"])[:3]),
+        priorities={},
+        stats={
+            "channels": stats,
+            "candidate_priorities": priorities,
+            "priority_status": "requires_independent_validation",
+            "activated": False,
+        },
+    )
 
 
 def channel_priorities(channels):

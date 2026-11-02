@@ -815,3 +815,50 @@ los servicios del usuario quedan intactos.
 
 Sin GPU ni data/private; código de Lectura, frontend y model.py intactos. No hay evidencia TR
 ni muestra humana nueva. Se entrega un [inventario de coordinación](ENTREGA_LECTURA_02NOV.md).
+
+
+## Sesión 02/11 · noche · 3.7 y 3.8
+
+Javier encarga continuar ambos puntos después de integrar el frontend. Se trabaja en
+feat/escala-aprendizaje, worktree propio desde main 042aa9c; alcance ampliado a los fallos
+concretos de OCR/extracción y la ruta de recalibración señalados en la entrega a Lectura.
+No se cambia model.py ni se usan datos privados o GPU; no se añaden dependencias.
+
+### Implementado y contrastado
+
+- Cabeceras de boquillas ancladas a su marca, columnas OCR y hilos ONNX explícitos en CPU.
+  Suplementos de giro/mosaico solo ante dimensiones ausentes o incoherentes, con cajas
+  transformadas al original y conservación de cotas previas fiables. Caché íntegra, atómica
+  y aislada por configuración; nueva versión de caché de trabajos.
+- El caso OCR heredado pasa sin cambiar sus exigencias. Batería completa: 424 correctas con
+  OCR instalado. Siete pruebas adicionales focalizadas cubren mosaico, giro, caché y conservación
+  de cotas/boquillas (cuatro estaban ya en la batería completa, tres se añaden después).
+- 336 revisiones D/CPU: 267 DRAFT y 69 errores frente a 251/85, 16 recuperaciones sin perder
+  ningún DRAFT anterior. Precisión de campos devueltos 91,04 %, recall 55,31 %; 194 geometrías
+  principales correctas. Los 96 casos con todos los campos evaluados correctos se conservan.
+  La configuración 2048 se descarta por regresión; los tiempos de exploración no son comparables.
+- D admite una curva global posterior a la fusión en la ruta de feedback. Grupos independientes
+  para curva, conformal y validación, agrupando alias y originales comunes. El ajuste normal de
+  bench conserva su política original; estrategias no observadas conservan la calibración base.
+- La CLI exige por defecto sesiones humanas finalizadas. Simulación solo con marca explícita;
+  ningún candidato se activa solo. Prioridades calculadas como propuestas, sin modificar la
+  extracción mientras no haya validación independiente. Ejemplos aprobados mantienen sus guardas.
+- Propuesta sintética D: ECE interna 0,0160→0,0136; reservada 0,0943→0,0753. Intervalos informativos
+  98,83→98,79 %; cobertura tras abstención 71,13→69,31 %. Objetivo ECE <0,05 no alcanzado. Sin activar.
+
+- Escala (03/11, cierre de la medición que quedó en marcha): Redis/Postgres/API con 1 y 4
+  workers sobre las 336 revisiones, 2.786,3 s frente a 906,9 s (3,07×), mismos estados en
+  todas, 0 llamadas externas. Tiempo, coste y estados por equipo en `por-equipo.csv`. 3.7 se
+  cierra con esa medida; los 69 errores quedan como trabajo de lectura.
+
+[Comparación, casos, protocolo y evidencias](../evidencias/fase3/02nov-cotas/README.md).
+[Interfaz y comandos](../API.md#lectura-cpu-y-aprendizaje-aprobado--0211-revisión-nocturna).
+
+### Límites que permanecen
+
+69 errores (53 por datos ausentes y 16 por incoherencia), precisión industrial frente a TR y
+coste de revisar/corregir 1.600 resultados aún sin demostrar. La muestra humana representativa
+no existe y E.5 sigue pospuesta; no se han fabricado sesiones, correcciones o aprobaciones reales.
+Few-shot visual sin eficacia medida en esta sesión; con providers=[] solo se verifica el circuito.
+3.7 queda cerrada con la medida de escala del 03/11. 3.8/E.6 sigue abierta: necesita una sesión
+de revisión humana real con correcciones representativas, y una ECE reservada < 0,05 con ellas.

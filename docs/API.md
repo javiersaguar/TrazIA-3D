@@ -537,3 +537,40 @@ Hasta 100 páginas por original; las restantes se declaran truncadas. Páginas d
 raster quedan sin lectura aunque incluyan una cabecera vectorial. Campos eliminados sin caja
 en B quedan sin localizar; no se proyecta su caja antigua sobre el plano nuevo. Ausencia de
 original, SHA diferente o error de lectura se declara explícitamente. [Detalle](MARCAS_REVISION.md).
+
+
+### Lectura CPU y aprendizaje aprobado · 02/11, revisión nocturna
+
+El OCR conserva el tamaño original del perfil de lectura y fija ONNX en CPU.
+`TRAZIA_OCR_THREADS=2` limita los hilos internos por sesión (1–8). La huella de trabajos
+incluye el perfil OCR y la versión del lector; una actualización no reutiliza resultados
+incompatibles. La caché OCR de imagen y página lleva suma de comprobación y escritura atómica.
+
+La cabecera de boquillas se reconstruye respecto a su marca para que una cota de otra zona
+no la parta en filas. Si faltan dimensiones o su combinación es incoherente, se prueba el giro
+90° para números verticales y, después, cuatro recortes solapados. Las cajas se transforman
+al sistema normalizado del PDF original. El mosaico solo sustituye dimensiones cuando la lectura
+es completa, compatible con las cotas previas de alta confianza y pasa las mismas restricciones.
+Las tablas y los atributos previos se conservan. No se rellenan campos desde GT ni se relajan
+los validadores. La geometría automática sigue siendo DRAFT.
+
+`python -m bench.recalibrar --almacen <store> --correcciones <jsonl> --base <base> --salida <dir>`
+exige por defecto intervenciones vinculadas a sesiones humanas finalizadas, auditoría SQL,
+originales verificables y aprobación vigente. `--simulacion-sintetica` permite ensayos de pruebas
+y marca el artefacto; no acredita una sesión humana real. Las APIs de correcciones no cambian.
+
+Las particiones agrupan por equipo y por componentes de documentos compartidos, incluidos
+alias transitivos. Hay grupos separados para curva, conformal y validación. La ruta de feedback
+de D ajusta una sola curva global posterior a la fusión; nunca curvas por canal. El ajuste
+habitual de `bench.calibrar` mantiene su protección original para D. Se conservan la calibración
+anterior y su huella como respaldo para las estrategias no observadas. Una propuesta rechazada
+no se publica y ninguna propuesta se activa automáticamente.
+
+La tasa de acierto por canal produce `candidate_priorities` y estadísticas, pero no cambia los
+pesos usados por el pipeline. `priority_status=requires_independent_validation` y
+`activated=false`: la evaluación anterior encontró una regresión, por lo que registrar más
+correcciones no autoriza aplicarla. Los ejemplos aprobados siguen viajando como datos citados,
+con exclusión del equipo y originales destino y los límites de contexto existentes.
+
+La validación representativa continúa dependiendo de correcciones humanas independientes.
+Las simulaciones no miden tiempo humano ni eficacia few-shot de un proveedor de visión.

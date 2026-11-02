@@ -12,21 +12,59 @@ from pathlib import Path
 
 from trazia.calibration import Calibration, calibration_path, load_calibration
 from trazia.calibration.feedback import training_rows
+from trazia.calibration.isotonic import fit_curve
 from trazia.calibration.scope import for_strategy
 from trazia.store import Store
 
-from .calibrar import MIN_GROUP, evaluate, fit
+from .calibrar import MIN_GROUP, PASSTHROUGH, _halves, evaluate, fit
+
+
+def independent_rows(rows: list[dict]) -> tuple[list[dict], dict]:
+    """Ni alias de equipo ni copias del mismo original pueden cruzar las particiones."""
+    parents = {r["tag"]: r["tag"] for r in rows}
+
+    def root(tag):
+        while parents[tag] != tag:
+            tag = parents[tag]
+        return tag
+
+    owners = {}
+    for row in rows:
+        for digest in row.get("document_hashes", []):
+            if digest in owners:
+                a, b = sorted((root(row["tag"]), root(owners[digest])))
+                parents[b] = a
+            else:
+                owners[digest] = row["tag"]
+    groups = {}
+    for tag in sorted(parents):
+        groups.setdefault(root(tag), []).append(tag)
+    return [{**r, "tag": root(r["tag"])} for r in rows], groups
 
 
 def propose(rows: list[dict], base: Calibration | None, *, min_equipment: int = 6) -> tuple:
+    rows, components = independent_rows(rows)
     tags = sorted({r["tag"] for r in rows})
     if len(tags) < min_equipment:
-        return None, {"status": "insufficient", "reason": "Faltan equipos aprobados independientes"}
+        return None, {
+            "status": "insufficient",
+            "reason": "Faltan equipos aprobados independientes",
+            "independent_groups": len(tags),
+            "equipment_components": components,
+        }
     held_out = set(tags[::3])
     train = [dict(r) for r in rows if r["tag"] not in held_out]
     test = [dict(r) for r in rows if r["tag"] in held_out]
     # fit divide train por equipo entre curva y conformal; no se mezcla con test.
-    candidate = fit(train)
+    curve_rows, conformal_rows = _halves(train)
+    feedback_curves = {}
+    for strategy in PASSTHROUGH:
+        own = [r for r in curve_rows if r["strategy"] == strategy]
+        if len(own) >= MIN_GROUP:
+            feedback_curves[strategy] = fit_curve(
+                [r["raw"] for r in own], [r["correct"] for r in own]
+            )
+    candidate = fit(train, feedback_curves=feedback_curves)
     if not candidate.curves or not test or len(test) < MIN_GROUP:
         return None, {"status": "insufficient", "reason": "Faltan campos para ajuste y validación"}
     strategies = {r["strategy"] for r in rows}
@@ -48,7 +86,7 @@ def propose(rows: list[dict], base: Calibration | None, *, min_equipment: int = 
             "status": "insufficient",
             "reason": "Alguna estrategia carece de muestra suficiente",
         }
-    candidate.fitted_on = "Correcciones humanas sintéticas aprobadas"
+    candidate.fitted_on = "Correcciones aprobadas; particiones independientes por equipo y original"
     candidate.curves = {k: v for k, v in candidate.curves.items() if not k.startswith("*|")}
     if base:
         # Las estrategias no observadas conservan su modelo mediante feedback_fallback.
@@ -73,6 +111,10 @@ def propose(rows: list[dict], base: Calibration | None, *, min_equipment: int = 
             "parent_sha256": base.sha256 if base else None,
             "fit_equipment": sorted(set(tags) - held_out),
             "test_equipment": sorted(held_out),
+            "curve_equipment": sorted({r["tag"] for r in curve_rows}),
+            "conformal_equipment": sorted({r["tag"] for r in conformal_rows}),
+            "equipment_components": components,
+            "post_fusion_feedback": sorted(feedback_curves),
         }
     )
     return candidate, {
@@ -93,23 +135,34 @@ def main(argv=None):
     p.add_argument("--almacen", type=Path, required=True)
     p.add_argument("--correcciones", type=Path, required=True)
     p.add_argument("--base", type=Path)
+    p.add_argument(
+        "--simulacion-sintetica",
+        action="store_true",
+        help="Permite auditorías de pruebas; marca la propuesta como simulada",
+    )
     p.add_argument("--salida", type=Path, default=Path("generated/recalibracion"))
     args = p.parse_args(argv)
     target = args.salida / "calibracion.json"
     base_path = args.base or calibration_path()
     if base_path and base_path.resolve() == target.resolve():
         p.error("La propuesta no puede sobrescribir la calibración base")
-    rows, provenance = training_rows(Store(args.almacen), args.correcciones)
+    rows, provenance = training_rows(
+        Store(args.almacen),
+        args.correcciones,
+        require_human_sessions=not args.simulacion_sintetica,
+    )
     base = load_calibration(args.base)
     candidate, report = propose(rows, base)
     args.salida.mkdir(parents=True, exist_ok=True)
     report.update(provenance)
     report["activated"] = False
+    report["synthetic_simulation"] = args.simulacion_sintetica
     report["base_sha256"] = base.sha256 if base else None
     target = args.salida / "calibracion.json"
     if target.exists():
         target.unlink()  # Nunca dejar que una propuesta antigua parezca el resultado actual.
     if candidate is not None and report["status"] == "candidate":
+        candidate.meta["synthetic_simulation"] = args.simulacion_sintetica
         temporary = target.with_suffix(".tmp")
         temporary.write_text(
             json.dumps(candidate.to_dict(), ensure_ascii=False, indent=2), encoding="utf-8"

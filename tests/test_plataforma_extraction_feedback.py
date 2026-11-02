@@ -83,6 +83,7 @@ def test_priorities_require_independent_groups_and_are_bounded():
 
 def test_only_completed_human_approved_correction_is_eligible_and_revocation_changes_cache(
     tmp_path,
+    monkeypatch,
 ):
     """Fixture unitaria de autoridad; no es una sesión real ni mide tiempo humano."""
     import time
@@ -153,6 +154,18 @@ def test_only_completed_human_approved_correction_is_eligible_and_revocation_cha
         feedback = build_feedback(store, request)
         assert feedback.verified and len(feedback.examples) == 1
         assert not feedback.priorities  # Un equipo no ajusta la prioridad.
+        import trazia.api.extraction_feedback as extraction_feedback
+
+        monkeypatch.setattr(
+            extraction_feedback,
+            "channel_priorities",
+            lambda rows: ({"ocr": 1.15}, {"ocr": {"equipment": 6, "fields": 100}}),
+        )
+        proposed = build_feedback(store, request)
+        assert not proposed.priorities
+        assert proposed.stats["candidate_priorities"] == {"ocr": 1.15}
+        assert proposed.stats["priority_status"] == "requires_independent_validation"
+        assert proposed.stats["activated"] is False
         same = {**request, "project_id": "DEMO-PLANT", "equipment_id": "vessel-001"}
         assert not build_feedback(store, same).examples
         patch("height", 6100)
