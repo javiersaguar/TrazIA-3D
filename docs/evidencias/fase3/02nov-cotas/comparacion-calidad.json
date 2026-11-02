@@ -1,0 +1,394 @@
+{
+  "alta_resolucion_descartada": {
+    "summary": {
+      "revisions": 336,
+      "statuses": {
+        "draft": 248,
+        "error": 88
+      },
+      "expected_fields": 7932,
+      "present_fields": 4987,
+      "correct_fields": 4381,
+      "precision_returned_fields": 0.8784840585522358,
+      "recall_correct_fields": 0.5523197175995965,
+      "drafts_all_geometry_correct": 191,
+      "drafts_all_fields_correct": 90,
+      "pipeline_seconds_sum": 1477.9968138420954,
+      "external_calls": 0,
+      "cost_for_1600_engineering_valid_ifc": null,
+      "engineering_accuracy_verified": false
+    },
+    "by_dataset": {
+      "s-adversarial": {
+        "revisions": 24,
+        "statuses": {
+          "draft": 24
+        },
+        "expected_fields": 576,
+        "present_fields": 616,
+        "correct_fields": 576,
+        "precision_returned_fields": 0.935064935064935,
+        "recall_correct_fields": 1.0,
+        "drafts_all_geometry_correct": 24,
+        "drafts_all_fields_correct": 14,
+        "pipeline_seconds_sum": 5.942734993994236,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "s-mecanico": {
+        "revisions": 72,
+        "statuses": {
+          "draft": 43,
+          "error": 29
+        },
+        "expected_fields": 864,
+        "present_fields": 201,
+        "correct_fields": 195,
+        "precision_returned_fields": 0.9701492537313433,
+        "recall_correct_fields": 0.22569444444444445,
+        "drafts_all_geometry_correct": 39,
+        "drafts_all_fields_correct": 0,
+        "pipeline_seconds_sum": 265.27670221008884,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "s-reservado": {
+        "revisions": 96,
+        "statuses": {
+          "draft": 74,
+          "error": 22
+        },
+        "expected_fields": 2484,
+        "present_fields": 1355,
+        "correct_fields": 1109,
+        "precision_returned_fields": 0.818450184501845,
+        "recall_correct_fields": 0.4464573268921095,
+        "drafts_all_geometry_correct": 48,
+        "drafts_all_fields_correct": 23,
+        "pipeline_seconds_sum": 493.3649523880449,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "s-dev": {
+        "revisions": 144,
+        "statuses": {
+          "draft": 107,
+          "error": 37
+        },
+        "expected_fields": 4008,
+        "present_fields": 2815,
+        "correct_fields": 2501,
+        "precision_returned_fields": 0.8884547069271759,
+        "recall_correct_fields": 0.624001996007984,
+        "drafts_all_geometry_correct": 80,
+        "drafts_all_fields_correct": 53,
+        "pipeline_seconds_sum": 713.4124242499674,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      }
+    },
+    "input_sha256": [
+      "da9ea85b70734d8ccdb0d63aef882b1d488667f08e52495a5a9b6c28a951e170"
+    ],
+    "report_sha256": "b4fc957bc17615adfb57c2d289c3959283984f7c4ed004414a6c26bc7ffb5c62",
+    "timings_comparable": false
+  },
+  "cabeceras": {
+    "summary": {
+      "revisions": 336,
+      "statuses": {
+        "draft": 252,
+        "error": 84
+      },
+      "expected_fields": 7932,
+      "present_fields": 4820,
+      "correct_fields": 4359,
+      "precision_returned_fields": 0.904356846473029,
+      "recall_correct_fields": 0.5495461422087746,
+      "drafts_all_geometry_correct": 187,
+      "drafts_all_fields_correct": 96,
+      "pipeline_seconds_sum": 716.6689155179629,
+      "external_calls": 0,
+      "cost_for_1600_engineering_valid_ifc": null,
+      "engineering_accuracy_verified": false
+    },
+    "by_dataset": {
+      "s-adversarial": {
+        "revisions": 24,
+        "statuses": {
+          "draft": 24
+        },
+        "expected_fields": 576,
+        "present_fields": 616,
+        "correct_fields": 576,
+        "precision_returned_fields": 0.935064935064935,
+        "recall_correct_fields": 1.0,
+        "drafts_all_geometry_correct": 24,
+        "drafts_all_fields_correct": 14,
+        "pipeline_seconds_sum": 3.120607919016038,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "s-mecanico": {
+        "revisions": 72,
+        "statuses": {
+          "draft": 40,
+          "error": 32
+        },
+        "expected_fields": 864,
+        "present_fields": 192,
+        "correct_fields": 189,
+        "precision_returned_fields": 0.984375,
+        "recall_correct_fields": 0.21875,
+        "drafts_all_geometry_correct": 38,
+        "drafts_all_fields_correct": 0,
+        "pipeline_seconds_sum": 114.29522444994655,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "s-reservado": {
+        "revisions": 96,
+        "statuses": {
+          "draft": 77,
+          "error": 19
+        },
+        "expected_fields": 2484,
+        "present_fields": 1329,
+        "correct_fields": 1100,
+        "precision_returned_fields": 0.8276899924755455,
+        "recall_correct_fields": 0.4428341384863124,
+        "drafts_all_geometry_correct": 47,
+        "drafts_all_fields_correct": 23,
+        "pipeline_seconds_sum": 235.11318211094476,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "s-dev": {
+        "revisions": 144,
+        "statuses": {
+          "draft": 111,
+          "error": 33
+        },
+        "expected_fields": 4008,
+        "present_fields": 2683,
+        "correct_fields": 2494,
+        "precision_returned_fields": 0.9295564666418189,
+        "recall_correct_fields": 0.622255489021956,
+        "drafts_all_geometry_correct": 78,
+        "drafts_all_fields_correct": 59,
+        "pipeline_seconds_sum": 364.13990103805554,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      }
+    },
+    "input_sha256": [
+      "da9ea85b70734d8ccdb0d63aef882b1d488667f08e52495a5a9b6c28a951e170"
+    ],
+    "report_sha256": "5cf2baab48d58a5cc6c1d444e076ae15cc9e6f9fb3ff9368b2b668cc05921e26",
+    "timings_comparable": false
+  },
+  "giro": {
+    "summary": {
+      "revisions": 336,
+      "statuses": {
+        "draft": 260,
+        "error": 76
+      },
+      "expected_fields": 7932,
+      "present_fields": 4857,
+      "correct_fields": 4405,
+      "precision_returned_fields": 0.9069384393658637,
+      "recall_correct_fields": 0.555345436207766,
+      "drafts_all_geometry_correct": 191,
+      "drafts_all_fields_correct": 96,
+      "pipeline_seconds_sum": 387.3427642979077,
+      "external_calls": 0,
+      "cost_for_1600_engineering_valid_ifc": null,
+      "engineering_accuracy_verified": false
+    },
+    "by_dataset": {
+      "s-adversarial": {
+        "revisions": 24,
+        "statuses": {
+          "draft": 24
+        },
+        "expected_fields": 576,
+        "present_fields": 616,
+        "correct_fields": 576,
+        "precision_returned_fields": 0.935064935064935,
+        "recall_correct_fields": 1.0,
+        "drafts_all_geometry_correct": 24,
+        "drafts_all_fields_correct": 14,
+        "pipeline_seconds_sum": 3.411863967005047,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "s-mecanico": {
+        "revisions": 72,
+        "statuses": {
+          "draft": 45,
+          "error": 27
+        },
+        "expected_fields": 864,
+        "present_fields": 207,
+        "correct_fields": 201,
+        "precision_returned_fields": 0.9710144927536232,
+        "recall_correct_fields": 0.2326388888888889,
+        "drafts_all_geometry_correct": 41,
+        "drafts_all_fields_correct": 0,
+        "pipeline_seconds_sum": 64.82563675304118,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "s-reservado": {
+        "revisions": 96,
+        "statuses": {
+          "draft": 77,
+          "error": 19
+        },
+        "expected_fields": 2484,
+        "present_fields": 1329,
+        "correct_fields": 1100,
+        "precision_returned_fields": 0.8276899924755455,
+        "recall_correct_fields": 0.4428341384863124,
+        "drafts_all_geometry_correct": 47,
+        "drafts_all_fields_correct": 23,
+        "pipeline_seconds_sum": 141.06034528098826,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "s-dev": {
+        "revisions": 144,
+        "statuses": {
+          "draft": 114,
+          "error": 30
+        },
+        "expected_fields": 4008,
+        "present_fields": 2705,
+        "correct_fields": 2528,
+        "precision_returned_fields": 0.9345656192236599,
+        "recall_correct_fields": 0.6307385229540918,
+        "drafts_all_geometry_correct": 79,
+        "drafts_all_fields_correct": 59,
+        "pipeline_seconds_sum": 178.04491829687322,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      }
+    },
+    "input_sha256": [
+      "da9ea85b70734d8ccdb0d63aef882b1d488667f08e52495a5a9b6c28a951e170"
+    ],
+    "report_sha256": "17da3b09fe12e1664d6a92ac914048d76c01c6e1cd268d58f5f26cf377a22134",
+    "timings_comparable": false
+  },
+  "mosaico": {
+    "summary": {
+      "revisions": 336,
+      "statuses": {
+        "draft": 267,
+        "error": 69
+      },
+      "expected_fields": 7932,
+      "present_fields": 4819,
+      "correct_fields": 4387,
+      "precision_returned_fields": 0.9103548454036107,
+      "recall_correct_fields": 0.5530761472516389,
+      "drafts_all_geometry_correct": 194,
+      "drafts_all_fields_correct": 96,
+      "pipeline_seconds_sum": 725.0681070500432,
+      "external_calls": 0,
+      "cost_for_1600_engineering_valid_ifc": null,
+      "engineering_accuracy_verified": false
+    },
+    "by_dataset": {
+      "s-adversarial": {
+        "revisions": 24,
+        "statuses": {
+          "draft": 24
+        },
+        "expected_fields": 576,
+        "present_fields": 616,
+        "correct_fields": 576,
+        "precision_returned_fields": 0.935064935064935,
+        "recall_correct_fields": 1.0,
+        "drafts_all_geometry_correct": 24,
+        "drafts_all_fields_correct": 14,
+        "pipeline_seconds_sum": 3.0995985759509495,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "s-mecanico": {
+        "revisions": 72,
+        "statuses": {
+          "draft": 46,
+          "error": 26
+        },
+        "expected_fields": 864,
+        "present_fields": 210,
+        "correct_fields": 204,
+        "precision_returned_fields": 0.9714285714285714,
+        "recall_correct_fields": 0.2361111111111111,
+        "drafts_all_geometry_correct": 42,
+        "drafts_all_fields_correct": 0,
+        "pipeline_seconds_sum": 126.88707206095569,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "s-reservado": {
+        "revisions": 96,
+        "statuses": {
+          "draft": 79,
+          "error": 17
+        },
+        "expected_fields": 2484,
+        "present_fields": 1314,
+        "correct_fields": 1099,
+        "precision_returned_fields": 0.8363774733637748,
+        "recall_correct_fields": 0.4424315619967794,
+        "drafts_all_geometry_correct": 47,
+        "drafts_all_fields_correct": 23,
+        "pipeline_seconds_sum": 294.3475792120589,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "s-dev": {
+        "revisions": 144,
+        "statuses": {
+          "draft": 118,
+          "error": 26
+        },
+        "expected_fields": 4008,
+        "present_fields": 2679,
+        "correct_fields": 2508,
+        "precision_returned_fields": 0.9361702127659575,
+        "recall_correct_fields": 0.625748502994012,
+        "drafts_all_geometry_correct": 81,
+        "drafts_all_fields_correct": 59,
+        "pipeline_seconds_sum": 300.7338572010776,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      }
+    },
+    "input_sha256": [
+      "da9ea85b70734d8ccdb0d63aef882b1d488667f08e52495a5a9b6c28a951e170"
+    ],
+    "report_sha256": "1a1501d91a8a309a7de91a666587cfbbe6a7d8ce768659068bec1aedd1859c25",
+    "timings_comparable": false
+  }
+}

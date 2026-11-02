@@ -1,0 +1,295 @@
+[
+  {
+    "dataset": "s-dev",
+    "tag": "D-200",
+    "degradation": "escaneado_pobre",
+    "revision": "2",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "d73a5b8d0008f0ef894e8e346f2c82d0dd2999d5cb15a341198f0b2403dedf24",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 34,
+      "present_fields": 6,
+      "correct_fields": 4,
+      "all_geometry_correct": false,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": []
+    }
+  },
+  {
+    "dataset": "s-dev",
+    "tag": "C-202",
+    "degradation": "escaneado_limpio",
+    "revision": "2",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "c905669939b9eb0f8c65587b2cf6c60e565823c111fc6a7bbf7853d53e5cb412",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 30,
+      "present_fields": 30,
+      "correct_fields": 24,
+      "all_geometry_correct": true,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": [
+        "nozzles.NN4.azimuth",
+        "nozzles.NN4.diameter",
+        "nozzles.NN4.elevation",
+        "nozzles.NN4.projection"
+      ]
+    }
+  },
+  {
+    "dataset": "s-dev",
+    "tag": "D-205",
+    "degradation": "escaneado_limpio",
+    "revision": "1",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "f3008c07d3908fedce2c138814fa06c095fb8ecce1f9ee82c3d6307d19238655",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 22,
+      "present_fields": 14,
+      "correct_fields": 13,
+      "all_geometry_correct": false,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": []
+    }
+  },
+  {
+    "dataset": "s-dev",
+    "tag": "D-205",
+    "degradation": "escaneado_limpio",
+    "revision": "2",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "f3008c07d3908fedce2c138814fa06c095fb8ecce1f9ee82c3d6307d19238655",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 22,
+      "present_fields": 10,
+      "correct_fields": 9,
+      "all_geometry_correct": false,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": []
+    }
+  },
+  {
+    "dataset": "s-dev",
+    "tag": "V-210",
+    "degradation": "escaneado_pobre",
+    "revision": "1",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "e79e9f15a42ef2b13d46efb8e894acee6e6b4c21c11f2ccd57b2b1e91247e664",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 30,
+      "present_fields": 6,
+      "correct_fields": 4,
+      "all_geometry_correct": false,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": []
+    }
+  },
+  {
+    "dataset": "s-dev",
+    "tag": "D-215",
+    "degradation": "escaneado_limpio",
+    "revision": "2",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "87d57f9ba8a22d930aedb21bd3350b91da8709f6809d626baa4dd91ec48a238e",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 26,
+      "present_fields": 6,
+      "correct_fields": 4,
+      "all_geometry_correct": false,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": []
+    }
+  },
+  {
+    "dataset": "s-dev",
+    "tag": "D-217",
+    "degradation": "escaneado_pobre",
+    "revision": "1",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "b2523c3bd54025fb04013ae88b989a0f460ef383192300f529e769fbdebf600e",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 30,
+      "present_fields": 30,
+      "correct_fields": 28,
+      "all_geometry_correct": false,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": []
+    }
+  },
+  {
+    "dataset": "s-dev",
+    "tag": "C-221",
+    "degradation": "escaneado_limpio",
+    "revision": "1",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "29ec93bbeb8bd584669c8b11b194a23b463c36d13ffb8008f38d044b7601dfbe",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 26,
+      "present_fields": 6,
+      "correct_fields": 6,
+      "all_geometry_correct": true,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": []
+    }
+  },
+  {
+    "dataset": "s-mecanico",
+    "tag": "P-400B",
+    "degradation": "escaneado_limpio",
+    "revision": "2",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "a3f14cbb89f54c82194d0b99eb9a769dad7ecf39f8837926355e5b50b90a67d2",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 12,
+      "present_fields": 4,
+      "correct_fields": 4,
+      "all_geometry_correct": true,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": []
+    }
+  },
+  {
+    "dataset": "s-mecanico",
+    "tag": "P-400B",
+    "degradation": "escaneado_pobre",
+    "revision": "2",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "a3f14cbb89f54c82194d0b99eb9a769dad7ecf39f8837926355e5b50b90a67d2",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 12,
+      "present_fields": 4,
+      "correct_fields": 4,
+      "all_geometry_correct": true,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": []
+    }
+  },
+  {
+    "dataset": "s-mecanico",
+    "tag": "P-401A",
+    "degradation": "escaneado_pobre",
+    "revision": "2",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "c7f1ecddc7a26e476e57f1d7af6590191122d5c000be02a6b63b79069fa82958",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 12,
+      "present_fields": 4,
+      "correct_fields": 2,
+      "all_geometry_correct": false,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": []
+    }
+  },
+  {
+    "dataset": "s-mecanico",
+    "tag": "P-406A",
+    "degradation": "escaneado_limpio",
+    "revision": "2",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "3debe1c2ac609518cc2075ae888c5d7052c97241d7461c0fefad6444f9a46a9e",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 12,
+      "present_fields": 4,
+      "correct_fields": 4,
+      "all_geometry_correct": true,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": []
+    }
+  },
+  {
+    "dataset": "s-mecanico",
+    "tag": "P-406A",
+    "degradation": "escaneado_pobre",
+    "revision": "2",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "3debe1c2ac609518cc2075ae888c5d7052c97241d7461c0fefad6444f9a46a9e",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 12,
+      "present_fields": 4,
+      "correct_fields": 4,
+      "all_geometry_correct": true,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": []
+    }
+  },
+  {
+    "dataset": "s-mecanico",
+    "tag": "P-407B",
+    "degradation": "escaneado_pobre",
+    "revision": "2",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "e2ab45f6b5e0755e5d53f0aacf353fbbbd21302fafdb319a4a688c3cdbed4788",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 12,
+      "present_fields": 4,
+      "correct_fields": 3,
+      "all_geometry_correct": false,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": []
+    }
+  },
+  {
+    "dataset": "s-reservado",
+    "tag": "D-700",
+    "degradation": "escaneado_limpio",
+    "revision": "2",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "08227e0f43b9ae7f324f02ce0f06c5a33db031cd8d4bb7bec71de14268300917",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 34,
+      "present_fields": 6,
+      "correct_fields": 3,
+      "all_geometry_correct": false,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": []
+    }
+  },
+  {
+    "dataset": "s-reservado",
+    "tag": "C-706",
+    "degradation": "escaneado_limpio",
+    "revision": "2",
+    "status": "draft",
+    "error": null,
+    "truth_sha256_after_prediction": "f9558b2a40fed2cf794c6462a826bda528399bd3067955a595cb14d62e3291af",
+    "previous_status": "error",
+    "quality": {
+      "expected_fields": 34,
+      "present_fields": 6,
+      "correct_fields": 3,
+      "all_geometry_correct": false,
+      "all_fields_correct": false,
+      "extra_nozzle_fields": []
+    }
+  }
+]

@@ -1,0 +1,699 @@
+{
+  "status": "candidate",
+  "fit_fields": 1754,
+  "test_fields": 917,
+  "before": {
+    "d_hibrido": {
+      "fields": 917,
+      "accuracy": 0.9389,
+      "ece_raw": 0.0343,
+      "ece_calibrated": 0.016,
+      "interval_coverage": 0.9888,
+      "interval_coverage_by_kind": {
+        "deg": 0.9935,
+        "mm": 0.9876
+      },
+      "numeric_fields_without_interval": 0,
+      "numeric_fields_vague_interval": 68,
+      "abstention": {
+        "threshold": 0.2105,
+        "coverage": 0.9248,
+        "risk_kept": 0.0094,
+        "risk_without_abstention": 0.0611
+      },
+      "risk_coverage": [
+        {
+          "threshold": 0.0,
+          "coverage": 1.0,
+          "risk": 0.0611
+        },
+        {
+          "threshold": 0.05,
+          "coverage": 0.9913,
+          "risk": 0.0528
+        },
+        {
+          "threshold": 0.1,
+          "coverage": 0.9913,
+          "risk": 0.0528
+        },
+        {
+          "threshold": 0.15,
+          "coverage": 0.9826,
+          "risk": 0.0444
+        },
+        {
+          "threshold": 0.2,
+          "coverage": 0.9826,
+          "risk": 0.0444
+        },
+        {
+          "threshold": 0.25,
+          "coverage": 0.9782,
+          "risk": 0.0401
+        },
+        {
+          "threshold": 0.3,
+          "coverage": 0.9673,
+          "risk": 0.0293
+        },
+        {
+          "threshold": 0.35,
+          "coverage": 0.9673,
+          "risk": 0.0293
+        },
+        {
+          "threshold": 0.4,
+          "coverage": 0.9673,
+          "risk": 0.0293
+        },
+        {
+          "threshold": 0.45,
+          "coverage": 0.9673,
+          "risk": 0.0293
+        },
+        {
+          "threshold": 0.5,
+          "coverage": 0.9673,
+          "risk": 0.0293
+        },
+        {
+          "threshold": 0.55,
+          "coverage": 0.9673,
+          "risk": 0.0293
+        },
+        {
+          "threshold": 0.6,
+          "coverage": 0.964,
+          "risk": 0.0294
+        },
+        {
+          "threshold": 0.65,
+          "coverage": 0.9248,
+          "risk": 0.0094
+        },
+        {
+          "threshold": 0.7,
+          "coverage": 0.9248,
+          "risk": 0.0094
+        },
+        {
+          "threshold": 0.75,
+          "coverage": 0.9248,
+          "risk": 0.0094
+        },
+        {
+          "threshold": 0.8,
+          "coverage": 0.9248,
+          "risk": 0.0094
+        },
+        {
+          "threshold": 0.85,
+          "coverage": 0.9248,
+          "risk": 0.0094
+        },
+        {
+          "threshold": 0.9,
+          "coverage": 0.9149,
+          "risk": 0.0095
+        },
+        {
+          "threshold": 0.95,
+          "coverage": 0.88,
+          "risk": 0.0037
+        },
+        {
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "risk": null
+        }
+      ],
+      "by_channel": {
+        "cajetin|vector": {
+          "fields": 16,
+          "accuracy": 1.0,
+          "confidence_raw": 0.9882,
+          "confidence": 0.9975
+        },
+        "cota|vector": {
+          "fields": 48,
+          "accuracy": 1.0,
+          "confidence_raw": 0.9872,
+          "confidence": 0.9975
+        },
+        "geometria|scan": {
+          "fields": 44,
+          "accuracy": 0.2273,
+          "confidence_raw": 0.3134,
+          "confidence": 0.3425
+        },
+        "ocr|scan": {
+          "fields": 405,
+          "accuracy": 0.9457,
+          "confidence_raw": 0.9091,
+          "confidence": 0.9472
+        },
+        "tabla|vector": {
+          "fields": 404,
+          "accuracy": 1.0,
+          "confidence_raw": 0.9899,
+          "confidence": 0.9975
+        }
+      }
+    }
+  },
+  "after": {
+    "d_hibrido": {
+      "fields": 917,
+      "accuracy": 0.9389,
+      "ece_raw": 0.0343,
+      "ece_calibrated": 0.0136,
+      "interval_coverage": 0.9888,
+      "interval_coverage_by_kind": {
+        "deg": 0.9935,
+        "mm": 0.9876
+      },
+      "numeric_fields_without_interval": 0,
+      "numeric_fields_vague_interval": 68,
+      "abstention": {
+        "threshold": 0.6744,
+        "coverage": 0.9248,
+        "risk_kept": 0.0094,
+        "risk_without_abstention": 0.0611
+      },
+      "risk_coverage": [
+        {
+          "threshold": 0.0,
+          "coverage": 1.0,
+          "risk": 0.0611
+        },
+        {
+          "threshold": 0.05,
+          "coverage": 0.9913,
+          "risk": 0.0528
+        },
+        {
+          "threshold": 0.1,
+          "coverage": 0.9913,
+          "risk": 0.0528
+        },
+        {
+          "threshold": 0.15,
+          "coverage": 0.9913,
+          "risk": 0.0528
+        },
+        {
+          "threshold": 0.2,
+          "coverage": 0.9913,
+          "risk": 0.0528
+        },
+        {
+          "threshold": 0.25,
+          "coverage": 0.9673,
+          "risk": 0.0293
+        },
+        {
+          "threshold": 0.3,
+          "coverage": 0.9673,
+          "risk": 0.0293
+        },
+        {
+          "threshold": 0.35,
+          "coverage": 0.964,
+          "risk": 0.0294
+        },
+        {
+          "threshold": 0.4,
+          "coverage": 0.964,
+          "risk": 0.0294
+        },
+        {
+          "threshold": 0.45,
+          "coverage": 0.9564,
+          "risk": 0.0228
+        },
+        {
+          "threshold": 0.5,
+          "coverage": 0.9564,
+          "risk": 0.0228
+        },
+        {
+          "threshold": 0.55,
+          "coverage": 0.9564,
+          "risk": 0.0228
+        },
+        {
+          "threshold": 0.6,
+          "coverage": 0.9564,
+          "risk": 0.0228
+        },
+        {
+          "threshold": 0.65,
+          "coverage": 0.9564,
+          "risk": 0.0228
+        },
+        {
+          "threshold": 0.7,
+          "coverage": 0.9248,
+          "risk": 0.0094
+        },
+        {
+          "threshold": 0.75,
+          "coverage": 0.9248,
+          "risk": 0.0094
+        },
+        {
+          "threshold": 0.8,
+          "coverage": 0.9248,
+          "risk": 0.0094
+        },
+        {
+          "threshold": 0.85,
+          "coverage": 0.9248,
+          "risk": 0.0094
+        },
+        {
+          "threshold": 0.9,
+          "coverage": 0.9248,
+          "risk": 0.0094
+        },
+        {
+          "threshold": 0.95,
+          "coverage": 0.9248,
+          "risk": 0.0094
+        },
+        {
+          "threshold": 1.0,
+          "coverage": 0.6194,
+          "risk": 0.0
+        }
+      ],
+      "by_channel": {
+        "cajetin|vector": {
+          "fields": 16,
+          "accuracy": 1.0,
+          "confidence_raw": 0.9882,
+          "confidence": 0.9989
+        },
+        "cota|vector": {
+          "fields": 48,
+          "accuracy": 1.0,
+          "confidence_raw": 0.9872,
+          "confidence": 1.0
+        },
+        "geometria|scan": {
+          "fields": 44,
+          "accuracy": 0.2273,
+          "confidence_raw": 0.3134,
+          "confidence": 0.3569
+        },
+        "ocr|scan": {
+          "fields": 405,
+          "accuracy": 0.9457,
+          "confidence_raw": 0.9091,
+          "confidence": 0.9526
+        },
+        "tabla|vector": {
+          "fields": 404,
+          "accuracy": 1.0,
+          "confidence_raw": 0.9899,
+          "confidence": 1.0
+        }
+      }
+    }
+  },
+  "limitation": "Solo campos emitidos contrastados con verdad sintética; no es una sesión humana",
+  "synthetic_simulation": true,
+  "human_sessions": 0,
+  "activated": false,
+  "input_sha256": "da9ea85b70734d8ccdb0d63aef882b1d488667f08e52495a5a9b6c28a951e170",
+  "extraction_source_sha256": "2fcfb0dbd42ee35052d5ff196065b73ccec04bb13f00e26873841310071c0de1",
+  "evaluator_sha256": "0cf2198410ef93f3e13a0c0d36af7f62692ca681467ed7c3acad6ee4fdd0af18",
+  "training_equipment": [
+    "C-201",
+    "C-202",
+    "C-203",
+    "C-204",
+    "C-208",
+    "C-209",
+    "C-211",
+    "C-213",
+    "C-214",
+    "C-221",
+    "D-200",
+    "D-205",
+    "D-206",
+    "D-207",
+    "D-215",
+    "D-216",
+    "D-217",
+    "D-218",
+    "D-220",
+    "V-210",
+    "V-212",
+    "V-219",
+    "V-222",
+    "V-223"
+  ],
+  "external_equipment": [
+    "C-701",
+    "C-704",
+    "C-706",
+    "C-707",
+    "C-708",
+    "C-713",
+    "D-700",
+    "D-703",
+    "D-710",
+    "D-711",
+    "D-712",
+    "D-714",
+    "V-702",
+    "V-705",
+    "V-709",
+    "V-715"
+  ],
+  "shared_originals": 0,
+  "external_before": {
+    "d_hibrido": {
+      "fields": 1313,
+      "accuracy": 0.837,
+      "ece_raw": 0.1267,
+      "ece_calibrated": 0.0943,
+      "interval_coverage": 0.9883,
+      "interval_coverage_by_kind": {
+        "deg": 0.9552,
+        "mm": 0.9944
+      },
+      "numeric_fields_without_interval": 0,
+      "numeric_fields_vague_interval": 365,
+      "abstention": {
+        "threshold": 0.2105,
+        "coverage": 0.7113,
+        "risk_kept": 0.0043,
+        "risk_without_abstention": 0.163
+      },
+      "risk_coverage": [
+        {
+          "threshold": 0.0,
+          "coverage": 1.0,
+          "risk": 0.163
+        },
+        {
+          "threshold": 0.05,
+          "coverage": 0.9871,
+          "risk": 0.152
+        },
+        {
+          "threshold": 0.1,
+          "coverage": 0.9871,
+          "risk": 0.152
+        },
+        {
+          "threshold": 0.15,
+          "coverage": 0.9467,
+          "risk": 0.1247
+        },
+        {
+          "threshold": 0.2,
+          "coverage": 0.9467,
+          "risk": 0.1247
+        },
+        {
+          "threshold": 0.25,
+          "coverage": 0.9276,
+          "risk": 0.1207
+        },
+        {
+          "threshold": 0.3,
+          "coverage": 0.869,
+          "risk": 0.1043
+        },
+        {
+          "threshold": 0.35,
+          "coverage": 0.869,
+          "risk": 0.1043
+        },
+        {
+          "threshold": 0.4,
+          "coverage": 0.869,
+          "risk": 0.1043
+        },
+        {
+          "threshold": 0.45,
+          "coverage": 0.869,
+          "risk": 0.1043
+        },
+        {
+          "threshold": 0.5,
+          "coverage": 0.869,
+          "risk": 0.1043
+        },
+        {
+          "threshold": 0.55,
+          "coverage": 0.869,
+          "risk": 0.1043
+        },
+        {
+          "threshold": 0.6,
+          "coverage": 0.869,
+          "risk": 0.1043
+        },
+        {
+          "threshold": 0.65,
+          "coverage": 0.7296,
+          "risk": 0.0042
+        },
+        {
+          "threshold": 0.7,
+          "coverage": 0.7296,
+          "risk": 0.0042
+        },
+        {
+          "threshold": 0.75,
+          "coverage": 0.7296,
+          "risk": 0.0042
+        },
+        {
+          "threshold": 0.8,
+          "coverage": 0.7296,
+          "risk": 0.0042
+        },
+        {
+          "threshold": 0.85,
+          "coverage": 0.7296,
+          "risk": 0.0042
+        },
+        {
+          "threshold": 0.9,
+          "coverage": 0.687,
+          "risk": 0.0044
+        },
+        {
+          "threshold": 0.95,
+          "coverage": 0.5811,
+          "risk": 0.0052
+        },
+        {
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "risk": null
+        }
+      ],
+      "by_channel": {
+        "cota|vector": {
+          "fields": 30,
+          "accuracy": 1.0,
+          "confidence_raw": 0.9872,
+          "confidence": 0.9975
+        },
+        "geometria|scan": {
+          "fields": 249,
+          "accuracy": 0.4137,
+          "confidence_raw": 0.3627,
+          "confidence": 0.3972
+        },
+        "geometria|vector": {
+          "fields": 642,
+          "accuracy": 1.0,
+          "confidence_raw": 0.8285,
+          "confidence": 0.9128
+        },
+        "ocr|scan": {
+          "fields": 296,
+          "accuracy": 0.7703,
+          "confidence_raw": 0.8553,
+          "confidence": 0.8845
+        },
+        "tabla|vector": {
+          "fields": 96,
+          "accuracy": 1.0,
+          "confidence_raw": 0.99,
+          "confidence": 0.9975
+        }
+      }
+    }
+  },
+  "external_after": {
+    "d_hibrido": {
+      "fields": 1313,
+      "accuracy": 0.837,
+      "ece_raw": 0.1267,
+      "ece_calibrated": 0.0753,
+      "interval_coverage": 0.9879,
+      "interval_coverage_by_kind": {
+        "deg": 0.9552,
+        "mm": 0.9942
+      },
+      "numeric_fields_without_interval": 0,
+      "numeric_fields_vague_interval": 389,
+      "abstention": {
+        "threshold": 0.6744,
+        "coverage": 0.6931,
+        "risk_kept": 0.0044,
+        "risk_without_abstention": 0.163
+      },
+      "risk_coverage": [
+        {
+          "threshold": 0.0,
+          "coverage": 1.0,
+          "risk": 0.163
+        },
+        {
+          "threshold": 0.05,
+          "coverage": 0.9871,
+          "risk": 0.152
+        },
+        {
+          "threshold": 0.1,
+          "coverage": 0.9871,
+          "risk": 0.152
+        },
+        {
+          "threshold": 0.15,
+          "coverage": 0.9871,
+          "risk": 0.152
+        },
+        {
+          "threshold": 0.2,
+          "coverage": 0.9871,
+          "risk": 0.152
+        },
+        {
+          "threshold": 0.25,
+          "coverage": 0.869,
+          "risk": 0.1043
+        },
+        {
+          "threshold": 0.3,
+          "coverage": 0.869,
+          "risk": 0.1043
+        },
+        {
+          "threshold": 0.35,
+          "coverage": 0.869,
+          "risk": 0.1043
+        },
+        {
+          "threshold": 0.4,
+          "coverage": 0.869,
+          "risk": 0.1043
+        },
+        {
+          "threshold": 0.45,
+          "coverage": 0.8279,
+          "risk": 0.0837
+        },
+        {
+          "threshold": 0.5,
+          "coverage": 0.8279,
+          "risk": 0.0837
+        },
+        {
+          "threshold": 0.55,
+          "coverage": 0.8279,
+          "risk": 0.0837
+        },
+        {
+          "threshold": 0.6,
+          "coverage": 0.8279,
+          "risk": 0.0837
+        },
+        {
+          "threshold": 0.65,
+          "coverage": 0.8279,
+          "risk": 0.0837
+        },
+        {
+          "threshold": 0.7,
+          "coverage": 0.6931,
+          "risk": 0.0044
+        },
+        {
+          "threshold": 0.75,
+          "coverage": 0.6931,
+          "risk": 0.0044
+        },
+        {
+          "threshold": 0.8,
+          "coverage": 0.6931,
+          "risk": 0.0044
+        },
+        {
+          "threshold": 0.85,
+          "coverage": 0.6931,
+          "risk": 0.0044
+        },
+        {
+          "threshold": 0.9,
+          "coverage": 0.6931,
+          "risk": 0.0044
+        },
+        {
+          "threshold": 0.95,
+          "coverage": 0.6931,
+          "risk": 0.0044
+        },
+        {
+          "threshold": 1.0,
+          "coverage": 0.2232,
+          "risk": 0.0034
+        }
+      ],
+      "by_channel": {
+        "cota|vector": {
+          "fields": 30,
+          "accuracy": 1.0,
+          "confidence_raw": 0.9872,
+          "confidence": 1.0
+        },
+        "geometria|scan": {
+          "fields": 249,
+          "accuracy": 0.4137,
+          "confidence_raw": 0.3627,
+          "confidence": 0.4153
+        },
+        "geometria|vector": {
+          "fields": 642,
+          "accuracy": 1.0,
+          "confidence_raw": 0.8285,
+          "confidence": 0.8873
+        },
+        "ocr|scan": {
+          "fields": 296,
+          "accuracy": 0.7703,
+          "confidence_raw": 0.8553,
+          "confidence": 0.8776
+        },
+        "tabla|vector": {
+          "fields": 96,
+          "accuracy": 1.0,
+          "confidence_raw": 0.99,
+          "confidence": 1.0
+        }
+      }
+    }
+  },
+  "base_sha256": "5496cf49cbe426d15ad807a662ce0aa26cb3454540b2b4b047ce3c8d3f0d66ec",
+  "candidate_sha256": "86a06e92ae92dc06d2e2d9ff506e21a5ddcad05f8c71270ad856c7a819fdf249"
+}

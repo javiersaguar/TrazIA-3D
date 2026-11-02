@@ -112,3 +112,17 @@ Se propone contrastar, dentro del lector, límites explícitos de hilos por sesi
 prueba controlada con el mismo corpus. Los hilos enumerados incluyen los que esperan: esta
 muestra puntual no prueba saturación sostenida, consumo máximo ni una causa aislada de la
 aceleración observada. No se ha cambiado la configuración del motor durante las mediciones.
+
+
+## Continuación autorizada del 02/11, noche
+
+Javier encarga proseguir 3.7/3.8. En feat/escala-aprendizaje se corrigen OCR/cabeceras,
+lecturas auxiliares de cotas y la ruta explícita de recalibración posterior a fusión de D.
+El caso OCR heredado pasa sin rebajar el test. 336 revisiones: 267 DRAFT/69 errores; se
+conservan todos los DRAFT y casos completamente correctos anteriores. La resolución alta
+se descarta por regresión; se mantiene el tamaño de lectura original.
+
+La propuesta sintética D mejora ECE reservada a 0,0753, sin activar y sin alcanzar 0,05.
+Prioridades automáticas desactivadas a falta de validación; candidatos y ejemplos conservados.
+Persisten 69 errores, la validación representativa humana y las referencias reales del evento.
+[Resultados y reproducción](../evidencias/fase3/02nov-cotas/README.md).

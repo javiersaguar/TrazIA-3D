@@ -1,4 +1,31 @@
-# Correcciones aprobadas en extracción · 01/11
+# Correcciones aprobadas en extracción · actualización 02/11, noche
+
+## Estado vigente
+
+Los ejemplos aprobados siguen llegando al extractor, con exclusión de equipo y documentos
+destino. **Las prioridades de canales se calculan como propuestas y no se aplican en producción**:
+el ensayo sintético anterior encontró una regresión. La respuesta interna conserva
+`candidate_priorities`, `priority_status="requires_independent_validation"` y `activated=false`.
+La clave de caché de trabajo pasa a versión 5 e incluye también el perfil de OCR; no se reutilizan
+resultados de la lectura anterior como si procedieran del lector nuevo.
+
+La CLI `python -m bench.recalibrar` exige ahora sesión humana finalizada, auditoría vinculada,
+aprobación vigente y originales verificables. `--simulacion-sintetica` permite ensayos aislados y
+los marca explícitamente. Nunca activa la propuesta. Los equipos que comparten un original se
+agrupan, incluso por enlaces transitivos, antes de separar ajuste de curva, conformal y prueba.
+
+La ruta de D admite una curva global posterior a la fusión, sin aprender curvas por canal que
+oculten el efecto de sus pesos. El ensayo de regresión sintético usa S-dev para ajuste y
+S-reservado para evaluación conocida: ECE **0,0943 → 0,0753**, todavía por encima de 0,05.
+La cobertura tras abstención baja de **71,13 % a 69,31 %** y el riesgo retenido pasa de
+**0,43 % a 0,44 %**. Los valores extraídos no cambian. Propuesta archivada, sin activar;
+**cero sesiones humanas**. [Método, evidencias y límites](evidencias/fase3/02nov-cotas/README.md).
+
+3.8/E.6 mantienen pendiente la evaluación con correcciones humanas representativas y la eficacia
+de los ejemplos con proveedores de visión. E.5 continúa pospuesta. El resto del documento
+conserva el historial fechado; las prioridades automáticas que describe el 01/11 ya no están activas.
+
+## Implementación del 01/11 (histórico)
 
 La API ya transporta feedback al proceso de extracción mediante un contexto aislado por trabajo. El perfil solo usa revisiones con huella de aprobación vigente, originales verificables, **sesión humana finalizada** y acciones de campo vinculadas a esa sesión. Se excluyen el equipo consultado y los documentos compartidos. Pruebas automáticas, sesiones abiertas, revocadas o sin vínculo quedan fuera. Los trabajos pueden desactivarlo con `use_learning: false`.
 
