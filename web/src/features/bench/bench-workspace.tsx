@@ -1,5 +1,7 @@
 "use client";
+import { useSearchParams, useRouter } from "next/navigation";
 
+import { EstudioWorkspace } from "@/features/estudio/estudio-workspace";
 import { BenchStudy } from "@/features/study/bench-study";
 import { Database, Terminal } from "lucide-react";
 import { motion } from "motion/react";
@@ -82,11 +84,13 @@ const CRITERIA: Criterion[] = [
 ];
 
 export function BenchWorkspace() {
-  const [source, setSource] = useState<"study" | "legacy">("study");
+  const params = useSearchParams(), router = useRouter();
+  const source = params.get("vista") === "estudio" ? "comparison" : params.get("vista") === "referencia" ? "legacy" : "study";
+  const setSource = (value: string) => router.replace(`/bench?vista=${value === "comparison" ? "estudio" : value === "legacy" ? "referencia" : "actual"}`, { scroll: false });
   return <div className="space-y-5">
     <Segmented label="Fuente de resultados" value={source} onChange={setSource}
-      options={[{ value: "study", label: "Estudio actual" }, { value: "legacy", label: "Bench de referencia v1" }]} />
-    {source === "study" ? <BenchStudy /> : <LegacyBenchWorkspace />}
+      options={[{ value: "study", label: "Estudio actual" }, { value: "comparison", label: "Comparar estrategias" }, { value: "legacy", label: "Bench de referencia v1" }]} />
+    {source === "study" ? <BenchStudy /> : source === "comparison" ? <EstudioWorkspace /> : <LegacyBenchWorkspace />}
   </div>;
 }
 

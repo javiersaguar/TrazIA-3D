@@ -43,7 +43,9 @@ export function GlobalKeys() {
         const item = NAV_ITEMS.find((i) => i.shortcut === e.key.toLowerCase());
         window.clearTimeout(pendingG.current);
         pendingG.current = null;
-        if (item) router.push(item.href);
+        const legacy: Record<string,string> = { "3":"/modelo?vista=revision", "4":"/modelo?vista=cambios", "7":"/bench?vista=estudio", "p":"/documentos", "f":"/documentos", "i":"/lote" };
+        const href = item?.href ?? legacy[e.key.toLowerCase()];
+        if (href) router.push(href);
       }
     };
     window.addEventListener("keydown", onKey);

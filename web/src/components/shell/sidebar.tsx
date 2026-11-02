@@ -1,18 +1,16 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { LogOut, Moon, PanelLeftClose, PanelLeftOpen, Search, Sun, X } from "lucide-react";
+import { LogOut, Settings, PanelLeftClose, PanelLeftOpen, Search, X } from "lucide-react";
 import { LayoutGroup, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import { useEffect } from "react";
 
 import { LogoMark, LogoWordmark } from "@/components/brand/logo";
 import { Tip } from "@/components/ui/controls";
 import { Icon, Kbd } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
-import { useMounted } from "@/lib/use-mounted";
 import { NAV, navItemFor } from "@/lib/nav";
 import { endDemoSession, initialsOf, useDemoUser } from "@/lib/session";
 import { useUi } from "@/stores/ui";
@@ -184,9 +182,6 @@ function SidebarBody({ collapsed, onNavigate }: { collapsed: boolean; onNavigate
                       ) : null}
                       <Icon icon={item.icon} className={cn("relative", isActive && "text-accent-text")} size={17} />
                       {!collapsed ? <span className="relative flex-1 truncate">{item.label}</span> : null}
-                      {!collapsed && !mobile && item.shortcut ? (
-                        <span className="relative font-mono text-[11px] text-faint uppercase">{item.shortcut}</span>
-                      ) : null}
                     </span>
                   );
                   return (
@@ -232,7 +227,7 @@ function UserRow({ collapsed, onSignOut }: { collapsed: boolean; onSignOut?: () 
         <Tip content={`${user} · sesión de demostración`} side="right">
           <span className="flex size-9 items-center justify-center">{avatar}</span>
         </Tip>
-        <ThemeToggle />
+        <SettingsLink onNavigate={onSignOut} />
         <SignOut onDone={onSignOut} />
       </div>
     );
@@ -244,7 +239,7 @@ function UserRow({ collapsed, onSignOut }: { collapsed: boolean; onSignOut?: () 
         <span className="block truncate text-[13px] text-text">{user}</span>
         <span className="block font-mono text-[10.5px] text-faint">sesión demo</span>
       </span>
-      <ThemeToggle />
+      <SettingsLink onNavigate={onSignOut} />
       <SignOut onDone={onSignOut} />
     </div>
   );
@@ -292,16 +287,6 @@ function DemoNotice({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
-  const mounted = useMounted();
-  const dark = !mounted || resolvedTheme !== "light";
-  const label = dark ? "Modo claro" : "Modo oscuro";
-  return (
-    <Tip content={label} side="top">
-      <button type="button" aria-label={label} onClick={() => setTheme(dark ? "light" : "dark")} className={footButton}>
-        <Icon icon={dark ? Sun : Moon} size={16} />
-      </button>
-    </Tip>
-  );
+function SettingsLink({ onNavigate }: { onNavigate?: () => void }) {
+ return <Tip content="Ajustes" side="top"><Link href="/ajustes" aria-label="Ajustes" onClick={onNavigate} className={footButton}><Icon icon={Settings} size={16} /></Link></Tip>;
 }

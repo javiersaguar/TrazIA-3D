@@ -129,7 +129,7 @@ test("Revisión enlaza evidencias, inspecciona IFC y recuerda tamaños", async (
     "aria-valuenow",
     String(resized),
   );
-  await page.getByText("Modelo", { exact: true }).click();
+  await page.getByRole("radio", { name: "Modelo", exact: true }).click();
   await expect(page.locator('[data-panel][id="pdf"]')).toHaveCSS(
     "flex-grow",
     "0",

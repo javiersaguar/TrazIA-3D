@@ -1,12 +1,3 @@
-import { SketchPage } from "@/components/shell/sketch-page";
 import { BatchSketch } from "@/features/bocetos/batch-sketch";
-
-export const metadata = { title: "Lote" };
-
-export default function LotePage() {
-  return (
-    <SketchPage href="/lote">
-      <BatchSketch />
-    </SketchPage>
-  );
-}
+import { ReportsSketch } from "@/features/bocetos/reports-sketch";
+export default function Page(){ return <div className="space-y-6"><h1 className="text-2xl font-semibold">Lotes e informes</h1><p className="text-sm text-warning">Vista de demostración · cola y exportaciones de ejemplo</p><BatchSketch /><ReportsSketch /></div>; }

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { PageHeader } from "@/components/shell/page-header";
 import { PageTransition } from "@/components/shell/page-transition";
 import { BenchWorkspace } from "@/features/bench/bench-workspace";
@@ -10,7 +11,7 @@ export default function BenchPage() {
   return (
     <PageTransition>
       <PageHeader title="Bench" description={item.description} />
-      <BenchWorkspace />
+      <Suspense fallback={<p>Cargando métricas…</p>}><BenchWorkspace /></Suspense>
     </PageTransition>
   );
 }

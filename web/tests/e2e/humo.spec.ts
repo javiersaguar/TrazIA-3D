@@ -4,11 +4,11 @@ const connected = Boolean(process.env.NEXT_PUBLIC_API_URL);
 const SCREENS = [
   { path: "/proyecto", title: "Resumen" },
   { path: "/pipeline", title: "Pipeline" },
-  { path: "/revision", title: "Revisión" },
-  { path: "/cambios", title: "Cambios" },
+  { path: "/revision", title: "Modelo" },
+  { path: "/cambios", title: "Modelo" },
   { path: "/bench", title: "Bench" },
   { path: "/impacto", title: "Impacto" },
-  { path: "/estudio", title: "Estudio" },
+  { path: "/estudio", title: "Bench" },
 ];
 
 function trackErrors(page: Page) {
@@ -30,13 +30,13 @@ test("las 7 pantallas cargan sin errores y avisan de que los datos son sintétic
 });
 
 const SKETCHES = [
-  { path: "/proyectos", title: "Proyectos" },
+  { path: "/proyectos", title: "Documentos" },
   { path: "/documentos", title: "Documentos" },
-  { path: "/modelo", title: "Modelo 3D" },
-  { path: "/familias", title: "Familias" },
-  { path: "/lote", title: "Lote" },
-  { path: "/informes", title: "Informes" },
-  { path: "/auditoria", title: "Auditoría" },
+  { path: "/modelo", title: "Modelo" },
+  { path: "/familias", title: "Documentos" },
+  { path: "/lote", title: "Lotes e informes" },
+  { path: "/informes", title: "Lotes e informes" },
+  { path: "/auditoria", title: "Documentos" },
   { path: "/ajustes", title: "Ajustes" },
 ];
 
@@ -82,9 +82,9 @@ test("la intro del logo se puede saltar y el recorrido de la demo completa sus c
 
 test("la barra lateral navega entre pantallas", async ({ page }) => {
   await page.goto("/proyecto");
-  await page.getByRole("navigation", { name: "Navegación principal" }).getByRole("link", { name: "Cambios" }).click();
-  await expect(page).toHaveURL(/\/cambios$/);
-  await expect(page.getByRole("heading", { level: 1, name: "Cambios" })).toBeVisible();
+  await page.getByRole("navigation", { name: "Navegación principal" }).getByRole("link", { name: "Modelo", exact: true }).click();
+  await expect(page).toHaveURL(/\/modelo(?:\?.*)?$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Modelo", exact: true })).toBeVisible();
 });
 
 test("en móvil la navegación vive en un panel que se cierra al elegir pantalla", async ({ page }) => {
@@ -98,9 +98,9 @@ test("en móvil la navegación vive en un panel que se cierra al elegir pantalla
 
   await page.getByRole("button", { name: "Abrir navegación" }).click();
   const sheet = page.getByRole("dialog", { name: "Navegación" });
-  await sheet.getByRole("link", { name: "Lote" }).click();
+  await sheet.getByRole("link", { name: "Lotes e informes" }).click();
   await expect(page).toHaveURL(/\/lote$/);
-  await expect(page.getByRole("heading", { level: 1, name: "Lote" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Lotes e informes" })).toBeVisible();
   await expect(sheet).toBeHidden();
   expect(errors, errors.join("\n")).toEqual([]);
 });
@@ -131,7 +131,7 @@ test("el menú de comandos lleva a una boquilla", async ({ page }) => {
   await input.fill("boquilla N3");
   await expect(page.getByRole("option", { name: "Boquilla N3", selected: true })).toBeVisible();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/revision$/);
+  await expect(page).toHaveURL(/\/modelo\?vista=revision$/);
 });
 
 test("el pipeline repite el recorrido y registra eventos", async ({ page }) => {

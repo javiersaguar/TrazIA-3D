@@ -18,7 +18,7 @@ test("Bench y Estudio muestran el mismo informe y distinguen el bench v1", async
   await expect(page.getByRole("heading", { name: "Rúbrica del jurado", exact: true })).toBeVisible();
   await page.getByRole("radio", { name: "Estudio actual", exact: true }).click();
   await page.getByRole("link", { name: "Ver variantes, ablaciones y frontera de Pareto" }).click();
-  await expect(page).toHaveURL(/\/estudio$/);
+  await expect(page).toHaveURL(/\/bench\?vista=estudio$/);
   await expect(page.getByRole("note")).toContainText("6 estilos medidos");
   await expect(page.getByRole("note")).not.toContainText("ocho proveedores");
 });

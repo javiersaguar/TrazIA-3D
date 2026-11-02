@@ -107,7 +107,6 @@ export function SettingsSketch() {
               </span>
               <span className="min-w-0">
                 <span className="block truncate text-[14px] text-text">{m.name}</span>
-                <span className="block truncate text-[12px] text-muted">{m.role}</span>
               </span>
             </li>
           ))}
