@@ -1,4 +1,5 @@
 "use client";
+import { useTheme } from "next-themes";
 
 import { Select } from "@react-three/postprocessing";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -136,6 +137,7 @@ function TransitionScene({
   measureKey?: number;
   onMeasure?(sample: PerformanceSample): void;
 }) {
+  const { resolvedTheme } = useTheme();
   const invalidate = useThree((s) => s.invalidate),
     reduce = useReducedMotion();
   useEffect(() => {
@@ -154,7 +156,7 @@ function TransitionScene({
   const column = offset + width / 2 + 1.6;
   const assets = useMemo(
     () => ({
-      hologram: createHologram(minY, maxY),
+      hologram: createHologram(minY, maxY, resolvedTheme === "light"),
       surfaces: {
         steel: createRevealSurface(minY, maxY),
         paint: createRevealSurface(minY, maxY, "paint"),
@@ -162,7 +164,7 @@ function TransitionScene({
         bolts: createRevealSurface(minY, maxY, "bolts"),
       },
     }),
-    [minY, maxY],
+    [minY, maxY, resolvedTheme],
   );
   const owned = useRef<typeof assets | null>(null);
   useEffect(() => {
@@ -286,6 +288,8 @@ function TransitionScene({
       <CameraRig
         bounds={viewBounds}
         orbitCenter={data.bounds.min.map((value, index) => (value + data.bounds.max[index]!) / 2) as [number, number, number]}
+        interactive={false}
+        orbit={false}
         view="front"
         handle={camera}
         measureKey={measureKey}
@@ -432,7 +436,7 @@ function HologramPlayer({
   const [ready, setReady] = useState(false);
   const onReady = useCallback(() => setReady(true), []);
   const draw = (data: Source) => (
-    <SceneCanvas
+    <SceneCanvas rotating={false} rotationControl={false}
       label={
         source === "ifc"
           ? "Holograma y materialización de geometría IFC sintética"

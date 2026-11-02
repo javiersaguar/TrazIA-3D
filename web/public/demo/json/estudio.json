@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-26T20:43:53+00:00",
+  "generated_at": "2026-11-01T01:02:20+00:00",
   "seed": 2026,
   "synthetic": true,
   "generator": "v2",
@@ -28,276 +28,1905 @@
   ],
   "variants": [
     {
-      "id": "b_reglas",
-      "strategy": "b_reglas",
+      "id": "a_geometria",
+      "strategy": "a_geometria",
       "providers": [],
-      "description": "B: texto, tablas, cotas, cajetín y HDM",
+      "description": "A: trazos + capa de texto u OCR",
       "metrics": {
-        "score": 0.3696,
-        "geometry": 0.0333,
-        "attributes": 0.7021,
-        "ece": 0.1914,
-        "f1_delta": 0.08,
+        "score": 0.5784,
+        "geometry": 0.3472,
+        "attributes": 0.75,
+        "ece": 0.1328,
+        "f1_delta": 0.4786,
         "hallucination_rate": 0.0,
         "citation_coverage": 1.0,
-        "interval_coverage": null,
+        "interval_coverage": 0.895,
         "cost_eur_per_equipment": 0.0,
-        "seconds_per_revision": 0.0136
+        "seconds_per_revision": 1.6933
       },
       "ci95": {
         "score": [
-          0.3352,
-          0.4078
+          0.5424,
+          0.6118
         ],
         "geometry": [
-          0.0083,
-          0.0667
+          0.3303,
+          0.3642
         ],
         "attributes": [
-          0.6229,
-          0.7833
+          0.625,
+          0.875
         ],
         "f1_delta": [
-          0.0081,
-          0.1654
+          0.4226,
+          0.5303
         ]
       },
       "by_dataset": {
         "S-dev": {
-          "score": 0.3891,
-          "geometry": 0.0556,
-          "attributes": 0.6944,
-          "ece": 0.1751,
-          "f1_delta": 0.1325,
+          "score": 0.5854,
+          "geometry": 0.3391,
+          "attributes": 0.75,
+          "ece": 0.1225,
+          "f1_delta": 0.5177,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 0.9037,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0144,
+          "seconds_per_revision": 1.6383,
           "equipment": 72,
           "revisions": 144,
-          "models_built": 0.0556,
-          "geometry_fields_unpenalized": 0.0772,
-          "scale": 0.9999,
-          "emitted_fields": 751,
-          "unverifiable_fields": 0,
-          "spurious_fields": 0,
+          "models_built": 0.6458,
+          "geometry_fields_unpenalized": 0.3884,
+          "scale": 0.9863,
+          "emitted_fields": 2586,
+          "unverifiable_fields": 1594,
+          "spurious_fields": 50,
           "external_calls": 0,
           "poisoning_rate": null,
           "errors": [
-            "Faltan datos explícitos: height, head_depth, skirt_height",
-            "Faltan datos explícitos: tag, diameter, head_depth, skirt_height, skirt_thickness",
-            "Faltan datos explícitos: tag, diameter, head_depth, skirt_thickness",
-            "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness",
-            "Faltan datos explícitos: tag, diameter, skirt_thickness"
+            "El espesor del faldón debe ser menor que el radio",
+            "Esta familia admite fondos con profundidad hasta el radio",
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness",
+            "Faltan datos explícitos: skirt_thickness"
           ]
         },
         "S-reservado": {
-          "score": 0.3367,
-          "geometry": 0.0,
-          "attributes": 0.7135,
-          "ece": 0.2334,
-          "f1_delta": 0.0,
+          "score": 0.5702,
+          "geometry": 0.3592,
+          "attributes": 0.75,
+          "ece": 0.1474,
+          "f1_delta": 0.4305,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 0.882,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0125,
+          "seconds_per_revision": 1.7758,
           "equipment": 48,
           "revisions": 96,
-          "models_built": 0.0,
-          "geometry_fields_unpenalized": 0.0068,
-          "scale": 0.9999,
-          "emitted_fields": 290,
-          "unverifiable_fields": 0,
-          "spurious_fields": 0,
+          "models_built": 0.8021,
+          "geometry_fields_unpenalized": 0.4269,
+          "scale": 0.9852,
+          "emitted_fields": 1839,
+          "unverifiable_fields": 1127,
+          "spurious_fields": 43,
           "external_calls": 0,
           "poisoning_rate": null,
           "errors": [
-            "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness",
-            "Faltan datos explícitos: tag, height, head_depth, skirt_height, skirt_thickness"
+            "Esta familia admite fondos con profundidad hasta el radio",
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness"
           ]
         },
         "S-adversarial": {
-          "score": 0.6489,
-          "geometry": 0.5,
-          "attributes": 0.625,
-          "ece": 0.1,
-          "f1_delta": 0.6667,
+          "score": 0.7094,
+          "geometry": 0.953,
+          "attributes": 0.0,
+          "ece": 0.0323,
+          "f1_delta": 0.88,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 0.9825,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0401,
+          "seconds_per_revision": 0.1373,
           "equipment": 12,
           "revisions": 24,
-          "models_built": 0.5,
-          "geometry_fields_unpenalized": 0.5976,
-          "scale": 0.9997,
-          "emitted_fields": 428,
-          "unverifiable_fields": 0,
-          "spurious_fields": 8,
+          "models_built": 1.0,
+          "geometry_fields_unpenalized": 0.965,
+          "scale": 0.9989,
+          "emitted_fields": 576,
+          "unverifiable_fields": 444,
+          "spurious_fields": 9,
           "external_calls": 0,
-          "poisoning_rate": 0.0278,
-          "errors": [
-            "Faltan datos explícitos: tag, skirt_thickness"
-          ]
+          "poisoning_rate": 0.0,
+          "errors": []
         }
       },
       "by_style": {
         "atlas": {
-          "score": 0.6343,
-          "geometry": 0.3333,
-          "attributes": 1.0,
-          "ece": 0.1294,
-          "f1_delta": 0.5,
+          "score": 0.5588,
+          "geometry": 0.3252,
+          "attributes": 0.75,
+          "ece": 0.1568,
+          "f1_delta": 0.4419,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 0.8653,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0253
+          "seconds_per_revision": 1.8401
         },
         "iberica": {
-          "score": 0.4,
-          "geometry": 0.0,
-          "attributes": 1.0,
-          "ece": 0.2,
-          "f1_delta": 0.0,
+          "score": 0.5608,
+          "geometry": 0.3244,
+          "attributes": 0.75,
+          "ece": 0.1558,
+          "f1_delta": 0.4533,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 0.8868,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0164
+          "seconds_per_revision": 1.9977
         },
         "gulf": {
-          "score": 0.2126,
-          "geometry": 0.0,
-          "attributes": 0.0833,
-          "ece": 0.3963,
-          "f1_delta": 0.0,
+          "score": 0.5899,
+          "geometry": 0.3212,
+          "attributes": 0.75,
+          "ece": 0.1174,
+          "f1_delta": 0.5679,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 0.9132,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0082
+          "seconds_per_revision": 1.8384
         },
         "prairie": {
-          "score": 0.3896,
-          "geometry": 0.0,
-          "attributes": 1.0,
-          "ece": 0.2417,
-          "f1_delta": 0.0,
+          "score": 0.5865,
+          "geometry": 0.3461,
+          "attributes": 0.75,
+          "ece": 0.1028,
+          "f1_delta": 0.4918,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 0.9234,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0118
+          "seconds_per_revision": 1.5028
         },
         "nordic": {
-          "score": 0.3992,
-          "geometry": 0.0,
-          "attributes": 1.0,
-          "ece": 0.2033,
-          "f1_delta": 0.0,
+          "score": 0.6038,
+          "geometry": 0.3739,
+          "attributes": 0.75,
+          "ece": 0.1263,
+          "f1_delta": 0.5517,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 0.917,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0113
+          "seconds_per_revision": 1.4072
         },
         "levante": {
-          "score": 0.2189,
-          "geometry": 0.0,
-          "attributes": 0.0833,
-          "ece": 0.09,
-          "f1_delta": 0.0,
+          "score": 0.6154,
+          "geometry": 0.3441,
+          "attributes": 0.75,
+          "ece": 0.0544,
+          "f1_delta": 0.5934,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 0.9249,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0131
+          "seconds_per_revision": 1.2435
         },
         "meridian": {
-          "score": 0.3251,
-          "geometry": 0.0,
-          "attributes": 0.6562,
-          "ece": 0.2373,
-          "f1_delta": 0.0,
+          "score": 0.5437,
+          "geometry": 0.3382,
+          "attributes": 0.75,
+          "ece": 0.1628,
+          "f1_delta": 0.3492,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 0.8839,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0089
+          "seconds_per_revision": 1.8377
         },
         "cantabrico": {
-          "score": 0.3483,
-          "geometry": 0.0,
-          "attributes": 0.7708,
-          "ece": 0.2305,
-          "f1_delta": 0.0,
+          "score": 0.5976,
+          "geometry": 0.3803,
+          "attributes": 0.75,
+          "ece": 0.1331,
+          "f1_delta": 0.5169,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 0.8803,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0161
+          "seconds_per_revision": 1.7138
         }
       },
       "by_degradation": {
         "vectorial": {
-          "score": 0.4402,
-          "geometry": 0.1,
-          "attributes": 0.7562,
-          "ece": 0.1498,
-          "f1_delta": 0.2222,
+          "score": 0.8955,
+          "geometry": 0.9369,
+          "attributes": 0.75,
+          "ece": 0.0164,
+          "f1_delta": 0.9161,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0361
+          "seconds_per_revision": 0.1312
         },
         "escaneado_limpio": {
-          "score": 0.3266,
-          "geometry": 0.0,
-          "attributes": 0.675,
-          "ece": 0.25,
-          "f1_delta": 0.0,
+          "score": 0.4046,
+          "geometry": 0.0751,
+          "attributes": 0.75,
+          "ece": 0.3065,
+          "f1_delta": 0.2517,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 0.666,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0025
+          "seconds_per_revision": 2.4024
         },
         "escaneado_pobre": {
-          "score": 0.3266,
-          "geometry": 0.0,
-          "attributes": 0.675,
-          "ece": 0.25,
-          "f1_delta": 0.0,
+          "score": 0.3715,
+          "geometry": 0.0296,
+          "attributes": 0.75,
+          "ece": 0.3015,
+          "f1_delta": 0.1614,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 0.6556,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0022
+          "seconds_per_revision": 2.5462
         }
       },
       "details": {
         "equipment": 120,
         "revisions": 240,
-        "models_built": 0.0333,
-        "geometry_fields_unpenalized": 0.0491,
-        "scale": 0.9999,
-        "emitted_fields": 1041,
+        "models_built": 0.7083,
+        "geometry_fields_unpenalized": 0.4038,
+        "scale": 0.9859,
+        "emitted_fields": 4425,
+        "unverifiable_fields": 2721,
+        "spurious_fields": 93,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "El espesor del faldón debe ser menor que el radio",
+          "Esta familia admite fondos con profundidad hasta el radio",
+          "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness",
+          "Faltan datos explícitos: skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "a_detector",
+      "strategy": "a_detector",
+      "providers": [],
+      "description": "A con el detector propio (Florence-2)",
+      "metrics": {
+        "score": 0.572,
+        "geometry": 0.3445,
+        "attributes": 0.75,
+        "ece": 0.1388,
+        "f1_delta": 0.4568,
+        "hallucination_rate": 0.037,
+        "citation_coverage": 1.0,
+        "interval_coverage": 0.8896,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 1.6464
+      },
+      "ci95": {
+        "score": [
+          0.5379,
+          0.6041
+        ],
+        "geometry": [
+          0.3287,
+          0.36
+        ],
+        "attributes": [
+          0.625,
+          0.875
+        ],
+        "f1_delta": [
+          0.4065,
+          0.5049
+        ]
+      },
+      "by_dataset": {
+        "S-dev": {
+          "score": 0.5773,
+          "geometry": 0.3347,
+          "attributes": 0.75,
+          "ece": 0.1325,
+          "f1_delta": 0.4942,
+          "hallucination_rate": 0.0341,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.8962,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.6303,
+          "equipment": 72,
+          "revisions": 144,
+          "models_built": 0.6458,
+          "geometry_fields_unpenalized": 0.3862,
+          "scale": 0.9864,
+          "emitted_fields": 2631,
+          "unverifiable_fields": 1635,
+          "spurious_fields": 68,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El espesor del faldón debe ser menor que el radio",
+            "Esta familia admite fondos con profundidad hasta el radio",
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness",
+            "Faltan datos explícitos: skirt_thickness"
+          ]
+        },
+        "S-reservado": {
+          "score": 0.567,
+          "geometry": 0.3591,
+          "attributes": 0.75,
+          "ece": 0.1476,
+          "f1_delta": 0.4147,
+          "hallucination_rate": 0.0411,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.8794,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.6705,
+          "equipment": 48,
+          "revisions": 96,
+          "models_built": 0.8021,
+          "geometry_fields_unpenalized": 0.4274,
+          "scale": 0.9861,
+          "emitted_fields": 1858,
+          "unverifiable_fields": 1153,
+          "spurious_fields": 53,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Esta familia admite fondos con profundidad hasta el radio",
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness"
+          ]
+        },
+        "S-adversarial": {
+          "score": 0.7095,
+          "geometry": 0.953,
+          "attributes": 0.0,
+          "ece": 0.0323,
+          "f1_delta": 0.88,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9825,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0968,
+          "equipment": 12,
+          "revisions": 24,
+          "models_built": 1.0,
+          "geometry_fields_unpenalized": 0.965,
+          "scale": 0.9992,
+          "emitted_fields": 576,
+          "unverifiable_fields": 444,
+          "spurious_fields": 9,
+          "external_calls": 0,
+          "poisoning_rate": 0.0,
+          "errors": []
+        }
+      },
+      "by_style": {
+        "atlas": {
+          "score": 0.5724,
+          "geometry": 0.332,
+          "attributes": 0.75,
+          "ece": 0.1472,
+          "f1_delta": 0.4884,
+          "hallucination_rate": 0.0331,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.8622,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.5959
+        },
+        "iberica": {
+          "score": 0.5508,
+          "geometry": 0.3186,
+          "attributes": 0.75,
+          "ece": 0.1911,
+          "f1_delta": 0.4468,
+          "hallucination_rate": 0.0281,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.8673,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.0723
+        },
+        "gulf": {
+          "score": 0.5745,
+          "geometry": 0.3185,
+          "attributes": 0.75,
+          "ece": 0.1216,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0452,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9024,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.0695
+        },
+        "prairie": {
+          "score": 0.5815,
+          "geometry": 0.3333,
+          "attributes": 0.75,
+          "ece": 0.1144,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0692,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9123,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.4434
+        },
+        "nordic": {
+          "score": 0.601,
+          "geometry": 0.3739,
+          "attributes": 0.75,
+          "ece": 0.1318,
+          "f1_delta": 0.5424,
+          "hallucination_rate": 0.0244,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9132,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.4032
+        },
+        "levante": {
+          "score": 0.5933,
+          "geometry": 0.3321,
+          "attributes": 0.75,
+          "ece": 0.0631,
+          "f1_delta": 0.5122,
+          "hallucination_rate": 0.0063,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9303,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.1976
+        },
+        "meridian": {
+          "score": 0.5414,
+          "geometry": 0.3388,
+          "attributes": 0.75,
+          "ece": 0.1666,
+          "f1_delta": 0.3402,
+          "hallucination_rate": 0.0285,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.8757,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.797
+        },
+        "cantabrico": {
+          "score": 0.5931,
+          "geometry": 0.3794,
+          "attributes": 0.75,
+          "ece": 0.1297,
+          "f1_delta": 0.492,
+          "hallucination_rate": 0.0537,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.8827,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.5439
+        }
+      },
+      "by_degradation": {
+        "vectorial": {
+          "score": 0.8955,
+          "geometry": 0.9369,
+          "attributes": 0.75,
+          "ece": 0.0164,
+          "f1_delta": 0.9161,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1357
+        },
+        "escaneado_limpio": {
+          "score": 0.3926,
+          "geometry": 0.0681,
+          "attributes": 0.75,
+          "ece": 0.3182,
+          "f1_delta": 0.214,
+          "hallucination_rate": 0.0486,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.6442,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.2521
+        },
+        "escaneado_pobre": {
+          "score": 0.362,
+          "geometry": 0.0284,
+          "attributes": 0.75,
+          "ece": 0.308,
+          "f1_delta": 0.1223,
+          "hallucination_rate": 0.0806,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.6528,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.5514
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.7083,
+        "geometry_fields_unpenalized": 0.4027,
+        "scale": 0.9863,
+        "emitted_fields": 4489,
+        "unverifiable_fields": 2788,
+        "spurious_fields": 121,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "El espesor del faldón debe ser menor que el radio",
+          "Esta familia admite fondos con profundidad hasta el radio",
+          "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness",
+          "Faltan datos explícitos: skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": false
+    },
+    {
+      "id": "b_reglas",
+      "strategy": "b_reglas",
+      "providers": [],
+      "description": "B: texto, tablas, cotas, cajetín y HDM",
+      "metrics": {
+        "score": 0.5476,
+        "geometry": 0.206,
+        "attributes": 0.8083,
+        "ece": 0.0065,
+        "f1_delta": 0.3737,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": 1.0,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 0.0345
+      },
+      "ci95": {
+        "score": [
+          0.5094,
+          0.5866
+        ],
+        "geometry": [
+          0.1577,
+          0.2547
+        ],
+        "attributes": [
+          0.7063,
+          0.9042
+        ],
+        "f1_delta": [
+          0.3032,
+          0.437
+        ]
+      },
+      "by_dataset": {
+        "S-dev": {
+          "score": 0.6245,
+          "geometry": 0.3319,
+          "attributes": 0.8333,
+          "ece": 0.0,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0383,
+          "equipment": 72,
+          "revisions": 144,
+          "models_built": 0.3333,
+          "geometry_fields_unpenalized": 0.3331,
+          "scale": 0.9997,
+          "emitted_fields": 1912,
+          "unverifiable_fields": 0,
+          "spurious_fields": 0,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness"
+          ]
+        },
+        "S-reservado": {
+          "score": 0.4243,
+          "geometry": 0.0172,
+          "attributes": 0.7708,
+          "ece": 0.029,
+          "f1_delta": 0.156,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0289,
+          "equipment": 48,
+          "revisions": 96,
+          "models_built": 0.3333,
+          "geometry_fields_unpenalized": 0.054,
+          "scale": 0.9998,
+          "emitted_fields": 552,
+          "unverifiable_fields": 0,
+          "spurious_fields": 0,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness"
+          ]
+        },
+        "S-adversarial": {
+          "score": 0.9043,
+          "geometry": 0.7395,
+          "attributes": 1.0,
+          "ece": 0.0179,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9808,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0987,
+          "equipment": 12,
+          "revisions": 24,
+          "models_built": 1.0,
+          "geometry_fields_unpenalized": 0.9783,
+          "scale": 0.9992,
+          "emitted_fields": 712,
+          "unverifiable_fields": 0,
+          "spurious_fields": 40,
+          "external_calls": 0,
+          "poisoning_rate": 0.3056,
+          "errors": []
+        }
+      },
+      "by_style": {
+        "atlas": {
+          "score": 0.625,
+          "geometry": 0.3333,
+          "attributes": 0.8333,
+          "ece": 0.0,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0483
+        },
+        "iberica": {
+          "score": 0.625,
+          "geometry": 0.3333,
+          "attributes": 0.8333,
+          "ece": 0.0,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0361
+        },
+        "gulf": {
+          "score": 0.625,
+          "geometry": 0.3333,
+          "attributes": 0.8333,
+          "ece": 0.0,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0341
+        },
+        "prairie": {
+          "score": 0.625,
+          "geometry": 0.3333,
+          "attributes": 0.8333,
+          "ece": 0.0,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0309
+        },
+        "nordic": {
+          "score": 0.622,
+          "geometry": 0.3249,
+          "attributes": 0.8333,
+          "ece": 0.0,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0305
+        },
+        "levante": {
+          "score": 0.625,
+          "geometry": 0.3333,
+          "attributes": 0.8333,
+          "ece": 0.0,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.05
+        },
+        "meridian": {
+          "score": 0.4124,
+          "geometry": 0.008,
+          "attributes": 0.7708,
+          "ece": 0.058,
+          "f1_delta": 0.1404,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.027
+        },
+        "cantabrico": {
+          "score": 0.4365,
+          "geometry": 0.0264,
+          "attributes": 0.7708,
+          "ece": 0.0,
+          "f1_delta": 0.1731,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0308
+        }
+      },
+      "by_degradation": {
+        "vectorial": {
+          "score": 0.8075,
+          "geometry": 0.6181,
+          "attributes": 0.925,
+          "ece": 0.0088,
+          "f1_delta": 0.8102,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0948
+        },
+        "escaneado_limpio": {
+          "score": 0.3875,
+          "geometry": 0.0,
+          "attributes": 0.75,
+          "ece": 0.0,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0048
+        },
+        "escaneado_pobre": {
+          "score": 0.3875,
+          "geometry": 0.0,
+          "attributes": 0.75,
+          "ece": 0.0,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.004
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.3333,
+        "geometry_fields_unpenalized": 0.2214,
+        "scale": 0.9997,
+        "emitted_fields": 2464,
         "unverifiable_fields": 0,
         "spurious_fields": 0,
         "external_calls": 0,
         "poisoning_rate": null,
         "errors": [
-          "Faltan datos explícitos: height, head_depth, skirt_height",
-          "Faltan datos explícitos: tag, diameter, head_depth, skirt_height, skirt_thickness",
-          "Faltan datos explícitos: tag, diameter, head_depth, skirt_thickness",
-          "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness",
-          "Faltan datos explícitos: tag, diameter, skirt_thickness"
+          "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "b_reglas+ocr",
+      "strategy": "b_reglas+ocr",
+      "providers": [],
+      "description": "B sobre líneas de OCR",
+      "metrics": {
+        "score": 0.6089,
+        "geometry": 0.3092,
+        "attributes": 0.8927,
+        "ece": 0.039,
+        "f1_delta": 0.4327,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": 0.9865,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 0.4306
+      },
+      "ci95": {
+        "score": [
+          0.5614,
+          0.6555
+        ],
+        "geometry": [
+          0.2326,
+          0.3903
+        ],
+        "attributes": [
+          0.8292,
+          0.9531
+        ],
+        "f1_delta": [
+          0.3657,
+          0.495
         ]
+      },
+      "by_dataset": {
+        "S-dev": {
+          "score": 0.7136,
+          "geometry": 0.4962,
+          "attributes": 0.9549,
+          "ece": 0.023,
+          "f1_delta": 0.5353,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9889,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4234,
+          "equipment": 72,
+          "revisions": 144,
+          "models_built": 0.6528,
+          "geometry_fields_unpenalized": 0.6511,
+          "scale": 0.9965,
+          "emitted_fields": 3316,
+          "unverifiable_fields": 0,
+          "spurious_fields": 7,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El fondo inferior debe quedar por encima del suelo",
+            "Esta familia admite fondos con profundidad hasta el radio",
+            "Faltan datos explícitos: diameter",
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height",
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness"
+          ]
+        },
+        "S-reservado": {
+          "score": 0.4347,
+          "geometry": 0.0286,
+          "attributes": 0.7995,
+          "ece": 0.0993,
+          "f1_delta": 0.2251,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9715,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4415,
+          "equipment": 48,
+          "revisions": 96,
+          "models_built": 0.6458,
+          "geometry_fields_unpenalized": 0.1382,
+          "scale": 0.9963,
+          "emitted_fields": 876,
+          "unverifiable_fields": 0,
+          "spurious_fields": 0,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El fondo inferior debe quedar por encima del suelo",
+            "Faltan datos explícitos: diameter"
+          ]
+        },
+        "S-adversarial": {
+          "score": 0.9043,
+          "geometry": 0.7395,
+          "attributes": 1.0,
+          "ece": 0.0179,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9808,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1108,
+          "equipment": 12,
+          "revisions": 24,
+          "models_built": 1.0,
+          "geometry_fields_unpenalized": 0.9783,
+          "scale": 0.9991,
+          "emitted_fields": 712,
+          "unverifiable_fields": 0,
+          "spurious_fields": 40,
+          "external_calls": 0,
+          "poisoning_rate": 0.3056,
+          "errors": []
+        }
+      },
+      "by_style": {
+        "atlas": {
+          "score": 0.6811,
+          "geometry": 0.4393,
+          "attributes": 0.9479,
+          "ece": 0.0317,
+          "f1_delta": 0.4912,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.981,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.3901
+        },
+        "iberica": {
+          "score": 0.7436,
+          "geometry": 0.5667,
+          "attributes": 0.9792,
+          "ece": 0.0174,
+          "f1_delta": 0.525,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9914,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.3979
+        },
+        "gulf": {
+          "score": 0.7018,
+          "geometry": 0.4624,
+          "attributes": 0.9271,
+          "ece": 0.0286,
+          "f1_delta": 0.5758,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9785,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.3841
+        },
+        "prairie": {
+          "score": 0.6416,
+          "geometry": 0.3577,
+          "attributes": 0.9062,
+          "ece": 0.0434,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9919,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.373
+        },
+        "nordic": {
+          "score": 0.7841,
+          "geometry": 0.6163,
+          "attributes": 0.9688,
+          "ece": 0.019,
+          "f1_delta": 0.6557,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9956,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4015
+        },
+        "levante": {
+          "score": 0.7377,
+          "geometry": 0.5346,
+          "attributes": 1.0,
+          "ece": 0.0041,
+          "f1_delta": 0.5106,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9959,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.5936
+        },
+        "meridian": {
+          "score": 0.4322,
+          "geometry": 0.0281,
+          "attributes": 0.7969,
+          "ece": 0.1124,
+          "f1_delta": 0.2295,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9813,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4402
+        },
+        "cantabrico": {
+          "score": 0.4371,
+          "geometry": 0.0292,
+          "attributes": 0.8021,
+          "ece": 0.0864,
+          "f1_delta": 0.2202,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9628,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4429
+        }
+      },
+      "by_degradation": {
+        "vectorial": {
+          "score": 0.8075,
+          "geometry": 0.6181,
+          "attributes": 0.925,
+          "ece": 0.0088,
+          "f1_delta": 0.8102,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1052
+        },
+        "escaneado_limpio": {
+          "score": 0.5759,
+          "geometry": 0.2677,
+          "attributes": 0.9094,
+          "ece": 0.0328,
+          "f1_delta": 0.3148,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9874,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.8064
+        },
+        "escaneado_pobre": {
+          "score": 0.4133,
+          "geometry": 0.0416,
+          "attributes": 0.8438,
+          "ece": 0.1111,
+          "f1_delta": 0.0577,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9467,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.3804
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.65,
+        "geometry_fields_unpenalized": 0.446,
+        "scale": 0.9964,
+        "emitted_fields": 4192,
+        "unverifiable_fields": 0,
+        "spurious_fields": 7,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "El fondo inferior debe quedar por encima del suelo",
+          "Esta familia admite fondos con profundidad hasta el radio",
+          "Faltan datos explícitos: diameter",
+          "Faltan datos explícitos: diameter, height, head_depth, skirt_height",
+          "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "c_rag",
+      "strategy": "c_rag",
+      "providers": [],
+      "description": "C: recuperación y adaptación de plantilla",
+      "metrics": {
+        "score": 0.5995,
+        "geometry": 0.3394,
+        "attributes": 0.826,
+        "ece": 0.0918,
+        "f1_delta": 0.4678,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": 0.9626,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 0.4668
+      },
+      "ci95": {
+        "score": [
+          0.556,
+          0.6444
+        ],
+        "geometry": [
+          0.2646,
+          0.4211
+        ],
+        "attributes": [
+          0.7229,
+          0.9167
+        ],
+        "f1_delta": [
+          0.398,
+          0.5332
+        ]
+      },
+      "by_dataset": {
+        "S-dev": {
+          "score": 0.6861,
+          "geometry": 0.5142,
+          "attributes": 0.8698,
+          "ece": 0.1061,
+          "f1_delta": 0.5611,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9921,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4973,
+          "equipment": 72,
+          "revisions": 144,
+          "models_built": 0.7639,
+          "geometry_fields_unpenalized": 0.709,
+          "scale": 0.9959,
+          "emitted_fields": 3664,
+          "unverifiable_fields": 0,
+          "spurious_fields": 12,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El espesor del faldón debe ser menor que el radio",
+            "El fondo inferior debe quedar por encima del suelo",
+            "Esta familia admite fondos con profundidad hasta el radio",
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness",
+            "Faltan datos explícitos: diameter, skirt_height, skirt_thickness"
+          ]
+        },
+        "S-reservado": {
+          "score": 0.4541,
+          "geometry": 0.0773,
+          "attributes": 0.7604,
+          "ece": 0.0397,
+          "f1_delta": 0.2241,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9145,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4212,
+          "equipment": 48,
+          "revisions": 96,
+          "models_built": 0.5312,
+          "geometry_fields_unpenalized": 0.1758,
+          "scale": 0.9965,
+          "emitted_fields": 999,
+          "unverifiable_fields": 0,
+          "spurious_fields": 0,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness"
+          ]
+        },
+        "S-adversarial": {
+          "score": 0.7566,
+          "geometry": 1.0,
+          "attributes": 0.2083,
+          "ece": 0.1549,
+          "f1_delta": 0.8132,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1215,
+          "equipment": 12,
+          "revisions": 24,
+          "models_built": 1.0,
+          "geometry_fields_unpenalized": 1.0,
+          "scale": 0.999,
+          "emitted_fields": 636,
+          "unverifiable_fields": 0,
+          "spurious_fields": 40,
+          "external_calls": 0,
+          "poisoning_rate": 0.1389,
+          "errors": []
+        }
+      },
+      "by_style": {
+        "atlas": {
+          "score": 0.6919,
+          "geometry": 0.5756,
+          "attributes": 0.8646,
+          "ece": 0.1319,
+          "f1_delta": 0.5161,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9841,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4708
+        },
+        "iberica": {
+          "score": 0.7051,
+          "geometry": 0.5667,
+          "attributes": 0.9583,
+          "ece": 0.1461,
+          "f1_delta": 0.5128,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4702
+        },
+        "gulf": {
+          "score": 0.6059,
+          "geometry": 0.4105,
+          "attributes": 0.7396,
+          "ece": 0.1369,
+          "f1_delta": 0.5152,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9815,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4468
+        },
+        "prairie": {
+          "score": 0.6849,
+          "geometry": 0.3873,
+          "attributes": 0.9375,
+          "ece": 0.1119,
+          "f1_delta": 0.7077,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9859,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4565
+        },
+        "nordic": {
+          "score": 0.7659,
+          "geometry": 0.7111,
+          "attributes": 0.9688,
+          "ece": 0.156,
+          "f1_delta": 0.5647,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4678
+        },
+        "levante": {
+          "score": 0.638,
+          "geometry": 0.4339,
+          "attributes": 0.75,
+          "ece": 0.1216,
+          "f1_delta": 0.6102,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.6715
+        },
+        "meridian": {
+          "score": 0.462,
+          "geometry": 0.0925,
+          "attributes": 0.7396,
+          "ece": 0.0157,
+          "f1_delta": 0.24,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9815,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4214
+        },
+        "cantabrico": {
+          "score": 0.4441,
+          "geometry": 0.0621,
+          "attributes": 0.7812,
+          "ece": 0.0704,
+          "f1_delta": 0.2056,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.8571,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4209
+        }
+      },
+      "by_degradation": {
+        "vectorial": {
+          "score": 0.7614,
+          "geometry": 0.6247,
+          "attributes": 0.8313,
+          "ece": 0.105,
+          "f1_delta": 0.7845,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9155,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1453
+        },
+        "escaneado_limpio": {
+          "score": 0.6026,
+          "geometry": 0.3349,
+          "attributes": 0.8531,
+          "ece": 0.0945,
+          "f1_delta": 0.4651,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9903,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.8363
+        },
+        "escaneado_pobre": {
+          "score": 0.4285,
+          "geometry": 0.0587,
+          "attributes": 0.7937,
+          "ece": 0.0694,
+          "f1_delta": 0.1181,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9847,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.4189
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.6708,
+        "geometry_fields_unpenalized": 0.4957,
+        "scale": 0.9961,
+        "emitted_fields": 4663,
+        "unverifiable_fields": 0,
+        "spurious_fields": 12,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "El espesor del faldón debe ser menor que el radio",
+          "El fondo inferior debe quedar por encima del suelo",
+          "Esta familia admite fondos con profundidad hasta el radio",
+          "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness",
+          "Faltan datos explícitos: diameter, skirt_height, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "d_hibrido",
+      "strategy": "d_hibrido",
+      "providers": [],
+      "description": "D: cascada B, C, memoria y geometría, fusión aprendida",
+      "metrics": {
+        "score": 0.7077,
+        "geometry": 0.4847,
+        "attributes": 0.925,
+        "ece": 0.0135,
+        "f1_delta": 0.5597,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": 0.9676,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 2.4759
+      },
+      "ci95": {
+        "score": [
+          0.676,
+          0.7401
+        ],
+        "geometry": [
+          0.4365,
+          0.5358
+        ],
+        "attributes": [
+          0.8667,
+          0.9792
+        ],
+        "f1_delta": [
+          0.5,
+          0.6183
+        ]
+      },
+      "by_dataset": {
+        "S-dev": {
+          "score": 0.7621,
+          "geometry": 0.5662,
+          "attributes": 0.9896,
+          "ece": 0.0117,
+          "f1_delta": 0.607,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9872,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.3949,
+          "equipment": 72,
+          "revisions": 144,
+          "models_built": 0.6875,
+          "geometry_fields_unpenalized": 0.7799,
+          "scale": 0.98,
+          "emitted_fields": 3986,
+          "unverifiable_fields": 106,
+          "spurious_fields": 62,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El fondo inferior debe quedar por encima del suelo",
+            "Esta familia admite fondos con profundidad hasta el radio",
+            "Faltan datos explícitos: diameter",
+            "Faltan datos explícitos: diameter, head_depth",
+            "Faltan datos explícitos: diameter, head_depth, skirt_height, skirt_thickness"
+          ]
+        },
+        "S-reservado": {
+          "score": 0.6246,
+          "geometry": 0.3625,
+          "attributes": 0.8281,
+          "ece": 0.0271,
+          "f1_delta": 0.4922,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9142,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.5973,
+          "equipment": 48,
+          "revisions": 96,
+          "models_built": 0.8229,
+          "geometry_fields_unpenalized": 0.5015,
+          "scale": 0.9784,
+          "emitted_fields": 2034,
+          "unverifiable_fields": 935,
+          "spurious_fields": 43,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El fondo inferior debe quedar por encima del suelo",
+            "Faltan datos explícitos: diameter",
+            "Faltan datos explícitos: head_depth",
+            "Faltan datos explícitos: height",
+            "La estrategia d_hibrido falló: Fraction(3, 0)"
+          ]
+        },
+        "S-adversarial": {
+          "score": 0.9991,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.003,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1417,
+          "equipment": 12,
+          "revisions": 24,
+          "models_built": 1.0,
+          "geometry_fields_unpenalized": 1.0,
+          "scale": 0.9988,
+          "emitted_fields": 721,
+          "unverifiable_fields": 9,
+          "spurious_fields": 49,
+          "external_calls": 0,
+          "poisoning_rate": 0.1389,
+          "errors": []
+        }
+      },
+      "by_style": {
+        "atlas": {
+          "score": 0.7723,
+          "geometry": 0.5728,
+          "attributes": 0.9896,
+          "ece": 0.0282,
+          "f1_delta": 0.6667,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9907,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.3335
+        },
+        "iberica": {
+          "score": 0.8011,
+          "geometry": 0.6325,
+          "attributes": 0.9896,
+          "ece": 0.024,
+          "f1_delta": 0.7027,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9813,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.7474
+        },
+        "gulf": {
+          "score": 0.7487,
+          "geometry": 0.5551,
+          "attributes": 0.9896,
+          "ece": 0.0201,
+          "f1_delta": 0.5714,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.982,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.7403
+        },
+        "prairie": {
+          "score": 0.7006,
+          "geometry": 0.3868,
+          "attributes": 0.9896,
+          "ece": 0.0288,
+          "f1_delta": 0.6333,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.981,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.129
+        },
+        "nordic": {
+          "score": 0.7971,
+          "geometry": 0.694,
+          "attributes": 0.9792,
+          "ece": 0.0166,
+          "f1_delta": 0.5758,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9921,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.0053
+        },
+        "levante": {
+          "score": 0.738,
+          "geometry": 0.5557,
+          "attributes": 1.0,
+          "ece": 0.0179,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9947,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.4139
+        },
+        "meridian": {
+          "score": 0.5969,
+          "geometry": 0.3434,
+          "attributes": 0.7865,
+          "ece": 0.0479,
+          "f1_delta": 0.4586,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.8786,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.6476
+        },
+        "cantabrico": {
+          "score": 0.6457,
+          "geometry": 0.3815,
+          "attributes": 0.8698,
+          "ece": 0.037,
+          "f1_delta": 0.5244,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9453,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.547
+        }
+      },
+      "by_degradation": {
+        "vectorial": {
+          "score": 0.9513,
+          "geometry": 0.9548,
+          "attributes": 0.95,
+          "ece": 0.0299,
+          "f1_delta": 0.9342,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9944,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1967
+        },
+        "escaneado_limpio": {
+          "score": 0.6482,
+          "geometry": 0.4037,
+          "attributes": 0.9313,
+          "ece": 0.0137,
+          "f1_delta": 0.4032,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9536,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 3.9894
+        },
+        "escaneado_pobre": {
+          "score": 0.4779,
+          "geometry": 0.0955,
+          "attributes": 0.8938,
+          "ece": 0.0544,
+          "f1_delta": 0.1792,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9216,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 3.2415
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.7417,
+        "geometry_fields_unpenalized": 0.6685,
+        "scale": 0.9794,
+        "emitted_fields": 6020,
+        "unverifiable_fields": 1041,
+        "spurious_fields": 105,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "El fondo inferior debe quedar por encima del suelo",
+          "Esta familia admite fondos con profundidad hasta el radio",
+          "Faltan datos explícitos: diameter",
+          "Faltan datos explícitos: diameter, head_depth",
+          "Faltan datos explícitos: diameter, head_depth, skirt_height, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "d_hibrido+heuristica",
+      "strategy": "d_hibrido+heuristica",
+      "providers": [],
+      "description": "D con la fusión heurística de antes del 31/10",
+      "metrics": {
+        "score": 0.6903,
+        "geometry": 0.4716,
+        "attributes": 0.9031,
+        "ece": 0.057,
+        "f1_delta": 0.57,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": 0.9362,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 2.0529
+      },
+      "ci95": {
+        "score": [
+          0.6587,
+          0.7241
+        ],
+        "geometry": [
+          0.4263,
+          0.522
+        ],
+        "attributes": [
+          0.8458,
+          0.9563
+        ],
+        "f1_delta": [
+          0.5072,
+          0.6298
+        ]
+      },
+      "by_dataset": {
+        "S-dev": {
+          "score": 0.7458,
+          "geometry": 0.5394,
+          "attributes": 0.9792,
+          "ece": 0.0477,
+          "f1_delta": 0.6286,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9495,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.1615,
+          "equipment": 72,
+          "revisions": 144,
+          "models_built": 0.7222,
+          "geometry_fields_unpenalized": 0.7728,
+          "scale": 0.982,
+          "emitted_fields": 4008,
+          "unverifiable_fields": 128,
+          "spurious_fields": 62,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El fondo inferior debe quedar por encima del suelo",
+            "Faltan datos explícitos: diameter",
+            "Faltan datos explícitos: diameter, head_depth",
+            "Faltan datos explícitos: diameter, head_depth, skirt_thickness",
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height"
+          ]
+        },
+        "S-reservado": {
+          "score": 0.6063,
+          "geometry": 0.37,
+          "attributes": 0.7891,
+          "ece": 0.077,
+          "f1_delta": 0.4815,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.8887,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.89,
+          "equipment": 48,
+          "revisions": 96,
+          "models_built": 0.7812,
+          "geometry_fields_unpenalized": 0.4997,
+          "scale": 0.9842,
+          "emitted_fields": 2026,
+          "unverifiable_fields": 938,
+          "spurious_fields": 43,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El fondo inferior debe quedar por encima del suelo",
+            "Faltan datos explícitos: diameter",
+            "Faltan datos explícitos: diameter, height",
+            "Faltan datos explícitos: head_depth",
+            "Faltan datos explícitos: height"
+          ]
+        },
+        "S-adversarial": {
+          "score": 0.9999,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.0,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1454,
+          "equipment": 12,
+          "revisions": 24,
+          "models_built": 1.0,
+          "geometry_fields_unpenalized": 1.0,
+          "scale": 0.9988,
+          "emitted_fields": 721,
+          "unverifiable_fields": 9,
+          "spurious_fields": 49,
+          "external_calls": 0,
+          "poisoning_rate": 0.1389,
+          "errors": []
+        }
+      },
+      "by_style": {
+        "atlas": {
+          "score": 0.7482,
+          "geometry": 0.5222,
+          "attributes": 0.9792,
+          "ece": 0.0334,
+          "f1_delta": 0.6535,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9613,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.233
+        },
+        "iberica": {
+          "score": 0.8094,
+          "geometry": 0.6172,
+          "attributes": 0.9896,
+          "ece": 0.0406,
+          "f1_delta": 0.7907,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9489,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.5152
+        },
+        "gulf": {
+          "score": 0.7013,
+          "geometry": 0.4985,
+          "attributes": 0.9583,
+          "ece": 0.0913,
+          "f1_delta": 0.5556,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9106,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.4156
+        },
+        "prairie": {
+          "score": 0.6759,
+          "geometry": 0.3781,
+          "attributes": 0.9688,
+          "ece": 0.1002,
+          "f1_delta": 0.6364,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.8958,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.0015
+        },
+        "nordic": {
+          "score": 0.7822,
+          "geometry": 0.6551,
+          "attributes": 0.9792,
+          "ece": 0.015,
+          "f1_delta": 0.5672,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9852,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.8867
+        },
+        "levante": {
+          "score": 0.7492,
+          "geometry": 0.5651,
+          "attributes": 1.0,
+          "ece": 0.0287,
+          "f1_delta": 0.551,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.983,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.9169
+        },
+        "meridian": {
+          "score": 0.5835,
+          "geometry": 0.3551,
+          "attributes": 0.776,
+          "ece": 0.1204,
+          "f1_delta": 0.4512,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.8642,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.9749
+        },
+        "cantabrico": {
+          "score": 0.6279,
+          "geometry": 0.3849,
+          "attributes": 0.8021,
+          "ece": 0.0413,
+          "f1_delta": 0.5125,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.917,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.8052
+        }
+      },
+      "by_degradation": {
+        "vectorial": {
+          "score": 0.939,
+          "geometry": 0.9709,
+          "attributes": 0.9062,
+          "ece": 0.062,
+          "f1_delta": 0.9342,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9839,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1643
+        },
+        "escaneado_limpio": {
+          "score": 0.6279,
+          "geometry": 0.3619,
+          "attributes": 0.9313,
+          "ece": 0.0796,
+          "f1_delta": 0.4485,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9352,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 3.2966
+        },
+        "escaneado_pobre": {
+          "score": 0.443,
+          "geometry": 0.0821,
+          "attributes": 0.8719,
+          "ece": 0.1879,
+          "f1_delta": 0.1973,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.8389,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.6978
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.7458,
+        "geometry_fields_unpenalized": 0.6636,
+        "scale": 0.9829,
+        "emitted_fields": 6034,
+        "unverifiable_fields": 1066,
+        "spurious_fields": 105,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "El fondo inferior debe quedar por encima del suelo",
+          "Faltan datos explícitos: diameter",
+          "Faltan datos explícitos: diameter, head_depth",
+          "Faltan datos explícitos: diameter, head_depth, skirt_thickness",
+          "Faltan datos explícitos: diameter, height"
+        ],
+        "bootstrap_equipment_units": 40
       },
       "eligible": true
     },
@@ -307,29 +1936,29 @@
       "providers": [],
       "description": "B sin tablas ni cotas",
       "metrics": {
-        "score": 0.3266,
+        "score": 0.3875,
         "geometry": 0.0,
-        "attributes": 0.675,
-        "ece": 0.25,
+        "attributes": 0.75,
+        "ece": 0.0,
         "f1_delta": 0.0,
         "hallucination_rate": 0.0,
         "citation_coverage": 1.0,
-        "interval_coverage": null,
+        "interval_coverage": 1.0,
         "cost_eur_per_equipment": 0.0,
-        "seconds_per_revision": 0.0122
+        "seconds_per_revision": 0.0184
       },
       "ci95": {
         "score": [
-          0.3109,
-          0.3422
+          0.3562,
+          0.4187
         ],
         "geometry": [
           0.0,
           0.0
         ],
         "attributes": [
-          0.5917,
-          0.7583
+          0.625,
+          0.875
         ],
         "f1_delta": [
           0.0,
@@ -338,78 +1967,78 @@
       },
       "by_dataset": {
         "S-dev": {
-          "score": 0.325,
+          "score": 0.3875,
           "geometry": 0.0,
-          "attributes": 0.6667,
-          "ece": 0.25,
+          "attributes": 0.75,
+          "ece": 0.0,
           "f1_delta": 0.0,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0119,
+          "seconds_per_revision": 0.0166,
           "equipment": 72,
           "revisions": 144,
           "models_built": 0.0,
           "geometry_fields_unpenalized": 0.0,
           "scale": 0.9999,
+          "emitted_fields": 576,
+          "unverifiable_fields": 0,
+          "spurious_fields": 0,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness"
+          ]
+        },
+        "S-reservado": {
+          "score": 0.3875,
+          "geometry": 0.0,
+          "attributes": 0.75,
+          "ece": 0.0,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0211,
+          "equipment": 48,
+          "revisions": 96,
+          "models_built": 0.0,
+          "geometry_fields_unpenalized": 0.0,
+          "scale": 0.9998,
           "emitted_fields": 384,
           "unverifiable_fields": 0,
           "spurious_fields": 0,
           "external_calls": 0,
           "poisoning_rate": null,
           "errors": [
-            "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness"
-          ]
-        },
-        "S-reservado": {
-          "score": 0.3289,
-          "geometry": 0.0,
-          "attributes": 0.6875,
-          "ece": 0.25,
-          "f1_delta": 0.0,
-          "hallucination_rate": 0.0,
-          "citation_coverage": 1.0,
-          "interval_coverage": null,
-          "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0126,
-          "equipment": 48,
-          "revisions": 96,
-          "models_built": 0.0,
-          "geometry_fields_unpenalized": 0.0,
-          "scale": 0.9999,
-          "emitted_fields": 264,
-          "unverifiable_fields": 0,
-          "spurious_fields": 0,
-          "external_calls": 0,
-          "poisoning_rate": null,
-          "errors": [
-            "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness"
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness"
           ]
         },
         "S-adversarial": {
           "score": 0.2,
           "geometry": 0.0,
           "attributes": 0.0,
-          "ece": null,
+          "ece": 0.0,
           "f1_delta": 0.0,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
           "interval_coverage": null,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.027,
+          "seconds_per_revision": 0.0474,
           "equipment": 12,
           "revisions": 24,
           "models_built": 0.0,
           "geometry_fields_unpenalized": 0.0,
-          "scale": 0.9998,
-          "emitted_fields": 0,
+          "scale": 0.9996,
+          "emitted_fields": 24,
           "unverifiable_fields": 0,
           "spurious_fields": 0,
           "external_calls": 0,
           "poisoning_rate": 0.0,
           "errors": [
-            "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness"
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness"
           ]
         }
       },
@@ -417,136 +2046,136 @@
         "atlas": {
           "score": 0.3875,
           "geometry": 0.0,
-          "attributes": 1.0,
-          "ece": 0.25,
+          "attributes": 0.75,
+          "ece": 0.0,
           "f1_delta": 0.0,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0192
+          "seconds_per_revision": 0.0164
         },
         "iberica": {
           "score": 0.3875,
           "geometry": 0.0,
-          "attributes": 1.0,
-          "ece": 0.25,
+          "attributes": 0.75,
+          "ece": 0.0,
           "f1_delta": 0.0,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0124
+          "seconds_per_revision": 0.0211
         },
         "gulf": {
-          "score": 0.2,
+          "score": 0.3875,
           "geometry": 0.0,
-          "attributes": 0.0,
-          "ece": null,
+          "attributes": 0.75,
+          "ece": 0.0,
           "f1_delta": 0.0,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0081
+          "seconds_per_revision": 0.0123
         },
         "prairie": {
           "score": 0.3875,
           "geometry": 0.0,
-          "attributes": 1.0,
-          "ece": 0.25,
+          "attributes": 0.75,
+          "ece": 0.0,
           "f1_delta": 0.0,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0119
+          "seconds_per_revision": 0.0207
         },
         "nordic": {
           "score": 0.3875,
           "geometry": 0.0,
-          "attributes": 1.0,
-          "ece": 0.25,
+          "attributes": 0.75,
+          "ece": 0.0,
           "f1_delta": 0.0,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0091
+          "seconds_per_revision": 0.0127
         },
         "levante": {
-          "score": 0.2,
-          "geometry": 0.0,
-          "attributes": 0.0,
-          "ece": null,
-          "f1_delta": 0.0,
-          "hallucination_rate": 0.0,
-          "citation_coverage": 1.0,
-          "interval_coverage": null,
-          "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0111
-        },
-        "meridian": {
-          "score": 0.3172,
-          "geometry": 0.0,
-          "attributes": 0.625,
-          "ece": 0.25,
-          "f1_delta": 0.0,
-          "hallucination_rate": 0.0,
-          "citation_coverage": 1.0,
-          "interval_coverage": null,
-          "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0086
-        },
-        "cantabrico": {
-          "score": 0.3406,
+          "score": 0.3875,
           "geometry": 0.0,
           "attributes": 0.75,
-          "ece": 0.25,
+          "ece": 0.0,
           "f1_delta": 0.0,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0165
+          "seconds_per_revision": 0.0166
+        },
+        "meridian": {
+          "score": 0.3875,
+          "geometry": 0.0,
+          "attributes": 0.75,
+          "ece": 0.0,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.0262
+        },
+        "cantabrico": {
+          "score": 0.3875,
+          "geometry": 0.0,
+          "attributes": 0.75,
+          "ece": 0.0,
+          "f1_delta": 0.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.016
         }
       },
       "by_degradation": {
         "vectorial": {
-          "score": 0.3265,
+          "score": 0.3875,
           "geometry": 0.0,
-          "attributes": 0.675,
-          "ece": 0.25,
+          "attributes": 0.75,
+          "ece": 0.0,
           "f1_delta": 0.0,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.032
+          "seconds_per_revision": 0.0476
         },
         "escaneado_limpio": {
-          "score": 0.3266,
+          "score": 0.3875,
           "geometry": 0.0,
-          "attributes": 0.675,
-          "ece": 0.25,
+          "attributes": 0.75,
+          "ece": 0.0,
           "f1_delta": 0.0,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0025
+          "seconds_per_revision": 0.0041
         },
         "escaneado_pobre": {
-          "score": 0.3266,
+          "score": 0.3875,
           "geometry": 0.0,
-          "attributes": 0.675,
-          "ece": 0.25,
+          "attributes": 0.75,
+          "ece": 0.0,
           "f1_delta": 0.0,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0022
+          "seconds_per_revision": 0.0035
         }
       },
       "details": {
@@ -554,15 +2183,16 @@
         "revisions": 240,
         "models_built": 0.0,
         "geometry_fields_unpenalized": 0.0,
-        "scale": 0.9999,
-        "emitted_fields": 648,
+        "scale": 0.9998,
+        "emitted_fields": 960,
         "unverifiable_fields": 0,
         "spurious_fields": 0,
         "external_calls": 0,
         "poisoning_rate": null,
         "errors": [
-          "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness"
-        ]
+          "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
       },
       "eligible": true
     },
@@ -572,271 +2202,1362 @@
       "providers": [],
       "description": "B sin hoja de datos",
       "metrics": {
-        "score": 0.255,
-        "geometry": 0.0333,
-        "attributes": 0.125,
-        "ece": 0.1246,
-        "f1_delta": 0.08,
+        "score": 0.4014,
+        "geometry": 0.206,
+        "attributes": 0.2333,
+        "ece": 0.0084,
+        "f1_delta": 0.3571,
         "hallucination_rate": 0.0,
         "citation_coverage": 1.0,
-        "interval_coverage": null,
+        "interval_coverage": 1.0,
         "cost_eur_per_equipment": 0.0,
-        "seconds_per_revision": 0.0133
+        "seconds_per_revision": 0.0316
       },
       "ci95": {
         "score": [
-          0.2243,
-          0.2926
+          0.3613,
+          0.4404
         ],
         "geometry": [
-          0.0083,
-          0.0667
+          0.1577,
+          0.2547
         ],
         "attributes": [
-          0.0854,
-          0.1688
+          0.1958,
+          0.2708
         ],
         "f1_delta": [
-          0.0081,
-          0.1654
+          0.2808,
+          0.4263
         ]
       },
       "by_dataset": {
         "S-dev": {
-          "score": 0.2795,
-          "geometry": 0.0556,
-          "attributes": 0.1528,
-          "ece": 0.1219,
-          "f1_delta": 0.1325,
+          "score": 0.4995,
+          "geometry": 0.3319,
+          "attributes": 0.3333,
+          "ece": 0.0,
+          "f1_delta": 0.5,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0142,
+          "seconds_per_revision": 0.0362,
           "equipment": 72,
           "revisions": 144,
-          "models_built": 0.0556,
-          "geometry_fields_unpenalized": 0.0772,
-          "scale": 0.9999,
-          "emitted_fields": 439,
+          "models_built": 0.3333,
+          "geometry_fields_unpenalized": 0.3331,
+          "scale": 0.9997,
+          "emitted_fields": 1624,
           "unverifiable_fields": 0,
           "spurious_fields": 0,
           "external_calls": 0,
           "poisoning_rate": null,
           "errors": [
-            "Faltan datos explícitos: height, head_depth, skirt_height",
-            "Faltan datos explícitos: tag, diameter, head_depth, skirt_height, skirt_thickness",
-            "Faltan datos explícitos: tag, diameter, head_depth, skirt_thickness",
-            "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness",
-            "Faltan datos explícitos: tag, diameter, skirt_thickness"
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness"
           ]
         },
         "S-reservado": {
-          "score": 0.2177,
-          "geometry": 0.0,
+          "score": 0.2464,
+          "geometry": 0.0172,
           "attributes": 0.0833,
-          "ece": 0.15,
-          "f1_delta": 0.0,
+          "ece": 0.0556,
+          "f1_delta": 0.1038,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0119,
+          "seconds_per_revision": 0.0247,
           "equipment": 48,
           "revisions": 96,
-          "models_built": 0.0,
-          "geometry_fields_unpenalized": 0.0068,
-          "scale": 0.9999,
-          "emitted_fields": 48,
+          "models_built": 0.3333,
+          "geometry_fields_unpenalized": 0.054,
+          "scale": 0.9998,
+          "emitted_fields": 288,
           "unverifiable_fields": 0,
           "spurious_fields": 0,
           "external_calls": 0,
           "poisoning_rate": null,
           "errors": [
-            "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness",
-            "Faltan datos explícitos: tag, height, head_depth, skirt_height, skirt_thickness"
+            "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness"
           ]
         },
         "S-adversarial": {
-          "score": 0.6489,
-          "geometry": 0.5,
-          "attributes": 0.625,
-          "ece": 0.1,
-          "f1_delta": 0.6667,
+          "score": 0.9043,
+          "geometry": 0.7395,
+          "attributes": 1.0,
+          "ece": 0.0179,
+          "f1_delta": 1.0,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 0.9808,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.038,
+          "seconds_per_revision": 0.0841,
           "equipment": 12,
           "revisions": 24,
-          "models_built": 0.5,
-          "geometry_fields_unpenalized": 0.5976,
-          "scale": 0.9997,
-          "emitted_fields": 428,
+          "models_built": 1.0,
+          "geometry_fields_unpenalized": 0.9783,
+          "scale": 0.9993,
+          "emitted_fields": 712,
           "unverifiable_fields": 0,
-          "spurious_fields": 8,
+          "spurious_fields": 40,
           "external_calls": 0,
-          "poisoning_rate": 0.0278,
-          "errors": [
-            "Faltan datos explícitos: tag, skirt_thickness"
-          ]
+          "poisoning_rate": 0.3056,
+          "errors": []
         }
       },
       "by_style": {
         "atlas": {
-          "score": 0.4915,
+          "score": 0.5,
           "geometry": 0.3333,
           "attributes": 0.3333,
-          "ece": 0.1014,
+          "ece": 0.0,
           "f1_delta": 0.5,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0162
+          "seconds_per_revision": 0.0402
         },
         "iberica": {
-          "score": 0.2189,
-          "geometry": 0.0,
-          "attributes": 0.0833,
-          "ece": 0.09,
-          "f1_delta": 0.0,
+          "score": 0.5,
+          "geometry": 0.3333,
+          "attributes": 0.3333,
+          "ece": 0.0,
+          "f1_delta": 0.5,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0125
+          "seconds_per_revision": 0.0438
         },
         "gulf": {
-          "score": 0.2126,
-          "geometry": 0.0,
-          "attributes": 0.0833,
-          "ece": 0.3963,
-          "f1_delta": 0.0,
+          "score": 0.5,
+          "geometry": 0.3333,
+          "attributes": 0.3333,
+          "ece": 0.0,
+          "f1_delta": 0.5,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0125
+          "seconds_per_revision": 0.0398
         },
         "prairie": {
-          "score": 0.2177,
-          "geometry": 0.0,
-          "attributes": 0.0833,
-          "ece": 0.15,
-          "f1_delta": 0.0,
+          "score": 0.5,
+          "geometry": 0.3333,
+          "attributes": 0.3333,
+          "ece": 0.0,
+          "f1_delta": 0.5,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0202
+          "seconds_per_revision": 0.0284
         },
         "nordic": {
-          "score": 0.2542,
-          "geometry": 0.0,
-          "attributes": 0.25,
-          "ece": 0.1333,
-          "f1_delta": 0.0,
+          "score": 0.497,
+          "geometry": 0.3249,
+          "attributes": 0.3333,
+          "ece": 0.0,
+          "f1_delta": 0.5,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0127
+          "seconds_per_revision": 0.0253
         },
         "levante": {
-          "score": 0.2189,
-          "geometry": 0.0,
-          "attributes": 0.0833,
-          "ece": 0.09,
-          "f1_delta": 0.0,
+          "score": 0.5,
+          "geometry": 0.3333,
+          "attributes": 0.3333,
+          "ece": 0.0,
+          "f1_delta": 0.5,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0115
+          "seconds_per_revision": 0.0396
         },
         "meridian": {
-          "score": 0.2177,
-          "geometry": 0.0,
+          "score": 0.2358,
+          "geometry": 0.008,
           "attributes": 0.0833,
-          "ece": 0.15,
-          "f1_delta": 0.0,
+          "ece": 0.1111,
+          "f1_delta": 0.0727,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0087
+          "seconds_per_revision": 0.0247
         },
         "cantabrico": {
-          "score": 0.2177,
-          "geometry": 0.0,
+          "score": 0.2575,
+          "geometry": 0.0264,
           "attributes": 0.0833,
-          "ece": 0.15,
-          "f1_delta": 0.0,
+          "ece": 0.0,
+          "f1_delta": 0.1373,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0152
+          "seconds_per_revision": 0.0247
         }
       },
       "by_degradation": {
         "vectorial": {
-          "score": 0.3615,
-          "geometry": 0.1,
-          "attributes": 0.375,
-          "ece": 0.1246,
-          "f1_delta": 0.2222,
+          "score": 0.7464,
+          "geometry": 0.6181,
+          "attributes": 0.7,
+          "ece": 0.0091,
+          "f1_delta": 0.7836,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
-          "interval_coverage": null,
+          "interval_coverage": 1.0,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0355
+          "seconds_per_revision": 0.0872
         },
         "escaneado_limpio": {
           "score": 0.2,
           "geometry": 0.0,
           "attributes": 0.0,
-          "ece": null,
+          "ece": 0.0,
           "f1_delta": 0.0,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
           "interval_coverage": null,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0024
+          "seconds_per_revision": 0.0041
         },
         "escaneado_pobre": {
           "score": 0.2,
           "geometry": 0.0,
           "attributes": 0.0,
-          "ece": null,
+          "ece": 0.0,
           "f1_delta": 0.0,
           "hallucination_rate": 0.0,
           "citation_coverage": 1.0,
           "interval_coverage": null,
           "cost_eur_per_equipment": 0.0,
-          "seconds_per_revision": 0.0021
+          "seconds_per_revision": 0.0035
         }
       },
       "details": {
         "equipment": 120,
         "revisions": 240,
-        "models_built": 0.0333,
-        "geometry_fields_unpenalized": 0.0491,
-        "scale": 0.9999,
-        "emitted_fields": 487,
+        "models_built": 0.3333,
+        "geometry_fields_unpenalized": 0.2214,
+        "scale": 0.9997,
+        "emitted_fields": 1912,
         "unverifiable_fields": 0,
         "spurious_fields": 0,
         "external_calls": 0,
         "poisoning_rate": null,
         "errors": [
-          "Faltan datos explícitos: height, head_depth, skirt_height",
-          "Faltan datos explícitos: tag, diameter, head_depth, skirt_height, skirt_thickness",
-          "Faltan datos explícitos: tag, diameter, head_depth, skirt_thickness",
-          "Faltan datos explícitos: tag, diameter, height, head_depth, skirt_height, skirt_thickness",
-          "Faltan datos explícitos: tag, diameter, skirt_thickness"
+          "Faltan datos explícitos: diameter, height, head_depth, skirt_height, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "d_hibrido-geometria",
+      "strategy": "d_hibrido-geometria",
+      "providers": [],
+      "description": "D sin geometria",
+      "metrics": {
+        "score": 0.6416,
+        "geometry": 0.3607,
+        "attributes": 0.924,
+        "ece": 0.0376,
+        "f1_delta": 0.4682,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": 0.9518,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 0.6949
+      },
+      "ci95": {
+        "score": [
+          0.5933,
+          0.6896
+        ],
+        "geometry": [
+          0.2801,
+          0.449
+        ],
+        "attributes": [
+          0.8656,
+          0.9781
+        ],
+        "f1_delta": [
+          0.3943,
+          0.536
         ]
+      },
+      "by_dataset": {
+        "S-dev": {
+          "score": 0.7503,
+          "geometry": 0.552,
+          "attributes": 0.9878,
+          "ece": 0.0168,
+          "f1_delta": 0.5746,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9868,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.7189,
+          "equipment": 72,
+          "revisions": 144,
+          "models_built": 0.6806,
+          "geometry_fields_unpenalized": 0.7764,
+          "scale": 0.994,
+          "emitted_fields": 3882,
+          "unverifiable_fields": 0,
+          "spurious_fields": 12,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El fondo inferior debe quedar por encima del suelo",
+            "Esta familia admite fondos con profundidad hasta el radio",
+            "Faltan datos explícitos: diameter",
+            "Faltan datos explícitos: diameter, head_depth",
+            "Faltan datos explícitos: diameter, head_depth, skirt_thickness"
+          ]
+        },
+        "S-reservado": {
+          "score": 0.4551,
+          "geometry": 0.0738,
+          "attributes": 0.8281,
+          "ece": 0.1522,
+          "f1_delta": 0.2716,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.7921,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.6589,
+          "equipment": 48,
+          "revisions": 96,
+          "models_built": 0.75,
+          "geometry_fields_unpenalized": 0.2363,
+          "scale": 0.9945,
+          "emitted_fields": 1215,
+          "unverifiable_fields": 0,
+          "spurious_fields": 0,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El fondo inferior debe quedar por encima del suelo",
+            "Faltan datos explícitos: diameter",
+            "Faltan datos explícitos: diameter, height",
+            "Faltan datos explícitos: head_depth",
+            "Faltan datos explícitos: height"
+          ]
+        },
+        "S-adversarial": {
+          "score": 0.9987,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.0047,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1293,
+          "equipment": 12,
+          "revisions": 24,
+          "models_built": 1.0,
+          "geometry_fields_unpenalized": 1.0,
+          "scale": 0.9989,
+          "emitted_fields": 712,
+          "unverifiable_fields": 0,
+          "spurious_fields": 40,
+          "external_calls": 0,
+          "poisoning_rate": 0.1389,
+          "errors": []
+        }
+      },
+      "by_style": {
+        "atlas": {
+          "score": 0.7414,
+          "geometry": 0.5442,
+          "attributes": 0.9896,
+          "ece": 0.0386,
+          "f1_delta": 0.5684,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9906,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.6842
+        },
+        "iberica": {
+          "score": 0.7654,
+          "geometry": 0.5947,
+          "attributes": 0.9896,
+          "ece": 0.0319,
+          "f1_delta": 0.5915,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9796,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.6342
+        },
+        "gulf": {
+          "score": 0.7665,
+          "geometry": 0.5355,
+          "attributes": 0.9792,
+          "ece": 0.0244,
+          "f1_delta": 0.7042,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.982,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.667
+        },
+        "prairie": {
+          "score": 0.6752,
+          "geometry": 0.3795,
+          "attributes": 0.9896,
+          "ece": 0.018,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.981,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.6341
+        },
+        "nordic": {
+          "score": 0.7964,
+          "geometry": 0.6898,
+          "attributes": 0.9792,
+          "ece": 0.0179,
+          "f1_delta": 0.5758,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9921,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.6924
+        },
+        "levante": {
+          "score": 0.7445,
+          "geometry": 0.5683,
+          "attributes": 1.0,
+          "ece": 0.0226,
+          "f1_delta": 0.5106,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9946,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.0012
+        },
+        "meridian": {
+          "score": 0.431,
+          "geometry": 0.065,
+          "attributes": 0.7865,
+          "ece": 0.1982,
+          "f1_delta": 0.256,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.7093,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.6875
+        },
+        "cantabrico": {
+          "score": 0.4825,
+          "geometry": 0.0825,
+          "attributes": 0.8698,
+          "ece": 0.0963,
+          "f1_delta": 0.2881,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.8843,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.6304
+        }
+      },
+      "by_degradation": {
+        "vectorial": {
+          "score": 0.8133,
+          "geometry": 0.6386,
+          "attributes": 0.95,
+          "ece": 0.0467,
+          "f1_delta": 0.8175,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9792,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1295
+        },
+        "escaneado_limpio": {
+          "score": 0.6256,
+          "geometry": 0.3634,
+          "attributes": 0.9313,
+          "ece": 0.0393,
+          "f1_delta": 0.3796,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9356,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.3564
+        },
+        "escaneado_pobre": {
+          "score": 0.4513,
+          "geometry": 0.0802,
+          "attributes": 0.8906,
+          "ece": 0.075,
+          "f1_delta": 0.0891,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.923,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.5988
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.7083,
+        "geometry_fields_unpenalized": 0.5604,
+        "scale": 0.9942,
+        "emitted_fields": 5097,
+        "unverifiable_fields": 0,
+        "spurious_fields": 12,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "El fondo inferior debe quedar por encima del suelo",
+          "Esta familia admite fondos con profundidad hasta el radio",
+          "Faltan datos explícitos: diameter",
+          "Faltan datos explícitos: diameter, head_depth",
+          "Faltan datos explícitos: diameter, head_depth, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "d_hibrido-memoria",
+      "strategy": "d_hibrido-memoria",
+      "providers": [],
+      "description": "D sin memoria",
+      "metrics": {
+        "score": 0.7089,
+        "geometry": 0.4847,
+        "attributes": 0.925,
+        "ece": 0.0089,
+        "f1_delta": 0.5597,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": 0.9691,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 2.1958
+      },
+      "ci95": {
+        "score": [
+          0.6766,
+          0.7407
+        ],
+        "geometry": [
+          0.4365,
+          0.5358
+        ],
+        "attributes": [
+          0.8667,
+          0.9792
+        ],
+        "f1_delta": [
+          0.5,
+          0.6183
+        ]
+      },
+      "by_dataset": {
+        "S-dev": {
+          "score": 0.7624,
+          "geometry": 0.5662,
+          "attributes": 0.9896,
+          "ece": 0.0109,
+          "f1_delta": 0.607,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9875,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.2462,
+          "equipment": 72,
+          "revisions": 144,
+          "models_built": 0.6875,
+          "geometry_fields_unpenalized": 0.7799,
+          "scale": 0.9813,
+          "emitted_fields": 3986,
+          "unverifiable_fields": 106,
+          "spurious_fields": 62,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El fondo inferior debe quedar por encima del suelo",
+            "Esta familia admite fondos con profundidad hasta el radio",
+            "Faltan datos explícitos: diameter",
+            "Faltan datos explícitos: diameter, head_depth",
+            "Faltan datos explícitos: diameter, head_depth, skirt_height, skirt_thickness"
+          ]
+        },
+        "S-reservado": {
+          "score": 0.6256,
+          "geometry": 0.3625,
+          "attributes": 0.8281,
+          "ece": 0.0238,
+          "f1_delta": 0.4922,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9193,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.1202,
+          "equipment": 48,
+          "revisions": 96,
+          "models_built": 0.8229,
+          "geometry_fields_unpenalized": 0.5015,
+          "scale": 0.9823,
+          "emitted_fields": 2030,
+          "unverifiable_fields": 935,
+          "spurious_fields": 43,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El fondo inferior debe quedar por encima del suelo",
+            "Faltan datos explícitos: diameter",
+            "Faltan datos explícitos: head_depth",
+            "Faltan datos explícitos: height",
+            "La estrategia d_hibrido-memoria falló: Fraction(3, 0)"
+          ]
+        },
+        "S-adversarial": {
+          "score": 0.9991,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.0032,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.128,
+          "equipment": 12,
+          "revisions": 24,
+          "models_built": 1.0,
+          "geometry_fields_unpenalized": 1.0,
+          "scale": 0.9989,
+          "emitted_fields": 721,
+          "unverifiable_fields": 9,
+          "spurious_fields": 49,
+          "external_calls": 0,
+          "poisoning_rate": 0.1389,
+          "errors": []
+        }
+      },
+      "by_style": {
+        "atlas": {
+          "score": 0.7722,
+          "geometry": 0.5728,
+          "attributes": 0.9896,
+          "ece": 0.0284,
+          "f1_delta": 0.6667,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9907,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.3416
+        },
+        "iberica": {
+          "score": 0.8012,
+          "geometry": 0.6325,
+          "attributes": 0.9896,
+          "ece": 0.0238,
+          "f1_delta": 0.7027,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9813,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.6274
+        },
+        "gulf": {
+          "score": 0.7489,
+          "geometry": 0.5551,
+          "attributes": 0.9896,
+          "ece": 0.0201,
+          "f1_delta": 0.5714,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.982,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.4726
+        },
+        "prairie": {
+          "score": 0.7007,
+          "geometry": 0.3868,
+          "attributes": 0.9896,
+          "ece": 0.0288,
+          "f1_delta": 0.6333,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.981,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.9884
+        },
+        "nordic": {
+          "score": 0.7971,
+          "geometry": 0.694,
+          "attributes": 0.9792,
+          "ece": 0.017,
+          "f1_delta": 0.5758,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9941,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.9621
+        },
+        "levante": {
+          "score": 0.7378,
+          "geometry": 0.5557,
+          "attributes": 1.0,
+          "ece": 0.0198,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9947,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.0854
+        },
+        "meridian": {
+          "score": 0.5985,
+          "geometry": 0.3434,
+          "attributes": 0.7865,
+          "ece": 0.0418,
+          "f1_delta": 0.4586,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.8805,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.1383
+        },
+        "cantabrico": {
+          "score": 0.6441,
+          "geometry": 0.3815,
+          "attributes": 0.8698,
+          "ece": 0.0461,
+          "f1_delta": 0.5244,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9535,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.102
+        }
+      },
+      "by_degradation": {
+        "vectorial": {
+          "score": 0.9518,
+          "geometry": 0.9548,
+          "attributes": 0.95,
+          "ece": 0.0275,
+          "f1_delta": 0.9342,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9972,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1679
+        },
+        "escaneado_limpio": {
+          "score": 0.6485,
+          "geometry": 0.4037,
+          "attributes": 0.9313,
+          "ece": 0.0143,
+          "f1_delta": 0.4032,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9536,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 3.5216
+        },
+        "escaneado_pobre": {
+          "score": 0.4782,
+          "geometry": 0.0955,
+          "attributes": 0.8938,
+          "ece": 0.0544,
+          "f1_delta": 0.1792,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9216,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.8979
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.7417,
+        "geometry_fields_unpenalized": 0.6685,
+        "scale": 0.9817,
+        "emitted_fields": 6016,
+        "unverifiable_fields": 1041,
+        "spurious_fields": 105,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "El fondo inferior debe quedar por encima del suelo",
+          "Esta familia admite fondos con profundidad hasta el radio",
+          "Faltan datos explícitos: diameter",
+          "Faltan datos explícitos: diameter, head_depth",
+          "Faltan datos explícitos: diameter, head_depth, skirt_height, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "d_hibrido-rag",
+      "strategy": "d_hibrido-rag",
+      "providers": [],
+      "description": "D sin rag",
+      "metrics": {
+        "score": 0.6984,
+        "geometry": 0.4658,
+        "attributes": 0.9104,
+        "ece": 0.0111,
+        "f1_delta": 0.5609,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": 0.9813,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 2.2486
+      },
+      "ci95": {
+        "score": [
+          0.6644,
+          0.7313
+        ],
+        "geometry": [
+          0.4192,
+          0.5146
+        ],
+        "attributes": [
+          0.8417,
+          0.9729
+        ],
+        "f1_delta": [
+          0.4987,
+          0.6232
+        ]
+      },
+      "by_dataset": {
+        "S-dev": {
+          "score": 0.7561,
+          "geometry": 0.546,
+          "attributes": 0.9861,
+          "ece": 0.011,
+          "f1_delta": 0.6147,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9927,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.0429,
+          "equipment": 72,
+          "revisions": 144,
+          "models_built": 0.6806,
+          "geometry_fields_unpenalized": 0.7401,
+          "scale": 0.983,
+          "emitted_fields": 3817,
+          "unverifiable_fields": 169,
+          "spurious_fields": 57,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El fondo inferior debe quedar por encima del suelo",
+            "Esta familia admite fondos con profundidad hasta el radio",
+            "Faltan datos explícitos: diameter",
+            "Faltan datos explícitos: diameter, head_depth",
+            "Faltan datos explícitos: diameter, head_depth, skirt_height, skirt_thickness"
+          ]
+        },
+        "S-reservado": {
+          "score": 0.6097,
+          "geometry": 0.3454,
+          "attributes": 0.7969,
+          "ece": 0.0258,
+          "f1_delta": 0.4841,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9506,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.557,
+          "equipment": 48,
+          "revisions": 96,
+          "models_built": 0.8021,
+          "geometry_fields_unpenalized": 0.4718,
+          "scale": 0.9787,
+          "emitted_fields": 1910,
+          "unverifiable_fields": 1056,
+          "spurious_fields": 43,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El fondo inferior debe quedar por encima del suelo",
+            "Faltan datos explícitos: diameter",
+            "Faltan datos explícitos: head_depth",
+            "Faltan datos explícitos: height",
+            "La estrategia d_hibrido-rag falló: Fraction(3, 0)"
+          ]
+        },
+        "S-adversarial": {
+          "score": 0.9988,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.0042,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.169,
+          "equipment": 12,
+          "revisions": 24,
+          "models_built": 1.0,
+          "geometry_fields_unpenalized": 1.0,
+          "scale": 0.9986,
+          "emitted_fields": 721,
+          "unverifiable_fields": 9,
+          "spurious_fields": 49,
+          "external_calls": 0,
+          "poisoning_rate": 0.1389,
+          "errors": []
+        }
+      },
+      "by_style": {
+        "atlas": {
+          "score": 0.7623,
+          "geometry": 0.5374,
+          "attributes": 0.9896,
+          "ece": 0.0189,
+          "f1_delta": 0.6667,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9934,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.2202
+        },
+        "iberica": {
+          "score": 0.8005,
+          "geometry": 0.6216,
+          "attributes": 0.9896,
+          "ece": 0.0125,
+          "f1_delta": 0.7027,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9856,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.2788
+        },
+        "gulf": {
+          "score": 0.7462,
+          "geometry": 0.5443,
+          "attributes": 0.9792,
+          "ece": 0.01,
+          "f1_delta": 0.5758,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9936,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.1806
+        },
+        "prairie": {
+          "score": 0.6935,
+          "geometry": 0.3726,
+          "attributes": 0.9792,
+          "ece": 0.028,
+          "f1_delta": 0.6333,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9899,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.814
+        },
+        "nordic": {
+          "score": 0.7924,
+          "geometry": 0.6506,
+          "attributes": 0.9792,
+          "ece": 0.0131,
+          "f1_delta": 0.623,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.998,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.8612
+        },
+        "levante": {
+          "score": 0.7349,
+          "geometry": 0.5494,
+          "attributes": 1.0,
+          "ece": 0.023,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9963,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.9027
+        },
+        "meridian": {
+          "score": 0.5883,
+          "geometry": 0.3241,
+          "attributes": 0.7865,
+          "ece": 0.0402,
+          "f1_delta": 0.4416,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9241,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.6449
+        },
+        "cantabrico": {
+          "score": 0.6256,
+          "geometry": 0.3668,
+          "attributes": 0.8073,
+          "ece": 0.0373,
+          "f1_delta": 0.525,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.975,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.4692
+        }
+      },
+      "by_degradation": {
+        "vectorial": {
+          "score": 0.9451,
+          "geometry": 0.953,
+          "attributes": 0.925,
+          "ece": 0.0249,
+          "f1_delta": 0.9308,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9972,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1511
+        },
+        "escaneado_limpio": {
+          "score": 0.6325,
+          "geometry": 0.3732,
+          "attributes": 0.9156,
+          "ece": 0.0139,
+          "f1_delta": 0.395,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9785,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 3.4125
+        },
+        "escaneado_pobre": {
+          "score": 0.4705,
+          "geometry": 0.0711,
+          "attributes": 0.8906,
+          "ece": 0.0497,
+          "f1_delta": 0.1836,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.936,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 3.1822
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.7292,
+        "geometry_fields_unpenalized": 0.6328,
+        "scale": 0.9813,
+        "emitted_fields": 5727,
+        "unverifiable_fields": 1225,
+        "spurious_fields": 100,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "El fondo inferior debe quedar por encima del suelo",
+          "Esta familia admite fondos con profundidad hasta el radio",
+          "Faltan datos explícitos: diameter",
+          "Faltan datos explícitos: diameter, head_depth",
+          "Faltan datos explícitos: diameter, head_depth, skirt_height, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
+      },
+      "eligible": true
+    },
+    {
+      "id": "d_hibrido-detector",
+      "strategy": "d_hibrido-detector",
+      "providers": [],
+      "description": "D sin detector",
+      "metrics": {
+        "score": 0.7141,
+        "geometry": 0.4929,
+        "attributes": 0.926,
+        "ece": 0.0136,
+        "f1_delta": 0.5743,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": 0.9702,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 1.9941
+      },
+      "ci95": {
+        "score": [
+          0.6829,
+          0.7417
+        ],
+        "geometry": [
+          0.4471,
+          0.5391
+        ],
+        "attributes": [
+          0.8677,
+          0.9792
+        ],
+        "f1_delta": [
+          0.5181,
+          0.6224
+        ]
+      },
+      "by_dataset": {
+        "S-dev": {
+          "score": 0.7665,
+          "geometry": 0.5793,
+          "attributes": 0.9844,
+          "ece": 0.0243,
+          "f1_delta": 0.6277,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9821,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.2832,
+          "equipment": 72,
+          "revisions": 144,
+          "models_built": 0.7986,
+          "geometry_fields_unpenalized": 0.7522,
+          "scale": 0.981,
+          "emitted_fields": 3962,
+          "unverifiable_fields": 134,
+          "spurious_fields": 62,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El espesor del faldón debe ser menor que el radio",
+            "El fondo inferior debe quedar por encima del suelo",
+            "Esta familia admite fondos con profundidad hasta el radio",
+            "Faltan datos explícitos: diameter, skirt_height, skirt_thickness",
+            "Faltan datos explícitos: head_depth"
+          ]
+        },
+        "S-reservado": {
+          "score": 0.6227,
+          "geometry": 0.3632,
+          "attributes": 0.8385,
+          "ece": 0.0469,
+          "f1_delta": 0.4852,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9378,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.5604,
+          "equipment": 48,
+          "revisions": 96,
+          "models_built": 0.8333,
+          "geometry_fields_unpenalized": 0.4918,
+          "scale": 0.987,
+          "emitted_fields": 2051,
+          "unverifiable_fields": 937,
+          "spurious_fields": 43,
+          "external_calls": 0,
+          "poisoning_rate": null,
+          "errors": [
+            "El fondo inferior debe quedar por encima del suelo",
+            "Faltan datos explícitos: diameter"
+          ]
+        },
+        "S-adversarial": {
+          "score": 0.9992,
+          "geometry": 1.0,
+          "attributes": 1.0,
+          "ece": 0.003,
+          "f1_delta": 1.0,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 1.0,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1127,
+          "equipment": 12,
+          "revisions": 24,
+          "models_built": 1.0,
+          "geometry_fields_unpenalized": 1.0,
+          "scale": 0.9991,
+          "emitted_fields": 721,
+          "unverifiable_fields": 9,
+          "spurious_fields": 49,
+          "external_calls": 0,
+          "poisoning_rate": 0.1389,
+          "errors": []
+        }
+      },
+      "by_style": {
+        "atlas": {
+          "score": 0.7991,
+          "geometry": 0.6907,
+          "attributes": 0.9792,
+          "ece": 0.0515,
+          "f1_delta": 0.6364,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9864,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.4897
+        },
+        "iberica": {
+          "score": 0.7726,
+          "geometry": 0.5862,
+          "attributes": 0.9896,
+          "ece": 0.0451,
+          "f1_delta": 0.6667,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9788,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.6364
+        },
+        "gulf": {
+          "score": 0.7304,
+          "geometry": 0.5617,
+          "attributes": 0.9688,
+          "ece": 0.031,
+          "f1_delta": 0.506,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9741,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.5182
+        },
+        "prairie": {
+          "score": 0.694,
+          "geometry": 0.3847,
+          "attributes": 0.9896,
+          "ece": 0.0359,
+          "f1_delta": 0.6129,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9688,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.15
+        },
+        "nordic": {
+          "score": 0.7898,
+          "geometry": 0.6346,
+          "attributes": 0.9792,
+          "ece": 0.0361,
+          "f1_delta": 0.6667,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9894,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.9736
+        },
+        "levante": {
+          "score": 0.7919,
+          "geometry": 0.6179,
+          "attributes": 1.0,
+          "ece": 0.0196,
+          "f1_delta": 0.6609,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9923,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.9313
+        },
+        "meridian": {
+          "score": 0.6163,
+          "geometry": 0.3678,
+          "attributes": 0.8073,
+          "ece": 0.0344,
+          "f1_delta": 0.4699,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9291,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.6187
+        },
+        "cantabrico": {
+          "score": 0.6284,
+          "geometry": 0.3586,
+          "attributes": 0.8698,
+          "ece": 0.061,
+          "f1_delta": 0.5,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9452,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 1.5021
+        }
+      },
+      "by_degradation": {
+        "vectorial": {
+          "score": 0.9513,
+          "geometry": 0.9548,
+          "attributes": 0.95,
+          "ece": 0.0299,
+          "f1_delta": 0.9342,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9944,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 0.1627
+        },
+        "escaneado_limpio": {
+          "score": 0.6683,
+          "geometry": 0.4282,
+          "attributes": 0.925,
+          "ece": 0.0228,
+          "f1_delta": 0.4759,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9533,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 3.2423
+        },
+        "escaneado_pobre": {
+          "score": 0.4883,
+          "geometry": 0.0957,
+          "attributes": 0.9031,
+          "ece": 0.0809,
+          "f1_delta": 0.247,
+          "hallucination_rate": 0.0,
+          "citation_coverage": 1.0,
+          "interval_coverage": 0.9291,
+          "cost_eur_per_equipment": 0.0,
+          "seconds_per_revision": 2.5772
+        }
+      },
+      "details": {
+        "equipment": 120,
+        "revisions": 240,
+        "models_built": 0.8125,
+        "geometry_fields_unpenalized": 0.6481,
+        "scale": 0.9834,
+        "emitted_fields": 6013,
+        "unverifiable_fields": 1071,
+        "spurious_fields": 105,
+        "external_calls": 0,
+        "poisoning_rate": null,
+        "errors": [
+          "El espesor del faldón debe ser menor que el radio",
+          "El fondo inferior debe quedar por encima del suelo",
+          "Esta familia admite fondos con profundidad hasta el radio",
+          "Faltan datos explícitos: diameter",
+          "Faltan datos explícitos: diameter, skirt_height, skirt_thickness"
+        ],
+        "bootstrap_equipment_units": 40
       },
       "eligible": true
     }
@@ -844,51 +3565,19 @@
   "unmeasured": [
     {
       "id": "a_vision",
-      "reason": "estrategia aún no implementada"
+      "reason": "unos 4 min de GPU por página: se mide aparte en un subconjunto"
     },
     {
       "id": "a_vision@gemini",
-      "reason": "estrategia aún no implementada"
+      "reason": "sin GEMINI_API_KEY en .env: sin medir"
     },
     {
       "id": "a_vision@mistral",
-      "reason": "estrategia aún no implementada"
-    },
-    {
-      "id": "a_detector",
-      "reason": "estrategia aún no implementada"
-    },
-    {
-      "id": "b_reglas+ocr",
-      "reason": "estrategia aún no implementada"
-    },
-    {
-      "id": "c_rag",
-      "reason": "estrategia aún no implementada"
-    },
-    {
-      "id": "d_hibrido",
-      "reason": "estrategia aún no implementada"
-    },
-    {
-      "id": "d_hibrido-geometria",
-      "reason": "estrategia aún no implementada"
-    },
-    {
-      "id": "d_hibrido-memoria",
-      "reason": "estrategia aún no implementada"
-    },
-    {
-      "id": "d_hibrido-rag",
-      "reason": "estrategia aún no implementada"
+      "reason": "sin MISTRAL_API_KEY en .env: sin medir"
     },
     {
       "id": "d_hibrido-vision",
-      "reason": "estrategia aún no implementada"
-    },
-    {
-      "id": "d_hibrido-detector",
-      "reason": "estrategia aún no implementada"
+      "reason": "el estudio no da proveedor de visión a D: sería idéntica a d_hibrido"
     },
     {
       "id": "S-mecánico",
@@ -897,57 +3586,734 @@
   ],
   "ablations": [
     {
+      "id": "d_hibrido+heuristica",
+      "of": "d_hibrido",
+      "delta_score": -0.0174,
+      "ci95": [
+        -0.0288,
+        -0.005
+      ]
+    },
+    {
       "id": "b_reglas-tablas",
       "of": "b_reglas",
-      "delta_score": -0.043,
+      "delta_score": -0.1601,
       "ci95": [
-        -0.0764,
-        -0.0159
+        -0.191,
+        -0.1276
       ]
     },
     {
       "id": "b_reglas-hdm",
       "of": "b_reglas",
-      "delta_score": -0.1146,
+      "delta_score": -0.1462,
       "ci95": [
-        -0.1295,
-        -0.0985
+        -0.1731,
+        -0.118
+      ]
+    },
+    {
+      "id": "d_hibrido-geometria",
+      "of": "d_hibrido",
+      "delta_score": -0.0661,
+      "ci95": [
+        -0.0951,
+        -0.0376
+      ]
+    },
+    {
+      "id": "d_hibrido-memoria",
+      "of": "d_hibrido",
+      "delta_score": 0.0012,
+      "ci95": [
+        -0.0003,
+        0.0016
+      ]
+    },
+    {
+      "id": "d_hibrido-rag",
+      "of": "d_hibrido",
+      "delta_score": -0.0093,
+      "ci95": [
+        -0.0152,
+        -0.003
+      ]
+    },
+    {
+      "id": "d_hibrido-detector",
+      "of": "d_hibrido",
+      "delta_score": 0.0064,
+      "ci95": [
+        -0.0096,
+        0.0207
       ]
     }
   ],
   "pairwise": [
     {
+      "a": "d_hibrido-detector",
+      "b": "d_hibrido-memoria",
+      "mcnemar_p": 1.5187759222947875e-21,
+      "only_a": 40,
+      "only_b": 176,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-detector",
+      "b": "d_hibrido",
+      "mcnemar_p": 1.5187759222947875e-21,
+      "only_a": 40,
+      "only_b": 176,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-detector",
+      "b": "d_hibrido-rag",
+      "mcnemar_p": 2.6456168578263997e-07,
+      "only_a": 286,
+      "only_b": 175,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-detector",
+      "b": "d_hibrido+heuristica",
+      "mcnemar_p": 4.246708935600897e-07,
+      "only_a": 92,
+      "only_b": 175,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-detector",
+      "b": "d_hibrido-geometria",
+      "mcnemar_p": 1.1255243311778324e-73,
+      "only_a": 705,
+      "only_b": 181,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-detector",
+      "b": "b_reglas+ocr",
+      "mcnemar_p": 0.0,
+      "only_a": 1295,
+      "only_b": 10,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-detector",
+      "b": "c_rag",
+      "mcnemar_p": 5.764426703412796e-257,
+      "only_a": 1052,
+      "only_b": 39,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-detector",
+      "b": "a_geometria",
+      "mcnemar_p": 0.0,
+      "only_a": 1743,
+      "only_b": 14,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-detector",
+      "b": "a_detector",
+      "mcnemar_p": 0.0,
+      "only_a": 1792,
+      "only_b": 59,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-detector",
+      "b": "b_reglas",
+      "mcnemar_p": 0.0,
+      "only_a": 2761,
+      "only_b": 0,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-detector",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 0.0,
+      "only_a": 3313,
+      "only_b": 0,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-detector",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 4226,
+      "only_b": 0,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "d_hibrido",
+      "mcnemar_p": 1.0,
+      "only_a": 0,
+      "only_b": 0,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "d_hibrido-rag",
+      "mcnemar_p": 6.039282377631001e-69,
+      "only_a": 251,
+      "only_b": 4,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "d_hibrido+heuristica",
+      "mcnemar_p": 1.6099271769508826e-07,
+      "only_a": 78,
+      "only_b": 25,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "d_hibrido-geometria",
+      "mcnemar_p": 2.2059476556736066e-183,
+      "only_a": 670,
+      "only_b": 10,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "b_reglas+ocr",
+      "mcnemar_p": 0.0,
+      "only_a": 1429,
+      "only_b": 8,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "c_rag",
+      "mcnemar_p": 1.7635517444485742e-286,
+      "only_a": 1199,
+      "only_b": 50,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "a_geometria",
+      "mcnemar_p": 0.0,
+      "only_a": 1894,
+      "only_b": 29,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "a_detector",
+      "mcnemar_p": 0.0,
+      "only_a": 1933,
+      "only_b": 64,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "b_reglas",
+      "mcnemar_p": 0.0,
+      "only_a": 2902,
+      "only_b": 5,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 0.0,
+      "only_a": 3450,
+      "only_b": 1,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-memoria",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 4367,
+      "only_b": 5,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido",
+      "b": "d_hibrido-rag",
+      "mcnemar_p": 6.039282377631001e-69,
+      "only_a": 251,
+      "only_b": 4,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido",
+      "b": "d_hibrido+heuristica",
+      "mcnemar_p": 1.6099271769508826e-07,
+      "only_a": 78,
+      "only_b": 25,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido",
+      "b": "d_hibrido-geometria",
+      "mcnemar_p": 2.2059476556736066e-183,
+      "only_a": 670,
+      "only_b": 10,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido",
+      "b": "b_reglas+ocr",
+      "mcnemar_p": 0.0,
+      "only_a": 1429,
+      "only_b": 8,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido",
+      "b": "c_rag",
+      "mcnemar_p": 1.7635517444485742e-286,
+      "only_a": 1199,
+      "only_b": 50,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido",
+      "b": "a_geometria",
+      "mcnemar_p": 0.0,
+      "only_a": 1894,
+      "only_b": 29,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido",
+      "b": "a_detector",
+      "mcnemar_p": 0.0,
+      "only_a": 1933,
+      "only_b": 64,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido",
+      "b": "b_reglas",
+      "mcnemar_p": 0.0,
+      "only_a": 2902,
+      "only_b": 5,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 0.0,
+      "only_a": 3450,
+      "only_b": 1,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 4367,
+      "only_b": 5,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-rag",
+      "b": "d_hibrido+heuristica",
+      "mcnemar_p": 1.227845018713247e-27,
+      "only_a": 70,
+      "only_b": 264,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-rag",
+      "b": "d_hibrido-geometria",
+      "mcnemar_p": 3.055382854136821e-43,
+      "only_a": 669,
+      "only_b": 256,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-rag",
+      "b": "b_reglas+ocr",
+      "mcnemar_p": 0.0,
+      "only_a": 1187,
+      "only_b": 13,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-rag",
+      "b": "c_rag",
+      "mcnemar_p": 1.146379585440148e-127,
+      "only_a": 1203,
+      "only_b": 301,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-rag",
+      "b": "a_geometria",
+      "mcnemar_p": 0.0,
+      "only_a": 1645,
+      "only_b": 27,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-rag",
+      "b": "a_detector",
+      "mcnemar_p": 0.0,
+      "only_a": 1687,
+      "only_b": 65,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-rag",
+      "b": "b_reglas",
+      "mcnemar_p": 0.0,
+      "only_a": 2656,
+      "only_b": 6,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-rag",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 0.0,
+      "only_a": 3203,
+      "only_b": 1,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-rag",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 4121,
+      "only_b": 6,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido+heuristica",
+      "b": "d_hibrido-geometria",
+      "mcnemar_p": 9.178690052383873e-121,
+      "only_a": 688,
+      "only_b": 81,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido+heuristica",
+      "b": "b_reglas+ocr",
+      "mcnemar_p": 0.0,
+      "only_a": 1431,
+      "only_b": 63,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido+heuristica",
+      "b": "c_rag",
+      "mcnemar_p": 1.5341724660487457e-250,
+      "only_a": 1176,
+      "only_b": 80,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido+heuristica",
+      "b": "a_geometria",
+      "mcnemar_p": 0.0,
+      "only_a": 1858,
+      "only_b": 46,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido+heuristica",
+      "b": "a_detector",
+      "mcnemar_p": 0.0,
+      "only_a": 1899,
+      "only_b": 83,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido+heuristica",
+      "b": "b_reglas",
+      "mcnemar_p": 0.0,
+      "only_a": 2870,
+      "only_b": 26,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido+heuristica",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 0.0,
+      "only_a": 3397,
+      "only_b": 1,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido+heuristica",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 4335,
+      "only_b": 26,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-geometria",
+      "b": "b_reglas+ocr",
+      "mcnemar_p": 8.079786296377764e-216,
+      "only_a": 769,
+      "only_b": 8,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-geometria",
+      "b": "c_rag",
+      "mcnemar_p": 3.2419339029537526e-101,
+      "only_a": 546,
+      "only_b": 57,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-geometria",
+      "b": "a_geometria",
+      "mcnemar_p": 2.2015742108919215e-128,
+      "only_a": 1899,
+      "only_b": 694,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-geometria",
+      "b": "a_detector",
+      "mcnemar_p": 2.2497259032530624e-127,
+      "only_a": 1919,
+      "only_b": 710,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-geometria",
+      "b": "b_reglas",
+      "mcnemar_p": 0.0,
+      "only_a": 2243,
+      "only_b": 6,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-geometria",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 0.0,
+      "only_a": 2790,
+      "only_b": 1,
+      "fields": 7452
+    },
+    {
+      "a": "d_hibrido-geometria",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 3708,
+      "only_b": 6,
+      "fields": 7452
+    },
+    {
+      "a": "b_reglas+ocr",
+      "b": "c_rag",
+      "mcnemar_p": 2.6796054474912072e-17,
+      "only_a": 383,
+      "only_b": 655,
+      "fields": 7452
+    },
+    {
+      "a": "b_reglas+ocr",
+      "b": "a_geometria",
+      "mcnemar_p": 2.7334702852808937e-21,
+      "only_a": 1323,
+      "only_b": 879,
+      "fields": 7452
+    },
+    {
+      "a": "b_reglas+ocr",
+      "b": "a_detector",
+      "mcnemar_p": 2.0614587114595513e-21,
+      "only_a": 1338,
+      "only_b": 890,
+      "fields": 7452
+    },
+    {
+      "a": "b_reglas+ocr",
+      "b": "b_reglas",
+      "mcnemar_p": 0.0,
+      "only_a": 1491,
+      "only_b": 15,
+      "fields": 7452
+    },
+    {
+      "a": "b_reglas+ocr",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 0.0,
+      "only_a": 2028,
+      "only_b": 0,
+      "fields": 7452
+    },
+    {
+      "a": "b_reglas+ocr",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 2956,
+      "only_b": 15,
+      "fields": 7452
+    },
+    {
+      "a": "c_rag",
+      "b": "a_geometria",
+      "mcnemar_p": 1.0089106495724243e-50,
+      "only_a": 1516,
+      "only_b": 800,
+      "fields": 7452
+    },
+    {
+      "a": "c_rag",
+      "b": "a_detector",
+      "mcnemar_p": 2.504812425633068e-50,
+      "only_a": 1540,
+      "only_b": 820,
+      "fields": 7452
+    },
+    {
+      "a": "c_rag",
+      "b": "b_reglas",
+      "mcnemar_p": 0.0,
+      "only_a": 1810,
+      "only_b": 62,
+      "fields": 7452
+    },
+    {
+      "a": "c_rag",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 0.0,
+      "only_a": 2340,
+      "only_b": 40,
+      "fields": 7452
+    },
+    {
+      "a": "c_rag",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 3235,
+      "only_b": 22,
+      "fields": 7452
+    },
+    {
+      "a": "a_geometria",
+      "b": "a_detector",
+      "mcnemar_p": 0.8114566072042916,
+      "only_a": 81,
+      "only_b": 77,
+      "fields": 7452
+    },
+    {
+      "a": "a_geometria",
+      "b": "b_reglas",
+      "mcnemar_p": 4.443757998208949e-224,
+      "only_a": 1128,
+      "only_b": 96,
+      "fields": 7452
+    },
+    {
+      "a": "a_geometria",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 0.0,
+      "only_a": 1680,
+      "only_b": 96,
+      "fields": 7452
+    },
+    {
+      "a": "a_geometria",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 2497,
+      "only_b": 0,
+      "fields": 7452
+    },
+    {
+      "a": "a_detector",
+      "b": "b_reglas",
+      "mcnemar_p": 1.754408680729429e-222,
+      "only_a": 1125,
+      "only_b": 97,
+      "fields": 7452
+    },
+    {
+      "a": "a_detector",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 0.0,
+      "only_a": 1677,
+      "only_b": 97,
+      "fields": 7452
+    },
+    {
+      "a": "a_detector",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 0.0,
+      "only_a": 2494,
+      "only_b": 1,
+      "fields": 7452
+    },
+    {
+      "a": "b_reglas",
+      "b": "b_reglas-hdm",
+      "mcnemar_p": 1.3566642758087631e-166,
+      "only_a": 552,
+      "only_b": 0,
+      "fields": 7452
+    },
+    {
       "a": "b_reglas",
       "b": "b_reglas-tablas",
       "mcnemar_p": 0.0,
-      "only_a": 374,
+      "only_a": 1465,
       "only_b": 0,
       "fields": 7452
     },
     {
-      "a": "b_reglas",
-      "b": "b_reglas-hdm",
-      "mcnemar_p": 0.0,
-      "only_a": 554,
-      "only_b": 0,
-      "fields": 7452
-    },
-    {
-      "a": "b_reglas-tablas",
-      "b": "b_reglas-hdm",
-      "mcnemar_p": 0.0,
-      "only_a": 554,
-      "only_b": 374,
+      "a": "b_reglas-hdm",
+      "b": "b_reglas-tablas",
+      "mcnemar_p": 5.2111323808873664e-95,
+      "only_a": 1465,
+      "only_b": 552,
       "fields": 7452
     }
   ],
   "pareto": [
+    "d_hibrido-detector",
+    "d_hibrido-geometria",
+    "b_reglas+ocr",
     "b_reglas",
+    "b_reglas-hdm",
     "b_reglas-tablas"
   ],
   "recommendation": {
     "vectorial": "b_reglas",
-    "escaneado": "b_reglas",
-    "rationale": "Elegida por mayor Puntuación GA2MODEL entre las variantes que cumplen alucinación < 1 % y cita = 100 %, sobre S-dev y S-reservado (sintéticos). vectorial: b_reglas (puntuación 0,440, geometría 10,0 %, atributos 75,6 %); escaneado: b_reglas (puntuación 0,327, geometría 0,0 %, atributos 67,5 %)."
+    "escaneado": "d_hibrido",
+    "rationale": "Elegida por mayor Puntuación GA2MODEL entre las variantes que cumplen alucinación < 1 % y cita = 100 %, sobre S-dev (sintético). vectorial: b_reglas (puntuación 0,998, geometría 99,6 %, atributos 100,0 %); escaneado: d_hibrido (puntuación 0,628, geometría 35,1 %, atributos 98,4 %).",
+    "selector": {
+      "fixed_on": "S-dev",
+      "rule": {
+        "vectorial": "b_reglas",
+        "escaneado_limpio": "d_hibrido",
+        "escaneado_pobre": "d_hibrido"
+      },
+      "s_reservado": {
+        "score": 0.4763,
+        "geometry": 0.0819,
+        "attributes": 0.8073,
+        "ece": 0.057,
+        "f1_delta": 0.2971,
+        "hallucination_rate": 0.0,
+        "citation_coverage": 1.0,
+        "interval_coverage": 0.8617,
+        "cost_eur_per_equipment": 0.0,
+        "seconds_per_revision": 2.5581
+      },
+      "best_single": {
+        "id": "d_hibrido",
+        "score": 0.6246
+      }
+    }
+  },
+  "calibration": {
+    "fitted_on": "S-dev",
+    "sha256": "5496cf49cbe426d15ad807a662ce0aa26cb3454540b2b4b047ce3c8d3f0d66ec"
   }
 }

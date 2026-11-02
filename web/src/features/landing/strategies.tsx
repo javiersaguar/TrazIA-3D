@@ -1,108 +1,27 @@
 "use client";
-
-import { motion } from "motion/react";
-
-import { CountUp } from "@/components/motion/count-up";
-import { EASE_OUT } from "@/components/motion/reveal";
-import { cn } from "@/lib/cn";
-
-/*
-  Las cuatro estrategias, como una tabla de revisiones de plano. Solo B tiene cifras publicadas
-  (docs/ESTUDIO.md, estudio 1 del 26/10/2026, datos sintéticos); A, C y D se miden en la fase 2 y
-  aquí no se inventa ningún número.
-*/
-
-type Metric = { label: string; value: number; decimals?: number; suffix?: string };
-
-const B_METRICS: Metric[] = [
-  { label: "Puntuación", value: 0.37, decimals: 3 },
-  { label: "Atributos", value: 70.2, decimals: 1, suffix: " %" },
-  { label: "Geometría", value: 3.3, decimals: 1, suffix: " %" },
-  { label: "Alucinación", value: 0, suffix: " %" },
-  { label: "Cita correcta", value: 100, suffix: " %" },
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+import study from "@/lib/data/study-summary.json";
+const rows=[
+ {id:"A",variant:"a_geometria",name:"Visión + 3D",text:"Geometría desde los trazos, escala desde cotas y cruce de alzado y planta.",scope:"Variante geométrica sin modelo multimodal; Qwen se midió en otro subconjunto."},
+ {id:"B",variant:"b_reglas+ocr",name:"Datos + reglas",text:"Texto, tablas, cotas, cajetín y hoja de datos, con OCR para los escaneados.",scope:"B con OCR en CPU."},
+ {id:"C",variant:"c_rag",name:"RAG",text:"Recupera una plantilla y busca la evidencia en el documento actual.",scope:"Recuperación por huella ligera; ColQwen2 permanece desactivado."},
+ {id:"D",variant:"d_hibrido",name:"Híbrido",text:"Combina reglas, recuperación, geometría y memoria con fusión aprendida.",scope:"Fusión aprendida y calibración v6."},
 ];
-
-const ROWS: { id: string; name: string; text: string; metrics?: Metric[] }[] = [
-  { id: "A", name: "Visión + 3D", text: "Saca la geometría de los trazos del dibujo. Las cotas solo fijan la escala y nombran las boquillas." },
-  {
-    id: "B",
-    name: "Datos + reglas",
-    text: "Lee texto, tablas, cotas, cajetín y hoja de datos, sin aprendizaje. Nunca inventa: si falla, el campo queda vacío.",
-    metrics: B_METRICS,
-  },
-  { id: "C", name: "RAG", text: "Busca un equipo aprobado parecido y hereda dónde mirar. Un valor de la biblioteca nunca entra sin evidencia del plano actual." },
-  {
-    id: "D",
-    name: "Híbrido",
-    text: "Cascada de lo barato a lo caro: B, la plantilla de C, la memoria de la revisión anterior y la geometría de A como control.",
-  },
-];
-
-export function Strategies() {
-  return (
-    <section id="estrategias" aria-labelledby="estrategias-titulo" className="mx-auto w-full max-w-[1240px] scroll-mt-20 px-5 py-24 md:px-8 md:py-32">
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-end">
-        <h2 id="estrategias-titulo" className="landing-display text-[clamp(32px,4.2vw,56px)] leading-[1] text-strong">
-          Cuatro maneras de leer un plano
-        </h2>
-        <p className="max-w-[56ch] text-[16px] leading-relaxed text-muted">
-          Las cuatro estrategias del reto se comparan con el mismo banco de pruebas. Se queda la que diga el dato, no la
-          más llamativa.
-        </p>
-      </div>
-
-      <div className="mt-12 overflow-hidden rounded-[16px] border border-border bg-surface">
-        <div className="hidden grid-cols-[72px_minmax(0,1fr)_minmax(0,1.15fr)] border-b border-border px-5 py-2.5 text-[12px] text-faint md:grid">
-          <span>Estrategia</span>
-          <span>Cómo lee</span>
-          <span>Medido en el banco de pruebas</span>
-        </div>
-        <ul>
-          {ROWS.map((r, i) => (
-            <motion.li
-              key={r.id}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.5, delay: i * 0.07, ease: EASE_OUT }}
-              className={cn(
-                "grid gap-4 border-b border-border px-5 py-6 last:border-b-0 md:grid-cols-[72px_minmax(0,1fr)_minmax(0,1.15fr)] md:items-start",
-                r.metrics && "bg-surface-raised/60",
-              )}
-            >
-              <span
-                className={cn(
-                  "flex size-10 items-center justify-center rounded-full border font-mono text-[15px]",
-                  r.metrics ? "border-accent text-accent-text" : "border-border-strong text-muted",
-                )}
-              >
-                {r.id}
-              </span>
-              <div>
-                <h3 className="text-[16px] font-semibold text-strong">{r.name}</h3>
-                <p className="mt-1.5 max-w-[52ch] text-[14.5px] leading-relaxed text-muted">{r.text}</p>
-              </div>
-              {r.metrics ? (
-                <div>
-                  <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-5">
-                    {r.metrics.map((m) => (
-                      <div key={m.label}>
-                        <dt className="text-[12px] text-faint">{m.label}</dt>
-                        <dd className="mt-0.5 text-[20px] font-semibold text-strong tabular-nums">
-                          <CountUp value={m.value} decimals={m.decimals} suffix={m.suffix} />
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                  <p className="mt-3 text-[12px] text-warning">Estudio 1, 26/10/2026. Datos sintéticos, no planos del organizador.</p>
-                </div>
-              ) : (
-                <p className="text-[14px] text-faint md:pt-1">Se mide en el estudio de la fase 2.</p>
-              )}
-            </motion.li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
+const fmt=(v:number|null|undefined,d=3)=>v==null?"Sin medir":v.toLocaleString("es-ES",{minimumFractionDigits:d,maximumFractionDigits:d});
+const pct=(v:number|null|undefined)=>v==null?"Sin medir":`${fmt(v*100,1)} %`;
+export function Strategies(){
+ const [hovered,setHovered]=useState<string|null>(null);
+ const [focused,setFocused]=useState<string|null>(null);
+ const active=hovered??focused;
+ return <section id="estrategias" aria-labelledby="estrategias-titulo" className="relative z-[2] mx-auto w-full max-w-[1240px] scroll-mt-20 px-5 py-24 md:px-8 md:py-32">
+  <div className="grid gap-6 lg:grid-cols-2"><h2 id="estrategias-titulo" className="landing-display text-[clamp(32px,4.2vw,56px)] leading-none text-strong">Cuatro maneras de leer un plano</h2><div><p className="text-base leading-relaxed text-muted">Las mismas entradas, cuatro enfoques. Explora cada opción para consultar sus métricas y el alcance de la medición.</p><p className="mt-3 text-xs text-warning">{study.study} · {study.generated_at.slice(0,10).split("-").reverse().join("/")} · Datos sintéticos · no planos de TR</p></div></div>
+  <div className="mt-10 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">{rows.map(row=>{
+   const v=study.variants.find(v=>v.id===row.variant)!,m=v.metrics,expanded=active===row.id;
+   return <div key={row.id} onMouseEnter={()=>setHovered(row.id)} onMouseLeave={()=>setHovered(null)} onFocus={()=>setFocused(row.id)} onBlur={e=>{if(!e.currentTarget.contains(e.relatedTarget))setFocused(null);}} onKeyDown={e=>{if(e.key==="Escape"){setHovered(null);setFocused(null);}}} className={expanded?"bg-surface-raised":""}>
+    <button type="button" aria-expanded={expanded} aria-controls={`metrics-${row.id}`} onClick={()=>setFocused(row.id)} className="flex w-full items-start gap-5 p-5 text-left md:items-center md:p-7"><span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-accent font-mono text-accent-text">{row.id}</span><span className="min-w-0 flex-1"><strong className="text-base text-strong">{row.name}</strong><span className="mt-1 block text-sm leading-relaxed text-muted">{row.text}</span></span><span className="text-right"><span className="block text-xs text-muted">Puntuación</span><strong className="font-mono text-xl text-strong">{fmt(m.score)}</strong></span><ChevronDown className="mt-1 size-4 shrink-0 text-muted"/></button>
+    <div id={`metrics-${row.id}`} hidden={!expanded} className="border-t border-border px-6 py-5 md:pl-[100px]"><dl className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">{[["Atributos",pct(m.attributes)],["Geometría",pct(m.geometry)],["Alucinación",pct(m.hallucination_rate)],["Cita correcta",pct(m.citation_coverage)],["F1 de cambios",fmt(m.f1_delta)],["Cobertura de intervalos",pct(m.interval_coverage)],["API · €/equipo",fmt(m.cost_eur_per_equipment,4)],["ECE",fmt(m.ece)],["Segundos/revisión",fmt(m.seconds_per_revision,2)]].map(([label,value])=><div key={label}><dt className="text-xs text-muted">{label}</dt><dd className="mt-1 font-mono text-lg text-strong">{value}</dd></div>)}</dl><p className="mt-4 text-xs text-muted">IC95 de puntuación: [{fmt(v.ci95.score[0])}; {fmt(v.ci95.score[1])}]. {row.scope} Conjuntos: {study.datasets.join(", ")}. La puntuación geométrica no es el porcentaje de IFC aprobados. El coste de proveedores excluye cómputo y revisión.</p></div>
+   </div>;
+  })}</div>
+ </section>;
 }

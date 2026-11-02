@@ -1,180 +1,36 @@
 "use client";
-
-import { motion } from "motion/react";
-import type { ReactNode } from "react";
-
+import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
+import { useMotionPreference } from "@/lib/use-motion-preference";
+import { useRef } from "react";
 import { DrawPath } from "@/components/motion/draw-path";
-import { EASE_OUT } from "@/components/motion/reveal";
-
-/*
-  Cuatro pasos reales, en orden. Los globos numerados y la línea de cota que los une salen del
-  lenguaje de los planos: aquí sí hay una secuencia.
-*/
-
-const ink = { stroke: "var(--sheet-ink)", strokeWidth: 1.2, fill: "none", vectorEffect: "non-scaling-stroke" as const, strokeLinejoin: "round" as const };
-const thin = { stroke: "var(--sheet-thin)", strokeWidth: 0.8, fill: "none", vectorEffect: "non-scaling-stroke" as const };
-const sky = { stroke: "var(--accent)", strokeWidth: 1.3, fill: "none", vectorEffect: "non-scaling-stroke" as const, strokeLinejoin: "round" as const };
-const rev = { stroke: "var(--revision)", strokeWidth: 1.3, fill: "none", vectorEffect: "non-scaling-stroke" as const, strokeLinejoin: "round" as const };
-
-function Pop({ delay, children }: { delay: number; children: ReactNode }) {
-  return (
-    <motion.g initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.4, delay, ease: "easeOut" }}>
-      {children}
-    </motion.g>
-  );
-}
-
-function PlanArt() {
-  return (
-    <svg viewBox="0 0 200 130" className="h-full w-full" aria-hidden>
-      <DrawPath inView d="M14 10 H186 V120 H14 Z M20 16 H180 V114 H20 Z" {...thin} duration={0.8} />
-      <DrawPath inView d="M70 28 A14 7 0 0 1 98 28 V86 M70 28 V86 M70 86 A14 7 0 0 0 98 86 M70 86 V104 M98 86 V104 M64 104 H104" {...ink} delay={0.2} duration={1} />
-      <DrawPath inView d="M84 20 V110" {...thin} strokeDasharray="8 2 2 2" delay={0.4} />
-      <DrawPath inView d="M124 84 H180 M124 94 H180 M124 104 H180 M124 84 V114 M150 84 V114" {...thin} delay={0.7} duration={0.6} />
-      <DrawPath inView d="M104 34 H116 M104 86 H116 M112 34 V86" {...thin} delay={0.9} duration={0.5} />
-    </svg>
-  );
-}
-
-function EvidenceArt() {
-  return (
-    <svg viewBox="0 0 200 130" className="h-full w-full" aria-hidden>
-      <DrawPath inView d="M30 40 V18 M110 40 V18 M30 24 H110" {...thin} duration={0.6} />
-      <DrawPath inView d="M30 40 V110 M110 40 V110" {...ink} delay={0.1} duration={0.8} />
-      <Pop delay={0.5}>
-        <text x={70} y={20} textAnchor="middle" className="font-mono" fontSize={10} fill="var(--text-muted)">
-          Ø2000
-        </text>
-      </Pop>
-      <DrawPath inView d="M52 8 H88 V27 H52 Z" {...sky} strokeDasharray="3 2" delay={0.75} duration={0.5} />
-      <DrawPath inView d="M88 18 C120 18 118 66 132 66" {...sky} delay={1.0} duration={0.5} />
-      <Pop delay={1.3}>
-        <rect x={132} y={54} width={60} height={34} rx={6} fill="var(--surface-raised)" stroke="var(--border-strong)" />
-        <text x={140} y={68} className="font-mono" fontSize={9} fill="var(--text)">
-          2000 mm
-        </text>
-        <rect x={140} y={75} width={44} height={3} rx={1.5} fill="var(--border)" />
-      </Pop>
-      <motion.rect
-        x={140}
-        y={75}
-        height={3}
-        rx={1.5}
-        fill="var(--accent)"
-        initial={{ width: 0 }}
-        whileInView={{ width: 40 }}
-        viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: 0.6, delay: 1.5, ease: EASE_OUT }}
-      />
-    </svg>
-  );
-}
-
-function ModelArt() {
-  return (
-    <svg viewBox="0 0 200 130" className="h-full w-full" aria-hidden>
-      <Pop delay={0.9}>
-        <path d="M76 28 A24 9 0 0 1 124 28 V100 A24 9 0 0 1 76 100 Z" fill="var(--accent-soft)" />
-      </Pop>
-      <DrawPath inView d="M76 28 A24 9 0 0 1 124 28 A24 9 0 0 1 76 28 Z" {...sky} duration={0.6} />
-      <DrawPath inView d="M76 28 V100 M124 28 V100" {...sky} delay={0.3} duration={0.6} />
-      <DrawPath inView d="M76 100 A24 9 0 0 0 124 100" {...sky} delay={0.55} duration={0.4} />
-      <DrawPath inView d="M76 100 A24 9 0 0 1 124 100" {...thin} strokeDasharray="3 2" delay={0.6} duration={0.4} />
-      <DrawPath inView d="M76 28 A24 18 0 0 1 124 28" {...sky} delay={0.7} duration={0.4} />
-      <DrawPath inView d="M124 62 H140 M140 56 V68" {...sky} delay={0.85} duration={0.3} />
-      <Pop delay={1.1}>
-        <text x={150} y={118} className="font-mono" fontSize={9} fill="var(--text-faint)">
-          IFC4
-        </text>
-      </Pop>
-    </svg>
-  );
-}
-
-function ChangesArt() {
-  return (
-    <svg viewBox="0 0 200 130" className="h-full w-full" aria-hidden>
-      <DrawPath inView d="M40 40 A16 6 0 0 1 72 40 V108 M40 40 V108 M36 108 H76" {...thin} duration={0.8} />
-      <Pop delay={0.3}>
-        <text x={56} y={124} textAnchor="middle" className="font-mono" fontSize={9} fill="var(--text-faint)">
-          A
-        </text>
-      </Pop>
-      <DrawPath inView d="M118 28 A16 6 0 0 1 150 28 V108 M118 28 V108 M114 108 H154" {...rev} delay={0.5} duration={0.9} />
-      <Pop delay={0.9}>
-        <text x={134} y={124} textAnchor="middle" className="font-mono" fontSize={9} fill="var(--revision)">
-          B
-        </text>
-      </Pop>
-      <DrawPath inView d="M76 40 H114 M76 28 H114" {...thin} strokeDasharray="2 3" delay={1.0} duration={0.5} />
-      <DrawPath inView d="M100 40 V28" {...rev} delay={1.3} duration={0.3} />
-      <Pop delay={1.45}>
-        <text x={160} y={38} className="font-mono" fontSize={9.5} fill="var(--revision)">
-          +500
-        </text>
-      </Pop>
-    </svg>
-  );
-}
-
-const STEPS = [
-  {
-    title: "Plano",
-    text: "Subes el PDF del plano GA. Se leen el texto, las tablas, las cotas y el cajetín; si no hay capa de texto, entra el OCR.",
-    art: <PlanArt />,
-  },
-  {
-    title: "Evidencia",
-    text: "Cada campo guarda su valor, su unidad, la zona del plano de la que sale y la confianza de la lectura.",
-    art: <EvidenceArt />,
-  },
-  {
-    title: "Modelo",
-    text: "Con los campos revisados se genera el IFC. El visor enseña esa geometría, no un dibujo aparte.",
-    art: <ModelArt />,
-  },
-  {
-    title: "Cambios",
-    text: "Con una revisión nueva, compara A y B: qué cambió, cuánto y dónde, en el plano y en 3D.",
-    art: <ChangesArt />,
-  },
+const steps=[
+ {title:"Plano",text:"Sube el plano GA y sus hojas de datos. Se leen texto, tablas y cotas; el OCR entra cuando el documento está escaneado."},
+ {title:"Evidencia",text:"Cada valor conserva unidad, página, región y confianza. Puedes volver al recorte que explica la lectura."},
+ {title:"Modelo",text:"La geometría IFC queda como borrador. Una persona contrasta los campos y resuelve lo que falta antes de aprobar."},
+ {title:"Cambios",text:"Una nueva revisión muestra dónde cambia el equipo, cuánto cambia y qué disciplinas se ven afectadas."},
 ];
-
-export function HowItWorks() {
-  return (
-    <section id="como-funciona" aria-labelledby="como-titulo" className="mx-auto w-full max-w-[1240px] scroll-mt-20 px-5 py-24 md:px-8 md:py-32">
-      <div className="max-w-[60ch]">
-        <h2 id="como-titulo" className="landing-display text-[clamp(32px,4.2vw,56px)] leading-[1] text-strong">
-          Cómo funciona
-        </h2>
-        <p className="mt-4 text-[16px] leading-relaxed text-muted">Cuatro pasos, del PDF al modelo que revisa una persona.</p>
-      </div>
-
-      <div className="relative mt-14">
-        {/* Línea de cota que une los cuatro globos */}
-        <svg aria-hidden className="pointer-events-none absolute top-[15px] right-[calc(25%-16px)] left-4 hidden h-3 overflow-visible lg:block" preserveAspectRatio="none" viewBox="0 0 100 12">
-          <DrawPath inView d="M0 6 H100" stroke="var(--sheet-thin)" strokeWidth={0.8} vectorEffect="non-scaling-stroke" fill="none" duration={1.2} />
-        </svg>
-        <ol className="grid gap-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-          {STEPS.map((s, i) => (
-            <motion.li
-              key={s.title}
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.55, delay: i * 0.08, ease: EASE_OUT }}
-              className="relative"
-            >
-              <span className="relative z-[1] flex size-8 items-center justify-center rounded-full border border-accent bg-bg font-mono text-[13px] text-accent-text">
-                {i + 1}
-              </span>
-              <h3 className="mt-5 text-[17px] font-semibold text-strong">{s.title}</h3>
-              <p className="mt-2 max-w-[38ch] text-[14.5px] leading-relaxed text-muted">{s.text}</p>
-              <div className="drafting-grid mt-6 aspect-[20/13] overflow-hidden rounded-[12px] border border-border">{s.art}</div>
-            </motion.li>
-          ))}
-        </ol>
-      </div>
-    </section>
-  );
+const vessel="M70 34 C70 12 126 12 126 34 L126 100 C126 122 70 122 70 100 Z";
+function Art({step}:{step:number}) {
+ const color=step===2?"var(--accent)":"var(--sheet-ink)";
+ return <svg viewBox="0 0 220 150" className="h-full w-full" role="img" aria-label={["Plano de recipiente acotado","Cota conectada a su lectura","Recipiente IFC con boquillas","Dos revisiones y una variación de altura"][step]}>
+  <g fill="none" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+   {step===0?<><rect x="12" y="10" width="196" height="130" stroke="var(--sheet-thin)"/><path d="M12 118H208M140 118V140M175 118V140M140 129H208" stroke="var(--sheet-thin)"/></>:null}
+   {step<3?<><DrawPath inView d={vessel} stroke={color} fill={step===2?"var(--accent-soft)":"none"} duration={.8}/><DrawPath inView d="M70 95V123H126V95M62 123H134M126 65H148V56H153V74H148M70 84H52V78H47V91H52" stroke={color} duration={.8} delay={.15}/><path d="M98 9V130" stroke="var(--sheet-thin)" strokeDasharray="6 3 1 3"/></>:null}
+   {step===0||step===1?<><path d="M70 25V9M126 25V9M70 14H126M64 14L70 12V16ZM132 14L126 12V16Z" stroke="var(--accent)"/><text x="98" y="8" fill="var(--text)" stroke="none" fontSize="8" textAnchor="middle">Ø2000</text></>:null}
+   {step===1?<><rect x="64" y="3" width="68" height="19" rx="3" stroke="var(--accent)" strokeDasharray="3 2"/><DrawPath inView d="M132 14C172 14 150 52 168 52" stroke="var(--accent)" delay={.3}/><rect x="146" y="53" width="66" height="42" rx="6" stroke="var(--border-strong)" fill="var(--surface)"/><text x="179" y="70" fill="var(--text)" stroke="none" fontSize="9" textAnchor="middle">2000 mm</text><path d="M154 82H202" stroke="var(--accent)" strokeWidth="3"/></>:null}
+   {step===2?<><path d="M70 34C70 44 126 44 126 34M70 100C70 110 126 110 126 100" stroke="var(--accent)"/><text x="164" y="133" fill="var(--text-muted)" stroke="none" fontSize="9">IFC4</text><circle cx="151" cy="65" r="7" stroke="var(--accent)"/></>:null}
+   {step===3?<><DrawPath inView d="M36 50C36 32 88 32 88 50V119H36ZM31 119H93" stroke="var(--sheet-ink)"/><DrawPath inView d="M132 30C132 12 184 12 184 30V119H132ZM127 119H189" stroke="var(--revision)" delay={.2}/><path d="M90 30H123M90 50H123M115 30V50M111 34L115 30L119 34M111 46L115 50L119 46" stroke="var(--revision)"/><text x="97" y="71" fill="var(--revision)" stroke="none" fontSize="9">+500 mm</text><text x="62" y="136" fill="var(--text-muted)" stroke="none" fontSize="10">A</text><text x="158" y="136" fill="var(--revision)" stroke="none" fontSize="10">B</text></>:null}
+  </g>
+ </svg>;
+}
+function Step({index,progress}:{index:number;progress:MotionValue<number>}) {
+ const reduce=useMotionPreference(),opacity=useTransform(progress,[index*.13,index*.13+.22],[.15,1]);
+ const transform=useTransform(progress,[index*.13,index*.13+.22],["translateY(18px)","translateY(0px)"]);
+ const step=steps[index]!;
+ return <li className="process-step relative min-w-0"><span className="relative z-[2] flex size-8 items-center justify-center rounded-full border border-accent bg-bg font-mono text-sm text-accent-text">{index+1}</span><h3 className="mt-5 text-lg font-semibold text-strong">{step.title}</h3><p className="mt-2 min-h-[100px] text-sm leading-relaxed text-muted">{step.text}</p><motion.div style={{opacity:reduce?1:opacity,transform:reduce?"none":transform}} className="drafting-grid mt-5 max-lg:max-w-[520px] aspect-[22/15] overflow-hidden rounded-xl border border-border"><Art step={index}/></motion.div></li>;
+}
+export function HowItWorks(){
+ const ref=useRef<HTMLElement>(null),reduce=useMotionPreference();
+ const {scrollYProgress}=useScroll({target:ref,offset:["start 90%","end 70%"]});
+ return <section ref={ref} id="como-funciona" aria-labelledby="como-titulo" className="relative z-[2] mx-auto w-full max-w-[1240px] scroll-mt-20 px-5 py-24 md:px-8 md:py-32"><h2 id="como-titulo" className="landing-display text-[clamp(32px,4.2vw,56px)] leading-none text-strong">Cómo funciona</h2><p className="mt-4 text-base text-muted">Cuatro pasos, del PDF al modelo que revisa una persona.</p><div className="relative mt-14"><div aria-hidden className="absolute top-4 right-[calc(25%-40px)] left-4 hidden h-px bg-border-strong lg:block"><motion.div className="absolute inset-0 origin-left bg-accent" style={{scaleX:reduce?1:scrollYProgress}}/></div><ol className="grid gap-12 lg:grid-cols-4 lg:gap-8">{steps.map((s,i)=><Step key={s.title} index={i} progress={scrollYProgress}/>)}</ol></div></section>;
 }

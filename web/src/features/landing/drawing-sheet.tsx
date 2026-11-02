@@ -548,6 +548,7 @@ export function DrawingSheet({
               }}
             >
               <ShowcaseVessel
+                rotationControl={false}
                 mode="particles"
                 interactive
                 hud={false}

@@ -621,9 +621,11 @@ export function SceneCanvas({
   label,
   rotating: controlledRotating,
   onRotationChange,
+  rotationControl = true,
 }: {
   children: ReactNode;
   label: string;
+  rotationControl?: boolean;
   rotating?: boolean;
   onRotationChange?(value: boolean): void;
 }) {
@@ -682,7 +684,7 @@ export function SceneCanvas({
           </Selection>
         </Canvas>
         <div ref={portal} className={styles.labels} />
-        <button type="button" className={`${styles.button} ${styles.orbit}`} disabled={!!reduce}
+        {rotationControl ? <button type="button" className={`${styles.button} ${styles.orbit}`} disabled={!!reduce}
           aria-label={rotating && !reduce ? "Pausar giro de cámara 360°" : "Activar giro de cámara 360°"}
           aria-pressed={rotating && !reduce}
           title={reduce ? "Giro desactivado por movimiento reducido" : "Una vuelta por minuto · pausa al arrastrar"}
@@ -690,7 +692,7 @@ export function SceneCanvas({
           onPointerUp={event => event.stopPropagation()}
           onClick={event => { event.stopPropagation(); setRotating(!rotating); }}>
           {rotating && !reduce ? <Pause /> : <Play />} 360°
-        </button>
+        </button> : null}
       </RenderBoundary>
     </div>
   );

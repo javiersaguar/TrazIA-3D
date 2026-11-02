@@ -418,3 +418,10 @@
     transform: translateX(-8px);
   }
 }
+
+.landing-spotlight { background: radial-gradient(circle, rgb(42 168 242 / .16), rgb(42 168 242 / .05) 40%, transparent 70%); }
+[data-theme="light"] .landing-spotlight { background: radial-gradient(circle, rgb(3 87 147 / .25), rgb(3 87 147 / .09) 40%, transparent 70%); mix-blend-mode: multiply; }
+
+@media (max-width: 1023px) { .process-step:not(:last-child)::after { content:""; position:absolute; left:15px; top:32px; bottom:-48px; width:1px; background:var(--border-strong); z-index:-1; } .process-step > h3,.process-step > p,.process-step > div { margin-left:48px; } }
+
+@media (prefers-reduced-motion: reduce) { .process-step > div { opacity:1 !important; transform:none !important; } }

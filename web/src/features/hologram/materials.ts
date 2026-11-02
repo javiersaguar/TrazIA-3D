@@ -1,4 +1,4 @@
-import { AdditiveBlending, Color, DoubleSide, MeshPhysicalMaterial, ShaderMaterial } from "three";
+import { AdditiveBlending, NormalBlending, Color, DoubleSide, MeshPhysicalMaterial, ShaderMaterial } from "three";
 import { BRAND } from "@/lib/brand";
 import type { Finish } from "../showcase3d/equipment-geometry";
 import { brushedTextures } from "../viewer3d/brushed-textures";
@@ -6,10 +6,10 @@ import { brushedTextures } from "../viewer3d/brushed-textures";
 export const scanProgress = (value: number) => Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0;
 export const scanHeight = (min: number, max: number, value: number) => min + (max - min) * scanProgress(value);
 
-export function createHologram(minY: number, maxY: number) {
+export function createHologram(minY: number, maxY: number, light = false) {
   return new ShaderMaterial({
-    transparent: true, depthWrite: false, side: DoubleSide, blending: AdditiveBlending,
-    uniforms: { uColor: { value: new Color(BRAND.hologram) }, uTime: { value: 0 },
+    transparent: true, depthWrite: false, side: DoubleSide, blending: light ? NormalBlending : AdditiveBlending,
+    uniforms: { uColor: { value: new Color(light ? BRAND.skyDeep : BRAND.hologram) }, uTime: { value: 0 },
       uProgress: { value: 0 }, uMin: { value: minY }, uMax: { value: maxY } },
     vertexShader: `
       varying vec3 vWorld; varying vec3 vNormal; varying vec3 vView;

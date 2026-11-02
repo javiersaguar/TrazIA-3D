@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion, type SVGMotionProps } from "motion/react";
+import { motion, type SVGMotionProps } from "motion/react";
 import { useId } from "react";
+import { useMotionPreference } from "@/lib/use-motion-preference";
 
 type DrawPathProps = SVGMotionProps<SVGPathElement> & {
   /** Retraso en segundos. */
@@ -20,14 +21,14 @@ type DrawPathProps = SVGMotionProps<SVGPathElement> & {
  *   servidor y el del cliente coincidan al hidratar.
  */
 export function DrawPath({ delay = 0, duration = 0.9, inView = false, strokeDasharray, ...props }: DrawPathProps) {
-  const reduced = useReducedMotion();
+  const reduced = useMotionPreference();
   const maskId = `dp${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
 
   const shown = { pathLength: 1, opacity: 1 };
   const transition = reduced
     ? { duration: 0 }
     : { pathLength: { duration, delay, ease: [0.65, 0, 0.35, 1] as const }, opacity: { duration: 0.01, delay } };
-  const trigger = inView ? { whileInView: shown, viewport: { once: true, margin: "-60px" } } : { animate: shown };
+  const trigger = inView && !reduced ? { whileInView: shown, viewport: { once: true, margin: "-60px" } } : { animate: shown };
 
   if (strokeDasharray == null) {
     return <motion.path initial={{ pathLength: 0, opacity: 0 }} transition={transition} {...trigger} {...props} />;

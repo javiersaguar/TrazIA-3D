@@ -104,9 +104,9 @@ export function LandingPage({ fontClassName }: { fontClassName?: string }) {
       <IntroOverlay playing={playing} flew={flew} onFinish={finish} />
       <LandingHeader flew={flew} />
 
+      <Spotlight size={680} />
       <main>
         <section aria-labelledby="hero-titulo" className="relative overflow-hidden">
-          <Spotlight size={680} />
           <div
             aria-hidden
             className="landing-paper pointer-events-none absolute inset-0 opacity-70 [mask-image:radial-gradient(65%_70%_at_72%_35%,#000,transparent)]"

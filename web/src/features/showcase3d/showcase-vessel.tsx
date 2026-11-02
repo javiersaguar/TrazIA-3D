@@ -1,4 +1,5 @@
 "use client";
+import { useTheme } from "next-themes";
 
 import Image from "next/image";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -21,7 +22,7 @@ export const EQUIPMENT_LABELS: Record<EquipmentKind, string> = {
 export type ShowcaseVesselProps = {
   kind?: EquipmentKind; mode?: "particles" | "hologram" | "real"; interactive?: boolean;
   onKindChange?(kind: EquipmentKind): void; hud?: boolean; className?: string;
-  measureKey?: number; onMeasure?(sample: PerformanceSample): void;
+  measureKey?: number; onMeasure?(sample: PerformanceSample): void; rotationControl?: boolean;
 };
 export type EquipmentThumbProps = { kind: EquipmentKind; size?: number };
 
@@ -42,12 +43,13 @@ function EquipmentScene({ kind, mode, interactive, onBearing, measureKey, onMeas
   kind: EquipmentKind; mode: "particles" | "hologram" | "real"; interactive: boolean;
   onBearing(value: string): void; measureKey?: number; onMeasure?(sample: PerformanceSample): void;
 }) {
+  const { resolvedTheme } = useTheme();
   const model = useMemo(() => equipmentGeometry(kind), [kind]);
   useEffect(() => retainEquipment(kind), [kind]);
   const reduce = useReducedMotion();
   const camera = useRef<CameraHandle>(null);
   const bounds = useMemo(() => ({ min: model.bounds.min.toArray() as [number,number,number], max: model.bounds.max.toArray() as [number,number,number] }), [model]);
-  const hologram = useMemo(() => createHologram(model.bounds.min.y, model.bounds.max.y), [model]);
+  const hologram = useMemo(() => createHologram(model.bounds.min.y, model.bounds.max.y, resolvedTheme === "light"), [model, resolvedTheme]);
   const shader = useRef<typeof hologram | null>(null), invalidate = useThree(s => s.invalidate);
   useEffect(() => { shader.current = hologram; }, [hologram]);
   useFrame((_, delta) => {
@@ -66,7 +68,7 @@ function EquipmentScene({ kind, mode, interactive, onBearing, measureKey, onMeas
   </>;
 }
 
-export function ShowcaseVessel({ kind, mode = "real", interactive = true, onKindChange, hud = true, className, measureKey, onMeasure }: ShowcaseVesselProps) {
+export function ShowcaseVessel({ kind, mode = "real", interactive = true, onKindChange, hud = true, className, measureKey, onMeasure, rotationControl = true }: ShowcaseVesselProps) {
   const [localKind, setKind] = useState<EquipmentKind>("vertical");
   const current = kind ?? localKind;
   const bearing = useRef<HTMLSpanElement>(null), pointer = useRef({ x: 0, y: 0 });
@@ -76,7 +78,7 @@ export function ShowcaseVessel({ kind, mode = "real", interactive = true, onKind
       onPointerUp={e => {
         if (interactive && Math.hypot(e.clientX - pointer.current.x, e.clientY - pointer.current.y) < 4) select(EQUIPMENT_KINDS[(EQUIPMENT_KINDS.indexOf(current) + 1) % EQUIPMENT_KINDS.length]!);
       }}>
-      <SceneCanvas label={`${EQUIPMENT_LABELS[current]} ilustrativo, no procede de un IFC`}>
+      <SceneCanvas rotationControl={rotationControl} label={`${EQUIPMENT_LABELS[current]} ilustrativo, no procede de un IFC`}>
         <EquipmentScene kind={current} mode={mode} interactive={interactive} onBearing={value => { if (bearing.current) bearing.current.textContent = value; }} measureKey={measureKey} onMeasure={onMeasure} />
       </SceneCanvas>
     </div>

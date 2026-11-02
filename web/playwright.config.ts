@@ -28,7 +28,7 @@ export default defineConfig({
     launchOptions: cpuOnly ? { args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"] } : undefined,
   },
   projects: [
-    { name: "humo", testMatch: /(?:humo|api|study|3d)\.spec\.ts/ },
+    { name: "humo", testMatch: /(?:humo|api|study|3d|producto)\.spec\.ts/ },
     { name: "capturas", testMatch: /capturas\.spec\.ts/ },
   ],
   webServer: [
