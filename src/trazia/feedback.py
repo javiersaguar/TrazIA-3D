@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import math
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
@@ -18,7 +19,12 @@ class Feedback:
     def sha256(self):
         return hashlib.sha256(
             json.dumps(
-                {"examples": self.examples, "priorities": self.priorities}, sort_keys=True
+                {
+                    "examples": self.examples,
+                    "priorities": self.priorities,
+                    "verified": self.verified,
+                },
+                sort_keys=True,
             ).encode()
         ).hexdigest()
 
@@ -37,7 +43,7 @@ def using(feedback):
 
 def extraction_prompt(spec):
     feedback = CURRENT.get()
-    if not feedback or not feedback.examples:
+    if not feedback or not feedback.verified or not feedback.examples:
         return spec.prompt, spec.prompt_sha256
     examples = []
     for example in feedback.examples[:3]:
@@ -60,11 +66,14 @@ def extraction_prompt(spec):
 
 def prioritize(candidates):
     feedback = CURRENT.get()
-    if not feedback or not feedback.priorities:
+    if not feedback or not feedback.verified or not feedback.priorities:
         return candidates
     result = []
     for candidate in candidates:
         factor = feedback.priorities.get(candidate.channel, 1.0)
+        if not isinstance(factor, (int, float)) or not math.isfinite(factor):
+            factor = 1.0
+        factor = min(1.15, max(0.85, factor))
         score = min(0.99, max(0.01, candidate.source.confidence * factor))
         result.append(
             candidate.model_copy(

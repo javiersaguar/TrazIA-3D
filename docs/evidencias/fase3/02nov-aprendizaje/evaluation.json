@@ -1,0 +1,1219 @@
+{
+  "synthetic_simulation": true,
+  "human_sessions": 0,
+  "activated": false,
+  "gpu": false,
+  "production_store_modified": false,
+  "input_sha256": "da9ea85b70734d8ccdb0d63aef882b1d488667f08e52495a5a9b6c28a951e170",
+  "baseline_metadata": {
+    "at": "2026-11-02T12:24:32.932780+00:00",
+    "source_tree_sha256": "cdb9ae9bfcad68d2bb2980573fa5c88c2951926bc91eeb88c94c1da42732f854",
+    "script_sha256": "7c2de2955ee070073c1770a2f055566dc3fc6cbe8f7c62052d619a0743b48e73",
+    "calibration_sha256": "5496cf49cbe426d15ad807a662ce0aa26cb3454540b2b4b047ce3c8d3f0d66ec",
+    "fusion_sha256": "a7d09074255ee78af4af3dd1cb7dd8f592e795c5000ebad560cc2a0415486d55",
+    "python": "3.12.16 (main, Oct 28 2026, 02:01:35) [GCC 12.2.0]",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.36",
+    "cuda_visible_devices": "-1",
+    "measurement_image": "trazia-plataforma:20261102-cpu-tests",
+    "source_overridden_by_readonly_mount": true,
+    "feedback_sha256": null,
+    "feedback_experimental_only": false
+  },
+  "evaluator_sha256": "4822aeb22f480b9da1a2ae1e0bee5ca3282ff5345ed74395aaea9cd658068411",
+  "train_equipment": [
+    "C-201",
+    "C-202",
+    "C-203",
+    "C-204",
+    "C-208",
+    "C-209",
+    "C-211",
+    "C-213",
+    "C-214",
+    "C-221",
+    "D-200",
+    "D-205",
+    "D-206",
+    "D-207",
+    "D-215",
+    "D-216",
+    "D-217",
+    "D-218",
+    "D-220",
+    "V-210",
+    "V-212",
+    "V-219",
+    "V-222",
+    "V-223"
+  ],
+  "test_equipment": [
+    "C-701",
+    "C-704",
+    "C-706",
+    "C-707",
+    "C-708",
+    "C-713",
+    "D-700",
+    "D-703",
+    "D-710",
+    "D-711",
+    "D-712",
+    "D-714",
+    "V-702",
+    "V-705",
+    "V-709",
+    "V-715"
+  ],
+  "train_fields": 2662,
+  "test_fields": 1328,
+  "shared_documents": 0,
+  "channel_priorities": {
+    "tabla": 1.076294,
+    "cota": 1.069701,
+    "cajetin": 1.055689,
+    "ocr": 1.007977,
+    "geometria": 0.85
+  },
+  "channel_statistics": {
+    "tabla": {
+      "fields": 1144,
+      "equipment": 24
+    },
+    "cota": {
+      "fields": 141,
+      "equipment": 24
+    },
+    "cajetin": {
+      "fields": 48,
+      "equipment": 24
+    },
+    "ocr": {
+      "fields": 1149,
+      "equipment": 24
+    },
+    "geometria": {
+      "fields": 180,
+      "equipment": 20
+    }
+  },
+  "examples": [
+    {
+      "synthetic_simulation": true,
+      "source": "synthetic ground truth, not human approval",
+      "path": "height",
+      "before": {
+        "value": 10550.0,
+        "unit": "mm"
+      },
+      "after": {
+        "value": 11000,
+        "unit": "mm"
+      },
+      "evidence_text": "10550"
+    },
+    {
+      "synthetic_simulation": true,
+      "source": "synthetic ground truth, not human approval",
+      "path": "head_depth",
+      "before": {
+        "value": 80.0,
+        "unit": "mm"
+      },
+      "after": {
+        "value": 375,
+        "unit": "mm"
+      },
+      "evidence_text": "80"
+    },
+    {
+      "synthetic_simulation": true,
+      "source": "synthetic ground truth, not human approval",
+      "path": "height",
+      "before": {
+        "value": 6700.0,
+        "unit": "mm"
+      },
+      "after": {
+        "value": 10400,
+        "unit": "mm"
+      },
+      "evidence_text": "6700"
+    }
+  ],
+  "baseline": {
+    "revisions": 96,
+    "statuses": {
+      "draft": 77,
+      "error": 19
+    },
+    "expected_fields": 2484,
+    "present_fields": 1329,
+    "correct_fields": 1100,
+    "precision_returned_fields": 0.8276899924755455,
+    "recall_correct_fields": 0.4428341384863124,
+    "drafts_all_geometry_correct": 47,
+    "drafts_all_fields_correct": 23,
+    "pipeline_seconds_sum": 747.5598697000387,
+    "external_calls": 0,
+    "cost_for_1600_engineering_valid_ifc": null,
+    "engineering_accuracy_verified": false
+  },
+  "calibration": {
+    "status": "insufficient",
+    "reason": "Faltan campos para ajuste y validación",
+    "activated": false,
+    "synthetic_simulation": true,
+    "human_sessions": 0,
+    "external_holdout_before": {
+      "d_hibrido": {
+        "fields": 1328,
+        "accuracy": 0.8283,
+        "ece_raw": 0.1235,
+        "ece_calibrated": 0.0913,
+        "interval_coverage": 0.9882,
+        "interval_coverage_by_kind": {
+          "deg": 0.9552,
+          "mm": 0.9944
+        },
+        "numeric_fields_without_interval": 0,
+        "numeric_fields_vague_interval": 383,
+        "abstention": {
+          "threshold": 0.2105,
+          "coverage": 0.7011,
+          "risk_kept": 0.0043,
+          "risk_without_abstention": 0.1717
+        },
+        "risk_coverage": [
+          {
+            "threshold": 0.0,
+            "coverage": 1.0,
+            "risk": 0.1717
+          },
+          {
+            "threshold": 0.05,
+            "coverage": 0.9842,
+            "risk": 0.1584
+          },
+          {
+            "threshold": 0.1,
+            "coverage": 0.9842,
+            "risk": 0.1584
+          },
+          {
+            "threshold": 0.15,
+            "coverage": 0.9405,
+            "risk": 0.1281
+          },
+          {
+            "threshold": 0.2,
+            "coverage": 0.9405,
+            "risk": 0.1281
+          },
+          {
+            "threshold": 0.25,
+            "coverage": 0.9187,
+            "risk": 0.1213
+          },
+          {
+            "threshold": 0.3,
+            "coverage": 0.8607,
+            "risk": 0.105
+          },
+          {
+            "threshold": 0.35,
+            "coverage": 0.8607,
+            "risk": 0.105
+          },
+          {
+            "threshold": 0.4,
+            "coverage": 0.8607,
+            "risk": 0.105
+          },
+          {
+            "threshold": 0.45,
+            "coverage": 0.8607,
+            "risk": 0.105
+          },
+          {
+            "threshold": 0.5,
+            "coverage": 0.8607,
+            "risk": 0.105
+          },
+          {
+            "threshold": 0.55,
+            "coverage": 0.8607,
+            "risk": 0.105
+          },
+          {
+            "threshold": 0.6,
+            "coverage": 0.8607,
+            "risk": 0.105
+          },
+          {
+            "threshold": 0.65,
+            "coverage": 0.7191,
+            "risk": 0.0042
+          },
+          {
+            "threshold": 0.7,
+            "coverage": 0.7191,
+            "risk": 0.0042
+          },
+          {
+            "threshold": 0.75,
+            "coverage": 0.7191,
+            "risk": 0.0042
+          },
+          {
+            "threshold": 0.8,
+            "coverage": 0.7191,
+            "risk": 0.0042
+          },
+          {
+            "threshold": 0.85,
+            "coverage": 0.7191,
+            "risk": 0.0042
+          },
+          {
+            "threshold": 0.9,
+            "coverage": 0.677,
+            "risk": 0.0044
+          },
+          {
+            "threshold": 0.95,
+            "coverage": 0.5745,
+            "risk": 0.0052
+          },
+          {
+            "threshold": 1.0,
+            "coverage": 0.0,
+            "risk": null
+          }
+        ],
+        "by_channel": {
+          "cota|vector": {
+            "fields": 30,
+            "accuracy": 1.0,
+            "confidence_raw": 0.9872,
+            "confidence": 0.9975
+          },
+          "geometria|scan": {
+            "fields": 267,
+            "accuracy": 0.4007,
+            "confidence_raw": 0.3526,
+            "confidence": 0.3877
+          },
+          "geometria|vector": {
+            "fields": 642,
+            "accuracy": 1.0,
+            "confidence_raw": 0.8285,
+            "confidence": 0.9128
+          },
+          "ocr|scan": {
+            "fields": 293,
+            "accuracy": 0.7679,
+            "confidence_raw": 0.8551,
+            "confidence": 0.8843
+          },
+          "tabla|vector": {
+            "fields": 96,
+            "accuracy": 1.0,
+            "confidence_raw": 0.99,
+            "confidence": 0.9975
+          }
+        }
+      }
+    },
+    "external_holdout_after": null
+  },
+  "calibration_by_strategy": {
+    "d_hibrido": {
+      "status": "insufficient",
+      "reason": "Faltan campos para ajuste y validación",
+      "activated": false,
+      "synthetic_simulation": true,
+      "human_sessions": 0,
+      "external_holdout_before": {
+        "d_hibrido": {
+          "fields": 1328,
+          "accuracy": 0.8283,
+          "ece_raw": 0.1235,
+          "ece_calibrated": 0.0913,
+          "interval_coverage": 0.9882,
+          "interval_coverage_by_kind": {
+            "deg": 0.9552,
+            "mm": 0.9944
+          },
+          "numeric_fields_without_interval": 0,
+          "numeric_fields_vague_interval": 383,
+          "abstention": {
+            "threshold": 0.2105,
+            "coverage": 0.7011,
+            "risk_kept": 0.0043,
+            "risk_without_abstention": 0.1717
+          },
+          "risk_coverage": [
+            {
+              "threshold": 0.0,
+              "coverage": 1.0,
+              "risk": 0.1717
+            },
+            {
+              "threshold": 0.05,
+              "coverage": 0.9842,
+              "risk": 0.1584
+            },
+            {
+              "threshold": 0.1,
+              "coverage": 0.9842,
+              "risk": 0.1584
+            },
+            {
+              "threshold": 0.15,
+              "coverage": 0.9405,
+              "risk": 0.1281
+            },
+            {
+              "threshold": 0.2,
+              "coverage": 0.9405,
+              "risk": 0.1281
+            },
+            {
+              "threshold": 0.25,
+              "coverage": 0.9187,
+              "risk": 0.1213
+            },
+            {
+              "threshold": 0.3,
+              "coverage": 0.8607,
+              "risk": 0.105
+            },
+            {
+              "threshold": 0.35,
+              "coverage": 0.8607,
+              "risk": 0.105
+            },
+            {
+              "threshold": 0.4,
+              "coverage": 0.8607,
+              "risk": 0.105
+            },
+            {
+              "threshold": 0.45,
+              "coverage": 0.8607,
+              "risk": 0.105
+            },
+            {
+              "threshold": 0.5,
+              "coverage": 0.8607,
+              "risk": 0.105
+            },
+            {
+              "threshold": 0.55,
+              "coverage": 0.8607,
+              "risk": 0.105
+            },
+            {
+              "threshold": 0.6,
+              "coverage": 0.8607,
+              "risk": 0.105
+            },
+            {
+              "threshold": 0.65,
+              "coverage": 0.7191,
+              "risk": 0.0042
+            },
+            {
+              "threshold": 0.7,
+              "coverage": 0.7191,
+              "risk": 0.0042
+            },
+            {
+              "threshold": 0.75,
+              "coverage": 0.7191,
+              "risk": 0.0042
+            },
+            {
+              "threshold": 0.8,
+              "coverage": 0.7191,
+              "risk": 0.0042
+            },
+            {
+              "threshold": 0.85,
+              "coverage": 0.7191,
+              "risk": 0.0042
+            },
+            {
+              "threshold": 0.9,
+              "coverage": 0.677,
+              "risk": 0.0044
+            },
+            {
+              "threshold": 0.95,
+              "coverage": 0.5745,
+              "risk": 0.0052
+            },
+            {
+              "threshold": 1.0,
+              "coverage": 0.0,
+              "risk": null
+            }
+          ],
+          "by_channel": {
+            "cota|vector": {
+              "fields": 30,
+              "accuracy": 1.0,
+              "confidence_raw": 0.9872,
+              "confidence": 0.9975
+            },
+            "geometria|scan": {
+              "fields": 267,
+              "accuracy": 0.4007,
+              "confidence_raw": 0.3526,
+              "confidence": 0.3877
+            },
+            "geometria|vector": {
+              "fields": 642,
+              "accuracy": 1.0,
+              "confidence_raw": 0.8285,
+              "confidence": 0.9128
+            },
+            "ocr|scan": {
+              "fields": 293,
+              "accuracy": 0.7679,
+              "confidence_raw": 0.8551,
+              "confidence": 0.8843
+            },
+            "tabla|vector": {
+              "fields": 96,
+              "accuracy": 1.0,
+              "confidence_raw": 0.99,
+              "confidence": 0.9975
+            }
+          }
+        }
+      },
+      "external_holdout_after": null
+    },
+    "b_reglas+ocr": {
+      "status": "candidate",
+      "fit_fields": 1758,
+      "test_fields": 899,
+      "before": {
+        "b_reglas+ocr": {
+          "fields": 899,
+          "accuracy": 0.9644,
+          "ece_raw": 0.1077,
+          "ece_calibrated": 0.0215,
+          "interval_coverage": 0.9938,
+          "interval_coverage_by_kind": {
+            "deg": 1.0,
+            "mm": 0.9923
+          },
+          "numeric_fields_without_interval": 0,
+          "numeric_fields_vague_interval": 38,
+          "abstention": {
+            "threshold": null,
+            "coverage": 0.9577,
+            "risk_kept": 0.0058,
+            "risk_without_abstention": 0.0356
+          },
+          "risk_coverage": [
+            {
+              "threshold": 0.0,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.05,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.1,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.15,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.2,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.25,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.3,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.35,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.4,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.45,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.5,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.55,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.6,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.65,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.7,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 0.75,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 0.8,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 0.85,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 0.9,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 0.95,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 1.0,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            }
+          ],
+          "by_channel": {
+            "cajetin|vector": {
+              "fields": 16,
+              "accuracy": 1.0,
+              "confidence_raw": 0.85,
+              "confidence": 1.0
+            },
+            "cota|vector": {
+              "fields": 48,
+              "accuracy": 1.0,
+              "confidence_raw": 0.95,
+              "confidence": 1.0
+            },
+            "ocr|scan": {
+              "fields": 431,
+              "accuracy": 0.9258,
+              "confidence_raw": 0.8469,
+              "confidence": 0.9706
+            },
+            "tabla|vector": {
+              "fields": 404,
+              "accuracy": 1.0,
+              "confidence_raw": 0.896,
+              "confidence": 1.0
+            }
+          }
+        }
+      },
+      "after": {
+        "b_reglas+ocr": {
+          "fields": 899,
+          "accuracy": 0.9644,
+          "ece_raw": 0.1077,
+          "ece_calibrated": 0.0064,
+          "interval_coverage": 0.9938,
+          "interval_coverage_by_kind": {
+            "deg": 1.0,
+            "mm": 0.9923
+          },
+          "numeric_fields_without_interval": 0,
+          "numeric_fields_vague_interval": 38,
+          "abstention": {
+            "threshold": 0.4375,
+            "coverage": 0.9577,
+            "risk_kept": 0.0058,
+            "risk_without_abstention": 0.0356
+          },
+          "risk_coverage": [
+            {
+              "threshold": 0.0,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.05,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.1,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.15,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.2,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.25,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.3,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.35,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.4,
+              "coverage": 1.0,
+              "risk": 0.0356
+            },
+            {
+              "threshold": 0.45,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 0.5,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 0.55,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 0.6,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 0.65,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 0.7,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 0.75,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 0.8,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 0.85,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 0.9,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 0.95,
+              "coverage": 0.9577,
+              "risk": 0.0058
+            },
+            {
+              "threshold": 1.0,
+              "coverage": 0.5295,
+              "risk": 0.0
+            }
+          ],
+          "by_channel": {
+            "cajetin|vector": {
+              "fields": 16,
+              "accuracy": 1.0,
+              "confidence_raw": 0.85,
+              "confidence": 0.9927
+            },
+            "cota|vector": {
+              "fields": 48,
+              "accuracy": 1.0,
+              "confidence_raw": 0.95,
+              "confidence": 1.0
+            },
+            "ocr|scan": {
+              "fields": 431,
+              "accuracy": 0.9258,
+              "confidence_raw": 0.8469,
+              "confidence": 0.9388
+            },
+            "tabla|vector": {
+              "fields": 404,
+              "accuracy": 1.0,
+              "confidence_raw": 0.896,
+              "confidence": 1.0
+            }
+          }
+        }
+      },
+      "limitation": "Validación sintética por equipo; no acredita planos reales ni ausencia de sesgo de selección",
+      "activated": false,
+      "synthetic_simulation": true,
+      "human_sessions": 0,
+      "external_holdout_before": {
+        "b_reglas+ocr": {
+          "fields": 564,
+          "accuracy": 0.7199,
+          "ece_raw": 0.1706,
+          "ece_calibrated": 0.1454,
+          "interval_coverage": 0.9458,
+          "interval_coverage_by_kind": {
+            "mm": 0.9458
+          },
+          "numeric_fields_without_interval": 0,
+          "numeric_fields_vague_interval": 228,
+          "abstention": {
+            "threshold": null,
+            "coverage": 0.5957,
+            "risk_kept": 0.0387,
+            "risk_without_abstention": 0.2801
+          },
+          "risk_coverage": [
+            {
+              "threshold": 0.0,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.05,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.1,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.15,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.2,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.25,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.3,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.35,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.4,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.45,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.5,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.55,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.6,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.65,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.7,
+              "coverage": 0.5957,
+              "risk": 0.0387
+            },
+            {
+              "threshold": 0.75,
+              "coverage": 0.5957,
+              "risk": 0.0387
+            },
+            {
+              "threshold": 0.8,
+              "coverage": 0.5957,
+              "risk": 0.0387
+            },
+            {
+              "threshold": 0.85,
+              "coverage": 0.5957,
+              "risk": 0.0387
+            },
+            {
+              "threshold": 0.9,
+              "coverage": 0.5957,
+              "risk": 0.0387
+            },
+            {
+              "threshold": 0.95,
+              "coverage": 0.5957,
+              "risk": 0.0387
+            },
+            {
+              "threshold": 1.0,
+              "coverage": 0.5957,
+              "risk": 0.0387
+            }
+          ],
+          "by_channel": {
+            "cota|vector": {
+              "fields": 96,
+              "accuracy": 0.6042,
+              "confidence_raw": 0.6406,
+              "confidence": 0.7709
+            },
+            "ocr|scan": {
+              "fields": 372,
+              "accuracy": 0.6774,
+              "confidence_raw": 0.6772,
+              "confidence": 0.8549
+            },
+            "tabla|vector": {
+              "fields": 96,
+              "accuracy": 1.0,
+              "confidence_raw": 0.8167,
+              "confidence": 1.0
+            }
+          }
+        }
+      },
+      "external_holdout_after": {
+        "b_reglas+ocr": {
+          "fields": 564,
+          "accuracy": 0.7199,
+          "ece_raw": 0.1706,
+          "ece_calibrated": 0.0753,
+          "interval_coverage": 0.9458,
+          "interval_coverage_by_kind": {
+            "mm": 0.9458
+          },
+          "numeric_fields_without_interval": 0,
+          "numeric_fields_vague_interval": 228,
+          "abstention": {
+            "threshold": 0.4375,
+            "coverage": 0.5957,
+            "risk_kept": 0.0387,
+            "risk_without_abstention": 0.2801
+          },
+          "risk_coverage": [
+            {
+              "threshold": 0.0,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.05,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.1,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.15,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.2,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.25,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.3,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.35,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.4,
+              "coverage": 1.0,
+              "risk": 0.2801
+            },
+            {
+              "threshold": 0.45,
+              "coverage": 0.7128,
+              "risk": 0.1269
+            },
+            {
+              "threshold": 0.5,
+              "coverage": 0.7128,
+              "risk": 0.1269
+            },
+            {
+              "threshold": 0.55,
+              "coverage": 0.7128,
+              "risk": 0.1269
+            },
+            {
+              "threshold": 0.6,
+              "coverage": 0.7128,
+              "risk": 0.1269
+            },
+            {
+              "threshold": 0.65,
+              "coverage": 0.7128,
+              "risk": 0.1269
+            },
+            {
+              "threshold": 0.7,
+              "coverage": 0.5957,
+              "risk": 0.0387
+            },
+            {
+              "threshold": 0.75,
+              "coverage": 0.5957,
+              "risk": 0.0387
+            },
+            {
+              "threshold": 0.8,
+              "coverage": 0.5957,
+              "risk": 0.0387
+            },
+            {
+              "threshold": 0.85,
+              "coverage": 0.5957,
+              "risk": 0.0387
+            },
+            {
+              "threshold": 0.9,
+              "coverage": 0.5957,
+              "risk": 0.0387
+            },
+            {
+              "threshold": 0.95,
+              "coverage": 0.5957,
+              "risk": 0.0387
+            },
+            {
+              "threshold": 1.0,
+              "coverage": 0.2766,
+              "risk": 0.0833
+            }
+          ],
+          "by_channel": {
+            "cota|vector": {
+              "fields": 96,
+              "accuracy": 0.6042,
+              "confidence_raw": 0.6406,
+              "confidence": 0.7709
+            },
+            "ocr|scan": {
+              "fields": 372,
+              "accuracy": 0.6774,
+              "confidence_raw": 0.6772,
+              "confidence": 0.7485
+            },
+            "tabla|vector": {
+              "fields": 96,
+              "accuracy": 1.0,
+              "confidence_raw": 0.8167,
+              "confidence": 1.0
+            }
+          }
+        }
+      }
+    }
+  },
+  "prompt_contract": {
+    "base_sha256": "3d12d523b1d8041f507a8248a3173a70272e08b19a397ce02ae6030f4e9b28b1",
+    "with_examples_sha256": "8a119b20ddbc62275b6126e71b0163bfbf617e88e1710860f8dcafaf0b610fc4",
+    "changed": true,
+    "provider_calls": 0
+  },
+  "profiles": {
+    "priorities": {
+      "summary": {
+        "revisions": 96,
+        "statuses": {
+          "draft": 77,
+          "error": 19
+        },
+        "expected_fields": 2484,
+        "present_fields": 1249,
+        "correct_fields": 1008,
+        "precision_returned_fields": 0.8070456365092074,
+        "recall_correct_fields": 0.4057971014492754,
+        "drafts_all_geometry_correct": 35,
+        "drafts_all_fields_correct": 15,
+        "pipeline_seconds_sum": 6.286561914035701,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "paired_recall": {
+        "equipment": 16,
+        "mean_delta": -0.03719795999207764,
+        "ci95": [
+          -0.06078617052881759,
+          -0.01652121707268766
+        ],
+        "bootstrap_samples": 2000,
+        "seed": 2026,
+        "unit": "fraction of expected fields correct",
+        "grouping": "equipment; revisions and styles stay together"
+      },
+      "accepted_for_production": false
+    },
+    "examples": {
+      "summary": {
+        "revisions": 96,
+        "statuses": {
+          "draft": 77,
+          "error": 19
+        },
+        "expected_fields": 2484,
+        "present_fields": 1329,
+        "correct_fields": 1100,
+        "precision_returned_fields": 0.8276899924755455,
+        "recall_correct_fields": 0.4428341384863124,
+        "drafts_all_geometry_correct": 47,
+        "drafts_all_fields_correct": 23,
+        "pipeline_seconds_sum": 6.746458258996427,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "paired_recall": {
+        "equipment": 16,
+        "mean_delta": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "bootstrap_samples": 2000,
+        "seed": 2026,
+        "unit": "fraction of expected fields correct",
+        "grouping": "equipment; revisions and styles stay together"
+      },
+      "accepted_for_production": false
+    },
+    "combined": {
+      "summary": {
+        "revisions": 96,
+        "statuses": {
+          "draft": 77,
+          "error": 19
+        },
+        "expected_fields": 2484,
+        "present_fields": 1249,
+        "correct_fields": 1008,
+        "precision_returned_fields": 0.8070456365092074,
+        "recall_correct_fields": 0.4057971014492754,
+        "drafts_all_geometry_correct": 35,
+        "drafts_all_fields_correct": 15,
+        "pipeline_seconds_sum": 6.277158322984178,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "paired_recall": {
+        "equipment": 16,
+        "mean_delta": -0.03719795999207764,
+        "ci95": [
+          -0.06078617052881759,
+          -0.01652121707268766
+        ],
+        "bootstrap_samples": 2000,
+        "seed": 2026,
+        "unit": "fraction of expected fields correct",
+        "grouping": "equipment; revisions and styles stay together"
+      },
+      "accepted_for_production": false
+    }
+  },
+  "limitation": "Contexto experimental directo; sin sesiones ni autorización humana de producción. Sin proveedores de visión: few-shot solo prueba transporte del prompt, no eficacia visual.",
+  "wall_seconds": 19.55093560399837
+}

@@ -28,3 +28,18 @@ abstenciones, aciertos/errores por campo, calibración, latencia y coste. Verifi
 equipo/documento y retirada al revocar; no incorporar al contexto respuestas del equipo evaluado.
 Informar tamaño de muestra, diferencias pareadas e incertidumbre antes de atribuir mejora causal.
 No se publican originales reales ni correcciones sin autorización.
+
+## Evaluación sintética adicional · 02/11
+
+[Ablación reproducible](evidencias/fase3/02nov-aprendizaje/README.md): ajuste en 24 equipos de
+S-dev y prueba en 16 equipos disjuntos de S-reservado (96 revisiones), sin documentos compartidos.
+Las prioridades reducen el recall medio por equipo en 3,72 puntos, IC95 [−6,08; −1,65]; el perfil
+queda rechazado. Los ejemplos cambian el prompt, con resultado CPU idéntico al no utilizar
+proveedores; su eficacia visual sigue sin medir. La recalibración sintética de B+OCR reduce ECE
+externa 0,1454 → 0,0753, aún sobre el objetivo 0,05, y no se activa. La ruta actual de D no propone
+curva sin las filas de fusión con máscaras: [entrega a Lectura](agentes/ENTREGA_LECTURA_02NOV.md).
+
+Se ha reforzado el consumidor para ignorar feedback no verificado, distinguirlo en la huella y
+acotar los factores a [0,85; 1,15]. La simulación usa un contexto experimental aislado: cero
+sesiones humanas, cero aprobaciones fabricadas y ningún cambio en el almacén de producción.
+3.8/E.6 conservan su validación humana pendiente; E.5 permanece pospuesta.
