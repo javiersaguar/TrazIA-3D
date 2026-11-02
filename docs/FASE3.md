@@ -462,3 +462,38 @@ incluye candidatos, alternativas, fuentes y GT consultada únicamente después d
 3.7/H.7 no se cierran: faltan cobertura y precisión suficientes y un coste defendible de 1.600 IFC
 correctos. El diagrama y la extrapolación previos siguen identificados como hipótesis de cómputo,
 no gasto de proyecto medido. No se debilitan los validadores para aumentar la tasa de exportación.
+
+## Tres tareas autónomas de Plataforma · 02/11
+
+**3.7/H.7:** repetido el corpus completo con D y B+OCR en CPU (672 predicciones). D conserva
+251 DRAFT/85 errores; B+OCR produce 220/116 y no justifica un fallback. Contraste por campo y
+entrega de 63 ausencias/22 geometrías incoherentes a Lectura. Redis real con 1/4 workers:
+**1.828,75/1.242,72 s; 1,4716× observado**, mismos estados y valores/unidades de todos los modelos,
+cero aciertos de caché de trabajo y llamadas externas. La inspección tenía un contador en el
+nivel JSON equivocado: corregido y reconstruido desde respuestas archivadas, **95 DRAFT con
+boquillas sin colocar**, 96 con campos evaluados correctos y solo 81 sin pendientes de boquillas
+además de ese acierto. No son modelos aprobados ni precisión de ingeniería real.
+[Medición, calidad, presupuesto y reproducción](evidencias/fase3/02nov/README.md).
+
+Con cuatro workers, 400×4 se extrapola a 98,63 min para terminaciones, incluidas fallidas, y
+0,6575 € de cómputo bajo la hipótesis 0,10 €/worker-h. Tiempo y coste de 1.600 IFC correctos
+siguen en null. La arquitectura existente sigue vigente; la muestra de recursos recomienda
+investigar límites de hilos de OCR con Lectura, sin atribuir causalidad a una captura puntual.
+
+**D.4:** auditoría automática ampliada contra STEP reabierto: unidad explícita y escala, cotas
+analíticas, puertos, GUID, propiedades técnicas y roundtrip de FieldsJSON. **48/48 combinaciones
+válidas**, ocho casos, tres esquemas y dos modos de detalle; se audita también B en cada caso
+(96 exportaciones), conservando los GUID. Se comprueba además que los 48 STEP archivados declaran
+unidad de longitud. [Matriz](ifc-checks/02nov/README.md). BIMvision/TR siguen fuera de esta prueba.
+
+**3.8/E.6:** ensayo sintético con 24 equipos de ajuste y 16 de prueba independientes. Prioridades:
+−3,72 pp de recall medio por equipo, IC95 [−6,08; −1,65], perfil rechazado. Few-shot cambia el
+prompt y conserva resultados CPU sin proveedores; eficacia visual sin medir. B+OCR propone
+recalibración ECE externa 0,1454 → 0,0753, sin activar. D no obtiene propuesta por la ruta actual
+de fusión con máscaras de su arnés. Se impide consumir feedback no verificado y se acotan los
+factores. [Ablaciones y límites](evidencias/fase3/02nov-aprendizaje/README.md).
+
+Cero sesiones humanas y cero datos privados. E.5 permanece pospuesta. Las partes de corrección
+de extracción y recalibración de D quedan en la [entrega a Lectura](agentes/ENTREGA_LECTURA_02NOV.md).
+Se cierran los tres alcances autónomos de esta sesión; los padres 3.7/H.7, 3.8/E.6 y las
+validaciones externas conservan pendientes expresos en el roadmap.

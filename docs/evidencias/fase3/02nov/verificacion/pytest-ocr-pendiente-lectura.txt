@@ -1,0 +1,27 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________________ test_b_with_ocr_reads_a_scanned_drawing ____________________
+
+scanned_case = PosixPath('/tmp/pytest-of-root/pytest-0/v20/s-dev')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7c7bb1de8b30>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_b_with_ocr_reads_a_scanne0')
+
+>   ???
+E   AssertionError: assert 21 >= ((4 * 7) - 2)
+E    +  where 21 = sum(<generator object test_b_with_ocr_reads_a_scanned_drawing.<locals>.<genexpr> at 0x7c7b60397c60>)
+E    +  and   7 = len([{'id': 'N1', 'diameter': 200, 'projection': 500, 'elevation': 12350, ...}, {'id': 'N2', 'diameter': 300, 'projection'...jection': 500, 'elevation': 11700, ...}, {'id': 'N6', 'diameter': 250, 'projection': 300, 'elevation': 5700, ...}, ...])
+
+C:\Users\Javier\Documents\Codex\2026-10-26\https-indesiahack-org-tecnicas-reunidas-2026\outputs\TrazIA-3D-plataforma\tests\test_lectura_ocr.py:96: AssertionError
+----------------------------- Captured stderr call -----------------------------
+[32m[INFO] 2026-11-02 13:53:21,000 [RapidOCR] base.py:23: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-11-02 13:53:21,072 [RapidOCR] download_file.py:60: File exists and is valid: /app/.venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_det_small.onnx[0m
+[32m[INFO] 2026-11-02 13:53:21,072 [RapidOCR] main.py:63: Using /app/.venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_det_small.onnx[0m
+[32m[INFO] 2026-11-02 13:53:22,560 [RapidOCR] base.py:23: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-11-02 13:53:22,562 [RapidOCR] download_file.py:60: File exists and is valid: /app/.venv/lib/python3.12/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-11-02 13:53:22,562 [RapidOCR] main.py:63: Using /app/.venv/lib/python3.12/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-11-02 13:53:22,747 [RapidOCR] base.py:23: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-11-02 13:53:22,772 [RapidOCR] download_file.py:60: File exists and is valid: /app/.venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_rec_small.onnx[0m
+[32m[INFO] 2026-11-02 13:53:22,772 [RapidOCR] main.py:63: Using /app/.venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_rec_small.onnx[0m
+=========================== short test summary info ============================
+FAILED tests/test_lectura_ocr.py::test_b_with_ocr_reads_a_scanned_drawing - A...
+1 failed in 8.83s

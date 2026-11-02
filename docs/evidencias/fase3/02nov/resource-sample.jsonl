@@ -1,0 +1,4 @@
+{"BlockIO":"0B / 89.8MB","CPUPerc":"664.04%","Container":"trazia-scale-d366d73593-worker-1","ID":"85028fa71740","MemPerc":"3.25%","MemUsage":"1.399GiB / 43.11GiB","Name":"trazia-scale-d366d73593-worker-1","NetIO":"2.23MB / 2.43MB","PIDs":"95"}
+{"BlockIO":"0B / 110MB","CPUPerc":"779.16%","Container":"trazia-scale-d366d73593-worker-2","ID":"247107c704f1","MemPerc":"3.17%","MemUsage":"1.367GiB / 43.11GiB","Name":"trazia-scale-d366d73593-worker-2","NetIO":"2.05MB / 2.28MB","PIDs":"95"}
+{"BlockIO":"12.3kB / 94.2MB","CPUPerc":"88.24%","Container":"trazia-scale-d366d73593-worker-3","ID":"e476c5fc0635","MemPerc":"3.11%","MemUsage":"1.339GiB / 43.11GiB","Name":"trazia-scale-d366d73593-worker-3","NetIO":"2.1MB / 2.33MB","PIDs":"95"}
+{"BlockIO":"12.3kB / 109MB","CPUPerc":"779.60%","Container":"trazia-scale-d366d73593-worker-4","ID":"cb3e490cb16e","MemPerc":"3.20%","MemUsage":"1.38GiB / 43.11GiB","Name":"trazia-scale-d366d73593-worker-4","NetIO":"2.01MB / 2.2MB","PIDs":"95"}

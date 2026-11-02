@@ -753,3 +753,65 @@ en Linux/CPU, 24,48 s. El baseline Linux previo tiene 389 pasadas y un fallo de 
 pytest con error 4551. No se modifica su política ni se presenta el baseline como verde. El
 contenedor de pruebas deriva de la imagen CPU existente añadiendo solo reportlab 4.5.1, ya fijado
 en uv.lock; fuente y carpetas públicas se montan en lectura. Sin cambios de dependencias del repo.
+
+### 3.7/H.7 · Diagnóstico, calidad y escala CPU cerrados en el alcance autónomo
+
+Se ejecutan D y B+OCR en las 336 revisiones del mismo corpus (672 predicciones). D conserva
+251 DRAFT/85 errores; B+OCR cae a 220/116. Las cuatro variantes del sondeo de S-dev no justifican
+un fallback seguro. Se entregan a Lectura los 63 casos con campos ausentes y 22 con geometría
+incoherente, con candidatos, evidencias, GT consultada después y comandos reproducibles.
+
+Nueva medición Redis/Postgres: **1.828,75/1.242,72 s con 1/4 workers, 1,4716×**, 251 DRAFT y
+85 errores en ambos, mismos valores/unidades y calidad por revisión. Cero aciertos de caché de
+trabajo y cero llamadas externas. Se guardan los JSON reales de la API y se contrastan después.
+Se corrige un fallo de medición: boquillas sin colocar están en Revision, no en Equipment.
+Los originales de medición conservan su identidad y se añade la reconstrucción: **95 DRAFT con
+boquillas sin colocar**, 185 con geometría principal correcta, 96 con todos los campos evaluados
+correctos y solo 81 sin boquillas pendientes además de ese acierto. La rúbrica excluye atributos
+HDM y no implica aprobación ni precisión de ingeniería real. La muestra de recursos registra
+95 hilos por worker y deja una hipótesis concreta de ajuste ONNX para Lectura.
+
+Escenario 400×4: cuatro workers, 98,63 min de terminaciones incluidas fallidas y 0,6575 € si
+se supone 0,10 €/worker-h. Revisión humana, coste total y 1.600 IFC correctos siguen sin medir.
+Se actualizan roadmap y pitch sin cerrar sus padres. [Resultados completos](../evidencias/fase3/02nov/README.md).
+
+Cambios de interfaz: `--guardar-modelos` opcional en measure_scale/run_scale; nuevo evaluador
+posterior score_scale_quality; triage admite variantes CPU y corpus completo sin cambiar su
+comportamiento predeterminado de diagnóstico de errores. Sin cambios de API ni model.py.
+
+### 3.8/E.6 · Evaluación sintética adicional cerrada
+
+Ajuste en 24 equipos S-dev, prueba en 16 equipos S-reservado; cero originales compartidos y
+ninguna etiqueta del equipo evaluado incorporada a su contexto. Prioridades solas/combinadas:
+−3,72 pp de recall medio por equipo, IC95 [−6,08; −1,65]; se rechazan. Ejemplos: cambia la huella
+del prompt, sin cambio de extracción CPU ni llamadas a proveedores; eficacia few-shot visual
+sin medir. B+OCR reduce ECE externa 0,1454 → 0,0753 y conserva 94,58 % de cobertura en intervalos
+informativos, con 228 numéricos demasiado amplios excluidos. No se activa y no alcanza ECE 0,05.
+D devuelve insufficient porque su ruta actual de `propose` no entrega datos de fusión con
+máscaras; el diagnóstico se traslada a Lectura sin alterar su código.
+
+Corregido el consumidor de feedback: contexto no verificado no modifica prompts/prioridades,
+estado de verificación en la huella y factores finitos acotados [0,85; 1,15]. Confianza de
+calibración tomada de Source.confidence_raw, conservando la del extractor por separado. La
+simulación dura 19,55 s con caché caliente; no se atribuye una aceleración al aprendizaje.
+Cero sesiones/aprobaciones humanas fabricadas y almacén de producción intacto. E.5 sigue
+pospuesta y la validación humana de E.6 sigue abierta. [Evidencias](../evidencias/fase3/02nov-aprendizaje/README.md).
+
+### Verificación final del 02/11
+
+Ruff check y formato correctos (219 archivos Python). **416 pruebas correctas y una omisión
+OCR opcional en 252,99 s**, perfil sin el extra OCR; dos avisos, uno de Starlette y otro esperado
+del test que corrompe deliberadamente el eje de un puerto. Al instalar OCR, el test real previo
+de Lectura sigue fallando sin recuperar boquillas: repetición focalizada 8,83 s. Se conserva
+ese fallo, no se cambia ni se presenta la omisión como su solución.
+
+Windows bloquea el ejecutable de pytest con código 4551; las pruebas se ejecutan en Linux
+aislado, sin eludir esa política. La fuente final se monta en lectura en imágenes CPU: sin
+RapidOCR para el perfil dev/api/geo y con RapidOCR para el test OCR explícito. La imagen de
+pruebas añade reportlab 4.5.1 ya fijado en uv.lock; pyproject.toml/uv.lock no cambian. Los 48 STEP
+archivados vuelven a comprobarse con unidad de longitud explícita y escala 1 m. D.4 tiene además
+un caso negativo de unidad ausente. Ambos despliegues de escala y sus volúmenes se retiran;
+los servicios del usuario quedan intactos.
+
+Sin GPU ni data/private; código de Lectura, frontend y model.py intactos. No hay evidencia TR
+ni muestra humana nueva. Se entrega un [inventario de coordinación](ENTREGA_LECTURA_02NOV.md).

@@ -1,0 +1,171 @@
+{
+  "synthetic": true,
+  "providers": [],
+  "gpu": false,
+  "scope": "previous_errors",
+  "complete": true,
+  "workers": 4,
+  "wall_seconds": 323.13637355700484,
+  "input_sha256": [
+    "da9ea85b70734d8ccdb0d63aef882b1d488667f08e52495a5a9b6c28a951e170"
+  ],
+  "comparison": {
+    "d_hibrido": {
+      "summary": {
+        "revisions": 34,
+        "statuses": {
+          "error": 34
+        },
+        "expected_fields": 928,
+        "present_fields": 334,
+        "correct_fields": 254,
+        "precision_returned_fields": 0.7604790419161677,
+        "recall_correct_fields": 0.27370689655172414,
+        "drafts_all_geometry_correct": 0,
+        "drafts_all_fields_correct": 0,
+        "pipeline_seconds_sum": 317.2761377730276,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "by_dataset": {
+        "s-dev": {
+          "revisions": 34,
+          "statuses": {
+            "error": 34
+          },
+          "expected_fields": 928,
+          "present_fields": 334,
+          "correct_fields": 254,
+          "precision_returned_fields": 0.7604790419161677,
+          "recall_correct_fields": 0.27370689655172414,
+          "drafts_all_geometry_correct": 0,
+          "drafts_all_fields_correct": 0,
+          "pipeline_seconds_sum": 317.2761377730276,
+          "external_calls": 0,
+          "cost_for_1600_engineering_valid_ifc": null,
+          "engineering_accuracy_verified": false
+        }
+      }
+    },
+    "b_reglas+ocr": {
+      "summary": {
+        "revisions": 34,
+        "statuses": {
+          "error": 33,
+          "draft": 1
+        },
+        "expected_fields": 928,
+        "present_fields": 276,
+        "correct_fields": 234,
+        "precision_returned_fields": 0.8478260869565217,
+        "recall_correct_fields": 0.2521551724137931,
+        "drafts_all_geometry_correct": 0,
+        "drafts_all_fields_correct": 0,
+        "pipeline_seconds_sum": 313.53433572903305,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "by_dataset": {
+        "s-dev": {
+          "revisions": 34,
+          "statuses": {
+            "error": 33,
+            "draft": 1
+          },
+          "expected_fields": 928,
+          "present_fields": 276,
+          "correct_fields": 234,
+          "precision_returned_fields": 0.8478260869565217,
+          "recall_correct_fields": 0.2521551724137931,
+          "drafts_all_geometry_correct": 0,
+          "drafts_all_fields_correct": 0,
+          "pipeline_seconds_sum": 313.53433572903305,
+          "external_calls": 0,
+          "cost_for_1600_engineering_valid_ifc": null,
+          "engineering_accuracy_verified": false
+        }
+      }
+    },
+    "d_hibrido-geometria": {
+      "summary": {
+        "revisions": 34,
+        "statuses": {
+          "error": 33,
+          "draft": 1
+        },
+        "expected_fields": 928,
+        "present_fields": 276,
+        "correct_fields": 234,
+        "precision_returned_fields": 0.8478260869565217,
+        "recall_correct_fields": 0.2521551724137931,
+        "drafts_all_geometry_correct": 0,
+        "drafts_all_fields_correct": 0,
+        "pipeline_seconds_sum": 313.01910156598024,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "by_dataset": {
+        "s-dev": {
+          "revisions": 34,
+          "statuses": {
+            "error": 33,
+            "draft": 1
+          },
+          "expected_fields": 928,
+          "present_fields": 276,
+          "correct_fields": 234,
+          "precision_returned_fields": 0.8478260869565217,
+          "recall_correct_fields": 0.2521551724137931,
+          "drafts_all_geometry_correct": 0,
+          "drafts_all_fields_correct": 0,
+          "pipeline_seconds_sum": 313.01910156598024,
+          "external_calls": 0,
+          "cost_for_1600_engineering_valid_ifc": null,
+          "engineering_accuracy_verified": false
+        }
+      }
+    },
+    "d_hibrido+heuristica": {
+      "summary": {
+        "revisions": 34,
+        "statuses": {
+          "error": 34
+        },
+        "expected_fields": 928,
+        "present_fields": 334,
+        "correct_fields": 254,
+        "precision_returned_fields": 0.7604790419161677,
+        "recall_correct_fields": 0.27370689655172414,
+        "drafts_all_geometry_correct": 0,
+        "drafts_all_fields_correct": 0,
+        "pipeline_seconds_sum": 317.12362719701923,
+        "external_calls": 0,
+        "cost_for_1600_engineering_valid_ifc": null,
+        "engineering_accuracy_verified": false
+      },
+      "by_dataset": {
+        "s-dev": {
+          "revisions": 34,
+          "statuses": {
+            "error": 34
+          },
+          "expected_fields": 928,
+          "present_fields": 334,
+          "correct_fields": 254,
+          "precision_returned_fields": 0.7604790419161677,
+          "recall_correct_fields": 0.27370689655172414,
+          "drafts_all_geometry_correct": 0,
+          "drafts_all_fields_correct": 0,
+          "pipeline_seconds_sum": 317.12362719701923,
+          "external_calls": 0,
+          "cost_for_1600_engineering_valid_ifc": null,
+          "engineering_accuracy_verified": false
+        }
+      }
+    }
+  },
+  "limitation": "Paralelismo por conjunto; no mide Redis ni aísla causalidad de cachés"
+}

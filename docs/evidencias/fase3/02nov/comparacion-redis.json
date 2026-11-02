@@ -1,0 +1,73 @@
+{
+  "at": "2026-11-02T13:54:43.827290+00:00",
+  "synthetic": true,
+  "cpu_only": true,
+  "input_sha256": "da9ea85b70734d8ccdb0d63aef882b1d488667f08e52495a5a9b6c28a951e170",
+  "same_input": true,
+  "same_image": true,
+  "state_differences": [],
+  "exported_value_unit_differences": [],
+  "quality_differences": [],
+  "seconds_1_worker": 1828.7487858910026,
+  "seconds_4_workers": 1242.7152766949948,
+  "speedup_observed": 1.4715750423174694,
+  "projection_400x4": {
+    "1": {
+      "measured": false,
+      "seconds_for_1600_terminal_jobs": 8708.327551861918,
+      "seconds_for_1600_valid_ifc": null,
+      "seconds_for_1600_draft_ifc": null,
+      "cost_eur": 0.0,
+      "limitation": "Extrapolación de este lote y estrategia. Las terminaciones incluyen errores; no prueban 1600 modelos válidos.",
+      "compute_cost_scenario": {
+        "measured": false,
+        "assumed_eur_worker_hour": 0.1,
+        "estimated_eur_for_1600_terminal_jobs": 0.24189798755171996,
+        "excluded": "Energía local, almacenamiento, API y coste de producir IFC correctos"
+      }
+    },
+    "4": {
+      "measured": false,
+      "seconds_for_1600_terminal_jobs": 5917.69179378569,
+      "seconds_for_1600_valid_ifc": null,
+      "seconds_for_1600_draft_ifc": null,
+      "cost_eur": 0.0,
+      "limitation": "Extrapolación de este lote y estrategia. Las terminaciones incluyen errores; no prueban 1600 modelos válidos.",
+      "compute_cost_scenario": {
+        "measured": false,
+        "assumed_eur_worker_hour": 0.1,
+        "estimated_eur_for_1600_terminal_jobs": 0.6575213104206322,
+        "excluded": "Energía local, almacenamiento, API y coste de producir IFC correctos"
+      }
+    }
+  },
+  "quality_exported": {
+    "revisions": 336,
+    "statuses": {
+      "draft": 251,
+      "error": 85
+    },
+    "expected_fields": 7932,
+    "present_fields": 4242,
+    "correct_fields": 3959,
+    "precision_returned_fields": 0.9332861857614333,
+    "recall_correct_fields": 0.4991174987392839,
+    "drafts_all_geometry_correct": 185,
+    "drafts_all_fields_correct": 96,
+    "pipeline_seconds_sum": 4824.584617032007,
+    "external_calls": 0,
+    "cost_for_1600_engineering_valid_ifc": null,
+    "engineering_accuracy_verified": false,
+    "drafts_with_unplaced_nozzles": 95,
+    "drafts_all_fields_correct_and_no_unplaced_nozzles": 81
+  },
+  "inspection_bug": {
+    "description": "El contador original consulta Equipment.unplaced_nozzles; el contrato lo guarda en Revision.unplaced_nozzles. Código corregido al terminar ambas pasadas; calidad reconstruida desde respuestas archivadas, sin repetir inferencia.",
+    "affected_drafts": 95,
+    "reported_originally": 0,
+    "corrected": 95
+  },
+  "project_cost_for_1600_correct_ifc": null,
+  "human_corrections": 0,
+  "tr_reference_available": false
+}
