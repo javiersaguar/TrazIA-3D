@@ -10,34 +10,18 @@ import { Kbd } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 
 /*
-  La intro se ve una vez por sesión de navegador. Con movimiento reducido no se muestra.
-  En el servidor se pinta siempre (cubre la portada desde el primer fotograma); si en el cliente
-  ya se vio, se quita al hidratar sin animación.
+  La intro se ve cada vez que se carga la portada. Con movimiento reducido no se muestra.
+  En el servidor se pinta siempre (cubre la portada desde el primer fotograma); con movimiento
+  reducido se quita al hidratar sin animación.
 */
 
-const KEY = "trazia.intro";
 const noSubscribe = () => () => {};
-
-function introAlreadyDone(): boolean {
-  try {
-    if (window.sessionStorage.getItem(KEY)) return true;
-  } catch {
-    /* sin almacenamiento: se decide solo por el movimiento reducido */
-  }
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
+const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 export function useIntro() {
-  const skipped = useSyncExternalStore(noSubscribe, introAlreadyDone, () => false);
+  const skipped = useSyncExternalStore(noSubscribe, prefersReducedMotion, () => false);
   const [finished, setFinished] = useState(false);
-  const finish = useCallback(() => {
-    try {
-      window.sessionStorage.setItem(KEY, "1");
-    } catch {
-      /* nada */
-    }
-    setFinished(true);
-  }, []);
+  const finish = useCallback(() => setFinished(true), []);
   return { playing: !skipped && !finished, flew: finished, finish };
 }
 
