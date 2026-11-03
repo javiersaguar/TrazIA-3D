@@ -1,11 +1,13 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 
 import { LOGO_ASSEMBLE_SECONDS, LogoAssemble } from "@/components/brand/logo-assemble";
+import { CollabCross, TrLogoAssemble } from "@/components/brand/tr-logo-assemble";
 import { EASE_OUT } from "@/components/motion/reveal";
 import { Kbd } from "@/components/ui/primitives";
+import { cn } from "@/lib/cn";
 
 /*
   La intro se ve una vez por sesión de navegador. Con movimiento reducido no se muestra.
@@ -38,6 +40,31 @@ export function useIntro() {
   }, []);
   return { playing: !skipped && !finished, flew: finished, finish };
 }
+
+/*
+  «TrazIA 3D × Técnicas Reunidas». Se pinta en dos capas con la misma rejilla de huecos fijos:
+  la de TrazIA se desmonta al terminar para que su logo viaje a la cabecera (layoutId) y la del
+  aspa y Técnicas Reunidas se desvanece. Los huecos vacíos mantienen las dos capas alineadas.
+*/
+const SLOT = {
+  trazia: "w-[clamp(182px,30.8vw,280px)] h-[calc(clamp(128px,22vw,200px)+36px+clamp(26px,4.4vw,40px))]",
+  cross: "size-[clamp(22px,3.2vw,32px)]",
+  tr: "w-[clamp(182px,30.8vw,280px)] aspect-[452/255]",
+};
+
+function Lockup({ trazia, cross, tr }: { trazia?: ReactNode; cross?: ReactNode; tr?: ReactNode }) {
+  return (
+    <div className="-mt-[6vh] flex flex-col items-center gap-[clamp(18px,4.2vw,56px)] sm:flex-row">
+      <div className={cn("flex justify-center", SLOT.trazia)}>{trazia}</div>
+      <div className={SLOT.cross}>{cross}</div>
+      <div className={SLOT.tr}>{tr}</div>
+    </div>
+  );
+}
+
+const collab = {
+  exit: (animated: boolean) => ({ opacity: 0, scale: animated ? 0.98 : 1, transition: { duration: animated ? 0.35 : 0, ease: EASE_OUT } }),
+};
 
 const backdrop = {
   exit: (animated: boolean) => ({ opacity: 0, transition: { duration: animated ? 0.6 : 0, ease: EASE_OUT } }),
@@ -78,10 +105,22 @@ export function IntroOverlay({ playing, flew, onFinish }: { playing: boolean; fl
             Saltar intro <Kbd>Esc</Kbd>
           </motion.button>
         ) : null}
+        {playing ? (
+          <motion.div
+            key="intro-collab"
+            custom={flew}
+            variants={collab}
+            exit="exit"
+            className="pointer-events-none fixed inset-0 z-[61] flex items-center justify-center"
+            aria-hidden
+          >
+            <Lockup cross={<CollabCross className="size-full" />} tr={<TrLogoAssemble />} />
+          </motion.div>
+        ) : null}
       </AnimatePresence>
       {playing ? (
         <div className="fixed inset-0 z-[61] flex cursor-pointer items-center justify-center" onClick={onFinish} aria-hidden>
-          <LogoAssemble markLayoutId="brand-mark" wordLayoutId="brand-word" className="-mt-[6vh]" />
+          <Lockup trazia={<LogoAssemble markLayoutId="brand-mark" wordLayoutId="brand-word" />} />
         </div>
       ) : null}
     </>
