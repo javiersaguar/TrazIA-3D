@@ -1,3 +1,9 @@
-.node { transition: border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out); cursor: pointer; }
+.node { position: relative; isolation: isolate; transition: border-color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out); cursor: pointer; }
+.node::after { content: ""; position: absolute; pointer-events: none; inset: -7px; border: 2px solid var(--accent); border-radius: 18px; box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 40%, transparent); opacity: 0; transition: opacity var(--dur-base) var(--ease-out); }
+.node[data-active="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, var(--surface)); box-shadow: 0 0 0 3px var(--accent-soft), 0 0 30px color-mix(in srgb, var(--accent) 30%, transparent); }
+.node[data-active="true"]::after { opacity: .65; }
+.node[data-moving="true"]::after { animation: phase-signal .85s linear infinite alternate; }
+.node[data-selected="true"] { outline: 2px solid var(--accent); outline-offset: 3px; }
 .node:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
-@media (prefers-reduced-motion: reduce) { .node { transition: none; } }
+@keyframes phase-signal { from { opacity: .35; transform: scale(.99); } to { opacity: .9; transform: scale(1.025); } }
+@media (prefers-reduced-motion: reduce) { .node, .node::after { transition: none; animation: none !important; } }

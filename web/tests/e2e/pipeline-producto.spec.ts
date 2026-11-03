@@ -62,6 +62,9 @@ test("eventos sin API, teclado y ancho móvil", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/pipeline");
   await page.getByRole("button", { name: "Explorar Ingesta", exact: true }).press("Enter");
+  await expect(page.getByRole("complementary", {name: "Detalle de la etapa"})).toContainText("Sin datos reales de ejecución");
+  await expect(page.getByTestId("stage-progress")).toContainText("Porcentaje real no disponible");
+  await page.getByRole("button", {name: "Cerrar detalle de etapa"}).click();
   await expect(page.getByLabel("Posición en el recorrido")).toHaveValue("0");
   await page.getByRole("button", { name: "Eventos reales", exact:true }).click();
   await expect(page.getByText("Sin API conectada. La simulación de demo no acredita ejecución real.", {exact:true})).toBeVisible();
@@ -79,5 +82,27 @@ test("el grafo observa un trabajo real por SSE", async ({ page }) => {
   await page.getByRole("button", {name: "Explorar IFC", exact: true}).press("Enter");
   await expect(page.locator('[data-stage="ifc"]')).toHaveAttribute("data-active", "true");
   await expect(page.locator('[data-stage="ifc"]')).toContainText("eventos OK");
+  const inspector = page.getByRole("complementary", {name: "Detalle de la etapa"});
+  await expect(inspector).toContainText("Datos reales del trabajo");
+  await expect(inspector).toContainText("Finalizada");
+  await expect(inspector.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "100");
+  await inspector.screenshot({path: "../docs/capturas/pipeline-inspector-real.png"});
   await expect(page.getByRole("cell", {name: /IFC4 DRAFT almacenado/})).toBeVisible();
+});
+
+
+test("traza rápida, halo e inspector de fase", async ({ page }) => {
+  await page.goto("/pipeline");
+  await page.getByRole("button", {name: "Etapa siguiente",exact:true}).click();
+  await page.getByRole("button", {name: "Reproducir explicación",exact:true}).click();
+  await expect(page.locator(".react-flow__edge animateMotion").first()).toHaveAttribute("dur", "0.78s");
+  await expect(page.locator('[data-active="true"][data-moving="true"]')).toHaveCount(1);
+  await page.getByRole("button", {name: "Pausar",exact:true}).click();
+  await page.getByRole("button", {name: "Explorar Ingesta",exact:true}).click();
+  const inspector = page.getByRole("complementary", {name: "Detalle de la etapa"});
+  await expect(inspector).toContainText("Registra cada PDF");
+  await expect(inspector).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(inspector).toHaveCount(0);
+  await expect(page.getByRole("button", {name: "Explorar Ingesta",exact:true})).toBeFocused();
 });

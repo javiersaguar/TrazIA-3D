@@ -68,6 +68,9 @@ type PipelineState = {
   activeStage: StageId | null;
   jobId: string | null;
   jobRun: JobStatus["run"];
+  jobStatus: string | null;
+  jobStrategy: string | null;
+  inputFiles: string[];
   warnings: string[];
   error: string | null;
   start: (rev: Revision, options?: StartOptions) => void;
@@ -81,7 +84,8 @@ let closeEvents: (() => void) | null = null;
 
 async function startApi(rev: Revision, options: StartOptions, set: Setter) {
   closeEvents?.();
-  set({ running: true, error: null, warnings: [], jobRun: null, jobId: null,
+  set({ running: true, error: null, warnings: [], jobRun: null, jobId: null, jobStatus: "queued", jobStrategy: options.strategy ?? "b_reglas",
+    inputFiles: options.files?.length ? options.files.map(file => file.name) : rev.documents.map(document => document.filename),
     revision: rev.revision, events: [], stages: initialStages(), activeStage: null });
   try {
     const identity = `${rev.project_id}:${rev.equipment.id}:${rev.revision}`;
@@ -95,10 +99,10 @@ async function startApi(rev: Revision, options: StartOptions, set: Setter) {
       equipment_id: rev.equipment.id, revision: `${rev.revision}-run-${Date.now().toString(36)}`,
       strategy: options.strategy ?? "b_reglas", dataset: options.dataset ?? (options.files?.length ? "real" : rev.dataset) });
     const job = await getJob(id);
-    set({ jobId: id });
+    set({ jobId: id, jobStatus: job.status });
     closeEvents = subscribeJob(id, event => {
       set(state => {
-        if (state.events.some(e => e.id === String(event.id))) return {};
+        if (state.jobId !== id || state.events.some(e => e.id === String(event.id))) return {};
         const definition = STAGES.find(d => d.id === event.stage);
         const at = Math.max(0, event.created_at - job.created_at);
         const events = [{ ...event, id: String(event.id), at }, ...state.events];
@@ -107,15 +111,15 @@ async function startApi(rev: Revision, options: StartOptions, set: Setter) {
         const next: StageRunState = { status: event.status === "omitido" ? "skipped" : "done",
           ok: previous.ok + (event.status === "ok" ? 1 : 0),
           total: previous.total + (event.status === "omitido" ? 0 : 1), lastEventAt: event.created_at * 1000 };
-        return { events, error: null, stages: { ...state.stages, [definition.id]: next }, activeStage: definition.id };
+        return { events, error: null, jobStatus: "running", stages: { ...state.stages, [definition.id]: next }, activeStage: definition.id };
       });
     }, status => {
       closeEvents = null;
-      set({ running: false, activeStage: null, lastFinishedAt: Date.now() });
-      void getJob(id).then(result => set({ jobRun: result.run, warnings: result.warnings,
-        error: status === "done" ? null : result.error ?? `Trabajo ${status}` })).catch(error => set({ error: String(error) }));
+      set({ running: false, activeStage: null, jobStatus: status, lastFinishedAt: Date.now() });
+      void getJob(id).then(result => set(state => state.jobId === id ? { jobRun: result.run, jobStatus: result.status, warnings: result.warnings,
+        error: status === "done" ? null : result.error ?? `Trabajo ${status}` } : {})).catch(error => set(state => state.jobId === id ? { error: String(error) } : {}));
     }, () => set({ error: "Conexión de eventos interrumpida; intentando reanudar con la API." }));
-  } catch (error) { set({ running: false, error: error instanceof Error ? error.message : String(error) }); }
+  } catch (error) { set({ running: false, jobStatus: "error", error: error instanceof Error ? error.message : String(error) }); }
 }
 
 export const usePipeline = create<PipelineState>()((set, get) => ({
@@ -126,12 +130,12 @@ export const usePipeline = create<PipelineState>()((set, get) => ({
   stages: initialStages(),
   activeStage: null,
 
-  jobId: null, jobRun: null, warnings: [], error: null,
+  jobId: null, jobRun: null, jobStatus: null, jobStrategy: null, inputFiles: [], warnings: [], error: null,
   cancel: () => {
     const id = get().jobId;
     if (!id) return;
     closeEvents?.(); closeEvents = null;
-    void cancelJob(id).then(() => set({ running: false, activeStage: null, error: "Trabajo cancelado" }))
+    void cancelJob(id).then(() => set({ running: false, activeStage: null, jobStatus: "cancelled", error: "Trabajo cancelado" }))
       .catch(error => set({ error: String(error) }));
   },
   start: (rev, options = {}) => {
