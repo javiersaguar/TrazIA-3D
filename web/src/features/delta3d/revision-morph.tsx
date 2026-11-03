@@ -12,6 +12,7 @@ import {
   useRef,
   useState,
   type Ref,
+  type RefObject,
 } from "react";
 import type { Bounds } from "@/workers/ifc-protocol";
 import { BRAND } from "@/lib/brand";
@@ -127,6 +128,7 @@ function TimelineScene({
   hoveredId,
   onlyChanged,
   playback,
+  pending,
   camera,
   onTick,
   onStep,
@@ -147,6 +149,8 @@ function TimelineScene({
   hoveredId: string | null;
   onlyChanged: boolean;
   playback: Ref<Playback>;
+  /** Valor pedido con el deslizador antes de que la escena existiera. */
+  pending: RefObject<number | null>;
   camera: Ref<CameraHandle>;
   onTick(value: number): void;
   onStep(index: number): void;
@@ -179,6 +183,14 @@ function TimelineScene({
   useEffect(() => {
     state.current.speed = speed;
   }, [speed]);
+  // La escena se monta después del primer render del lienzo: aplica lo que se pidió mientras tanto
+  useEffect(() => {
+    const value = pending.current;
+    if (value === null || progress !== undefined) return;
+    state.current.value = clampProgress(value);
+    state.current.playing = false;
+    invalidate();
+  }, [pending, progress, invalidate]);
   useEffect(() => {
     state.current.playing = playing;
     if (playing) last.current = -1;
@@ -395,6 +407,7 @@ export function RevisionMorph({
   const root = useRef<HTMLDivElement>(null),
     camera = useRef<CameraHandle>(null),
     playback = useRef<Playback>(null),
+    pending = useRef<number | null>(null),
     range = useRef<HTMLInputElement>(null),
     output = useRef<HTMLOutputElement>(null),
     badge = useRef<HTMLDivElement>(null);
@@ -458,12 +471,14 @@ export function RevisionMorph({
     [a, b, steps],
   );
   const setPlaying = (v: boolean) => {
+    if (v) pending.current = null;
     setOwnPlaying(v);
     onPlayingChange?.(v);
   };
   const stop = () => setPlaying(false);
   const seek = (value: number) => {
     stop();
+    pending.current = value;
     playback.current?.seek(value);
     onProgress?.(value);
   };
@@ -540,6 +555,7 @@ export function RevisionMorph({
               hoveredId={hoveredId}
               onlyChanged={onlyChanged}
               playback={playback}
+              pending={pending}
               camera={camera}
               onTick={tick}
               onStep={(i) => {
