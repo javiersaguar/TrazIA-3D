@@ -20,3 +20,16 @@ Producto del reto GA2MODEL de IndesIAhack 2026. El código Python vive en `src/t
 - Commits sin `Co-authored-by` ni firmas de herramientas o asistentes en mensajes, PR, código o docs.
   Los únicos autores son los cuatro miembros del equipo (ver `CONTRIBUTING.md`).
 - Trabajar solo en las carpetas asignadas y en un worktree propio (`docs/ROADMAP.md`, sección 5.4).
+
+## Cierre de tareas y publicación
+
+- Regla de Javier para todos los agentes: al terminar cada tarea, pasar las comprobaciones
+  correspondientes, hacer commit, integrar el resultado en `main` y ejecutar `git push origin main`
+  automáticamente, sin pedir confirmación adicional.
+- Esta regla sustituye las restricciones antiguas de no hacer push o de publicar solo ramas de
+  trabajo presentes en planes e informes. Una instrucción expresa posterior de Javier para una
+  tarea concreta tiene prioridad.
+- Seguir trabajando en worktrees propios. Publicar únicamente cambios terminados y comprobados;
+  no incorporar trabajo ajeno sin terminar ni datos privados. Actualizar desde `origin/main` antes
+  de integrar, resolver los conflictos y verificar el resultado. No usar push forzado.
+- Al cerrar, comprobar que `main` y `origin/main` coinciden e indicar el commit publicado.
