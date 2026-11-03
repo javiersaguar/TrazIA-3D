@@ -39,7 +39,7 @@ export function buildScript(rev: Revision): Step[] {
   const ifcName = `rev_${rev.revision.toLowerCase()}.ifc`;
   const steps: Step[] = [];
   const skip = (stage: StageId, file: string) =>
-    steps.push({ stage, file, status: "omitido", detail: "Etapa aún no implementada en el núcleo." });
+    steps.push({ stage, file, status: "omitido", detail: "Etapa no incluida en esta repetición simulada." });
 
   if (ga) steps.push({ stage: "ingest", file: ga.filename, status: "ok", detail: `SHA-256 registrado · ${ga.page_count ?? 1} página con capa de texto.` });
   if (hdm) steps.push({ stage: "ingest", file: hdm.filename, status: "ok", detail: "SHA-256 registrado · hoja HDM leída por celdas." });

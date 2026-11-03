@@ -1,7 +1,7 @@
 /*
-  Definición de las etapas del pipeline tal como existen hoy en src/trazia.
-  `available: false` = está en el roadmap pero no implementado: se muestra como "Próximamente"
-  y la repetición simulada la salta. No se inventan latencias ni costes.
+  Catálogo de etapas del backend. `available` indica únicamente si una etapa forma
+  parte del guion de la demo offline; no acredita disponibilidad ni ejecución real.
+  En modo API, los estados proceden de los eventos del trabajo.
 */
 
 export type StageId =

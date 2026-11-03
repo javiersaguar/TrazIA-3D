@@ -15,6 +15,7 @@ import { useRevision } from "@/lib/queries";
 import { usePipeline, type StageRunState } from "@/stores/pipeline";
 import { useUi } from "@/stores/ui";
 import { STAGE_ICON } from "./stage-meta";
+import type { Strategy } from "./graph-model";
 
 const PipelineGraph = dynamic(() => import("./pipeline-graph").then((m) => m.PipelineGraph), {
   ssr: false,
@@ -30,7 +31,7 @@ export function PipelineWorkspace() {
   const stages = usePipeline((s) => s.stages);
   const [filter, setFilter] = useState<StageId | null>(null);
   const [files, setFiles] = useState<File[]>([]);
-  const [strategy, setStrategy] = useState("b_reglas");
+  const [strategy, setStrategy] = useState<Strategy>("b_reglas");
   const [dataset, setDataset] = useState<"real" | "synthetic">("real");
   const error = usePipeline(s => s.error);
   const jobId = usePipeline(s => s.jobId);
@@ -60,7 +61,7 @@ export function PipelineWorkspace() {
               disabled={running} onChange={event => setFiles(Array.from(event.target.files ?? []))} className="max-w-[340px] rounded border border-border bg-surface p-2" />
           </label>
           <label className="grid gap-1">Estrategia
-            <select aria-label="Estrategia de lectura" value={strategy} disabled={running} onChange={event => setStrategy(event.target.value)} className="rounded border border-border bg-surface p-2">
+            <select aria-label="Estrategia de lectura" value={strategy} disabled={running} onChange={event => setStrategy(event.target.value as Strategy)} className="rounded border border-border bg-surface p-2">
               <option value="b_reglas">B · reglas</option><option value="a_vision">A · visión</option>
               <option value="c_rag">C · recuperación</option><option value="d_hibrido">D · híbrido</option>
             </select>
@@ -79,7 +80,7 @@ export function PipelineWorkspace() {
       <Panel className="overflow-hidden">
         <PanelHeader
           title="Grafo del pipeline"
-          description={apiEnabled ? "Las etapas se iluminan con eventos persistidos del servidor. Sin ejecutar no significa disponible ni medida." : "Los extractores corren en paralelo entre clasificación y normalización. Las etapas discontinuas aún no existen."}
+          description="Explora la ruta de cada estrategia o sigue los eventos de una ejecución. Los canales condicionales se identifican en sus tarjetas."
           actions={
             <div className="flex gap-2">
             {apiEnabled && running && jobId ? <Button size="sm" onClick={cancel}>Cancelar</Button> : null}
@@ -91,7 +92,7 @@ export function PipelineWorkspace() {
           }
         />
         <div className="px-3 pb-3">
-          <PipelineGraph />
+          <PipelineGraph strategy={strategy} onStrategyChange={setStrategy} />
         </div>
       </Panel>
 
@@ -102,7 +103,7 @@ export function PipelineWorkspace() {
             <p className="text-[13px] text-muted">El anillo es la salud de la etapa en la última ejecución, no un recuento de ficheros.</p>
           </div>
           <span className="text-xs text-muted">
-            {apiEnabled ? `${STAGES.filter(s => stages[s.id].lastEventAt !== null).length} etapas con eventos` : `${STAGES.filter(s => s.available).length} de ${STAGES.length} etapas disponibles`}
+            {apiEnabled ? `${STAGES.filter(s => stages[s.id].lastEventAt !== null).length} etapas con eventos` : `${STAGES.filter(s => s.available).length} de ${STAGES.length} etapas en el guion demo`}
           </span>
         </div>
         <StageCarousel stages={stages} onShowEvents={setFilter} />
@@ -168,7 +169,7 @@ function StageCard({ def, run, onShowEvents }: { def: StageDef; run: StageRunSta
   const available = apiEnabled ? run.lastEventAt !== null : def.available;
   const health = available && run.status !== "skipped" && run.total > 0 ? run.ok / run.total : null;
   const badge = !available ? (
-    <Badge tone="neutral">{apiEnabled ? "Sin ejecutar" : "Próximamente"}</Badge>
+    <Badge tone="neutral">{apiEnabled ? "Sin ejecutar" : "Fuera del guion demo"}</Badge>
   ) : run.status === "skipped" ? <Badge tone="neutral">Omitida</Badge> : run.status === "done" ? (
     run.ok === run.total ? <Badge tone="live">Al día</Badge> : <Badge tone="danger">Con errores</Badge>
   ) : (
