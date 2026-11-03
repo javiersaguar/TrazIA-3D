@@ -272,9 +272,6 @@ test("la portada carga el 3D por separado y el clic cambia la familia", async ({
   page.on("console", (m) => {
     if (m.type() === "error") errors.push(m.text());
   });
-  await page.addInitScript(() =>
-    sessionStorage.setItem("trazia.intro", "visto"),
-  );
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const vessel = page.locator("[data-equipment-kind]").first();
