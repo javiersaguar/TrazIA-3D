@@ -1,0 +1,34 @@
+{
+  "provider": "freesound",
+  "query": "reverse cymbal swell",
+  "license_policy": "cc0",
+  "ordering": "relevance; popularity is supporting evidence only",
+  "results": [
+    {
+      "id": "fs:344886",
+      "title": "soneproject__rise-crashandreverse.wav",
+      "author": "escortmarius",
+      "duration_seconds": 7.75855,
+      "preview_url": "https://cdn.freesound.org/previews/344/344886_2527354-hq.mp3",
+      "downloads": 1907,
+      "page_url": "https://freesound.org/people/escortmarius/sounds/344886/",
+      "license_label": "Creative Commons 0",
+      "description": "Remix of soneprojects sample www.freesound.org/people/soneproject/sounds/334522/",
+      "rating": 4.0,
+      "rating_count": 15
+    },
+    {
+      "id": "fs:334525",
+      "title": "rise5.wav",
+      "author": "soneproject",
+      "duration_seconds": 8.0,
+      "preview_url": "https://cdn.freesound.org/previews/334/334525_2127539-hq.mp3",
+      "downloads": 2892,
+      "page_url": "https://freesound.org/people/soneproject/sounds/334525/",
+      "license_label": "Creative Commons 0",
+      "description": "i designed these in renoise stacking various of my samples and synths presets, then bouncing processing until it sound right for my use",
+      "rating": 4.8,
+      "rating_count": 19
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "provider": "freesound",
+  "query": "dark ambient industrial drone",
+  "license_policy": "cc0",
+  "ordering": "relevance; popularity is supporting evidence only",
+  "results": [
+    {
+      "id": "fs:862217",
+      "title": "Foley Percussions and Glitches with Background Drones Soundscape",
+      "author": "bassimat",
+      "duration_seconds": 86.1667,
+      "preview_url": "https://cdn.freesound.org/previews/862/862217_15636277-hq.mp3",
+      "downloads": 124,
+      "page_url": "https://freesound.org/people/bassimat/sounds/862217/",
+      "license_label": "Creative Commons 0",
+      "description": "An experimental soundscape built from: a) layered foley percussions b) organic glitch textures c) deep atmospheric drones Everyday objects (recorded with Zoom H1essential) are transformed into rhythmic elements that interact with evolving granular details and sustained ambient backgrounds, creating an immersive compositions sustained by the drones. Drones are created with MANTICE presets Delta Pulse and Earth Monolith Ritual ( https://bassimatte.github.io/mantice/ )",
+      "rating": 4.5,
+      "rating_count": 16
+    },
+    {
+      "id": "fs:875050",
+      "title": "High-Current Electrical Rattling over a Dark Ambient Atmosphere",
+      "author": "bassimat",
+      "duration_seconds": 56.0923,
+      "preview_url": "https://cdn.freesound.org/previews/875/875050_15636277-hq.mp3",
+      "downloads": 66,
+      "page_url": "https://freesound.org/people/bassimat/sounds/875050/",
+      "license_label": "Creative Commons 0",
+      "description": "A dark ambient soundscape with high-current electrical rattling sounds moving over a deep atmospheric background. The electrical sounds are irregular, with small vibrations, buzzes and crackles appearing and disappearing. Sample from: https://freesound.org/people/Jon5515/sounds/872512/",
+      "rating": 5.0,
+      "rating_count": 3
+    },
+    {
+      "id": "fs:865213",
+      "title": "Synthetic Amazonian Insects with Rumbling Metallic Drone",
+      "author": "bassimat",
+      "duration_seconds": 66.625,
+      "preview_url": "https://cdn.freesound.org/previews/865/865213_15636277-hq.mp3",
+      "downloads": 90,
+      "page_url": "https://freesound.org/people/bassimat/sounds/865213/",
+      "license_label": "Creative Commons 0",
+      "description": "An immersive experimental soundscape featuring synthetic insect-like calls inspired by the Amazon rainforest layered over a deep rumbling metallic drone. Organic rhythmic movements intertwine with industrial resonances, creating a mysterious atmosphere that feels both natural and artificial. Ideal for ambient music, cinematic scoring, sci-fi environments, experimental productions, installations, and sound design.",
+      "rating": 5.0,
+      "rating_count": 6
+    },
+    {
+      "id": "fs:865628",
+      "title": "Mechanical Drone Texture (Seamless Loop)",
+      "author": "kkenny101",
+      "duration_seconds": 5.9935,
+      "preview_url": "https://cdn.freesound.org/previews/865/865628_17997500-hq.mp3",
+      "downloads": 112,
+      "page_url": "https://freesound.org/people/kkenny101/sounds/865628/",
+      "license_label": "Creative Commons 0",
+      "description": "A heavily time-stretched transformation of the original sound source, slowed down to approximately 20% of its original speed. The processing included subtle frequency filtering and adjustments to make the texture suitable for seamless looping. The result resembles a slow-moving machine, industrial mechanism, or abstract mechanical drone with a dark and atmospheric quality. Processing: Extreme time stretching (20% speed) Frequency range adjustment Loop preparation Original source: https://freesound.org/people/JonCon_Library/sounds/483122/",
+      "rating": 5.0,
+      "rating_count": 5
+    },
+    {
+      "id": "fs:535086",
+      "title": "established_plane_030217.wav",
+      "author": "Syni44",
+      "duration_seconds": 67.9045,
+      "preview_url": "https://cdn.freesound.org/previews/535/535086_5692962-hq.mp3",
+      "downloads": 251,
+      "page_url": "https://freesound.org/people/Syni44/sounds/535086/",
+      "license_label": "Creative Commons 0",
+      "description": "a spooky industrial drone, good for setting a dark atmospheric mood.",
+      "rating": 5.0,
+      "rating_count": 6
+    },
+    {
+      "id": "fs:452999",
+      "title": "Postapocalyptic Drone",
+      "author": "Breviceps",
+      "duration_seconds": 20.6946,
+      "preview_url": "https://cdn.freesound.org/previews/452/452999_9159316-hq.mp3",
+      "downloads": 678,
+      "page_url": "https://freesound.org/people/Breviceps/sounds/452999/",
+      "license_label": "Creative Commons 0",
+      "description": "A dark drone string pad for postapocalyptic moments",
+      "rating": 5.0,
+      "rating_count": 20
+    },
+    {
+      "id": "fs:221481",
+      "title": "Time Nightmares - 05",
+      "author": "funkymuskrat",
+      "duration_seconds": 87.4643,
+      "preview_url": "https://cdn.freesound.org/previews/221/221481_32926-hq.mp3",
+      "downloads": 145,
+      "page_url": "https://freesound.org/people/funkymuskrat/sounds/221481/",
+      "license_label": "Creative Commons 0",
+      "description": "Time dilation dilated into concave ambient drone washes.",
+      "rating": 5.0,
+      "rating_count": 3
+    },
+    {
+      "id": "fs:271328",
+      "title": "industrial_machine_hydraulic",
+      "author": "Kostrava",
+      "duration_seconds": 29.5064,
+      "preview_url": "https://cdn.freesound.org/previews/271/271328_1134415-hq.mp3",
+      "downloads": 1918,
+      "page_url": "https://freesound.org/people/Kostrava/sounds/271328/",
+      "license_label": "Creative Commons 0",
+      "description": "/zoom h2n",
+      "rating": 4.7,
+      "rating_count": 24
+    }
+  ]
+}

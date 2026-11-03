@@ -1,0 +1,73 @@
+{
+  "provider": "freesound",
+  "query": "mechanical latch click",
+  "license_policy": "cc0",
+  "ordering": "relevance; popularity is supporting evidence only",
+  "results": [
+    {
+      "id": "fs:278205",
+      "title": "Switch Flip #1",
+      "author": "IanStarGem",
+      "duration_seconds": 0.975635,
+      "preview_url": "https://cdn.freesound.org/previews/278/278205_4965320-hq.mp3",
+      "downloads": 3448,
+      "page_url": "https://freesound.org/people/IanStarGem/sounds/278205/",
+      "license_label": "Creative Commons 0",
+      "description": "Switch Flip #1. Modify/use however you want. Recorded with a ZOOM H4n using built-in stereo mics. Edited & processed with FL Studio 11 & Edison. Recorded at an inactive Ski-Lift. Technically the original sound was not a switch, it was a rain-proof cover on a power outlet. If you use this in anything, please put it in the comments, me and other people may want to check it out!",
+      "rating": 4.7,
+      "rating_count": 32
+    },
+    {
+      "id": "fs:793444",
+      "title": "Click?.mp3",
+      "author": "golakersri23",
+      "duration_seconds": 1.00134,
+      "preview_url": "https://cdn.freesound.org/previews/793/793444_17070716-hq.mp3",
+      "downloads": 67,
+      "page_url": "https://freesound.org/people/golakersri23/sounds/793444/",
+      "license_label": "Creative Commons 0",
+      "description": "A short, sharp clicking sound lasting about 1 second. It has a mechanical, high-pitched, percussive quality but is not a pen click, keyboard, car door, airplane cabinet, child lock, glove box, nail gun, or stamp. The sound is dry (no echo), suggesting it comes from a small, solid object or mechanism. Could be a latch, button, or a small snapping mechanism. Do you know what it is?",
+      "rating": null,
+      "rating_count": null
+    },
+    {
+      "id": "fs:556632",
+      "title": "Push Toggle Switch 3",
+      "author": "cookies+policy",
+      "duration_seconds": 1.41927,
+      "preview_url": "https://cdn.freesound.org/previews/556/556632_10713160-hq.mp3",
+      "downloads": 116,
+      "page_url": "https://freesound.org/people/cookies+policy/sounds/556632/",
+      "license_label": "Creative Commons 0",
+      "description": "Mechanical latching toggle switch. Click here for the rest of the switch sample library.",
+      "rating": 5.0,
+      "rating_count": 4
+    },
+    {
+      "id": "fs:448393",
+      "title": "Satisfying Plastic Handle Unlock",
+      "author": "LordForklift",
+      "duration_seconds": 1.33408,
+      "preview_url": "https://cdn.freesound.org/previews/448/448393_2294740-hq.mp3",
+      "downloads": 2335,
+      "page_url": "https://freesound.org/people/LordForklift/sounds/448393/",
+      "license_label": "Creative Commons 0",
+      "description": "Plastic Window Handle Unlock, very satisfying \"chunk\" sound. Let me know what you can do with this. (IMO the best I recorded that day)",
+      "rating": 4.6,
+      "rating_count": 34
+    },
+    {
+      "id": "fs:648831",
+      "title": "Door closing, modern apartment, springy #15",
+      "author": "JapanYoshiTheGamer",
+      "duration_seconds": 0.697604,
+      "preview_url": "https://cdn.freesound.org/previews/648/648831_2901280-hq.mp3",
+      "downloads": 284,
+      "page_url": "https://freesound.org/people/JapanYoshiTheGamer/sounds/648831/",
+      "license_label": "Creative Commons 0",
+      "description": "The sound of me closing a door in my apartment. Smooth hinges with no creaking. You can hear the springy latching mechanism when it shuts completely. One of 15 takes; there are also 15 takes of opening this same door.",
+      "rating": 4.5,
+      "rating_count": 4
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "provider": "freesound",
+  "query": "tension build",
+  "license_policy": "cc0",
+  "ordering": "relevance; popularity is supporting evidence only",
+  "results": [
+    {
+      "id": "fs:196730",
+      "title": "Build_01.wav",
+      "author": "PaulMorek",
+      "duration_seconds": 11.1678,
+      "preview_url": "https://cdn.freesound.org/previews/196/196730_172194-hq.mp3",
+      "downloads": 3142,
+      "page_url": "https://freesound.org/people/PaulMorek/sounds/196730/",
+      "license_label": "Creative Commons 0",
+      "description": "a ten second build up sound",
+      "rating": 4.7,
+      "rating_count": 22
+    },
+    {
+      "id": "fs:113974",
+      "title": "build up music.mp3",
+      "author": "cheesepuff",
+      "duration_seconds": 38.3096,
+      "preview_url": "https://cdn.freesound.org/previews/113/113974_682033-hq.mp3",
+      "downloads": 939,
+      "page_url": "https://freesound.org/people/cheesepuff/sounds/113974/",
+      "license_label": "Creative Commons 0",
+      "description": "yet another short simple song i made on my keyboard.",
+      "rating": 4.6,
+      "rating_count": 13
+    },
+    {
+      "id": "fs:761533",
+      "title": "Crimsonsquare lyft rise",
+      "author": "SamuSounds79",
+      "duration_seconds": 22.2254,
+      "preview_url": "https://cdn.freesound.org/previews/761/761533_15550851-hq.mp3",
+      "downloads": 194,
+      "page_url": "https://freesound.org/people/SamuSounds79/sounds/761533/",
+      "license_label": "Creative Commons 0",
+      "description": "A remix of this snd :: https://freesound.org/people/colorsCrimsonTears/sounds/585802/#comments Time stretched it a bit....put a panner...then a reverb... 🎱🇹🇷🗿 פּאַטש יאַ מאַמאַ הייס סאָוס",
+      "rating": 4.7,
+      "rating_count": 9
+    },
+    {
+      "id": "fs:608217",
+      "title": "Inhale with glass.wav",
+      "author": "guitargeorge-2",
+      "duration_seconds": 1.77304,
+      "preview_url": "https://cdn.freesound.org/previews/608/608217_11586128-hq.mp3",
+      "downloads": 1156,
+      "page_url": "https://freesound.org/people/guitargeorge-2/sounds/608217/",
+      "license_label": "Creative Commons 0",
+      "description": "Used a glass to breathe into to create this riser type effect",
+      "rating": 4.3,
+      "rating_count": 16
+    },
+    {
+      "id": "fs:344886",
+      "title": "soneproject__rise-crashandreverse.wav",
+      "author": "escortmarius",
+      "duration_seconds": 7.75855,
+      "preview_url": "https://cdn.freesound.org/previews/344/344886_2527354-hq.mp3",
+      "downloads": 1907,
+      "page_url": "https://freesound.org/people/escortmarius/sounds/344886/",
+      "license_label": "Creative Commons 0",
+      "description": "Remix of soneprojects sample www.freesound.org/people/soneproject/sounds/334522/",
+      "rating": 4.0,
+      "rating_count": 15
+    },
+    {
+      "id": "fs:404124",
+      "title": "Reversed Suspenseful Harp 3.wav",
+      "author": "DeVern",
+      "duration_seconds": 2.75195,
+      "preview_url": "https://cdn.freesound.org/previews/404/404124_2866779-hq.mp3",
+      "downloads": 2576,
+      "page_url": "https://freesound.org/people/DeVern/sounds/404124/",
+      "license_label": "Creative Commons 0",
+      "description": "A suspenseful reversed harp sound I used in a short film. The short film can be found here. https://www.youtube.com/watch?v=9h1hEryVB-s",
+      "rating": 4.9,
+      "rating_count": 32
+    },
+    {
+      "id": "fs:261210",
+      "title": "Mechanical Synth Swell.wav",
+      "author": "Stereo Surgeon",
+      "duration_seconds": 17.5543,
+      "preview_url": "https://cdn.freesound.org/previews/261/261210_2297168-hq.mp3",
+      "downloads": 2392,
+      "page_url": "https://freesound.org/people/Stereo%20Surgeon/sounds/261210/",
+      "license_label": "Creative Commons 0",
+      "description": "Mechanical synth swell FX pad. Kinda dark undertones with a bit of distortion. Licence: CC 0",
+      "rating": 4.8,
+      "rating_count": 38
+    }
+  ]
+}

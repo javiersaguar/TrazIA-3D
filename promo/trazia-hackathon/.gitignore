@@ -1,0 +1,7 @@
+# Proyecto audiovisual: se versionan el código, los documentos, los recursos y los dos MP4 finales
+node_modules/
+out/qa/
+out/frames/
+*.log
+# Capturas sin tapar (llevan el subtítulo de la barra lateral); solo en local
+public/captures/_orig/
