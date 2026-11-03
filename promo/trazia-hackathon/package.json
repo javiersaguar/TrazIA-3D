@@ -1,0 +1,27 @@
+{
+  "name": "trazia-hackathon-promo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Boceto de película de producto de TrazIA-3D (IndesIAhack 2026 · GA2MODEL). Proyecto Remotion independiente del producto.",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts TraziaPromo out/trazia-ga2model-draft.mp4 --gl=angle",
+    "render:nobgm": "remotion render src/index.ts TraziaPromo out/trazia-ga2model-no-bgm.mp4 --gl=angle --props=props-nobgm.json",
+    "still": "remotion still src/index.ts TraziaPromo --gl=angle"
+  },
+  "dependencies": {
+    "@react-three/fiber": "9.3.0",
+    "@remotion/cli": "4.0.484",
+    "@remotion/google-fonts": "4.0.484",
+    "@remotion/three": "4.0.484",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "remotion": "4.0.484",
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.17",
+    "@types/three": "0.180.0",
+    "typescript": "5.9.3"
+  }
+}

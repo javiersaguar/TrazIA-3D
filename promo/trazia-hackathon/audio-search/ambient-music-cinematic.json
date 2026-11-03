@@ -1,0 +1,99 @@
+{
+  "provider": "freesound",
+  "query": "ambient music cinematic",
+  "license_policy": "cc0",
+  "ordering": "relevance; popularity is supporting evidence only",
+  "results": [
+    {
+      "id": "fs:610532",
+      "title": "Dark Sad Mood Orchestra Strings Piano Choir Cinematic Music Atmo Ambient Surround.wav",
+      "author": "szegvari",
+      "duration_seconds": 72.784,
+      "preview_url": "https://cdn.freesound.org/previews/610/610532_2282212-hq.mp3",
+      "downloads": 2043,
+      "page_url": "https://freesound.org/people/szegvari/sounds/610532/",
+      "license_label": "Creative Commons 0",
+      "description": "Dark Sad Mood Orchestra Strings Piano Choir Cinematic Music Atmo Ambient Surround 120bpm",
+      "rating": 4.8,
+      "rating_count": 69
+    },
+    {
+      "id": "fs:609657",
+      "title": "Slow Sad Mood Orchestral Strings Choir Cinematic Ambient Atmo Music Surround.wav",
+      "author": "szegvari",
+      "duration_seconds": 82.0,
+      "preview_url": "https://cdn.freesound.org/previews/609/609657_2282212-hq.mp3",
+      "downloads": 1936,
+      "page_url": "https://freesound.org/people/szegvari/sounds/609657/",
+      "license_label": "Creative Commons 0",
+      "description": "Slow Sad Mood Orchestral Strings Choir Cinematic Ambient Atmo Music Surround",
+      "rating": 4.6,
+      "rating_count": 49
+    },
+    {
+      "id": "fs:384202",
+      "title": "Slow Cinematic Music.wav",
+      "author": "DeVern",
+      "duration_seconds": 53.1473,
+      "preview_url": "https://cdn.freesound.org/previews/384/384202_2866779-hq.mp3",
+      "downloads": 3170,
+      "page_url": "https://freesound.org/people/DeVern/sounds/384202/",
+      "license_label": "Creative Commons 0",
+      "description": "A slow semi epic piece of music with a piano stings and some ambient pads. Created in FL Studio.",
+      "rating": 4.8,
+      "rating_count": 94
+    },
+    {
+      "id": "fs:595842",
+      "title": "Tribal Dance - Drum Synth Voice Cinematic Music Mastered.wav",
+      "author": "szegvari",
+      "duration_seconds": 64.2613,
+      "preview_url": "https://cdn.freesound.org/previews/595/595842_2282212-hq.mp3",
+      "downloads": 467,
+      "page_url": "https://freesound.org/people/szegvari/sounds/595842/",
+      "license_label": "Creative Commons 0",
+      "description": "Tribal Dance - Drum Synth Voice Cinematic Music Mastered",
+      "rating": 4.9,
+      "rating_count": 20
+    },
+    {
+      "id": "fs:610069",
+      "title": "Walking Nomads - Orchestra Strings Score Cinematic Drama Sad Mood Dark Theatre Film Atmo Music Surround.wav",
+      "author": "szegvari",
+      "duration_seconds": 82.0,
+      "preview_url": "https://cdn.freesound.org/previews/610/610069_2282212-hq.mp3",
+      "downloads": 1053,
+      "page_url": "https://freesound.org/people/szegvari/sounds/610069/",
+      "license_label": "Creative Commons 0",
+      "description": "Walking Nomads - Orchestra Strings Score Cinematic Drama Sad Mood Dark Theatre Film Atmo Music Surround",
+      "rating": 4.5,
+      "rating_count": 24
+    },
+    {
+      "id": "fs:609748",
+      "title": "Egypt Detective Flute Orcherstra Piano Atmo Dark Thriller Strings Cinematic Music Surround.wav",
+      "author": "szegvari",
+      "duration_seconds": 81.3227,
+      "preview_url": "https://cdn.freesound.org/previews/609/609748_2282212-hq.mp3",
+      "downloads": 1881,
+      "page_url": "https://freesound.org/people/szegvari/sounds/609748/",
+      "license_label": "Creative Commons 0",
+      "description": "Egypt Detective Flute Orcherstra Piano Atmo Dark Thriller Strings Cinematic Music Surround",
+      "rating": 4.7,
+      "rating_count": 67
+    },
+    {
+      "id": "fs:612949",
+      "title": "Dark Night Sad Mood String Violin Viola Drone 120Bpm Thriller Cinematic Music.wav",
+      "author": "szegvari",
+      "duration_seconds": 82.0,
+      "preview_url": "https://cdn.freesound.org/previews/612/612949_2282212-hq.mp3",
+      "downloads": 1152,
+      "page_url": "https://freesound.org/people/szegvari/sounds/612949/",
+      "license_label": "Creative Commons 0",
+      "description": "Dark Night Sad Mood String Violin Viola Drone 120Bpm Thriller Cinematic Music Mastered",
+      "rating": 4.7,
+      "rating_count": 32
+    }
+  ]
+}

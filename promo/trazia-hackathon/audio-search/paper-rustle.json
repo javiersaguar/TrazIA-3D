@@ -1,0 +1,99 @@
+{
+  "provider": "freesound",
+  "query": "paper rustle",
+  "license_policy": "cc0",
+  "ordering": "relevance; popularity is supporting evidence only",
+  "results": [
+    {
+      "id": "fs:353125",
+      "title": "Paper Rustle",
+      "author": "BenjaminNelan",
+      "duration_seconds": 1.12964,
+      "preview_url": "https://cdn.freesound.org/previews/353/353125_1196020-hq.mp3",
+      "downloads": 1798,
+      "page_url": "https://freesound.org/people/BenjaminNelan/sounds/353125/",
+      "license_label": "Creative Commons 0",
+      "description": "The rustle of a page of paper.",
+      "rating": 4.7,
+      "rating_count": 21
+    },
+    {
+      "id": "fs:10428",
+      "title": "rustle.paper_Tear_9.aif",
+      "author": "batchku",
+      "duration_seconds": 0.511655,
+      "preview_url": "https://cdn.freesound.org/previews/10/10428_186-hq.mp3",
+      "downloads": 4313,
+      "page_url": "https://freesound.org/people/batchku/sounds/10428/",
+      "license_label": "Creative Commons 0",
+      "description": "recordings of various rustling sounds with a stereo Audio Technica 853A",
+      "rating": 4.2,
+      "rating_count": 63
+    },
+    {
+      "id": "fs:693592",
+      "title": "rustle-effect-trash.mp3",
+      "author": "rottako",
+      "duration_seconds": 1.2771,
+      "preview_url": "https://cdn.freesound.org/previews/693/693592_3975583-hq.mp3",
+      "downloads": 155,
+      "page_url": "https://freesound.org/people/rottako/sounds/693592/",
+      "license_label": "Creative Commons 0",
+      "description": "A rough piece of paper rustling and crumbling.",
+      "rating": null,
+      "rating_count": null
+    },
+    {
+      "id": "fs:334200",
+      "title": "Paper Crumple 3",
+      "author": "WasabiWielder",
+      "duration_seconds": 0.44,
+      "preview_url": "https://cdn.freesound.org/previews/334/334200_4290188-hq.mp3",
+      "downloads": 723,
+      "page_url": "https://freesound.org/people/WasabiWielder/sounds/334200/",
+      "license_label": "Creative Commons 0",
+      "description": "Me crumpling a piece of paper near the mic. Recorded on a Zoom Q4 WAV Format.",
+      "rating": 4.1,
+      "rating_count": 7
+    },
+    {
+      "id": "fs:398898",
+      "title": "paper - crumple 01.wav",
+      "author": "Anthousai",
+      "duration_seconds": 1.90205,
+      "preview_url": "https://cdn.freesound.org/previews/398/398898_5923045-hq.mp3",
+      "downloads": 1199,
+      "page_url": "https://freesound.org/people/Anthousai/sounds/398898/",
+      "license_label": "Creative Commons 0",
+      "description": "Crumpling a piece of paper in my hand once. Recorded with a Tascam DR-40.",
+      "rating": 4.7,
+      "rating_count": 12
+    },
+    {
+      "id": "fs:566189",
+      "title": "Pickup_Note_01.wav",
+      "author": "scholzi982",
+      "duration_seconds": 1.0,
+      "preview_url": "https://cdn.freesound.org/previews/566/566189_5547093-hq.mp3",
+      "downloads": 483,
+      "page_url": "https://freesound.org/people/scholzi982/sounds/566189/",
+      "license_label": "Creative Commons 0",
+      "description": "A short clip of paper rustling to mimic the sound of a note being picked up.",
+      "rating": 4.9,
+      "rating_count": 9
+    },
+    {
+      "id": "fs:513303",
+      "title": "paper crinkle",
+      "author": "charlesart",
+      "duration_seconds": 1.94619,
+      "preview_url": "https://cdn.freesound.org/previews/513/513303_10403568-hq.mp3",
+      "downloads": 123,
+      "page_url": "https://freesound.org/people/charlesart/sounds/513303/",
+      "license_label": "Creative Commons 0",
+      "description": "Recording of crumpling notebook paper, edited with Garageband. Recorded on iPhone 6s.",
+      "rating": null,
+      "rating_count": null
+    }
+  ]
+}

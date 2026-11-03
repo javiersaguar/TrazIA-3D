@@ -1,0 +1,99 @@
+{
+  "provider": "freesound",
+  "query": "camera shutter",
+  "license_policy": "cc0",
+  "ordering": "relevance; popularity is supporting evidence only",
+  "results": [
+    {
+      "id": "fs:579883",
+      "title": "Pentax K1000 Camera Shutter.wav",
+      "author": "yfjesse",
+      "duration_seconds": 0.874989,
+      "preview_url": "https://cdn.freesound.org/previews/579/579883_2391840-hq.mp3",
+      "downloads": 508,
+      "page_url": "https://freesound.org/people/yfjesse/sounds/579883/",
+      "license_label": "Creative Commons 0",
+      "description": "shutter from a Pentax k1000 Camera recorded with AKG 414",
+      "rating": 4.8,
+      "rating_count": 16
+    },
+    {
+      "id": "fs:661279",
+      "title": "Real Canon T5i camera shutter",
+      "author": "igorzets",
+      "duration_seconds": 0.949546,
+      "preview_url": "https://cdn.freesound.org/previews/661/661279_3040688-hq.mp3",
+      "downloads": 685,
+      "page_url": "https://freesound.org/people/igorzets/sounds/661279/",
+      "license_label": "Creative Commons 0",
+      "description": "Sound of a Canon camera shutter taking two pictures.",
+      "rating": 4.9,
+      "rating_count": 15
+    },
+    {
+      "id": "fs:538142",
+      "title": "Camera shutter (Pentax K20D)",
+      "author": "tnk",
+      "duration_seconds": 0.418254,
+      "preview_url": "https://cdn.freesound.org/previews/538/538142_244233-hq.mp3",
+      "downloads": 907,
+      "page_url": "https://freesound.org/people/tnk/sounds/538142/",
+      "license_label": "Creative Commons 0",
+      "description": "Pentax K20D camera shutter sound, recorded with two Sennheiser e945 microphones.",
+      "rating": 4.8,
+      "rating_count": 16
+    },
+    {
+      "id": "fs:249750",
+      "title": "Camera shutter in Sony A55",
+      "author": "matthiastidlund",
+      "duration_seconds": 0.5,
+      "preview_url": "https://cdn.freesound.org/previews/249/249750_2896261-hq.mp3",
+      "downloads": 756,
+      "page_url": "https://freesound.org/people/matthiastidlund/sounds/249750/",
+      "license_label": "Creative Commons 0",
+      "description": "Shutter sound from Sony A55 SLT camera with standard 18-55mm lens mounted. Recorded with Zoom H2n.",
+      "rating": 5.0,
+      "rating_count": 8
+    },
+    {
+      "id": "fs:125318",
+      "title": "C220 camera shutter release.wav",
+      "author": "adeluc4",
+      "duration_seconds": 0.967646,
+      "preview_url": "https://cdn.freesound.org/previews/125/125318_2266204-hq.mp3",
+      "downloads": 1569,
+      "page_url": "https://freesound.org/people/adeluc4/sounds/125318/",
+      "license_label": "Creative Commons 0",
+      "description": "shutter release of camera",
+      "rating": 4.4,
+      "rating_count": 11
+    },
+    {
+      "id": "fs:175516",
+      "title": "camera shutter 2.wav",
+      "author": "mywhats",
+      "duration_seconds": 0.244,
+      "preview_url": "https://cdn.freesound.org/previews/175/175516_1084891-hq.mp3",
+      "downloads": 1874,
+      "page_url": "https://freesound.org/people/mywhats/sounds/175516/",
+      "license_label": "Creative Commons 0",
+      "description": "camera shutter from zenit-E russian analog camera",
+      "rating": 4.6,
+      "rating_count": 13
+    },
+    {
+      "id": "fs:784946",
+      "title": "Camera Shutter Snap",
+      "author": "SecureSubset",
+      "duration_seconds": 0.25,
+      "preview_url": "https://cdn.freesound.org/previews/784/784946_16752880-hq.mp3",
+      "downloads": 694,
+      "page_url": "https://freesound.org/people/SecureSubset/sounds/784946/",
+      "license_label": "Creative Commons 0",
+      "description": "The sound of a camera shutter snapping.",
+      "rating": 4.8,
+      "rating_count": 18
+    }
+  ]
+}

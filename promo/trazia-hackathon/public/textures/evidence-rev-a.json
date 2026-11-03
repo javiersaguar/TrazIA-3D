@@ -1,0 +1,312 @@
+[
+ {
+  "path": "equipment.tag",
+  "value": "V-101",
+  "unit": "1",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.1786145882750926,
+   0.4874784868518863,
+   0.19286823524884145
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.diameter",
+  "value": 2000.0,
+  "unit": "mm",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.2166243135384228,
+   0.5339544463025944,
+   0.23087796051217163
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.height",
+  "value": 6000.0,
+  "unit": "mm",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.24869501922935766,
+   0.51995420607769,
+   0.2629486662031065
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.head_depth",
+  "value": 500.0,
+  "unit": "mm",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.2807657249202925,
+   0.5440338129151964,
+   0.2950193718940413
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.skirt_height",
+  "value": 1200.0,
+  "unit": "mm",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.31283643061122735,
+   0.55524206858841,
+   0.32709007758497616
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.skirt_thickness",
+  "value": 20.0,
+  "unit": "mm",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.3449071363021622,
+   0.5636381809767075,
+   0.359160783275911
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.attributes.design_pressure",
+  "value": 16.0,
+  "unit": "bar",
+  "page": null,
+  "bbox": null,
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.attributes.design_temperature",
+  "value": 180.0,
+  "unit": "C",
+  "page": null,
+  "bbox": null,
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.attributes.material",
+  "value": "SA-516-70",
+  "unit": "1",
+  "page": null,
+  "bbox": null,
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.attributes.operating_weight",
+  "value": 12000.0,
+  "unit": "kg",
+  "page": null,
+  "bbox": null,
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.nozzles[0].diameter",
+  "value": 200.0,
+  "unit": "mm",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.4653255093481356,
+   0.7732688477856053,
+   0.4760157445784472
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.nozzles[0].projection",
+  "value": 400.0,
+  "unit": "mm",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.4653255093481356,
+   0.7732688477856053,
+   0.4760157445784472
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.nozzles[0].elevation",
+  "value": 2500.0,
+  "unit": "mm",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.4653255093481356,
+   0.7732688477856053,
+   0.4760157445784472
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.nozzles[0].azimuth",
+  "value": 0.0,
+  "unit": "deg",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.4653255093481356,
+   0.7732688477856053,
+   0.4760157445784472
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.nozzles[1].diameter",
+  "value": 100.0,
+  "unit": "mm",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.5033352346114658,
+   0.7774719436630605,
+   0.5140254698417774
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.nozzles[1].projection",
+  "value": 300.0,
+  "unit": "mm",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.5033352346114658,
+   0.7774719436630605,
+   0.5140254698417774
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.nozzles[1].elevation",
+  "value": 5500.0,
+  "unit": "mm",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.5033352346114658,
+   0.7774719436630605,
+   0.5140254698417774
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.nozzles[1].azimuth",
+  "value": 90.0,
+  "unit": "deg",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.5033352346114658,
+   0.7774719436630605,
+   0.5140254698417774
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.nozzles[2].diameter",
+  "value": 150.0,
+  "unit": "mm",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.541344959874796,
+   0.7816750395405155,
+   0.5520351951051076
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.nozzles[2].projection",
+  "value": 350.0,
+  "unit": "mm",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.541344959874796,
+   0.7816750395405155,
+   0.5520351951051076
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.nozzles[2].elevation",
+  "value": 3500.0,
+  "unit": "mm",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.541344959874796,
+   0.7816750395405155,
+   0.5520351951051076
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ },
+ {
+  "path": "equipment.nozzles[2].azimuth",
+  "value": 180.0,
+  "unit": "deg",
+  "page": 1,
+  "bbox": [
+   0.42837308103558774,
+   0.541344959874796,
+   0.7816750395405155,
+   0.5520351951051076
+  ],
+  "kind": null,
+  "text": null,
+  "confidence": null
+ }
+]
