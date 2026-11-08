@@ -2,10 +2,11 @@
 
 Workstream K. Plan: [PLAN_EDICION_ASISTIDA.md](PLAN_EDICION_ASISTIDA.md). Fecha: 08/11/2026.
 
-**Estado:** K.0–K.6 implementados en la rama `feat/edicion-asistida`, con pruebas escritas en
-`tests/test_edicion_asistida.py` y `web/src/features/design-edit/form.test.ts`. La suite **no se
-ha ejecutado en el portátil de desarrollo** porque le falta memoria. Debe pasar en CI antes
-de integrar en `main`. K.7 queda abierto hasta tener esa ejecución y una sesión de uso. K.8 no
+**Estado:** K.0–K.6 integrados en `main` (f2e8d25). Las pruebas
+(`tests/test_edicion_asistida.py` y `web/src/features/design-edit/form.test.ts`) y la suite
+completa pasan en CI en Ubuntu y Windows, con typecheck, lint, pruebas unitarias y build de la
+web. No se ejecutaron en el portátil de desarrollo porque le falta memoria. Quedan pendientes el
+recorrido con una persona (K.2 y K.4), la medida del modelo local (K.5) y el cierre de K.7. K.8 no
 se ha empezado. Todos los ejemplos son sintéticos (V-101) y no hay datos de TR.
 
 ## 1. Orden de diseño frente a corrección de lectura (K.0)
@@ -176,10 +177,10 @@ pospuesta).
 No se acredita cálculo resistente, proceso ni cumplimiento normativo. El chat con modelo local
 no se ha medido (aciertos, aclaraciones, latencia): solo está probado con un proveedor inyectado.
 
-## 7. Verificación pendiente (K.7)
+## 7. Verificación (K.7)
 
-- [ ] `uv run pytest -q tests/test_edicion_asistida.py` y la suite completa en CI (Ubuntu y Windows).
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test:unit` y `pnpm build` en CI.
+- [x] `uv run pytest -q` con la suite completa en CI (Ubuntu y Windows), 08/11.
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm test:unit` y `pnpm build` en CI, 08/11.
 - [ ] Recorrido en la aplicación con capturas en claro y oscuro: cambio válido, lote relacionado,
   unidades equivalentes, boquilla fuera de límites, ambigüedad, base obsoleta, reintento,
   cancelación, descarte y deshacer.

@@ -1,8 +1,9 @@
 # Edición asistida del modelo · plan de desarrollo
 
-Fecha: 08/11/2026. Estado: **K.0–K.6 implementados; pruebas escritas pendientes de ejecutar
-en CI; K.7 abierto; K.8 sin empezar**. Contrato, API y medidas en
-[EDICION_ASISTIDA.md](EDICION_ASISTIDA.md).
+Fecha: 08/11/2026. Estado: **K.0, K.1, K.3 y K.6 cerrados**: integrados en `main` (f2e8d25)
+con la suite en verde en CI (Ubuntu y Windows, web incluida). K.2, K.4 y K.5 están implementados,
+pero falta la comprobación con una persona o con el modelo local. K.7 sigue abierto y K.8 sin
+empezar. Contrato, API y medidas en [EDICION_ASISTIDA.md](EDICION_ASISTIDA.md).
 Workstream K del [ROADMAP](ROADMAP.md#k-edición-asistida-del-modelo-planificada).
 
 ## Resultado de producto
@@ -74,15 +75,15 @@ parámetros/IFC no acredita cálculo resistente, proceso ni cumplimiento normati
 
 ### K.0 · Operaciones y procedencia — Plataforma, con revisión de Lectura
 
-- [ ] Definir matriz familia × operación × restricciones, empezando por el recipiente vertical.
+- [x] Definir matriz familia × operación × restricciones, empezando por el recipiente vertical.
   Distinguir altura total/entre tangentes, elevación respecto al datum y azimut respecto al Norte.
-- [ ] Definir `correccion_extraccion` frente a `cambio_diseno` y cómo se conservan solicitud,
+- [x] Definir `correccion_extraccion` frente a `cambio_diseno` y cómo se conservan solicitud,
   actor, motivo, fuente anterior y nueva procedencia. No asumir que una orden tiene bbox en GA.
-- [ ] Resolver la compatibilidad de procedencia antes de implementar: `Source` 0.3 exige documento
+- [x] Resolver la compatibilidad de procedencia antes de implementar: `Source` 0.3 exige documento
   y página o celda, y una confianza numérica. Especificar los cambios aditivos/versionados que
   necesite una orden de diseño, su documento propio y los consumidores afectados; nunca crear
   una página ficticia ni inventar confianza IA para hacer pasar el validador.
-- [ ] Planificar el filtro explícito de diseño en correcciones, ejemplos y recalibración, además
+- [x] Planificar el filtro explícito de diseño en correcciones, ejemplos y recalibración, además
   de su visualización en auditoría y exportaciones. Documentar la ampliación de DEC-26/27.
 
 **Hecho cuando:** matriz y contrato de procedencia definidos en documentación técnica, con
@@ -91,13 +92,13 @@ Este punto bloquea aplicar cambios; las maquetas pueden avanzar con fixtures.
 
 ### K.1 · Propuestas y validación conjunta — Plataforma
 
-- [ ] Definir `ChangeProposal`: ID, proyecto/equipo, revisión base, ETag/fingerprint, operaciones
+- [x] Definir `ChangeProposal`: ID, proyecto/equipo, revisión base, ETag/fingerprint, operaciones
   tipadas, unidades originales/normalizadas, valores antes/después, motivo, actor y origen.
-- [ ] Añadir estados: borrador, requiere aclaración, inválida, lista para previsualizar,
+- [x] Añadir estados: borrador, requiere aclaración, inválida, lista para previsualizar,
   previsualizada, aplicada, descartada y obsoleta; separar errores de avisos.
-- [ ] Implementar lista cerrada de operaciones, rutas y tipos. Validar pertenencia al equipo,
+- [x] Implementar lista cerrada de operaciones, rutas y tipos. Validar pertenencia al equipo,
   unidades, rangos y relaciones entre parámetros sobre el lote completo.
-- [ ] Identificar cambios dependientes y piezas derivadas que deban regenerarse. Mostrar
+- [x] Identificar cambios dependientes y piezas derivadas que deban regenerarse. Mostrar
   cualquier ajuste adicional; no corregir silenciosamente otros campos.
 
 **Hecho cuando:** un lote coherente pasa aunque un cambio aislado produzca un estado intermedio
@@ -105,13 +106,13 @@ inválido; un lote incoherente se rechaza con motivo y campo, sin alterar la rev
 
 ### K.2 · Previsualización IFC y delta — Plataforma + 3D
 
-- [ ] Construir el candidato y su IFC en almacenamiento temporal aislado, con caducidad y limpieza.
-- [ ] Ejecutar validadores de datos, familia e IFC; registrar boquillas sin colocar y conflictos.
+- [x] Construir el candidato y su IFC en almacenamiento temporal aislado, con caducidad y limpieza.
+- [x] Ejecutar validadores de datos, familia e IFC; registrar boquillas sin colocar y conflictos.
   Bloquear confirmar si se introducen problemas o quedan problemas sin resolución explícita.
-- [ ] Comparar base/candidato con la capa existente: valores, unidades, geometría y GUID.
+- [x] Comparar base/candidato con la capa existente: valores, unidades, geometría y GUID.
 - [ ] Mostrar antes/después en el visor, resaltar elementos afectados y asociar cada cambio
   a su fila. Relacionar artefacto, propuesta, huella de parámetros y versión del generador.
-- [ ] Usar trabajos/SSE para operaciones costosas y cancelación, sin publicar el resultado temporal
+- [x] Usar trabajos/SSE para operaciones costosas y cancelación, sin publicar el resultado temporal
   como revisión. Informar progreso solo cuando exista un denominador real.
 
 **Hecho cuando:** cancelar no cambia el proyecto; la geometría vista corresponde al IFC temporal
@@ -119,14 +120,14 @@ validado y cada cambio visible se puede relacionar con una operación de la prop
 
 ### K.3 · Confirmación, revisión nueva y deshacer — Plataforma
 
-- [ ] Confirmar con ID/hash de propuesta, base vigente, `If-Match` e `Idempotency-Key`.
+- [x] Confirmar con ID/hash de propuesta, base vigente, `If-Match` e `Idempotency-Key`.
   Rechazar propuestas caducadas, alteradas, no previsualizadas o basadas en datos obsoletos.
-- [ ] Publicar una revisión nueva DRAFT, los artefactos exactos validados, procedencia y auditoría
+- [x] Publicar una revisión nueva DRAFT, los artefactos exactos validados, procedencia y auditoría
   como una unidad coherente. Preparar blobs por hash antes de la transacción SQL y limpiar huérfanos;
   no suponer una transacción única entre sistema de archivos y base de datos.
-- [ ] Registrar identidad del revisor y confirmación del lote; ninguna salida del LLM puede
+- [x] Registrar identidad del revisor y confirmación del lote; ninguna salida del LLM puede
   sustituirla ni aprobar automáticamente la revisión.
-- [ ] Deshacer el lote mediante una revisión compensatoria trazable. No borrar historia ni
+- [x] Deshacer el lote mediante una revisión compensatoria trazable. No borrar historia ni
   restaurar una aprobación antigua como si siguiera vigente.
 
 **Hecho cuando:** doble clic/reintento produce una sola revisión; una edición concurrente devuelve
@@ -134,13 +135,13 @@ conflicto recuperable; un fallo entre escritura de artefactos y commit no deja u
 
 ### K.4 · Formulario contextual en Modelo — Frontend + 3D
 
-- [ ] Abrir «Proponer cambios» desde el equipo o boquilla seleccionados; mostrar dimensiones,
+- [x] Abrir «Proponer cambios» desde el equipo o boquilla seleccionados; mostrar dimensiones,
   unidades, datum y valores actuales. Ocultar operaciones no soportadas para esa familia.
-- [ ] Permitir varios cambios, validación por campo y resumen antes/después con efecto sobre
+- [x] Permitir varios cambios, validación por campo y resumen antes/después con efecto sobre
   otras piezas. Mantener separado «Corregir lectura» de «Cambiar diseño».
-- [ ] Conectar crear → validar → previsualizar → confirmar, indicando revisión base, estado DRAFT
+- [x] Conectar crear → validar → previsualizar → confirmar, indicando revisión base, estado DRAFT
   y artefactos resultantes. Cambiar una entrada invalida la previsualización anterior.
-- [ ] Ofrecer descartar, recuperar errores y deshacer. Conservar selección/cámara cuando el
+- [x] Ofrecer descartar, recuperar errores y deshacer. Conservar selección/cámara cuando el
   elemento siga existiendo. El formulario funciona sin un modelo de lenguaje disponible.
 
 **Hecho cuando:** una persona realiza un cambio sintético completo desde la UI y ve la revisión
@@ -148,13 +149,13 @@ nueva persistir al recargar, su delta correcto y el regreso mediante deshacer. A
 
 ### K.5 · Chat que prepara cambios — Copiloto + Frontend
 
-- [ ] Añadir un modo explícito «Proponer cambios» manteniendo las preguntas actuales de lectura.
+- [x] Añadir un modo explícito «Proponer cambios» manteniendo las preguntas actuales de lectura.
   Documentar la evolución de DEC-26; el servicio actual no recibe permisos de escritura.
-- [ ] Resolver el objeto por selección/ID estable. Convertir texto en operaciones de K.1,
+- [x] Resolver el objeto por selección/ID estable. Convertir texto en operaciones de K.1,
   usando el contexto permitido y validación de esquema. Rechazar rutas/acciones ajenas al catálogo.
-- [ ] Pedir aclaración ante objeto, unidad, magnitud o referencia ambiguos. Distinguir petición
+- [x] Pedir aclaración ante objeto, unidad, magnitud o referencia ambiguos. Distinguir petición
   del usuario, texto de documentos e instrucciones internas; no ejecutar instrucciones del PDF.
-- [ ] Mostrar una tarjeta editable de propuesta. Reutilizar formulario, previsualización y botón
+- [x] Mostrar una tarjeta editable de propuesta. Reutilizar formulario, previsualización y botón
   de confirmación; la respuesta «hecho» del chatbot no aplica nada por sí misma.
 - [ ] Probar con proveedor inyectado y medir después el modelo local disponible: acciones
   correctas, aclaraciones, rechazos, latencia y coste. Modelo ausente/fallo → formulario accesible.
@@ -164,13 +165,13 @@ modifica nada; un intento de ejecutar acciones no permitidas falla. No hay escri
 
 ### K.6 · Plano derivado de revisión — Plataforma + Frontend
 
-- [ ] Generar un PDF anotado separado, vinculado a revisión base/destino y a la propuesta aplicada.
+- [x] Generar un PDF anotado separado, vinculado a revisión base/destino y a la propuesta aplicada.
   Etiquetarlo como propuesta o revisión de diseño derivada, con autor, fecha y tabla de cambios.
-- [ ] Dibujar Δ, llamadas y valores nuevos solo donde exista una región del plano verificable.
+- [x] Dibujar Δ, llamadas y valores nuevos solo donde exista una región del plano verificable.
   Si falta localización, incluirlo en la tabla como pendiente de delineación, sin inventar bbox.
-- [ ] Marcar cotas/posiciones afectadas y advertir cuándo el dibujo original ya no representa
+- [x] Marcar cotas/posiciones afectadas y advertir cuándo el dibujo original ya no representa
   a escala la geometría nueva. Una anotación no equivale a redibujar el recipiente.
-- [ ] Conservar PDF original y SHA intactos. Vincular IFC, informe y PDF derivados por revisión;
+- [x] Conservar PDF original y SHA intactos. Vincular IFC, informe y PDF derivados por revisión;
   impedir que se usen como referencia de extracción original sin una política explícita.
 
 **Hecho cuando:** se exporta un PDF legible con cambios trazables al modelo y sin alterar el

@@ -1150,24 +1150,24 @@ tiempo y tiene el vídeo listo. Todos pueden responder preguntas de su área.
 ### K. Edición asistida del modelo (planificada)
 
 **Plan del 08/11:** [secuencia, contratos propuestos, dependencias y criterios de cierre](PLAN_EDICION_ASISTIDA.md).
-La planificación está documentada; ninguna casilla de implementación de esta ampliación está cerrada.
-*08/11:* K.0–K.6 implementados en `feat/edicion-asistida` con sus pruebas escritas: contrato,
-matriz, API, cola de previsualización, confirmación, deshacer, vista Proponer cambios, chat de
-borradores y PDF derivado ([contrato, API y medidas](EDICION_ASISTIDA.md)). Las casillas siguen
-abiertas hasta que las pruebas pasen en CI: no se ejecutaron en el portátil de desarrollo por
-falta de memoria. K.8 sin empezar.
+*08/11:* K.0–K.6 integrados en `main` (f2e8d25) con la suite en verde en CI (Ubuntu, Windows y
+web): contrato, matriz, API, cola de previsualización, confirmación, deshacer, vista Proponer
+cambios, chat de borradores y PDF derivado ([contrato, API y medidas](EDICION_ASISTIDA.md)).
+Se cierran K.0, K.1, K.3 y K.6. Siguen abiertas K.2 y K.4, porque falta que una persona compruebe
+en el visor el antes/después y la revisión nueva al recargar, y K.5, porque falta medir el modelo
+local; el chat solo se ha probado con un proveedor inyectado. K.7 sigue abierto y K.8 sin empezar.
 Formulario y chat comparten un motor controlado de propuestas; confirmar crea una revisión DRAFT
 nueva. La previsualización lee IFC y las órdenes de diseño no alimentan el aprendizaje de extracción.
 
 | Estado | Tarea | Responsable | Hecho cuando |
 | --- | --- | --- | --- |
-| [ ] | **K.0 · Alcance y procedencia** | Plataforma + Lectura | Matriz de operaciones, trazabilidad de órdenes y exclusión del aprendizaje definidas; compatibilidad de Source resuelta |
-| [ ] | **K.1 · Propuestas y validación** | Plataforma | Lote tipado y validado conjuntamente sin modificar la revisión base |
+| [x] | **K.0 · Alcance y procedencia** | Plataforma + Lectura | Matriz de operaciones, trazabilidad de órdenes y exclusión del aprendizaje definidas; compatibilidad de Source resuelta |
+| [x] | **K.1 · Propuestas y validación** | Plataforma | Lote tipado y validado conjuntamente sin modificar la revisión base |
 | [ ] | **K.2 · Previsualización IFC** | Plataforma + 3D | Candidato temporal validado, delta por GUID y geometría visualizada igual al artefacto |
-| [ ] | **K.3 · Confirmar y deshacer** | Plataforma | Revisión nueva DRAFT, publicación coherente, idempotencia, concurrencia y reversión trazable |
+| [x] | **K.3 · Confirmar y deshacer** | Plataforma | Revisión nueva DRAFT, publicación coherente, idempotencia, concurrencia y reversión trazable |
 | [ ] | **K.4 · Formulario en Modelo** | Frontend + 3D | Cambios sobre equipo/boquilla, previsualización, confirmación y persistencia al recargar; cierra el MVP |
 | [ ] | **K.5 · Chat de cambios** | Copiloto + Frontend | Interpreta intención, aclara ambigüedades y prepara el mismo lote; no escribe ni confirma por sí solo |
-| [ ] | **K.6 · PDF derivado** | Plataforma + Frontend | Anotaciones y tabla de cambios trazables; original intacto y ubicaciones desconocidas declaradas |
+| [x] | **K.6 · PDF derivado** | Plataforma + Frontend | Anotaciones y tabla de cambios trazables; original intacto y ubicaciones desconocidas declaradas |
 | [ ] | **K.7 · Validación del recorrido** | Equipo | Evidencias sintéticas, pruebas de fallos/concurrencia, tiempos medidos y declaración de trabajo previo |
 | [ ] | **K.8 · Ampliación opcional** | Plataforma + 3D | Altas/bajas y otras familias verificadas; planos nuevos solo tras validar su generación |
 
