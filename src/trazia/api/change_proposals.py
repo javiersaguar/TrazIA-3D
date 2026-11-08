@@ -366,9 +366,12 @@ def replace_proposal(
     body: ProposalInput,
     idempotency_key: str | None = Header(None),
 ):
+    previous = []
+
     def action(session):
         record = load(session, identity)
         refresh(session, record)
+        previous.append(record.preview_ifc_sha256)
         if record.kind != "cambio_diseno" or body.origin == "deshacer":
             raise HTTPException(409, "Una propuesta de deshacer no se edita; descártala")
         if record.status not in OPEN:
@@ -382,13 +385,19 @@ def replace_proposal(
         session.add(record)
         return {"data": view(record)}
 
-    result = request.app.state.store.perform(
+    store = request.app.state.store
+    result = store.perform(
         f"PUT change-proposals/{identity}",
         require_key(idempotency_key),
         body.model_dump(mode="json"),
         action,
     )
-    purge_previews(request.app.state.store)
+    # La previsualización anterior deja de valer: su IFC temporal se elimina si nadie lo usa.
+    with Session(store.engine) as session:
+        for sha in filter(None, previous):
+            if not referenced(session, sha):
+                store.discard(sha)
+    purge_previews(store)
     return reply(result)
 
 
@@ -922,7 +931,7 @@ def element_map(base: Revision, candidate: Revision, evaluation, model) -> list[
         guid = stable_guid(key if index == 0 else f"{key}/{part.guid_key}")
         try:
             present = model.by_guid(guid) is not None
-        except RuntimeError:
+        except Exception:  # ifcopenshell no garantiza el tipo de error si falta el GUID
             present = False
         effect = effects.get(part.id, {})
         result.append(

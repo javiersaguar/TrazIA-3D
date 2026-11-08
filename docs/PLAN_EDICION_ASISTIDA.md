@@ -1,6 +1,8 @@
 # Edición asistida del modelo · plan de desarrollo
 
-Fecha: 08/11/2026. Estado: **planificado; funcionalidad nueva sin implementar**.
+Fecha: 08/11/2026. Estado: **K.0–K.6 implementados; pruebas escritas pendientes de ejecutar
+en CI; K.7 abierto; K.8 sin empezar**. Contrato, API y medidas en
+[EDICION_ASISTIDA.md](EDICION_ASISTIDA.md).
 Workstream K del [ROADMAP](ROADMAP.md#k-edición-asistida-del-modelo-planificada).
 
 ## Resultado de producto

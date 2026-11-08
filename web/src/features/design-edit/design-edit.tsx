@@ -84,7 +84,8 @@ function Workspace({ tag }: { tag: string }) {
   const [intent, setIntent] = useState<IntentDraft | null>(null);
 
   useEffect(() => { if (user && !actor) setActor(user); }, [user, actor]);
-  useEffect(() => { setGroup(groupForSelection(selectedId)); }, [selectedId]);
+  // Solo una pieza seleccionada fija el grupo; «Atributos» no se pierde al limpiar la selección.
+  useEffect(() => { if (selectedId) setGroup(groupForSelection(selectedId)); }, [selectedId]);
   useEffect(() => () => stopStream.current?.(), []);
   // Cambiar de base empieza de cero: una propuesta pertenece a una revisión concreta.
   useEffect(() => {

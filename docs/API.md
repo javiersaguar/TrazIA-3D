@@ -574,3 +574,12 @@ con exclusión del equipo y originales destino y los límites de contexto existe
 
 La validación representativa continúa dependiendo de correcciones humanas independientes.
 Las simulaciones no miden tiempo humano ni eficacia few-shot de un proveedor de visión.
+
+## Edición asistida del modelo · workstream K (08/11)
+
+Propuestas de cambio de diseño: `GET /revisions/{id}/design-operations`,
+`POST /revisions/{id}/change-proposals`, `GET|PUT /change-proposals/{id}`,
+`POST /change-proposals/{id}/preview|apply|discard|revert`, `GET /change-proposals/{id}/preview.ifc`,
+`GET /revisions/{id}/artifacts`, `GET /revisions/{id}/design-report.pdf` y
+`POST /copiloto/design-proposals`, que solo devuelve un borrador. Aplicar crea una revisión DRAFT
+nueva; nunca edita la base. Detalle y garantías en [EDICION_ASISTIDA.md](EDICION_ASISTIDA.md).
