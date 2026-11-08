@@ -67,10 +67,13 @@ function Workspace({ tag }: { tag: string }) {
     queryFn: () => listProposals(identity.data!.identity), enabled: !!identity.data,
   });
 
-  const [group, setGroup] = useState(() => groupForSelection(selectedId));
+  // El grupo sigue a la selección 3D salvo que la persona elija otro con esa misma selección.
+  const [choice, setChoice] = useState<{ group: string; selection: string | null } | null>(null);
+  const group = choice && choice.selection === selectedId ? choice.group : groupForSelection(selectedId);
   const [drafts, setDrafts] = useState<Drafts>({});
   const [reason, setReason] = useState("");
-  const [actor, setActor] = useState(user ?? "");
+  const [actorInput, setActor] = useState<string | null>(null);
+  const actor = actorInput ?? user ?? "";
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [signature, setSignature] = useState("");
   const [steps, setSteps] = useState<string[]>([]);
@@ -78,19 +81,16 @@ function Workspace({ tag }: { tag: string }) {
   const [side, setSide] = useState<"antes" | "despues">("despues");
   const applyKey = useRef<{ id: string; key: string } | null>(null);
   const stopStream = useRef<(() => void) | null>(null);
-  const pending = useRef<Proposal | null>(null);
   const [request, setRequest] = useState("");
   const [useModel, setUseModel] = useState(false);
   const [intent, setIntent] = useState<IntentDraft | null>(null);
 
-  useEffect(() => { if (user && !actor) setActor(user); }, [user, actor]);
-  // Solo una pieza seleccionada fija el grupo; «Atributos» no se pierde al limpiar la selección.
-  useEffect(() => { if (selectedId) setGroup(groupForSelection(selectedId)); }, [selectedId]);
   useEffect(() => () => stopStream.current?.(), []);
+
   // Cambiar de base empieza de cero: una propuesta pertenece a una revisión concreta.
-  useEffect(() => {
-    setProposal(pending.current); pending.current = null; setDrafts({}); setSteps([]); setIntent(null);
-  }, [label]);
+  function changeBase(next: string, carried: Proposal | null = null) {
+    setLabel(next); setProposal(carried); setDrafts({}); setSteps([]); setIntent(null);
+  }
 
   const targets = useMemo(() => catalog.data?.targets ?? [], [catalog.data]);
   const visible = targets.filter((t) => t.group === group);
@@ -98,7 +98,7 @@ function Workspace({ tag }: { tag: string }) {
   const dirty = !!proposal && proposal.kind === "cambio_diseno" && signature !== draftSignature(operations, reason);
   const editable = !proposal || (proposal.kind === "cambio_diseno" && EDITABLE.has(proposal.status));
   const preview = proposal?.preview && !dirty ? proposal.preview : null;
-  const issues = proposal?.issues ?? [];
+  const issues = useMemo(() => proposal?.issues ?? [], [proposal]);
   const states = useMemo(() => elementStates(preview, dirty ? [] : issues), [preview, issues, dirty]);
   const base = proposal?.base ?? (identity.data && catalog.data
     ? { revision_id: identity.data.identity, version: catalog.data.version, revision: catalog.data.revision } : null);
@@ -180,7 +180,7 @@ function Workspace({ tag }: { tag: string }) {
       const filled = draftsFromOperations(result.operations, targets);
       setDrafts(filled);
       const first = targets.find((t) => t.target in filled);
-      if (first) setGroup(first.group);
+      if (first) setChoice({ group: first.group, selection: selectedId });
       if (!reason.trim()) setReason(`Petición: «${text.trim().slice(0, 200)}»`);
     }
   });
@@ -196,9 +196,8 @@ function Workspace({ tag }: { tag: string }) {
     const current = await revisionIdentity(tag, target);
     const reversion = await revertProposal(applied.id, current.etag, name || applied.actor,
       `Deshacer la orden ${applied.id.slice(0, 8)} sobre ${applied.base.revision}`);
-    // La propuesta de deshacer pertenece a la revisión derivada: se fija al cambiar de base.
-    pending.current = reversion;
-    if (label === target) { setProposal(reversion); pending.current = null; } else setLabel(target);
+    // La propuesta de deshacer pertenece a la revisión derivada.
+    changeBase(target, reversion);
   });
 
   if (identity.isLoading || catalog.isLoading) return <Skeleton className="h-[620px]" />;
@@ -233,15 +232,15 @@ function Workspace({ tag }: { tag: string }) {
         <div className="space-y-4 overflow-y-auto px-5 pb-5 text-[13px]">
           <div className="grid grid-cols-2 gap-2">
             <label className="space-y-1"><span className="text-muted">Revisión base</span>
-              <select className={control} value={label} onChange={(e) => setLabel(e.target.value)} disabled={!!busy}>
+              <select className={control} value={label} onChange={(e) => changeBase(e.target.value)} disabled={!!busy}>
                 {labels.map((rev) => <option key={rev} value={rev}>Rev {rev}</option>)}
               </select>
             </label>
             <label className="space-y-1"><span className="text-muted">Elemento</span>
               <select className={control} value={group} onChange={(e) => {
-                setGroup(e.target.value);
                 const nozzle = e.target.value.startsWith("boquilla:") ? `nozzle:${e.target.value.slice(9)}` : null;
                 select(nozzle);
+                setChoice({ group: e.target.value, selection: nozzle });
               }}>
                 {groups(targets).map((g) => <option key={g.id} value={g.id}>{g.label}</option>)}
               </select>
@@ -353,7 +352,7 @@ function Workspace({ tag }: { tag: string }) {
             {proposal && proposal.status !== "applied" && proposal.status !== "discarded" &&
               <Button variant="ghost" disabled={!!busy} onClick={discard}>Descartar</Button>}
             {proposal?.status === "applied" && <>
-              <Button variant="secondary" onClick={() => { setLabel(proposal.target_revision); }}>
+              <Button variant="secondary" onClick={() => changeBase(proposal.target_revision)}>
                 Trabajar sobre {proposal.target_revision}
               </Button>
               {!proposal.reverted_by && proposal.kind === "cambio_diseno" &&
