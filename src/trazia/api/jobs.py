@@ -143,6 +143,11 @@ async def run_job(store: Store, job_id: str):
     with Session(store.engine) as session:
         job = session.get(JobRecord, job_id)
         study = job is not None and job.kind == "study"
+        preview = job is not None and job.kind == "design_preview"
+    if preview:
+        from .change_proposals import run_preview_job
+
+        return await run_preview_job(store, job_id)
     if study:
         from .study_jobs import run_study_job
 

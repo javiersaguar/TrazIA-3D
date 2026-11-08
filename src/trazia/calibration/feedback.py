@@ -8,6 +8,7 @@ from pathlib import Path
 
 from sqlmodel import Session, select
 
+from trazia.design.provenance import is_design_field
 from trazia.model import Revision, fields
 from trazia.store import AuditRecord, CorrectionRecord, ReviewSessionRecord, RevisionRecord, Store
 
@@ -89,6 +90,9 @@ def training_rows(
                     continue
             prediction = fields(Revision.model_validate_json(audits[0].before_json).equipment)[path]
             source = prediction.source
+            if is_design_field(prediction) or is_design_field(final):
+                counts["design_order"] += 1
+                continue
             if (
                 prediction.state in ("accepted", "corrected", "assumed")
                 or source.channel == "humano"

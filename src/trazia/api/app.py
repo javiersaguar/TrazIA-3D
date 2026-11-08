@@ -22,6 +22,7 @@ from sqlmodel import Session, select
 from trazia.copilot import CopilotAnswer, CopilotUnavailable
 from trazia.copilot import ask as ask_copilot
 from trazia.copilot.cache import answer_cached
+from trazia.design.provenance import is_design, is_design_field
 from trazia.ifc import build_ifc
 from trazia.model import FieldState, Identifier, Model, Revision, Source, fields
 from trazia.queue import ProcessQueue
@@ -175,6 +176,12 @@ def create_app(
             raise ValueError("TRAZIA_QUEUE debe ser process o redis")
         app.state.queue = queue
         await recover_jobs(store, queue)
+        from .change_proposals import purge_previews
+
+        try:
+            purge_previews(store)
+        except (OSError, SQLAlchemyError):
+            logging.getLogger("trazia.api").warning("No se limpiaron previsualizaciones caducadas")
         try:
             yield
         finally:
@@ -182,14 +189,16 @@ def create_app(
             store.close()
 
     app = FastAPI(title="TrazIA-3D", version="0.3", lifespan=lifespan)
+    from .change_proposals import router as proposals_router
     from .snapshots import router as snapshots_router
 
     app.include_router(snapshots_router)
+    app.include_router(proposals_router)
     app.add_middleware(UploadLimit, limit=MAX_UPLOAD + 1024 * 1024)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins(),
-        allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
+        allow_methods=["GET", "POST", "PUT", "PATCH", "OPTIONS"],
         allow_headers=["Content-Type", "Idempotency-Key", "If-Match", "Last-Event-ID"],
         expose_headers=["ETag", "X-Audit-Id"],
     )
@@ -400,6 +409,20 @@ def create_app(
                 raise HTTPException(
                     412, "El campo ha cambiado; recarga y revisa su evidencia antes de editar"
                 )
+            if body.source is not None and is_design(body.source):
+                raise HTTPException(
+                    422, "Una orden de diseño solo nace de una propuesta confirmada"
+                )
+            if is_design_field(target) and (
+                body.value is not None
+                or body.source is not None
+                or body.state in ("corrected", "abstained")
+            ):
+                raise HTTPException(
+                    409,
+                    "Este valor procede de una orden de diseño, no de una lectura del plano. "
+                    "Para cambiarlo prepara una propuesta de cambio o deshaz la orden.",
+                )
             if body.state == "corrected" and body.value is None:
                 raise HTTPException(422, "Corregir requiere un valor")
             expected = {
@@ -596,12 +619,21 @@ def create_app(
         schema: Literal["IFC4", "IFC4X3", "IFC2X3"] = "IFC4",
         draft: bool = False,
     ):
+        from .change_proposals import published_ifc
+
         with Session(request.app.state.store.engine) as session:
             row = get_revision(session, identity)
             model = Revision.model_validate_json(row.payload)
+            # Una revisión derivada sirve el IFC exacto validado al confirmarla mientras
+            # sus datos no cambien; si cambian, se regenera desde los datos vigentes.
+            published = published_ifc(session, row, model) if draft and schema == "IFC4" else None
         try:
             content = (
-                build_ifc(model, draft=draft, schema=schema, details=model.dataset == "synthetic")
+                request.app.state.store.read(published)
+                if published
+                else build_ifc(
+                    model, draft=draft, schema=schema, details=model.dataset == "synthetic"
+                )
                 .to_string()
                 .encode()
             )

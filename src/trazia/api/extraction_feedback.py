@@ -6,6 +6,7 @@ from collections import defaultdict
 
 from sqlmodel import Session, select
 
+from trazia.design.provenance import is_design_field
 from trazia.feedback import Feedback
 from trazia.model import Revision, fields
 from trazia.store import AuditRecord, DocumentRecord, ReviewSessionRecord, RevisionRecord
@@ -96,6 +97,8 @@ def build_feedback(store, request):
                         or after is None
                         or not before.source.channel
                         or before.source.channel == "humano"
+                        or is_design_field(before)
+                        or is_design_field(after)
                         or before.state in ("accepted", "corrected")
                         or after.state not in ("accepted", "corrected")
                         or before.unit != after.unit
