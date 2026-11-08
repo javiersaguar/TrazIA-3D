@@ -26,10 +26,11 @@ const CONSEQUENCE: Record<ReviewField["group"], string> = {
 
 export function CopilotLauncher() {
   const setOpen = useUi((s) => s.setCopilotOpen);
+  const open = useUi((s) => s.copilotOpen);
   const pathname = usePathname();
   // En Revisión y Cambios taparía la cola de campos y los controles del visor;
   // allí se abre desde la píldora de la barra superior.
-  if (pathname.startsWith("/revision") || pathname.startsWith("/cambios")) return null;
+  if (open || pathname.startsWith("/revision") || pathname.startsWith("/cambios")) return null;
   return (
     <Tip content="Copiloto de revisión" side="left">
       <button
@@ -57,10 +58,10 @@ export function CopilotPanel() {
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen} modal={false}>
-      <Dialog.Portal>
         <Dialog.Content
           onInteractOutside={(e) => e.preventDefault()}
-          className="sheet-content fixed top-[calc(var(--topbar-height)+12px)] right-3 bottom-3 z-40 flex w-[380px] max-w-[calc(100vw_-_24px)] flex-col rounded-[var(--radius-panel)] border border-border bg-surface-raised shadow-[var(--shadow-pop)]"
+          data-testid="copilot-dock"
+          className="relative order-first mx-4 mt-4 flex max-h-[min(520px,70dvh)] min-w-0 flex-col rounded-[var(--radius-panel)] border border-border bg-surface-raised xl:sticky xl:top-[calc(var(--topbar-height)+16px)] xl:order-last xl:mr-4 xl:ml-0 xl:h-[calc(100dvh-var(--topbar-height)-32px)] xl:max-h-none xl:w-[360px] xl:shrink-0"
         >
           <header className="flex items-start gap-3 border-b border-border px-5 py-4">
             <span className="inline-flex size-9 items-center justify-center rounded-full border border-border-strong bg-surface">
@@ -75,7 +76,7 @@ export function CopilotPanel() {
             </Dialog.Close>
           </header>
 
-          <div className="flex-1 overflow-y-auto px-5 py-4">
+          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
             {apiEnabled ? <CopilotConversation key={`${revision}:${field?.path ?? "equipment"}`} revision={revision} field={field} /> : field ? <Explanation field={field} /> : (
               <EmptyState icon={MousePointerClick} title="Selecciona un campo">
                 Elige un valor en la cola de revisión, una región del plano o un elemento del modelo para ver de dónde
@@ -88,7 +89,6 @@ export function CopilotPanel() {
             {apiEnabled ? "El copiloto propone. Las acciones de revisión siguen en tus manos." : "Reglas de la demo offline. Conecta la API local para consultar Ollama con citas."}
           </footer>
         </Dialog.Content>
-      </Dialog.Portal>
     </Dialog.Root>
   );
 }

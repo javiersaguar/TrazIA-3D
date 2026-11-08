@@ -13,12 +13,14 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar />
-        <main className="mx-auto w-full max-w-[1520px] flex-1 px-4 pt-5 pb-24 sm:px-6 sm:pt-6">{children}</main>
+        <div className="flex min-w-0 flex-1 flex-col gap-4 xl:flex-row" data-testid="app-workspace">
+          <main className="@container order-last mx-auto w-full min-w-0 max-w-[1520px] flex-1 px-4 pt-5 pb-24 sm:px-6 sm:pt-6 xl:order-first">{children}</main>
+          <CopilotPanel />
+        </div>
       </div>
       <MobileNav />
       <CommandMenu />
       <ShortcutsDialog />
-      <CopilotPanel />
       <CopilotLauncher />
       <GlobalKeys />
       <GuidedTour />

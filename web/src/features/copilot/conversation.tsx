@@ -2,7 +2,8 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LoaderCircle, Send } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { useQuestion } from "./draft";
 import { Badge, Button, Code, Icon } from "@/components/ui/primitives";
 import { ApiError, askCopilot, type CopilotAnswer } from "@/lib/api/client";
 import { formatValue } from "@/lib/format";
@@ -10,7 +11,7 @@ import type { RevisionId } from "@/lib/mock/api";
 import type { ReviewField } from "@/lib/mock/fields";
 
 export function CopilotConversation({ revision, field }: { revision: RevisionId; field?: ReviewField }) {
-  const [question, setQuestion] = useState("");
+  const [question, setQuestion] = useQuestion(revision, field?.path);
   const controller = useRef<AbortController | null>(null);
   const input = useRef<HTMLTextAreaElement>(null);
   const client = useQueryClient();
