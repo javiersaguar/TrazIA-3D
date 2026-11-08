@@ -1,9 +1,8 @@
 "use client";
 
-import { motion } from "motion/react";
-import { useId } from "react";
+import { useId, type CSSProperties } from "react";
 
-import { EASE_IN_OUT, EASE_OUT } from "@/components/motion/reveal";
+import styles from "./intro-assembly.module.css";
 import { cn } from "@/lib/cn";
 import { FaceGradients, MARK_FACES, WORD_FACES, faceFill } from "./logo";
 import { MARK_VIEWBOX, WORD_VIEWBOX, type LogoRole } from "./logo-geometry";
@@ -77,7 +76,7 @@ function AssembledMark() {
       </defs>
 
       {MARK_PARTS.map(({ f, i, dx, dy, t0, ink }) => (
-        <motion.path
+        <path
           key={i}
           d={f.d}
           fill={faceFill(f, uid, i)}
@@ -86,28 +85,21 @@ function AssembledMark() {
           strokeWidth={1.25}
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
-          initial={{ pathLength: 0, x: dx, y: dy, fillOpacity: 0, strokeOpacity: 1 }}
-          animate={{ pathLength: 1, x: 0, y: 0, fillOpacity: 1, strokeOpacity: 0 }}
-          transition={{
-            pathLength: { duration: 0.7, delay: t0, ease: EASE_IN_OUT },
-            x: { duration: 0.95, delay: t0 + 0.1, ease: EASE_OUT },
-            y: { duration: 0.95, delay: t0 + 0.1, ease: EASE_OUT },
-            fillOpacity: { duration: 0.45, delay: 0.72 + t0 * 0.6, ease: "easeOut" },
-            strokeOpacity: { duration: 0.4, delay: 1.1, ease: "easeOut" },
-          }}
+          pathLength={1}
+          className={styles.face}
+          style={{"--dx":`${dx}px`, "--dy":`${dy}px`, "--draw-delay":`${t0}s`,
+            "--move-delay":`${t0+.1}s`, "--fill-delay":`${.72+t0*.6}s`} as CSSProperties}
         />
       ))}
 
       {/* Brillo que recorre la marca al quedar montada */}
       <g clipPath={`url(#${uid}-clip)`}>
-        <motion.rect
+        <rect
           y={230}
           width={180}
           height={665}
           fill={`url(#${uid}-sheen)`}
-          initial={{ x: 120 }}
-          animate={{ x: 980 }}
-          transition={{ duration: 0.8, delay: 1.15, ease: EASE_IN_OUT }}
+          className={styles.sheen}
         />
       </g>
     </svg>
@@ -117,59 +109,34 @@ function AssembledMark() {
 function AssembledWordmark() {
   const uid = `lw${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   return (
-    <motion.div
-      className="relative h-full"
-      initial={{ filter: "blur(10px)", opacity: 0 }}
-      animate={{ filter: "blur(0px)", opacity: 1 }}
-      transition={{ duration: 0.7, delay: WORD_START, ease: EASE_OUT }}
-    >
+    <div className={cn("relative h-full", styles.word)}>
       {/* Brillo breve detrás de «3D» */}
-      <motion.span
-        aria-hidden
-        className="pointer-events-none absolute inset-y-[-60%] right-[-6%] left-[66%] rounded-full blur-2xl"
-        style={{ background: "radial-gradient(closest-side, var(--logo-sky), transparent)" }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: [0, 0.75, 0.22] }}
-        transition={{ duration: 1.1, delay: WORD_START + 0.45, times: [0, 0.35, 1], ease: "easeOut" }}
+      <span aria-hidden className={cn("pointer-events-none absolute inset-y-[-60%] right-[-6%] left-[66%] rounded-full blur-2xl",styles.glow)}
+        style={{background:"radial-gradient(closest-side, var(--logo-sky), transparent)"}}
       />
       <svg viewBox={WORD_VIEWBOX} className="relative block h-full w-auto overflow-visible" aria-hidden>
         {WORD_PARTS.map(({ f, i }, k) => (
-          <motion.path
+          <path
             key={i}
             d={f.d}
             fill={faceFill(f, uid, i)}
             fillRule="evenodd"
-            initial={{ opacity: 0, y: 34 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: WORD_START + k * 0.05, ease: EASE_OUT }}
+            className={styles.letter}
+            style={{"--letter-delay":`${WORD_START+k*.05}s`} as CSSProperties}
           />
         ))}
       </svg>
-    </motion.div>
+    </div>
   );
 }
 
 /**
- * Animación de formación del logo. Los contenedores llevan `layoutId` opcionales para que, al
- * terminar, la marca y el wordmark viajen hasta donde estén las copias estáticas con el mismo id.
+ * Animación de formación del logo. Las dos capas del viaje se identifican sin
+ * montar copias ni ejecutar la proyección de layout de toda la portada.
  */
-export function LogoAssemble({
-  className,
-  markLayoutId,
-  wordLayoutId,
-}: {
-  className?: string;
-  markLayoutId?: string;
-  wordLayoutId?: string;
-}) {
-  return (
-    <div className={cn("flex flex-col items-center", className)}>
-      <motion.div layoutId={markLayoutId} className="w-[clamp(128px,22vw,200px)]">
-        <AssembledMark />
-      </motion.div>
-      <motion.div layoutId={wordLayoutId} className="mt-9 h-[clamp(26px,4.4vw,40px)]">
-        <AssembledWordmark />
-      </motion.div>
-    </div>
-  );
+export function LogoAssemble({ className }: { className?: string }) {
+  return <div className={cn("flex flex-col items-center",className)}>
+    <div data-intro-logo-part="mark" className={cn("w-[clamp(128px,22vw,200px)]",styles.layer)}><AssembledMark /></div>
+    <div data-intro-logo-part="word" className={cn("mt-9 h-[clamp(26px,4.4vw,40px)]",styles.layer)}><AssembledWordmark /></div>
+  </div>;
 }

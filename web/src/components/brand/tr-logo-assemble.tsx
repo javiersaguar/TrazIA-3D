@@ -1,9 +1,8 @@
 "use client";
 
-import { motion } from "motion/react";
-import { useId } from "react";
+import { useId, type CSSProperties } from "react";
 
-import { EASE_IN_OUT, EASE_OUT } from "@/components/motion/reveal";
+import styles from "./intro-assembly.module.css";
 import { cn } from "@/lib/cn";
 import { TR_MARK_BOX, TR_MARK_PIECES, TR_VIEWBOX, TR_WORD_LETTERS } from "./tr-logo-geometry";
 
@@ -35,14 +34,9 @@ export function TrLogoAssemble({ className }: { className?: string }) {
         </linearGradient>
       </defs>
 
-      <motion.g
-        style={{ transformBox: "fill-box", transformOrigin: "center" }}
-        initial={{ scale: 0.94 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 1.3, delay: 0.1, ease: EASE_OUT }}
-      >
+      <g className={styles.trMark}>
         {TR_MARK_PIECES.map((d, i) => (
-          <motion.path
+          <path
             key={i}
             d={d}
             fill="var(--logo-ink-hi)"
@@ -51,39 +45,32 @@ export function TrLogoAssemble({ className }: { className?: string }) {
             strokeWidth={1.25}
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
-            initial={{ pathLength: 0, fillOpacity: 0, strokeOpacity: 1 }}
-            animate={{ pathLength: 1, fillOpacity: 1, strokeOpacity: 0 }}
-            transition={{
-              pathLength: { duration: i ? 0.55 : 0.8, delay: i ? 0.42 : 0.12, ease: EASE_IN_OUT },
-              fillOpacity: { duration: 0.45, delay: 0.82 + i * 0.08, ease: "easeOut" },
-              strokeOpacity: { duration: 0.4, delay: 1.1, ease: "easeOut" },
-            }}
+            pathLength={1} className={styles.trFace}
+            style={{"--edge-duration":`${i ? .55 : .8}s`,"--draw-delay":`${i ? .42 : .12}s`,"--fill-delay":`${.82+i*.08}s`} as CSSProperties}
           />
         ))}
-      </motion.g>
+      </g>
 
       {/* Brillo celeste que recorre la marca al quedar formada */}
       <g clipPath={`url(#${uid}-clip)`}>
-        <motion.rect
+        <rect
           y={MY}
           width={MW * 0.45}
           height={MH}
           fill={`url(#${uid}-sheen)`}
-          initial={{ x: MX - MW * 0.5 }}
-          animate={{ x: MX + MW }}
-          transition={{ duration: 0.8, delay: 1.2, ease: EASE_IN_OUT }}
+          className={styles.trSheen}
+          style={{"--sheen-from":`${MX-MW*.5}px`,"--sheen-to":`${MX+MW}px`} as CSSProperties}
         />
       </g>
 
       {TR_WORD_LETTERS.map((d, k) => (
-        <motion.path
+        <path
           key={k}
           d={d}
           fill="var(--logo-ink-hi)"
           fillRule="evenodd"
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: WORD_START + k * 0.03, ease: EASE_OUT }}
+          className={styles.letter}
+          style={{"--letter-y":"14px","--letter-delay":`${WORD_START+k*.03}s`} as CSSProperties}
         />
       ))}
     </svg>
@@ -96,38 +83,26 @@ export function TrLogoAssemble({ className }: { className?: string }) {
  */
 export function CollabCross({ className }: { className?: string }) {
   return (
-    <motion.span
-      className={cn("relative block", className)}
-      initial={{ opacity: 0, rotate: -90, scale: 0.7 }}
-      animate={{ opacity: 1, rotate: 0, scale: 1 }}
-      transition={{ duration: 0.9, delay: 0.5, ease: EASE_OUT }}
-      aria-hidden
-    >
-      <motion.span
-        className="pointer-events-none absolute inset-[-70%] rounded-full blur-xl"
-        style={{ background: "radial-gradient(closest-side, var(--logo-sky), transparent)" }}
-        initial={{ opacity: 0, scale: 0.6 }}
-        animate={{ opacity: [0, 0.7, 0], scale: [0.6, 1.15, 1.3] }}
-        transition={{ duration: 1, delay: 1.45, times: [0, 0.3, 1], ease: "easeOut" }}
-      />
+    <span className={cn("relative block",styles.cross,className)} aria-hidden>
+      <span className={cn("pointer-events-none absolute inset-[-70%] rounded-full blur-xl",styles.crossGlow)}
+        style={{background:"radial-gradient(closest-side, var(--logo-sky), transparent)"}} />
       <svg viewBox="0 0 24 24" className="relative block size-full overflow-visible">
         {[
           { d: "M4 4 20 20", delay: 0.6 },
           { d: "M20 4 4 20", delay: 0.82 },
         ].map((l) => (
-          <motion.path
+          <path
             key={l.d}
             d={l.d}
             fill="none"
             stroke="var(--logo-sky)"
             strokeWidth={2.2}
             strokeLinecap="round"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 0.38, delay: l.delay, ease: EASE_IN_OUT }}
+            pathLength={1} className={styles.crossLine}
+            style={{"--draw-delay":`${l.delay}s`} as CSSProperties}
           />
         ))}
       </svg>
-    </motion.span>
+    </span>
   );
 }

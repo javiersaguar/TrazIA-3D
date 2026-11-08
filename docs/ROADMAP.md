@@ -1082,6 +1082,11 @@ Ninguno es decorativo: los cuatro explican algo. Fuera de estos momentos, la int
   móvil; página reajustada y pregunta conservada durante la sesión.
 - [x] **08/11 · Landing más ligera sin rediseño:** presupuesto adaptativo de píxeles, menos
   trabajo de materiales y pausas del titular/escenas; no se acredita FPS nativo nuevo.
+- [x] **08/11 · Entrada y vuelo del logo:** formación con CSS, vuelo mediante dos
+  transformaciones nativas, escenas pesadas después del vuelo y diálogo de demo diferido.
+  Pruebas con movimiento normal/reducido, salto y redimensionado; comparación local CPU
+  y peso inicial en [evidencias](evidencias/intro-fluida/README.md). El presupuesto global
+  de JS y la fluidez en Vercel siguen sin acreditarse.
 - [x] **08/11 · Proponer cambios a todo el ancho:** formulario bajo el IFC, valores actuales,
   recorrido por piezas y borradores por proyecto/equipo/revisión conservados al navegar y
   recargar. [Pruebas y capturas](evidencias/web-fluidez/README.md). No cierra la sesión humana K.4.

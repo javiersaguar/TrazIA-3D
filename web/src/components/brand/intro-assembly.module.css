@@ -1,0 +1,45 @@
+.face {
+  stroke-dasharray: 1;
+  animation: face-move .95s var(--ease-out) var(--move-delay) both,
+    edge-draw .7s var(--ease-in-out) var(--draw-delay) both,
+    face-fill .45s ease-out var(--fill-delay) both,
+    edge-fade .4s ease-out 1.1s both;
+}
+.sheen { animation: sheen .8s var(--ease-in-out) 1.15s both; }
+.word { animation: word-in .7s var(--ease-out) 1.05s both; }
+.letter { animation: letter-in .5s var(--ease-out) var(--letter-delay) both; }
+.glow { animation: glow 1.1s ease-out 1.5s both; }
+.trMark { transform-box: fill-box; transform-origin: center; animation: tr-mark 1.3s var(--ease-out) .1s both; }
+.trFace { stroke-dasharray: 1; animation: edge-draw var(--edge-duration) var(--ease-in-out) var(--draw-delay) both,
+  face-fill .45s ease-out var(--fill-delay) both, edge-fade .4s ease-out 1.1s both; }
+.trSheen { animation: tr-sheen .8s var(--ease-in-out) 1.2s both; }
+.cross { animation: cross-in .9s var(--ease-out) .5s both; }
+.crossGlow { animation: cross-glow 1s ease-out 1.45s both; }
+.crossLine { stroke-dasharray: 1; animation: edge-draw .38s var(--ease-in-out) var(--draw-delay) both; }
+.layer { transform-origin: 0 0; will-change: transform; }
+
+@keyframes face-move { from { transform: translate(var(--dx), var(--dy)); } to { transform: translate(0, 0); } }
+@keyframes edge-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes face-fill { from { fill-opacity: 0; } to { fill-opacity: 1; } }
+@keyframes edge-fade { from { stroke-opacity: 1; } to { stroke-opacity: 0; } }
+@keyframes sheen { from { transform: translateX(120px); } to { transform: translateX(980px); } }
+@keyframes word-in { from { filter: blur(10px); opacity: 0; } to { filter: blur(0); opacity: 1; } }
+@keyframes letter-in { from { opacity: 0; transform: translateY(var(--letter-y, 34px)); } to { opacity: 1; transform: translateY(0); } }
+@keyframes glow { 0% { opacity: 0; } 35% { opacity: .75; } 100% { opacity: .22; } }
+@keyframes tr-mark { from { transform: scale(.94); } to { transform: scale(1); } }
+@keyframes tr-sheen { from { transform: translateX(var(--sheen-from)); } to { transform: translateX(var(--sheen-to)); } }
+@keyframes cross-in { from { opacity: 0; transform: rotate(-90deg) scale(.7); } to { opacity: 1; transform: rotate(0) scale(1); } }
+@keyframes cross-glow { 0% { opacity: 0; transform: scale(.6); } 30% { opacity: .7; transform: scale(1.15); } 100% { opacity: 0; transform: scale(1.3); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .face,.sheen,.word,.letter,.glow,.trMark,.trFace,.trSheen,.cross,.crossGlow,.crossLine { animation: none; }
+  .face,.trFace { stroke-opacity: 0; }
+  .sheen,.trSheen,.glow,.crossGlow { opacity: 0; }
+}
+
+/* Al volar, el logo queda en su forma final, incluso si se saltó el montaje. */
+:global([data-phase="flying"][data-early-skip="true"]) .face { animation: none; transform: none; fill-opacity: 1; stroke-opacity: 0; }
+:global([data-phase="flying"][data-early-skip="true"]) .word,
+:global([data-phase="flying"][data-early-skip="true"]) .letter { animation: none; opacity: 1; transform: none; filter: none; }
+:global([data-phase="flying"][data-early-skip="true"]) .sheen,
+:global([data-phase="flying"][data-early-skip="true"]) .glow { animation: none; opacity: 0; }

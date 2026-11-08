@@ -87,9 +87,9 @@ function Stages() {
   );
 }
 
-export function DemoDialog({ children }: { children: ReactElement }) {
+export function DemoDialog({ children, defaultOpen = false, onDismiss }: { children?: ReactElement; defaultOpen?: boolean; onDismiss?():void }) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [run, setRun] = useState(0);
 
   return (
@@ -97,10 +97,11 @@ export function DemoDialog({ children }: { children: ReactElement }) {
       open={open}
       onOpenChange={(o) => {
         setOpen(o);
+        if(!o)onDismiss?.();
         if (o) setRun((r) => r + 1);
       }}
     >
-      <Dialog.Trigger asChild>{children}</Dialog.Trigger>
+      {children && <Dialog.Trigger asChild>{children}</Dialog.Trigger>}
       <Dialog.Portal>
         <Dialog.Overlay className="cmd-overlay fixed inset-0 z-50 bg-[var(--scrim)] backdrop-blur-[2px]" />
         <Dialog.Content className="cmd-content fixed top-1/2 left-1/2 z-50 w-[min(520px,calc(100vw-32px))] -translate-x-1/2 -translate-y-1/2 rounded-[16px] border border-border bg-surface-raised p-5 shadow-[var(--shadow-pop)] sm:p-6">

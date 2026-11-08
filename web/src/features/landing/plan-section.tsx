@@ -14,7 +14,7 @@ import { ScrollPhases, useReducedPreference } from "./scroll-phases";
 
 const Signature = dynamic(() => import("@/features/viewer3d/signature").then((m) => m.Signature), { ssr: false, loading: () => null });
 
-export function PlanSection() {
+export function PlanSection({ enabled = true }: { enabled?: boolean }) {
   const ref = useRef<HTMLElement>(null);
   const reduced = useReducedPreference();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
@@ -38,7 +38,7 @@ export function PlanSection() {
           </div>
 
           <div className="relative h-[min(62vh,560px)] lg:order-first" data-testid="landing-signature">
-            {near ? <Signature pixelBudget={650_000} progress={progress} /> : null}
+            {enabled && near ? <Signature pixelBudget={650_000} progress={progress} /> : null}
           </div>
         </div>
       </div>

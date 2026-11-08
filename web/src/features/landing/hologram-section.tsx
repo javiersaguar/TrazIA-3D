@@ -34,7 +34,7 @@ const PHASES: ScrollPhase[] = [
   },
 ];
 
-export function HologramSection() {
+export function HologramSection({ enabled = true }: { enabled?: boolean }) {
   const ref = useRef<HTMLElement>(null);
   const reduced = useReducedPreference();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
@@ -53,7 +53,7 @@ export function HologramSection() {
 
           <div className="relative h-[min(62vh,560px)] overflow-hidden rounded-[16px] border border-border bg-surface-sunken">
             {/* El aviso «Ilustrativo» y el avance ya los pinta HologramToReal (arriba y abajo) */}
-            {near ? (
+            {enabled && near ? (
               <HologramToReal pixelBudget={650_000} source="procedural" layout="side" progressValue={scrollYProgress} controls={false} callouts className="h-full w-full" />
             ) : null}
           </div>

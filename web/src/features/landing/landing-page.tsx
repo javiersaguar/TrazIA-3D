@@ -2,14 +2,17 @@
 
 import { motion, type Variants } from "motion/react";
 import Link from "next/link";
-import { useCallback, type ComponentProps } from "react";
+import dynamic from "next/dynamic";
+import { useCallback, useRef, useState, type ComponentProps } from "react";
 
 import { LogoMark, LogoWordmark } from "@/components/brand/logo";
-import { EASE_IN_OUT, EASE_OUT } from "@/components/motion/reveal";
+import { EASE_OUT } from "@/components/motion/reveal";
 import { Spotlight } from "@/components/motion/spotlight";
 import { LiveDot } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
-import { DemoDialog } from "./demo-dialog";
+const DemoDialog = dynamic(()=>import("./demo-dialog").then(m=>m.DemoDialog),{
+  ssr:false,loading:()=> <p role="status" className="text-xs text-muted">Abriendo el recorrido…</p>,
+});
 import { DrawingSheet } from "./drawing-sheet";
 import { HologramSection } from "./hologram-section";
 import { HowItWorks } from "./how-it-works";
@@ -32,8 +35,8 @@ const hero: Variants = {
   shown: { transition: { staggerChildren: 0.07, delayChildren: 0.15 } },
 };
 const rise: Variants = {
-  hidden: { opacity: 0, y: 16 },
-  shown: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE_OUT } },
+  hidden: { opacity: 0, transform: "translateY(16px)" },
+  shown: { opacity: 1, transform: "translateY(0)" , transition: { duration: 0.6, ease: EASE_OUT } },
 };
 
 /** Lleva al formulario de acceso y pone el foco en el usuario. */
@@ -43,18 +46,13 @@ function focusLogin() {
   window.setTimeout(() => input?.focus({ preventScroll: true }), 350);
 }
 
-function LandingHeader({ flew }: { flew: boolean }) {
-  const flight = { duration: 0.8, ease: EASE_IN_OUT };
+function LandingHeader({ introActive }: { introActive: boolean }) {
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-bg/75 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-[1240px] items-center gap-6 px-5 md:px-8">
         <Link href="/" aria-label="TrazIA 3D, inicio" className="flex items-center gap-3 rounded-[8px]">
-          <motion.span key={flew ? "mark-flown" : "mark"} layoutId={flew ? "brand-mark" : undefined} transition={flight} className="block size-9">
-            <LogoMark className="size-9" />
-          </motion.span>
-          <motion.span key={flew ? "word-flown" : "word"} layoutId={flew ? "brand-word" : undefined} transition={flight} className="block h-[15px]">
-            <LogoWordmark className="h-[15px] w-auto" />
-          </motion.span>
+          <span data-intro-target="mark" style={{visibility:introActive?"hidden":"visible"}} className="block size-9"><LogoMark className="size-9" /></span>
+          <span data-intro-target="word" style={{visibility:introActive?"hidden":"visible"}} className="block h-[15px]"><LogoWordmark className="h-[15px] w-auto" /></span>
         </Link>
         <nav aria-label="Secciones" className="ml-auto hidden items-center gap-1 md:flex">
           {LINKS.map((l) => (
@@ -97,14 +95,18 @@ function BracketButton({ className, ...props }: ComponentProps<"button">) {
 }
 
 export function LandingPage({ fontClassName }: { fontClassName?: string }) {
-  const { playing, flew, finish } = useIntro();
-  const play = !playing;
+  const { phase, fly, finish } = useIntro();
+  const play = phase !== "assembling";
+  const ready = phase === "ready";
   const start = useCallback(() => focusLogin(), []);
+  const [demoOpen, setDemoOpen] = useState(false);
+  const demoTrigger = useRef<HTMLButtonElement>(null);
+  const closeDemo = () => { setDemoOpen(false); requestAnimationFrame(()=>demoTrigger.current?.focus()); };
 
   return (
-    <div className={cn("min-h-dvh bg-bg text-text", fontClassName)}>
-      <IntroOverlay playing={playing} flew={flew} onFinish={finish} />
-      <LandingHeader flew={flew} />
+    <div className={cn("min-h-dvh bg-bg text-text", fontClassName)} data-intro-phase={phase}>
+      <IntroOverlay phase={phase} onFly={fly} onReady={finish} />
+      <LandingHeader introActive={!ready} />
 
       <Spotlight size={680} />
       <main>
@@ -130,25 +132,24 @@ export function LandingPage({ fontClassName }: { fontClassName?: string }) {
                 <LoginCard />
               </motion.div>
               <motion.div variants={rise} className="mt-3">
-                <DemoDialog>
-                  <BracketButton />
-                </DemoDialog>
+                <BracketButton ref={demoTrigger} aria-haspopup="dialog" aria-expanded={demoOpen} onClick={()=>setDemoOpen(true)} />
+                {demoOpen && <DemoDialog defaultOpen onDismiss={closeDemo} />}
               </motion.div>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 18 }}
-              animate={play ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
+              initial={{ opacity: 0, transform: "translateY(18px)" }}
+              animate={play ? { opacity: 1, transform: "translateY(0)" } : { opacity: 0, transform: "translateY(18px)" }}
               transition={{ duration: 0.8, delay: 0.1, ease: EASE_OUT }}
               className="min-w-0 lg:pt-2"
             >
-              <DrawingSheet play={play} className="h-[clamp(460px,74vh,700px)]" />
+              <DrawingSheet play={ready} className="h-[clamp(460px,74vh,700px)]" />
             </motion.div>
           </div>
         </section>
 
-        <PlanSection />
-        <HologramSection />
+        <PlanSection enabled={ready} />
+        <HologramSection enabled={ready} />
         <HowItWorks />
         <Strategies />
       </main>
