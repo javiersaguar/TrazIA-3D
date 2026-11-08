@@ -1,3 +1,4 @@
+import { convertDisplay } from "./display-value";
 import type { ElementState } from "@/features/viewer3d/product-mesh";
 import type { Datum, Issue, OperationInput, Preview, Target } from "./api";
 
@@ -43,7 +44,14 @@ export function groups(targets: Target[]): { id: string; label: string }[] {
 export function toOperations(drafts: Drafts, targets: Target[]): OperationInput[] {
   const known = new Map(targets.map((t) => [t.target, t]));
   return Object.entries(drafts)
-    .filter(([key, draft]) => known.has(key) && draft.value.trim() !== "")
+    .filter(([key, draft]) => {
+      const target = known.get(key);
+      if (!target || !draft.value.trim()) return false;
+      const canonical = target.text ? draft.value.trim() : convertDisplay(draft.value.trim(), draft.unit, target.unit);
+      const same = canonical === String(target.current.value) ||
+        (!target.text && canonical !== "" && Number.isFinite(Number(canonical)) && Number(canonical) === target.current.value);
+      return !(same && (target.text || canonical !== "") && (!draft.datum || draft.datum === target.datums[0]));
+    })
     .map(([key, draft]) => {
       const target = known.get(key)!;
       const operation: OperationInput = { target: key, value: draft.value.trim() };

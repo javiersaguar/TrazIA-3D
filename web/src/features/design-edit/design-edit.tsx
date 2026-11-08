@@ -11,21 +11,24 @@ import { FullscreenFrame } from "@/components/shell/fullscreen";
 import { Segmented } from "@/components/ui/controls";
 import { Badge, Button, EmptyState, Icon, Panel, PanelHeader, Skeleton } from "@/components/ui/primitives";
 import { apiEnabled } from "@/lib/api/config";
-import { cancelJob, getJob, subscribeJob } from "@/lib/api/client";
+import { ApiError, cancelJob, getJob, subscribeJob } from "@/lib/api/client";
+import { editableElements } from "./elements";
+import { convertDisplay } from "./display-value";
 import { PartsEditor } from "./parts-editor";
+import { draftKey, useDraftField, useDraftCache } from "./draft-store";
 import { formatValue } from "@/lib/format";
 import { useEquipment } from "@/lib/queries";
 import { useDemoUser } from "@/lib/session";
 import { useSelection } from "@/stores/selection";
 
 import {
-  startDrawing, getDrawings, drawingDownloadUrl, type DrawingFiles, type PartChange,
+  startDrawing, getDrawings, drawingDownloadUrl,
   STATUS_LABEL, applyProposal, designReportUrl, interpretRequest, createProposal, discardProposal, getCatalog, getProposal, listProposals,
   previewIfcUrl, replaceProposal, revertProposal, revisionIdentity, revisionIfcUrl, startPreview,
-  type Datum, type IntentDraft, type Issue, type Proposal, type Target,
+  type Datum, type Issue, type Proposal, type Target,
 } from "./api";
 import {
-  clarifiedText, draftSignature, draftsFromOperations, elementStates, groupForSelection, groups, issuesFor,
+  clarifiedText, draftSignature, draftsFromOperations, elementStates, issuesFor,
   toOperations, unitsFor, type Drafts,
 } from "./form";
 
@@ -52,18 +55,21 @@ export function DesignEditWorkspace({ tag = "V-101" }: { tag?: string }) {
 }
 
 function Workspace({ tag: initialTag }: { tag: string }) {
-  const [tag, setTag] = useState(initialTag);
-  const [projectId, setProjectId] = useState("DEMO-PLANT");
+  const [savedTag, setTag] = useDraftField(draftKey("navigation","",""), "tag");
+  const [savedProjectId, setProjectId] = useDraftField(draftKey("navigation","",""), "projectId");
   const qc = useQueryClient();
   const user = useDemoUser();
   const selectedId = useSelection((s) => s.selectedId);
   const select = useSelection((s) => s.setSelected);
   const equipment = useEquipment();
   const rows = equipment.data ?? [];
-  const selectedEquipment = rows.find(row => row.tag === tag && (row.project_id ?? "DEMO-PLANT") === projectId);
+  const selectedEquipment = rows.find(row => row.tag === savedTag && (row.project_id ?? "DEMO-PLANT") === savedProjectId)
+    ?? rows.find(row => row.tag === initialTag) ?? rows[0];
+  const tag = selectedEquipment?.tag ?? savedTag ?? initialTag;
+  const projectId = selectedEquipment?.project_id ?? savedProjectId;
   const equipmentKey = (row: (typeof rows)[number]) => `${row.project_id ?? "DEMO-PLANT"}:${row.tag}`;
   const labels: string[] = selectedEquipment?.revisions ?? ["B"];
-  const [chosenLabel, setLabel] = useState<string>("B");
+  const [chosenLabel, setLabel] = useDraftField(draftKey(projectId,tag,"selection"), "label");
   const label = labels.includes(chosenLabel) ? chosenLabel : labels[labels.length - 1] ?? "B";
   const identity = useQuery({ queryKey: ["design-identity", projectId, tag, label], queryFn: () => revisionIdentity(tag, label, projectId) });
   const catalog = useQuery({
@@ -75,38 +81,96 @@ function Workspace({ tag: initialTag }: { tag: string }) {
     queryFn: () => listProposals(identity.data!.identity), enabled: !!identity.data,
   });
 
+  const cacheKey = draftKey(projectId, tag, label);
+  const [, setPendingJob] = useDraftField(cacheKey, "pendingJob");
+  const [partForm, setPartForm] = useDraftField(cacheKey, "partForm");
+
   // El grupo sigue a la selección 3D salvo que la persona elija otro con esa misma selección.
-  const [choice, setChoice] = useState<{ group: string; selection: string | null } | null>(null);
-  const group = choice && choice.selection === selectedId ? choice.group : groupForSelection(selectedId);
-  const [drafts, setDrafts] = useState<Drafts>({});
-  const [partChanges,setPartChanges] = useState<PartChange[]>([]);
-  const [detailLevel,setDetailLevel] = useState<2|3|undefined>();
-  const [drawing,setDrawing] = useState<DrawingFiles|null>(null);
+  const [choice, setChoice] = useDraftField(cacheKey, "choice");
+  const chosenGroup = choice && choice.selection === selectedId ? choice.group : null;
+  const [drafts, setDrafts] = useDraftField(cacheKey, "drafts");
+  const [partChanges,setPartChanges] = useDraftField(cacheKey, "partChanges");
+  const [detailLevel,setDetailLevel] = useDraftField(cacheKey, "detailLevel");
+  const [drawing,setDrawing] = useDraftField(cacheKey, "drawing");
   const [activeJob,setActiveJob] = useState<string|null>(null);
-  const [reason, setReason] = useState("");
-  const [actorInput, setActor] = useState<string | null>(null);
+  const [reason, setReason] = useDraftField(cacheKey, "reason");
+  const [actorInput, setActor] = useDraftField(cacheKey, "actor");
   const actor = actorInput ?? user ?? "";
   const name = actor.trim();
-  const [proposal, setProposal] = useState<Proposal | null>(null);
-  const [signature, setSignature] = useState("");
+  const [proposal, setProposal] = useDraftField(cacheKey, "proposal");
+  const [signature, setSignature] = useDraftField(cacheKey, "signature");
   const [steps, setSteps] = useState<string[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
-  const [side, setSide] = useState<"antes" | "despues">("despues");
+  const [side, setSide] = useDraftField(cacheKey, "side");
   const applyKey = useRef<{ id: string; key: string } | null>(null);
   const stopStream = useRef<(() => void) | null>(null);
-  const [request, setRequest] = useState("");
-  const [useModel, setUseModel] = useState(false);
-  const [intent, setIntent] = useState<IntentDraft | null>(null);
+  const [request, setRequest] = useDraftField(cacheKey, "request");
+  const [useModel, setUseModel] = useDraftField(cacheKey, "useModel");
+  const [intent, setIntent] = useDraftField(cacheKey, "intent");
 
   useEffect(() => () => stopStream.current?.(), []);
 
+  useEffect(() => {
+    const id = useDraftCache.getState().entries[cacheKey]?.proposal?.id;
+    if (!id) return;
+    let live = true;
+    void getProposal(id).then(value => {
+      if (live) useDraftCache.getState().update(cacheKey, "proposal", value);
+    }).catch(error => {
+      if (live && error instanceof ApiError && error.status===404) useDraftCache.getState().update(cacheKey,"proposal",null);
+    });
+    return () => { live = false; };
+  }, [cacheKey]);
+
+  useEffect(() => {
+    const saved = useDraftCache.getState().entries[cacheKey]?.pendingJob;
+    if (!saved) return;
+    let live = true;
+    let stop: (()=>void) | undefined;
+    const finish = async (status: string) => {
+      try {
+        if (saved.kind === "preview") {
+          const id = useDraftCache.getState().entries[cacheKey]?.proposal?.id;
+          if (id) {
+            const value = await getProposal(id);
+            if (live) useDraftCache.getState().update(cacheKey,"proposal",value);
+          }
+        } else if (status === "done") {
+          const value = await getDrawings(saved.revisionId);
+          if (live) useDraftCache.getState().update(cacheKey,"drawing",value);
+        }
+      } finally {
+        if (live) { useDraftCache.getState().update(cacheKey,"pendingJob",null); setBusy(null); setActiveJob(null); }
+      }
+    };
+    void getJob(saved.id).then(job => {
+      if (!live) return;
+      if (["done","error","cancelled","timeout"].includes(job.status)) return finish(job.status);
+      setActiveJob(saved.id); setBusy("seguir");
+      stop = subscribeJob(saved.id,event=>setSteps(old=>[...old,event.detail]),status=>{void finish(status);},()=>{});
+    }).catch(() => { if (live) {setBusy(null);setActiveJob(null);} });
+    return () => {live=false;stop?.();};
+  },[cacheKey]);
+
   // Cambiar de base empieza de cero: una propuesta pertenece a una revisión concreta.
   function changeBase(next: string, carried: Proposal | null = null) {
-    setChoice(null); setLabel(next); setProposal(carried); setDrafts({}); setPartChanges([]); setDetailLevel(undefined); setDrawing(null); setSteps([]); setIntent(null);
+    setLabel(next); setSteps([]);
+    if (carried) {
+      const key = draftKey(projectId, tag, next);
+      useDraftCache.getState().update(key, "proposal", carried);
+    }
   }
 
   const targets = useMemo(() => catalog.data?.targets ?? [], [catalog.data]);
-  const visible = targets.filter((t) => t.group === group);
+  const elements = useMemo(() => editableElements(targets, catalog.data?.kind ?? ""), [targets, catalog.data?.kind]);
+  const group = (chosenGroup && elements.some(e => e.id === chosenGroup) ? chosenGroup : null)
+    ?? elements.find(e => e.semantic && e.semantic === selectedId?.replace(/^detail:/, "").split("/")[0])?.id ?? "equipo";
+  const currentElement = elements.find(e => e.id === group);
+  const visible = targets.filter(t => currentElement?.targets.includes(t.target));
+  const chooseElement = (id: string) => {
+    const next = elements.find(e => e.id === id);
+    select(next?.semantic ?? null); setChoice({group:id, selection:next?.semantic ?? null});
+  };
   const operations = toOperations(drafts, targets);
   const currentSignature = draftSignature(operations, reason) + JSON.stringify([partChanges,detailLevel,name,intent?.clarifications,intent?.rejected]);
   const dirty = !!proposal && proposal.kind === "cambio_diseno" && signature !== currentSignature;
@@ -122,7 +186,7 @@ function Workspace({ tag: initialTag }: { tag: string }) {
 
   function setDraft(target: Target, patch: Partial<Drafts[string]>) {
     setDrafts((old) => ({ ...old, [target.target]: {
-      value: old[target.target]?.value ?? "", unit: old[target.target]?.unit ?? target.unit,
+      value: old[target.target]?.value ?? String(target.current.value), unit: old[target.target]?.unit ?? target.unit,
       datum: old[target.target]?.datum ?? target.datums[0], ...patch,
     } }));
   }
@@ -154,7 +218,7 @@ function Workspace({ tag: initialTag }: { tag: string }) {
     if (!proposal) return;
     const job = await startPreview(proposal.id);
     setSteps([]);
-    setActiveJob(job.job_id);
+    setActiveJob(job.job_id); setPendingJob({id:job.job_id,kind:"preview",revisionId:proposal.base.revision_id});
     setBusy("previsualizar");
     await new Promise<void>((resolve,reject) => {
       stopStream.current?.();
@@ -167,7 +231,7 @@ function Workspace({ tag: initialTag }: { tag: string }) {
           }
           try { setProposal(await getProposal(proposal.id)); resolve(); }
           catch (failure) { reject(failure); }
-          finally { setActiveJob(null); }
+          finally { setActiveJob(null); setPendingJob(null); }
         },
         () => { toast.error("Seguimiento interrumpido; intentando reconectar. Puedes cancelar el trabajo."); });
     });
@@ -223,7 +287,7 @@ function Workspace({ tag: initialTag }: { tag: string }) {
     const target=proposal?.status==="applied"?proposal.target_revision:label;
     const current=await revisionIdentity(tag,target,projectId);
     const job=await startDrawing(current.identity,current.etag);
-    setActiveJob(job.job_id);setSteps([]);
+    setActiveJob(job.job_id);setPendingJob({id:job.job_id,kind:"drawing",revisionId:current.identity});setSteps([]);
     try {
       await new Promise<void>((resolve,reject)=>{
         stopStream.current?.();
@@ -233,7 +297,7 @@ function Workspace({ tag: initialTag }: { tag: string }) {
       });
       setDrawing(await getDrawings(current.identity));
       toast.success("Plano GA nuevo generado desde el IFC");
-    } finally {setActiveJob(null);}
+    } finally {setActiveJob(null);setPendingJob(null);}
   });
 
   if (identity.isLoading || catalog.isLoading) return <Skeleton className="h-[620px]" />;
@@ -243,13 +307,52 @@ function Workspace({ tag: initialTag }: { tag: string }) {
     </EmptyState></Panel>;
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_440px]" data-testid="design-edit">
+    <div className="space-y-5" data-testid="design-edit">
+      <Panel><div className="space-y-3 p-4">
+          <div className="grid gap-3 @xl:grid-cols-2 @4xl:grid-cols-4">
+            <label className="space-y-1"><span className="text-muted">Proyecto</span>
+              <select aria-label="Proyecto" className={control} value={projectId} disabled={!!busy} onChange={e=>{
+                const next=rows.find(row=>(row.project_id??"DEMO-PLANT")===e.target.value);
+                if(next){setProjectId(e.target.value);setTag(next.tag);select(null);}
+              }}>{[...new Set(rows.map(row=>row.project_id??"DEMO-PLANT"))].map(id=><option key={id}>{id}</option>)}</select>
+            </label>
+            <label className="space-y-1"><span className="text-muted">Equipo</span>
+              <select aria-label="Equipo" className={control} value={`${projectId}:${tag}`} disabled={!!busy} onChange={e => {
+                const next = rows.find(row => equipmentKey(row) === e.target.value);
+                if (next) { setTag(next.tag); setProjectId(next.project_id ?? "DEMO-PLANT"); select(null); }
+              }}>
+                {rows.filter(row=>(row.project_id??"DEMO-PLANT")===projectId).map(row => <option key={equipmentKey(row)} value={equipmentKey(row)}>{row.tag} · {row.kind} · {row.project_id ?? "DEMO-PLANT"}</option>)}
+              </select>
+            </label>
+            <label className="space-y-1"><span className="text-muted">Revisión base</span>
+              <select aria-label="Revisión base" className={control} value={label} onChange={(e) => changeBase(e.target.value)} disabled={!!busy}>
+                {labels.map((rev) => <option key={rev} value={rev}>Rev {rev}</option>)}
+              </select>
+            </label>
+            <label className="space-y-1"><span className="text-muted">Elemento</span>
+              <select aria-label="Elemento" className={control} value={group} onChange={(e) => chooseElement(e.target.value)}>
+                {elements.map(g => <option key={g.id} value={g.id}>{g.label}</option>)}
+              </select>
+            </label>
+          </div>
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
+          <span>Recorre las piezas del equipo; sus dimensiones comunes se comparten con el conjunto.</span>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="secondary" disabled={!!busy || elements.findIndex(e => e.id===group)<=0}
+              onClick={() => chooseElement(elements[elements.findIndex(e => e.id===group)-1]!.id)}>Pieza anterior</Button>
+            <span>{elements.findIndex(e => e.id===group)+1} / {elements.length}</span>
+            <Button size="sm" variant="secondary" disabled={!!busy || elements.findIndex(e => e.id===group)>=elements.length-1}
+              onClick={() => chooseElement(elements[elements.findIndex(e => e.id===group)+1]!.id)}>Pieza siguiente</Button>
+          </div>
+        </div>
+      </div></Panel>
+
       <FullscreenFrame
         title="Antes y después en el IFC"
         description={preview
           ? "Después: IFC temporal generado y validado con estos parámetros. No es una revisión hasta confirmar."
           : "Revisión base. Valida y previsualiza para ver el IFC de la propuesta."}
-        height="h-[min(72vh,760px)] min-h-[460px]"
+        height="h-[min(56vh,560px)] min-h-[340px]"
         actions={<>
           <span className="text-[12px] text-warning">{catalog.data?.dataset === "real" ? "Datos de la revisión" : "Datos sintéticos"} · {tag} · DRAFT</span>
           <Segmented<"antes" | "despues"> label="Revisión mostrada" value={preview ? side : "antes"} onChange={setSide}
@@ -265,37 +368,14 @@ function Workspace({ tag: initialTag }: { tag: string }) {
         <PanelHeader title="Proponer cambios de diseño"
           description="Cambia el diseño, no la lectura. Se crea una revisión DRAFT nueva; el plano original no se toca."
           actions={proposal ? <Badge tone={tone(proposal.status)}>{STATUS_LABEL[proposal.status]}</Badge> : null} />
-        <div className="space-y-4 overflow-y-auto px-5 pb-5 text-[13px]">
-          <div className="grid grid-cols-2 gap-2">
-            <label className="space-y-1"><span className="text-muted">Equipo</span>
-              <select aria-label="Equipo" className={control} value={`${projectId}:${tag}`} disabled={!!busy} onChange={e => {
-                const next = rows.find(row => equipmentKey(row) === e.target.value);
-                if (next) { setTag(next.tag); setProjectId(next.project_id ?? "DEMO-PLANT"); changeBase(""); select(null); }
-              }}>
-                {rows.map(row => <option key={equipmentKey(row)} value={equipmentKey(row)}>{row.tag} · {row.kind} · {row.project_id ?? "DEMO-PLANT"}</option>)}
-              </select>
-            </label>
-            <label className="space-y-1"><span className="text-muted">Revisión base</span>
-              <select aria-label="Revisión base" className={control} value={label} onChange={(e) => changeBase(e.target.value)} disabled={!!busy}>
-                {labels.map((rev) => <option key={rev} value={rev}>Rev {rev}</option>)}
-              </select>
-            </label>
-            <label className="space-y-1"><span className="text-muted">Elemento</span>
-              <select aria-label="Elemento" className={control} value={group} onChange={(e) => {
-                const nozzle = e.target.value.startsWith("boquilla:") ? `nozzle:${e.target.value.slice(9)}` : null;
-                select(nozzle);
-                setChoice({ group: e.target.value, selection: nozzle });
-              }}>
-                {groups(targets).map((g) => <option key={g.id} value={g.id}>{g.label}</option>)}
-              </select>
-            </label>
-          </div>
+        <div className="space-y-4 px-4 pb-5 text-[13px] sm:px-5" data-testid="design-form">
+
           {!catalog.data.geometry_supported && <p className="rounded border border-warning-border bg-warning-bg p-2 text-warning">
             Esta familia ({catalog.data.kind}, LOD {catalog.data.lod}) solo admite atributos: su geometría aún no tiene cobertura verificada.
           </p>}
           <p className="text-muted">{catalog.data.datum.elevation} Azimut: {catalog.data.datum.azimuth}</p>
 
-          {editable && <section className="space-y-2 rounded-[var(--radius-card)] border border-border p-3" aria-label="Describir el cambio">
+          {editable && <details className="space-y-2 rounded-[var(--radius-card)] border border-border p-3" open={!!request || !!intent}><summary className="cursor-pointer font-medium text-strong">Describir el cambio con el Copiloto</summary>
             <label className="block space-y-1">
               <span className="flex items-center gap-1.5 font-medium text-strong"><Icon icon={MessageSquareText} size={14} />Describir el cambio</span>
               <textarea className={control} rows={2} maxLength={2000} value={request} onChange={(e) => setRequest(e.target.value)}
@@ -324,9 +404,9 @@ function Workspace({ tag: initialTag }: { tag: string }) {
                 </div>}
               </div>)}
             </div>}
-          </section>}
+          </details>}
 
-          <fieldset disabled={!editable || !!busy} className="space-y-3">
+          <fieldset disabled={!editable || !!busy} className="grid gap-3 @xl:grid-cols-2 @4xl:grid-cols-3" data-testid="design-fields">
             {visible.length === 0 && <p className="text-muted">No hay operaciones admitidas para este elemento.</p>}
             {visible.map((target) => {
               const draft = drafts[target.target];
@@ -344,25 +424,37 @@ function Workspace({ tag: initialTag }: { tag: string }) {
                     </span>
                   </div>
                   <div className="flex gap-2">
-                    <input className={control} value={draft?.value ?? ""} placeholder="Sin cambio"
+                    <input className={control} value={draft?.value ?? String(target.current.value)}
                       inputMode={target.text ? "text" : "decimal"} aria-label={`Nuevo valor de ${target.label}`}
                       aria-invalid={own.some((i) => i.severity === "error")}
                       onChange={(e) => setDraft(target, { value: e.target.value })} />
                     {units.length > 0 && <select className={`${control} w-24`} aria-label={`Unidad de ${target.label}`}
-                      value={draft?.unit ?? target.unit} onChange={(e) => setDraft(target, { unit: e.target.value })}>
+                      value={draft?.unit ?? target.unit} onChange={(e) => setDraft(target, { unit: e.target.value, value: convertDisplay(draft?.value ?? String(target.current.value), draft?.unit ?? target.unit, e.target.value) })}>
                       {units.map((u) => <option key={u} value={u}>{u === "deg" ? "°" : u}</option>)}
                     </select>}
                   </div>
                   {target.datums.length > 1 && <select className={control} aria-label={`Referencia de ${target.label}`}
-                    value={draft?.datum ?? target.datums[0]} onChange={(e) => setDraft(target, { datum: e.target.value as Datum })}>
+                    value={draft?.datum ?? target.datums[0]} onChange={(e) => {
+                      const next = e.target.value as Datum, previous = draft?.datum ?? target.datums[0];
+                      const mmText = convertDisplay(draft?.value ?? String(target.current.value), draft?.unit ?? target.unit, "mm");
+                      const mm = mmText ? Number(mmText) : NaN;
+                      const shift = Number(convertDisplay(drafts.skirt_height?.value ?? String(catalog.data?.datum.shell_bottom_mm ?? 0), drafts.skirt_height?.unit ?? "mm", "mm"));
+                      const value = Number.isFinite(mm) ? String(mm + (previous === "tangente_inferior" ? shift : -shift)) : "";
+                      setDraft(target, { datum: next, value: convertDisplay(value, "mm", draft?.unit ?? target.unit) });
+                    }}>
                     {target.datums.map((d) => <option key={d} value={d}>Elevación {DATUM_LABEL[d]}</option>)}
                   </select>}
-                  <p className="text-[12px] text-muted">{target.rule}</p>
+                  <details className="text-[12px] text-muted"><summary className="cursor-pointer">Condiciones del campo</summary><p>{target.rule}</p></details>
+                  {draft && <Button size="sm" variant="ghost" onClick={() => setDrafts(old => {
+                    const next={...old}; delete next[target.target]; return next;
+                  })}>Restablecer {target.label}</Button>}
                   {operation?.resolution && !dirty && <p className="text-[12px] text-sky">{operation.resolution}</p>}
                   {own.map((issue, index) => <IssueLine key={index} issue={issue} />)}
                 </div>
               );
             })}
+          </fieldset>
+          <fieldset disabled={!editable || !!busy} className="grid gap-3 @xl:grid-cols-[2fr_1fr]">
             <label className="block space-y-1"><span className="text-muted">Motivo del cambio (obligatorio)</span>
               <textarea className={control} rows={2} maxLength={1000} value={reason} onChange={(e) => setReason(e.target.value)}
                 placeholder="Por ejemplo: aumentar capacidad según la hoja de proceso" />
@@ -372,7 +464,10 @@ function Workspace({ tag: initialTag }: { tag: string }) {
             </label>
           </fieldset>
 
-          <PartsEditor key={identity.data?.identity} catalog={catalog.data} changes={partChanges} onChange={setPartChanges} detailLevel={detailLevel} onDetailLevel={setDetailLevel} disabled={!editable || !!busy} />
+          <details className="rounded-[var(--radius-card)] border border-border p-3" data-testid="parts-section">
+            <summary className="cursor-pointer font-medium text-strong">Añadir o eliminar piezas {partChanges.length ? `· ${partChanges.length} en el lote` : ""}</summary>
+          <PartsEditor key={identity.data?.identity} catalog={catalog.data} form={partForm} onFormChange={setPartForm} changes={partChanges} onChange={setPartChanges} detailLevel={detailLevel} onDetailLevel={setDetailLevel} disabled={!editable || !!busy} />
+          </details>
           <p className="text-[12px] text-muted">
             ¿El plano dice otra cosa? Eso es <Link className="text-accent-text underline" href="/modelo?vista=revision">corregir la lectura</Link>,
             no cambiar el diseño: las órdenes de diseño no entran en el aprendizaje de extracción.
@@ -383,6 +478,7 @@ function Workspace({ tag: initialTag }: { tag: string }) {
             {steps.map((s, i) => <li key={i}>{s}</li>)}
           </ol>}
 
+          <p role="status" className="text-xs text-muted">Borrador conservado en esta sesión del navegador, por equipo y revisión. No se aplica hasta confirmar.</p>
           <div className="flex flex-wrap gap-2">
             {editable && <Button variant={proposal?.status === "ready" && !dirty ? "secondary" : "primary"} disabled={!canValidate} onClick={validate}>
               {busy === "validar" ? "Validando…" : proposal ? "Volver a validar" : "Validar lote"}
@@ -410,12 +506,12 @@ function Workspace({ tag: initialTag }: { tag: string }) {
           </div>
 
           {activeJob && <Button size="sm" variant="ghost" onClick={()=>void cancelJob(activeJob)}>Cancelar trabajo en curso</Button>}
-          <section aria-label="Plano GA nuevo" className="space-y-2 border-t border-border pt-3">
-            <h3 className="font-semibold">Generar plano nuevo desde IFC</h3>
+          <details aria-label="Plano GA nuevo" className="space-y-2 border-t border-border pt-3">
+            <summary className="cursor-pointer font-semibold">Generar plano nuevo desde IFC</summary>
             <p className="text-xs text-muted">Alzado, perfil y planta en A3, cotas exteriores y cajetín. DRAFT con escala física; proyección sin ocultación. Se usa la revisión persistida {proposal?.status==="applied"?proposal.target_revision:label}, no cambios sin confirmar.</p>
             <Button disabled={!!busy} onClick={makeDrawing}>{busy==="plano"?"Generando plano…":"Generar GA nuevo"}</Button>
             {drawing && <div className="flex flex-wrap gap-3 text-sm">{Object.entries(drawing.files).map(([key,file])=><a key={key} className="text-accent-text underline" href={drawingDownloadUrl(file.url)} download>Descargar {key.toUpperCase()}</a>)}</div>}
-          </section>
+          </details>
           <HistoryList proposals={history.data ?? []} busy={!!busy} onUndo={undo} />
         </div>
       </Panel>

@@ -1078,6 +1078,14 @@ Ninguno es decorativo: los cuatro explican algo. Fuera de estos momentos, la int
 
 #### I.9 Accesibilidad, rendimiento y pulido
 
+- [x] **08/11 · Copiloto sin superposición:** columna propia en escritorio y panel apilado en
+  móvil; página reajustada y pregunta conservada durante la sesión.
+- [x] **08/11 · Landing más ligera sin rediseño:** presupuesto adaptativo de píxeles, menos
+  trabajo de materiales y pausas del titular/escenas; no se acredita FPS nativo nuevo.
+- [x] **08/11 · Proponer cambios a todo el ancho:** formulario bajo el IFC, valores actuales,
+  recorrido por piezas y borradores por proyecto/equipo/revisión conservados al navegar y
+  recargar. [Pruebas y capturas](evidencias/web-fluidez/README.md). No cierra la sesión humana K.4.
+
 - Contraste AA, foco visible, todo operable con teclado (incluido seleccionar elementos 3D desde el árbol).
 - Presupuestos: JS inicial < 250 KB gz sin el chunk 3D (que se carga en diferido); LCP < 2 s en local;
   INP < 200 ms; visor a 60 fps.

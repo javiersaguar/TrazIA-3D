@@ -1,0 +1,119 @@
+import { expect, test } from "@playwright/test";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { resolve } from "node:path";
+
+const connected=!!process.env.NEXT_PUBLIC_API_URL;
+const output=resolve("../docs/evidencias/web-fluidez");
+
+test("el copiloto reserva una columna y se apila sin tapar contenido en móvil",async({page})=>{
+  await page.goto("/proyecto");
+  const main=page.getByRole("main");
+  const before=await main.boundingBox();
+  await page.getByRole("button",{name:"Abrir copiloto",exact:true}).click();
+  const dock=page.getByTestId("copilot-dock");
+  await expect(dock).toBeVisible();
+  const box=await dock.boundingBox(), after=await main.boundingBox();
+  expect(after!.width).toBeLessThan(before!.width);
+  expect(after!.x+after!.width).toBeLessThanOrEqual(box!.x);
+  if(connected)await page.getByLabel("Tu pregunta").fill("Conservar esta pregunta al navegar");
+  await page.getByRole("link",{name:"Documentos",exact:true}).click();
+  await page.waitForURL("**/documentos");
+  await expect(dock).toBeVisible();
+  if(connected)await expect(page.getByLabel("Tu pregunta")).toHaveValue("Conservar esta pregunta al navegar");
+  await page.screenshot({path:resolve(output,"copiloto-oscuro.png")});
+  await page.setViewportSize({width:800,height:900});
+  await expect.poll(async()=>{
+    const d=await dock.boundingBox(),m=await main.boundingBox();
+    return d!.y+d!.height<=m!.y;
+  }).toBe(true);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(800);
+  await page.getByRole("button",{name:"Cerrar copiloto"}).click();
+  await expect(dock).not.toBeVisible();
+});
+
+test("formulario debajo del IFC, valores actuales y borrador conservado entre vistas y recarga",async({page})=>{
+  test.skip(!connected,"Requiere API real");
+  test.setTimeout(90_000);
+  await page.emulateMedia({reducedMotion:"reduce"});
+  await page.goto("/modelo?vista=editar");
+  const diameter=page.getByLabel("Nuevo valor de Diámetro interior de la virola");
+  await expect(diameter).toHaveValue("2000");
+  const viewer=page.getByTestId("ifc-viewer"),form=page.getByTestId("design-form");
+  const v=await viewer.boundingBox(),f=await form.boundingBox();
+  expect(f!.y).toBeGreaterThan(v!.y+v!.height);
+  const columns=await page.getByTestId("design-fields").evaluate(node=>getComputedStyle(node).gridTemplateColumns.split(" ").length);
+  expect(columns).toBeGreaterThanOrEqual(2);
+  await page.getByLabel("Nuevo valor de Longitud entre tangentes (virola)",{exact:true}).fill("7100");
+  await page.getByLabel("Elemento",{exact:true}).selectOption("boquilla:N3");
+  const elevation=page.getByLabel("Nuevo valor de N3 · elevación");
+  await expect(elevation).toHaveValue("3700");
+  await elevation.fill("4200");
+  await page.getByRole("button",{name:"Pieza siguiente",exact:true}).click();
+  await page.getByLabel("Elemento",{exact:true}).selectOption("boquilla:N3");
+  await expect(elevation).toHaveValue("4200");
+  await page.getByLabel("Motivo del cambio (obligatorio)").fill("Ampliación sintética conservada");
+  await page.getByTestId("parts-section").locator("summary").first().click();
+  await page.getByLabel("ID de pieza nueva").fill("N9");
+  await page.getByLabel("Pieza: Diámetro",{exact:true}).fill("120");
+  await page.getByRole("radio",{name:"Cambios",exact:true}).click();
+  await page.getByRole("radio",{name:"Proponer cambios",exact:true}).click();
+  await expect(page.getByLabel("Motivo del cambio (obligatorio)")).toHaveValue("Ampliación sintética conservada");
+  await page.getByLabel("Elemento",{exact:true}).selectOption("boquilla:N3");
+  await expect(elevation).toHaveValue("4200");
+  await page.getByRole("link",{name:"Documentos",exact:true}).click();
+  await page.goto("/modelo?vista=editar");
+  await page.reload();
+  await page.getByLabel("Elemento",{exact:true}).selectOption("equipo");
+  await expect(page.getByLabel("Nuevo valor de Longitud entre tangentes (virola)",{exact:true})).toHaveValue("7100");
+  await page.getByTestId("parts-section").locator("summary").first().click();
+  await expect(page.getByLabel("ID de pieza nueva")).toHaveValue("N9");
+  await expect(page.getByLabel("Pieza: Diámetro",{exact:true})).toHaveValue("120");
+  await expect(viewer).toHaveAttribute("data-phase","ready",{timeout:60_000});
+  await page.evaluate(()=>window.scrollTo(0,0));
+  await page.screenshot({path:resolve(output,"edicion-oscuro.png"),fullPage:true});
+  await page.evaluate(()=>{document.documentElement.dataset.theme="light";document.documentElement.style.colorScheme="light";});
+  await page.screenshot({path:resolve(output,"edicion-claro.png"),fullPage:true});
+  await page.getByLabel("Revisión base").selectOption("A");
+  await expect(page.getByLabel("Nuevo valor de Longitud entre tangentes (virola)",{exact:true})).toHaveValue("6000");
+  await page.getByLabel("Revisión base").selectOption("B");
+  await expect(page.getByLabel("Nuevo valor de Longitud entre tangentes (virola)",{exact:true})).toHaveValue("7100");
+});
+
+test("la landing conserva el recorrido y pausa las escenas fuera de pantalla",async({page})=>{
+  test.setTimeout(120_000);
+  await page.emulateMedia({reducedMotion:"reduce"});
+  await page.goto("/");
+  const hero=page.locator('[data-pixel-budget="650000"]').first();
+  await expect(hero.locator("canvas")).toBeVisible({timeout:45_000});
+  await expect(hero).toHaveAttribute("data-scene-active","true");
+  const pixels=await hero.locator("canvas").evaluate((node:HTMLCanvasElement)=>({width:node.width,height:node.height}));
+  expect(pixels.width*pixels.height).toBeLessThanOrEqual(650000*1.02);
+  await page.getByRole("heading",{name:"Del holograma al modelo",exact:true}).scrollIntoViewIfNeeded();
+  await expect(hero).toHaveAttribute("data-scene-active","false");
+  await expect(page.locator('[data-source="procedural"] canvas')).toBeVisible({timeout:45_000});
+  await expect(page.getByRole("heading",{name:"Cómo funciona",exact:true})).toBeAttached();
+  mkdirSync(output,{recursive:true});
+  writeFileSync(resolve(output,"render.json"),JSON.stringify({renderer:"SwiftShader CPU",pixelBudget:650000,
+    previousPixelBudget:1000000,heroPixels:pixels,offscreenPaused:true,visualDesign:"preservado"},null,2));
+  await page.screenshot({path:resolve(output,"landing-holograma.png")});
+});
+
+test("recupera una previsualización en curso después de salir de Modelo",async({page})=>{
+  test.skip(!connected,"Requiere API real");
+  test.setTimeout(90_000);
+  await page.emulateMedia({reducedMotion:"reduce"});
+  await page.goto("/modelo?vista=editar");
+  const height=page.getByLabel("Nuevo valor de Longitud entre tangentes (virola)",{exact:true});
+  await height.fill("7200");
+  await page.getByLabel("Persona que propone").fill("Prueba sintética de recuperación");
+  await page.getByLabel("Motivo del cambio (obligatorio)").fill("Conservar propuesta al navegar");
+  await page.getByRole("button",{name:"Validar lote",exact:true}).click();
+  await page.getByRole("button",{name:"Previsualizar",exact:true}).click();
+  await expect(page.getByRole("button",{name:"Cancelar trabajo en curso",exact:true})).toBeVisible();
+  await page.getByRole("link",{name:"Documentos",exact:true}).click();
+  await page.waitForURL("**/documentos");
+  await page.goto("/modelo?vista=editar");
+  await expect(height).toHaveValue("7200");
+  await expect(page.getByRole("button",{name:/Confirmar y crear/})).toBeEnabled({timeout:60_000});
+  await expect(page.getByRole("button",{name:"Cancelar trabajo en curso",exact:true})).not.toBeVisible();
+});

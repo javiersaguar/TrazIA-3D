@@ -8,7 +8,9 @@ test("K8: alta desde chat, IFC, confirmación, plano y deshacer", async ({ page,
   test.setTimeout(120_000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/modelo?vista=editar");
+  await page.getByTestId("parts-section").locator("summary").first().click();
   await expect(page.getByLabel("ID de pieza nueva")).toBeVisible();
+  await page.getByText("Describir el cambio con el Copiloto",{exact:true}).click();
   const id = `N${Date.now()}`;
   await page.getByRole("textbox", { name: "Describir el cambio" }).fill(
     `Añade boquilla ${id} diámetro 100 mm proyección 200 mm elevación 4500 mm azimut 45 deg`);
@@ -31,6 +33,7 @@ test("K8: alta desde chat, IFC, confirmación, plano y deshacer", async ({ page,
   expect(result.revision_id).toBeTruthy();
   const model = await (await request.get(`${api}/equipment/V-101/revisions/${result.proposal.target_revision}`)).json();
   expect(model.equipment.nozzles.some((n: {id: string}) => n.id === id)).toBe(true);
+  await page.getByText("Generar plano nuevo desde IFC",{exact:true}).click();
   await page.getByRole("button", { name: "Generar GA nuevo", exact: true }).click();
   await expect(page.getByRole("link", { name: "Descargar PDF", exact: true })).toBeVisible({ timeout: 60_000 });
   const pdf = await request.get(await page.getByRole("link", { name: "Descargar PDF", exact: true }).getAttribute("href") ?? "");
@@ -42,6 +45,7 @@ test("K8: alta desde chat, IFC, confirmación, plano y deshacer", async ({ page,
 
 test("K8: piezas incompletas y LOD explícito", async ({ page }) => {
   await page.goto("/modelo?vista=editar");
+  await page.getByTestId("parts-section").locator("summary").first().click();
   await page.getByLabel("Tipo de pieza", { exact: true }).selectOption("platforms");
   await page.getByLabel("ID de pieza nueva").fill("PL_K8");
   await page.getByRole("button", { name: "Incluir pieza en la propuesta" }).click();
@@ -53,8 +57,10 @@ test("K8: cambiar a una familia cargada conserva su catálogo específico", asyn
   const familyTag = process.env.PW_K8_FAMILY_TAG;
   test.skip(!familyTag, "Requiere una revisión sintética horizontal cargada en la API de prueba.");
   await page.goto("/modelo?vista=editar");
+  await page.getByLabel("Proyecto", { exact: true }).selectOption("FAMILY-TEST");
   await page.getByLabel("Equipo", { exact: true }).selectOption({label:`${familyTag} · Recipiente horizontal · FAMILY-TEST`});
   await expect(page.getByLabel("Nuevo valor de horizontal.length")).toBeVisible();
+  await page.getByTestId("parts-section").locator("summary").first().click();
   await expect(page.getByLabel("Pieza: Dirección X", {exact:true})).toBeVisible();
   await expect(page.getByLabel("Revisión base")).toHaveValue("A");
   await page.getByLabel("Nuevo valor de horizontal.length").fill("7000");

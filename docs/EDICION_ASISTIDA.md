@@ -214,3 +214,20 @@ la revisión persistida seleccionada o recién confirmada, nunca sobre entradas 
 PDF y SVG contienen alzado, perfil y planta con escala física común; el manifiesto contiene
 GUID completos, cotas de envolvente y SHA del IFC descargable. Este plano nuevo es distinto
 al informe de anotaciones K6. [Evidencias y límites](evidencias/k8/README.md).
+
+
+## 9. Formulario ancho y borradores de sesión (08/11)
+
+El IFC ocupa una fila completa; el formulario va debajo, distribuido según el ancho disponible.
+Los selectores Proyecto/Equipo/Revisión/Elemento y Pieza anterior/siguiente permiten recorrer
+las piezas del catálogo. Cada campo parte del valor actual y puede restablecerse. Cambiar la
+unidad de presentación conserva la magnitud; los campos intactos no entran en la orden.
+
+Los borradores se separan por API, proyecto, equipo y revisión en `sessionStorage`. Se conservan
+al cambiar de vista, navegar a otra página o recargar: campos de todas las piezas, actor, motivo,
+texto del chat y parámetros de un alta incompleta. Duran la sesión de esa pestaña del navegador;
+si el almacenamiento está bloqueado queda el respaldo en memoria. No se guardan como revisiones
+ni se confirman automáticamente. Al volver se consulta de nuevo la propuesta en la API y se
+recupera el trabajo de previsualización si estaba en curso. El ETag sigue comprobándose al aplicar.
+
+El Copiloto reserva su propio espacio, sin cubrir el formulario. [Capturas, pruebas y límites](evidencias/web-fluidez/README.md).

@@ -1,0 +1,11 @@
+{
+  "renderer": "SwiftShader CPU",
+  "pixelBudget": 650000,
+  "previousPixelBudget": 1000000,
+  "heroPixels": {
+    "width": 195,
+    "height": 509
+  },
+  "offscreenPaused": true,
+  "visualDesign": "preservado"
+}
