@@ -13,6 +13,7 @@ export type Filename = string;
 export type Revision2 = string;
 export type Sha256 = string;
 export type PageCount = number | null;
+export type Role = "orden_diseno" | null;
 export type Id1 = string;
 export type DocumentId = string;
 export type Page = number | null;
@@ -38,6 +39,7 @@ export type Channel =
       | "rag"
       | "memoria_revision"
       | "humano"
+      | "diseno"
     )
   | null;
 export type Strategy = string | null;
@@ -46,6 +48,9 @@ export type PromptSha256 = string | null;
 export type Grounded = boolean | null;
 export type TextOriginal = string | null;
 export type UnitOriginal = string | null;
+export type Kind = "cambio_diseno";
+export type ProposalId = string;
+export type OperationId = string;
 export type State = "candidate" | "conflict" | "abstained" | "accepted" | "corrected" | "assumed";
 export type Low = number;
 export type High = number;
@@ -57,7 +62,7 @@ export type Alternatives = Alternative[];
 export type Explanation = string | null;
 export type Value1 = string;
 export type Unit1 = "1";
-export type Kind = "vertical_vessel" | "horizontal_vessel" | "column" | "tank" | "pump" | "compressor" | "generic";
+export type Kind1 = "vertical_vessel" | "horizontal_vessel" | "column" | "tank" | "pump" | "compressor" | "generic";
 export type Lod = 1 | 2 | 3;
 export type Support = ("skirt" | "legs" | "saddles" | "lugs" | "baseplate" | "none") | null;
 export type State1 = "candidate" | "conflict" | "abstained" | "accepted" | "corrected" | "assumed";
@@ -121,6 +126,12 @@ export type TokensOut = number | null;
 export type CostEur = number | null;
 export type ExternalCalls = number;
 export type AccountingComplete = boolean;
+export type UnplacedNozzles = string[];
+export type Kind2 = "cambio_diseno" | "reversion";
+export type RevisionId = string;
+export type InputSha2561 = string;
+export type ProposalId1 = string;
+export type OrderDocumentId = string;
 
 export interface Revision {
   schema_version?: SchemaVersion;
@@ -131,6 +142,8 @@ export interface Revision {
   equipment: Equipment;
   approval?: Approval | null;
   run?: RunInfo | null;
+  unplaced_nozzles?: UnplacedNozzles;
+  derived_from?: Derivation | null;
 }
 export interface Document {
   id: Id;
@@ -138,11 +151,12 @@ export interface Document {
   revision: Revision2;
   sha256: Sha256;
   page_count?: PageCount;
+  role?: Role;
 }
 export interface Equipment {
   id: Id1;
   tag: Tag;
-  kind?: Kind;
+  kind?: Kind1;
   lod?: Lod;
   support?: Support;
   envelope?: Envelope | null;
@@ -185,6 +199,15 @@ export interface Source {
   grounded?: Grounded;
   text_original?: TextOriginal;
   unit_original?: UnitOriginal;
+  design?: DesignRef | null;
+}
+/**
+ * Orden de diseño confirmada por una persona; no es una lectura del plano.
+ */
+export interface DesignRef {
+  kind?: Kind;
+  proposal_id: ProposalId;
+  operation_id: OperationId;
 }
 export interface Interval {
   low: Low;
@@ -342,4 +365,14 @@ export interface RunInfo {
   cost_eur?: CostEur;
   external_calls: ExternalCalls;
   accounting_complete?: AccountingComplete;
+}
+/**
+ * Revisión creada desde otra por una propuesta confirmada, no por una extracción.
+ */
+export interface Derivation {
+  kind: Kind2;
+  revision_id: RevisionId;
+  input_sha256: InputSha2561;
+  proposal_id: ProposalId1;
+  order_document_id: OrderDocumentId;
 }
