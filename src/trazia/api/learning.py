@@ -4,6 +4,7 @@ import hashlib
 
 from sqlmodel import Session, select
 
+from trazia.design.provenance import is_design_field
 from trazia.model import Revision, fields
 from trazia.store import AuditRecord, RevisionRecord, Store
 
@@ -31,6 +32,7 @@ def approved_examples(store: Store, *, after: int = 0, limit: int = 100):
                 not old
                 or not new
                 or not final
+                or any(is_design_field(f) for f in (old, new, final))
                 or new.state != "corrected"
                 or final.state != "corrected"
                 or (old.value, old.unit) == (new.value, new.unit)

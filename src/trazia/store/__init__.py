@@ -122,6 +122,52 @@ class CorrectionCursorRecord(SQLModel, table=True):
     byte_offset: int = 0
 
 
+class ChangeProposalRecord(SQLModel, table=True):
+    """Propuesta de cambio de diseño; aplicarla crea una revisión nueva, nunca edita la base."""
+
+    __tablename__ = "change_proposals"
+    id: str = Field(primary_key=True)
+    revision_id: str = Field(foreign_key="revisions.id", index=True)
+    base_version: int
+    base_sha256: str
+    status: str = Field(index=True)
+    kind: str = "cambio_diseno"
+    origin: str = "formulario"
+    actor: str
+    input_json: str
+    evaluation_json: str
+    content_json: str
+    proposal_sha256: str
+    target_label: str
+    preview_json: str | None = None
+    preview_ifc_sha256: str | None = None
+    candidate_json: str | None = None
+    params_sha256: str | None = None
+    generator_version: str | None = None
+    applied_revision_id: str | None = None
+    reverts_proposal_id: str | None = None
+    reverted_by: str | None = None
+    stale_reason: str | None = None
+    created_at: float = Field(default_factory=time.time)
+    updated_at: float = Field(default_factory=time.time)
+    expires_at: float
+
+
+class RevisionArtifactRecord(SQLModel, table=True):
+    """Archivo exacto publicado con una revisión, ligado a la huella de sus datos."""
+
+    __tablename__ = "revision_artifacts"
+    id: int | None = Field(default=None, primary_key=True)
+    revision_id: str = Field(foreign_key="revisions.id", index=True)
+    kind: str
+    sha256: str = Field(index=True)
+    media_type: str
+    input_sha256: str
+    generator_version: str
+    proposal_id: str | None = None
+    created_at: float = Field(default_factory=time.time)
+
+
 class IdempotencyConflict(ValueError):
     pass
 
@@ -176,6 +222,17 @@ class Store:
         if hashlib.sha256(content).hexdigest() != digest:
             raise ValueError("El SHA-256 del original no coincide")
         return content
+
+    def discard(self, digest: str) -> bool:
+        """Borra un blob temporal; quien llama comprueba antes que nada lo referencia."""
+        if len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
+            raise ValueError("SHA-256 inválido")
+        path = self.blobs / digest[:2] / digest
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            return False
+        return True
 
     def perform(self, scope: str, key: str, body: dict, action):
         """Efecto y respuesta se confirman juntos; la clave caduca a las 24 horas."""

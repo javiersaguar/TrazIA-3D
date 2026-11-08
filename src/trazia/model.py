@@ -24,11 +24,30 @@ Channel = Literal[
     "rag",
     "memoria_revision",
     "humano",
+    "diseno",
 ]
+
+
+def _is_none(value) -> bool:
+    return value is None
+
+
+# Ampliación aditiva de 0.3: un campo opcional ausente no se serializa, así que los JSON
+# y las huellas de aprobación anteriores no cambian.
+def optional(**kwargs):
+    return Field(default=None, exclude_if=_is_none, **kwargs)
 
 
 class Model(BaseModel):
     model_config = ConfigDict(extra="forbid", allow_inf_nan=False, strict=True)
+
+
+class DesignRef(Model):
+    """Orden de diseño confirmada por una persona; no es una lectura del plano."""
+
+    kind: Literal["cambio_diseno"] = "cambio_diseno"
+    proposal_id: Identifier
+    operation_id: Identifier
 
 
 class Source(Model):
@@ -48,15 +67,33 @@ class Source(Model):
     grounded: bool | None = None
     text_original: str | None = None
     unit_original: str | None = None
+    design: DesignRef | None = optional()
 
     @model_validator(mode="after")
     def check_location(self):
+        if self.design is not None or self.channel == "diseno":
+            return self.check_design()
         if self.page is None and not (self.sheet and self.cell):
             raise ValueError("La evidencia necesita página o bien hoja y celda")
         if self.bbox is not None:
             x0, y0, x1, y1 = self.bbox
             if self.page is None or not (0 <= x0 < x1 <= 1 and 0 <= y0 < y1 <= 1):
                 raise ValueError("bbox debe ser una región normalizada de una página")
+        return self
+
+    def check_design(self):
+        # La orden se localiza en su propio documento por operación; nunca en una página
+        # inventada del plano ni con una confianza de lectura heredada o estimada.
+        if self.design is None or self.channel != "diseno":
+            raise ValueError("Una orden de diseño requiere canal diseno y referencia de orden")
+        if any(v is not None for v in (self.page, self.sheet, self.cell, self.bbox)):
+            raise ValueError("Una orden de diseño no tiene página, celda ni región del plano")
+        if self.confidence != 1 or self.confidence_raw is not None:
+            raise ValueError("Una orden de diseño es un valor declarado: confianza 1 y sin bruta")
+        if any(v is not None for v in (self.strategy, self.model, self.prompt_sha256)):
+            raise ValueError("Una orden de diseño no procede de una estrategia de extracción")
+        if self.grounded is not None:
+            raise ValueError("Una orden de diseño no se contrasta con el plano original")
         return self
 
 
@@ -263,6 +300,18 @@ class Document(Model):
     revision: str = Field(min_length=1)
     sha256: SHA256
     page_count: int | None = Field(default=None, ge=1)
+    # Ausente = original aportado. Una orden de diseño es un JSON propio, nunca un original.
+    role: Literal["orden_diseno"] | None = optional()
+
+
+class Derivation(Model):
+    """Revisión creada desde otra por una propuesta confirmada, no por una extracción."""
+
+    kind: Literal["cambio_diseno", "reversion"]
+    revision_id: str = Field(min_length=1)
+    input_sha256: SHA256
+    proposal_id: Identifier
+    order_document_id: Identifier
 
 
 class Nozzle(Model):
@@ -457,6 +506,7 @@ class Revision(Model):
     # Boquillas leídas que no entraron en el modelo (incompletas o fuera de la virola): no se han
     # eliminado, y compare no las informa como bajas ni altas.
     unplaced_nozzles: list[Identifier] = Field(default_factory=list)
+    derived_from: Derivation | None = optional()
 
     @model_validator(mode="before")
     @classmethod
@@ -478,6 +528,18 @@ class Revision(Model):
                     raise ValueError(f"{path}: alternativa con documento desconocido")
                 if reference.page_count and source.page and source.page > reference.page_count:
                     raise ValueError(f"{path}: página fuera del documento")
+                # Un valor pedido como diseño nunca se atribuye al plano original, ni una
+                # lectura del plano a la orden.
+                if (source.channel == "diseno") != (reference.role == "orden_diseno"):
+                    raise ValueError(
+                        f"{path}: una orden de diseño solo cita su documento de orden"
+                        if source.channel == "diseno"
+                        else f"{path}: el documento de orden no es evidencia de lectura"
+                    )
+        if self.derived_from:
+            order = docs.get(self.derived_from.order_document_id)
+            if order is None or order.role != "orden_diseno":
+                raise ValueError("La revisión derivada debe incluir su documento de orden")
         if self.approval:
             if self.pending_review():
                 raise ValueError("La aprobación requiere revisar todos los campos")

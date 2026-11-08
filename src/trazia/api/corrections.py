@@ -11,6 +11,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlmodel import Session, select
 
+from trazia.design.provenance import is_design_field
 from trazia.model import fields
 from trazia.store import CorrectionCursorRecord, CorrectionRecord
 
@@ -19,6 +20,8 @@ def record_change(session, record, before, after, path, actor):
     old, new = fields(before.equipment).get(path), fields(after.equipment).get(path)
     if old is None or new is None:
         return
+    if is_design_field(old) or is_design_field(new):
+        return  # La auditoría la conserva; el registro de aprendizaje no.
     if (old.value, old.unit, old.state) == (new.value, new.unit, new.state):
         return
     source = old.source

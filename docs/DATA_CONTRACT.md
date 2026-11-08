@@ -213,3 +213,14 @@ abierto `data/private/` ni se atribuye este convenio matemático a VESOR o a TR.
 ### Normalización y referencia (01/11)
 
 Sin cambios de esquema 0.3: Source conserva la unidad y el texto originales; presión absoluta sigue marcada como bara. El PATCH normaliza antes de validar y deja auditoría de la conversión. El IFC puede declarar Norte explícito y lleva Pset TrazIA_ReferenceFrame. [Convenios, casos ambiguos y límite TR](NORMALIZACION.md).
+
+## Órdenes de diseño y revisiones derivadas (K.0, 08/11)
+
+Ampliación aditiva de 0.3, sin cambiar `schema_version`. Los campos opcionales nuevos no se
+serializan cuando faltan, así que los JSON y las huellas existentes no cambian.
+`Source.channel = "diseno"` exige `Source.design` y un documento con `role: orden_diseno`.
+Ese documento es la orden confirmada, no un original. Una orden no tiene página, región,
+estrategia ni confianza estimada: confianza 1 y sin bruta. `Revision.derived_from` liga la
+revisión DRAFT nueva con su base, su huella y la propuesta. Un valor de diseño nunca cita el
+plano original y nunca entra en el aprendizaje de extracción.
+[Matriz, API y límites](EDICION_ASISTIDA.md).

@@ -1151,6 +1151,11 @@ tiempo y tiene el vídeo listo. Todos pueden responder preguntas de su área.
 
 **Plan del 08/11:** [secuencia, contratos propuestos, dependencias y criterios de cierre](PLAN_EDICION_ASISTIDA.md).
 La planificación está documentada; ninguna casilla de implementación de esta ampliación está cerrada.
+*08/11:* K.0–K.6 implementados en `feat/edicion-asistida` con sus pruebas escritas: contrato,
+matriz, API, cola de previsualización, confirmación, deshacer, vista Proponer cambios, chat de
+borradores y PDF derivado ([contrato, API y medidas](EDICION_ASISTIDA.md)). Las casillas siguen
+abiertas hasta que las pruebas pasen en CI: no se ejecutaron en el portátil de desarrollo por
+falta de memoria. K.8 sin empezar.
 Formulario y chat comparten un motor controlado de propuestas; confirmar crea una revisión DRAFT
 nueva. La previsualización lee IFC y las órdenes de diseño no alimentan el aprendizaje de extracción.
 

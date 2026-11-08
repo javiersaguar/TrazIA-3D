@@ -33,14 +33,16 @@ def export(path: Path) -> dict:
         for i in range(0, len(verts), 3):
             x, y, z = verts[i], verts[i + 1], verts[i + 2]
             v += [round(x, 4), round(z, 4), round(-y, 4)]
-        out.append({
-            "id": product.GlobalId,
-            "type": product.is_a(),
-            "name": product.Name or "",
-            "description": getattr(product, "Description", None) or "",
-            "v": v,
-            "f": list(faces),
-        })
+        out.append(
+            {
+                "id": product.GlobalId,
+                "type": product.is_a(),
+                "name": product.Name or "",
+                "description": getattr(product, "Description", None) or "",
+                "v": v,
+                "f": list(faces),
+            }
+        )
     return {"source": path.name, "schema": model.schema, "products": out}
 
 
@@ -53,7 +55,9 @@ def main() -> None:
         print(name, len(data["products"]), "productos")
         for p in data["products"]:
             ys = p["v"][1::3]
-            print(f"  {p['type']:<26} {p['name'][:34]:<34} tris={len(p['f'])//3:<5} y=[{min(ys):.2f},{max(ys):.2f}] {p['id']}")
+            print(
+                f"  {p['type']:<26} {p['name'][:34]:<34} tris={len(p['f']) // 3:<5} y=[{min(ys):.2f},{max(ys):.2f}] {p['id']}"  # noqa: E501
+            )
 
 
 if __name__ == "__main__":
