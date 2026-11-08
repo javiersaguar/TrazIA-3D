@@ -414,6 +414,7 @@ function ProceduralSource({
 
 function HologramPlayer({
   source,
+  pixelBudget,
   layout = "side",
   progress,
   progressValue,
@@ -437,7 +438,7 @@ function HologramPlayer({
   const [ready, setReady] = useState(false);
   const onReady = useCallback(() => setReady(true), []);
   const draw = (data: Source) => (
-    <SceneCanvas rotating={false} rotationControl={false}
+    <SceneCanvas pixelBudget={pixelBudget} rotating={false} rotationControl={false}
       label={
         source === "ifc"
           ? "Holograma y materialización de geometría IFC sintética"

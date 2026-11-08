@@ -91,6 +91,7 @@ test("la landing conserva el recorrido y pausa las escenas fuera de pantalla",as
   await page.getByRole("heading",{name:"Del holograma al modelo",exact:true}).scrollIntoViewIfNeeded();
   await expect(hero).toHaveAttribute("data-scene-active","false");
   await expect(page.locator('[data-source="procedural"] canvas')).toBeVisible({timeout:45_000});
+  await expect(page.locator('[data-source="procedural"] [data-pixel-budget]')).toHaveAttribute("data-pixel-budget","650000");
   await expect(page.getByRole("heading",{name:"Cómo funciona",exact:true})).toBeAttached();
   mkdirSync(output,{recursive:true});
   writeFileSync(resolve(output,"render.json"),JSON.stringify({renderer:"SwiftShader CPU",pixelBudget:650000,
