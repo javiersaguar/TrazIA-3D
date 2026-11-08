@@ -17,6 +17,204 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/revisions/{identity}/design-operations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Design Operations */
+        get: operations["design_operations_revisions__identity__design_operations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/revisions/{identity}/change-proposals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Proposals */
+        get: operations["list_proposals_revisions__identity__change_proposals_get"];
+        put?: never;
+        /** Create Proposal */
+        post: operations["create_proposal_revisions__identity__change_proposals_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/change-proposals/{identity}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Proposal */
+        get: operations["get_proposal_change_proposals__identity__get"];
+        /** Replace Proposal */
+        put: operations["replace_proposal_change_proposals__identity__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/change-proposals/{identity}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview */
+        post: operations["preview_change_proposals__identity__preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/change-proposals/{identity}/preview.ifc": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Preview Ifc */
+        get: operations["preview_ifc_change_proposals__identity__preview_ifc_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/change-proposals/{identity}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apply */
+        post: operations["apply_change_proposals__identity__apply_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/change-proposals/{identity}/discard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Discard */
+        post: operations["discard_change_proposals__identity__discard_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/change-proposals/{identity}/revert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Revert
+         * @description Prepara la revisión compensatoria; se previsualiza y confirma como cualquier otra.
+         */
+        post: operations["revert_change_proposals__identity__revert_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/copiloto/design-proposals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Design Intent
+         * @description Prepara un borrador desde texto. No crea, valida ni confirma ninguna propuesta.
+         */
+        post: operations["design_intent_copiloto_design_proposals_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/revisions/{identity}/artifacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Artifacts */
+        get: operations["artifacts_revisions__identity__artifacts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/revisions/{identity}/design-report.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Design Report Pdf
+         * @description PDF derivado con la tabla de cambios y anotaciones; el original no se modifica.
+         */
+        get: operations["design_report_pdf_revisions__identity__design_report_pdf_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reference-system": {
         parameters: {
             query?: never;
@@ -614,6 +812,15 @@ export interface components {
              */
             unit?: "deg";
         };
+        /** ApplyInput */
+        ApplyInput: {
+            /** Actor */
+            actor: string;
+            /** Proposal Sha256 */
+            proposal_sha256: string;
+            /** Preview Ifc Sha256 */
+            preview_ifc_sha256: string;
+        };
         /** Approval */
         Approval: {
             /** Reviewer */
@@ -697,6 +904,15 @@ export interface components {
              */
             original_verified?: boolean;
         };
+        /** Clarification */
+        Clarification: {
+            /** Question */
+            question: string;
+            /** Options */
+            options?: string[];
+            /** Operation Id */
+            operation_id?: string | null;
+        };
         /** ColumnParameters */
         ColumnParameters: {
             /** Sections */
@@ -761,6 +977,41 @@ export interface components {
             /** Previous Id */
             previous_id?: string | null;
         };
+        /**
+         * Derivation
+         * @description Revisión creada desde otra por una propuesta confirmada, no por una extracción.
+         */
+        Derivation: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "cambio_diseno" | "reversion";
+            /** Revision Id */
+            revision_id: string;
+            /** Input Sha256 */
+            input_sha256: string;
+            /** Proposal Id */
+            proposal_id: string;
+            /** Order Document Id */
+            order_document_id: string;
+        };
+        /**
+         * DesignRef
+         * @description Orden de diseño confirmada por una persona; no es una lectura del plano.
+         */
+        DesignRef: {
+            /**
+             * Kind
+             * @default cambio_diseno
+             * @constant
+             */
+            kind?: "cambio_diseno";
+            /** Proposal Id */
+            proposal_id: string;
+            /** Operation Id */
+            operation_id: string;
+        };
         /** Dimension */
         Dimension: {
             source: components["schemas"]["Source"];
@@ -813,6 +1064,11 @@ export interface components {
              */
             unit?: "1";
         };
+        /** DiscardInput */
+        DiscardInput: {
+            /** Actor */
+            actor: string;
+        };
         /** Document */
         Document: {
             /** Id */
@@ -825,6 +1081,8 @@ export interface components {
             sha256: string;
             /** Page Count */
             page_count?: number | null;
+            /** Role */
+            role?: "orden_diseno" | null;
         };
         /** Elevation */
         Elevation: {
@@ -948,6 +1206,20 @@ export interface components {
             /** Saddle Positions */
             saddle_positions: components["schemas"]["Dimension"][];
         };
+        /** IntentInput */
+        IntentInput: {
+            /** Revision Id */
+            revision_id: string;
+            /** Text */
+            text: string;
+            /** Selected Id */
+            selected_id?: string | null;
+            /**
+             * Use Model
+             * @default false
+             */
+            use_model?: boolean;
+        };
         /** Interval */
         Interval: {
             /** Low */
@@ -1047,6 +1319,21 @@ export interface components {
             /** Nozzle Type */
             nozzle_type?: ("radial" | "tangential" | "top" | "bottom" | "inclined") | null;
         };
+        /** OperationInput */
+        OperationInput: {
+            /** Id */
+            id?: string | null;
+            /** Target */
+            target: string;
+            /** Value */
+            value: number | string;
+            /** Unit */
+            unit?: string | null;
+            /** Decimal Separator */
+            decimal_separator?: ("." | ",") | null;
+            /** Datum */
+            datum?: ("suelo" | "tangente_inferior" | "interno" | "norte") | null;
+        };
         /** PlatformParameters */
         PlatformParameters: {
             /** Id */
@@ -1077,6 +1364,45 @@ export interface components {
              */
             unit?: "mm";
         };
+        /** PreviewInput */
+        PreviewInput: {
+            /**
+             * Express Rules
+             * @default true
+             */
+            express_rules?: boolean;
+            /**
+             * Timeout Seconds
+             * @default 180
+             */
+            timeout_seconds?: number;
+        };
+        /** ProposalInput */
+        ProposalInput: {
+            /** Operations */
+            operations?: components["schemas"]["OperationInput"][];
+            /** Reason */
+            reason: string;
+            /** Actor */
+            actor: string;
+            /**
+             * Origin
+             * @default formulario
+             * @enum {string}
+             */
+            origin?: "formulario" | "chat" | "deshacer";
+            /** Request Text */
+            request_text?: string | null;
+            /** Clarifications */
+            clarifications?: components["schemas"]["Clarification"][];
+        };
+        /** RevertInput */
+        RevertInput: {
+            /** Actor */
+            actor: string;
+            /** Reason */
+            reason: string;
+        };
         /** Revision */
         Revision: {
             /**
@@ -1101,6 +1427,7 @@ export interface components {
             run?: components["schemas"]["RunInfo"] | null;
             /** Unplaced Nozzles */
             unplaced_nozzles?: string[];
+            derived_from?: components["schemas"]["Derivation"] | null;
         };
         /** RunInfo */
         RunInfo: {
@@ -1189,7 +1516,7 @@ export interface components {
             /** Confidence Raw */
             confidence_raw?: number | null;
             /** Channel */
-            channel?: ("texto" | "tabla" | "cota" | "cajetin" | "hoja_datos" | "vesor" | "ocr" | "detector" | "vision" | "geometria" | "rag" | "memoria_revision" | "humano") | null;
+            channel?: ("texto" | "tabla" | "cota" | "cajetin" | "hoja_datos" | "vesor" | "ocr" | "detector" | "vision" | "geometria" | "rag" | "memoria_revision" | "humano" | "diseno") | null;
             /** Strategy */
             strategy?: string | null;
             /** Model */
@@ -1202,6 +1529,7 @@ export interface components {
             text_original?: string | null;
             /** Unit Original */
             unit_original?: string | null;
+            design?: components["schemas"]["DesignRef"] | null;
         };
         /** Statement */
         Statement: {
@@ -1319,6 +1647,450 @@ export interface operations {
                 "application/json": components["schemas"]["Snapshot"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    design_operations_revisions__identity__design_operations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_proposals_revisions__identity__change_proposals_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_proposal_revisions__identity__change_proposals_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-match"?: string | null;
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProposalInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_proposal_change_proposals__identity__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    replace_proposal_change_proposals__identity__put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProposalInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_change_proposals__identity__preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PreviewInput"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_ifc_change_proposals__identity__preview_ifc_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    apply_change_proposals__identity__apply_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-match"?: string | null;
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApplyInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    discard_change_proposals__identity__discard_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DiscardInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revert_change_proposals__identity__revert_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-match"?: string | null;
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RevertInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    design_intent_copiloto_design_proposals_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IntentInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    artifacts_revisions__identity__artifacts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    design_report_pdf_revisions__identity__design_report_pdf_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {

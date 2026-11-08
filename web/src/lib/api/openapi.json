@@ -41,6 +41,696 @@
         }
       }
     },
+    "/revisions/{identity}/design-operations": {
+      "get": {
+        "summary": "Design Operations",
+        "operationId": "design_operations_revisions__identity__design_operations_get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/revisions/{identity}/change-proposals": {
+      "post": {
+        "summary": "Create Proposal",
+        "operationId": "create_proposal_revisions__identity__change_proposals_post",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProposalInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List Proposals",
+        "operationId": "list_proposals_revisions__identity__change_proposals_get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/change-proposals/{identity}": {
+      "get": {
+        "summary": "Get Proposal",
+        "operationId": "get_proposal_change_proposals__identity__get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace Proposal",
+        "operationId": "replace_proposal_change_proposals__identity__put",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProposalInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/change-proposals/{identity}/preview": {
+      "post": {
+        "summary": "Preview",
+        "operationId": "preview_change_proposals__identity__preview_post",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/PreviewInput"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/change-proposals/{identity}/preview.ifc": {
+      "get": {
+        "summary": "Preview Ifc",
+        "operationId": "preview_ifc_change_proposals__identity__preview_ifc_get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/change-proposals/{identity}/apply": {
+      "post": {
+        "summary": "Apply",
+        "operationId": "apply_change_proposals__identity__apply_post",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/change-proposals/{identity}/discard": {
+      "post": {
+        "summary": "Discard",
+        "operationId": "discard_change_proposals__identity__discard_post",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiscardInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/change-proposals/{identity}/revert": {
+      "post": {
+        "summary": "Revert",
+        "description": "Prepara la revisión compensatoria; se previsualiza y confirma como cualquier otra.",
+        "operationId": "revert_change_proposals__identity__revert_post",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevertInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/copiloto/design-proposals": {
+      "post": {
+        "summary": "Design Intent",
+        "description": "Prepara un borrador desde texto. No crea, valida ni confirma ninguna propuesta.",
+        "operationId": "design_intent_copiloto_design_proposals_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntentInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/revisions/{identity}/artifacts": {
+      "get": {
+        "summary": "Artifacts",
+        "operationId": "artifacts_revisions__identity__artifacts_get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/revisions/{identity}/design-report.pdf": {
+      "get": {
+        "summary": "Design Report Pdf",
+        "description": "PDF derivado con la tabla de cambios y anotaciones; el original no se modifica.",
+        "operationId": "design_report_pdf_revisions__identity__design_report_pdf_get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/reference-system": {
       "get": {
         "summary": "Reference System",
@@ -1787,6 +2477,34 @@
         ],
         "title": "Angle"
       },
+      "ApplyInput": {
+        "properties": {
+          "actor": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Actor"
+          },
+          "proposal_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Proposal Sha256"
+          },
+          "preview_ifc_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Preview Ifc Sha256"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "actor",
+          "proposal_sha256",
+          "preview_ifc_sha256"
+        ],
+        "title": "ApplyInput"
+      },
       "Approval": {
         "properties": {
           "reviewer": {
@@ -2063,6 +2781,43 @@
         ],
         "title": "Citation"
       },
+      "Clarification": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Question"
+          },
+          "options": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 6,
+            "title": "Options"
+          },
+          "operation_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operation Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question"
+        ],
+        "title": "Clarification"
+      },
       "ColumnParameters": {
         "properties": {
           "sections": {
@@ -2259,6 +3014,81 @@
         ],
         "title": "CopilotInput"
       },
+      "Derivation": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "cambio_diseno",
+              "reversion"
+            ],
+            "title": "Kind"
+          },
+          "revision_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Revision Id"
+          },
+          "input_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Input Sha256"
+          },
+          "proposal_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Proposal Id"
+          },
+          "order_document_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Order Document Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "revision_id",
+          "input_sha256",
+          "proposal_id",
+          "order_document_id"
+        ],
+        "title": "Derivation",
+        "description": "Revisión creada desde otra por una propuesta confirmada, no por una extracción."
+      },
+      "DesignRef": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "cambio_diseno",
+            "title": "Kind",
+            "default": "cambio_diseno"
+          },
+          "proposal_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Proposal Id"
+          },
+          "operation_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Operation Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "proposal_id",
+          "operation_id"
+        ],
+        "title": "DesignRef",
+        "description": "Orden de diseño confirmada por una persona; no es una lectura del plano."
+      },
       "Dimension": {
         "properties": {
           "source": {
@@ -2410,6 +3240,22 @@
         ],
         "title": "DirectionComponent"
       },
+      "DiscardInput": {
+        "properties": {
+          "actor": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Actor"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "actor"
+        ],
+        "title": "DiscardInput"
+      },
       "Document": {
         "properties": {
           "id": {
@@ -2444,6 +3290,18 @@
               }
             ],
             "title": "Page Count"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "orden_diseno"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role"
           }
         },
         "additionalProperties": false,
@@ -2958,6 +3816,46 @@
         ],
         "title": "HorizontalParameters"
       },
+      "IntentInput": {
+        "properties": {
+          "revision_id": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Revision Id"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "selected_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Id"
+          },
+          "use_model": {
+            "type": "boolean",
+            "title": "Use Model",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "revision_id",
+          "text"
+        ],
+        "title": "IntentInput"
+      },
       "Interval": {
         "properties": {
           "low": {
@@ -3241,6 +4139,92 @@
         ],
         "title": "Nozzle"
       },
+      "OperationInput": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "target": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Target"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Value"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "decimal_separator": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  ".",
+                  ","
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decimal Separator"
+          },
+          "datum": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "suelo",
+                  "tangente_inferior",
+                  "interno",
+                  "norte"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Datum"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "target",
+          "value"
+        ],
+        "title": "OperationInput"
+      },
       "PlatformParameters": {
         "properties": {
           "id": {
@@ -3331,6 +4315,109 @@
         ],
         "title": "PositiveDimension"
       },
+      "PreviewInput": {
+        "properties": {
+          "express_rules": {
+            "type": "boolean",
+            "title": "Express Rules",
+            "default": true
+          },
+          "timeout_seconds": {
+            "type": "number",
+            "maximum": 900,
+            "exclusiveMinimum": 0,
+            "title": "Timeout Seconds",
+            "default": 180
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "PreviewInput"
+      },
+      "ProposalInput": {
+        "properties": {
+          "operations": {
+            "items": {
+              "$ref": "#/components/schemas/OperationInput"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Operations"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 3,
+            "title": "Reason"
+          },
+          "actor": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Actor"
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "formulario",
+              "chat",
+              "deshacer"
+            ],
+            "title": "Origin",
+            "default": "formulario"
+          },
+          "request_text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Text"
+          },
+          "clarifications": {
+            "items": {
+              "$ref": "#/components/schemas/Clarification"
+            },
+            "type": "array",
+            "maxItems": 6,
+            "title": "Clarifications"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason",
+          "actor"
+        ],
+        "title": "ProposalInput"
+      },
+      "RevertInput": {
+        "properties": {
+          "actor": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Actor"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 3,
+            "title": "Reason"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "actor",
+          "reason"
+        ],
+        "title": "RevertInput"
+      },
       "Revision": {
         "properties": {
           "schema_version": {
@@ -3397,6 +4484,16 @@
             },
             "type": "array",
             "title": "Unplaced Nozzles"
+          },
+          "derived_from": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Derivation"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -3708,7 +4805,8 @@
                   "geometria",
                   "rag",
                   "memoria_revision",
-                  "humano"
+                  "humano",
+                  "diseno"
                 ]
               },
               {
@@ -3783,6 +4881,16 @@
               }
             ],
             "title": "Unit Original"
+          },
+          "design": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DesignRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
