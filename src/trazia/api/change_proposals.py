@@ -21,6 +21,7 @@ from sqlmodel import Session, select
 
 from trazia.design import ENGINE_VERSION, ProposalInput, catalog
 from trazia.design.catalog import FAMILY_MATRIX, geometry_supported
+from trazia.design.intent import IntentInput, interpret
 from trazia.design.proposal import (
     digest,
     evaluate,
@@ -666,6 +667,21 @@ def revert(
             action,
         )
     )
+
+
+@router.post("/copiloto/design-proposals")
+def design_intent(request: Request, body: IntentInput):
+    """Prepara un borrador desde texto. No crea, valida ni confirma ninguna propuesta."""
+    from trazia.design.intent import model_provider
+
+    with Session(request.app.state.store.engine) as session:
+        record = get_revision(session, body.revision_id)
+        model = Revision.model_validate_json(record.payload)
+    provider = getattr(request.app.state, "design_intent_provider", None)
+    if provider is None and body.use_model:
+        provider = model_provider
+    draft = interpret(model, body.text, selected_id=body.selected_id, provider=provider)
+    return {**draft, "revision_id": record.id, "version": record.version}
 
 
 @router.get("/revisions/{identity}/artifacts")

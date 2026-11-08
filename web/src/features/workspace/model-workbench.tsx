@@ -10,8 +10,9 @@ const loading = () => <Skeleton className="h-[620px]" />;
 const Review = dynamic(() => import("@/features/review/review-workspace").then((m) => m.ReviewWorkspace), { ssr: false, loading });
 const Changes = dynamic(() => import("@/features/changes/changes-workspace").then((m) => m.ChangesWorkspace), { ssr: false, loading });
 const Model = dynamic(() => import("@/features/hologram/model-workspace").then((m) => m.ModelWorkspace), { ssr: false, loading });
+const DesignEdit = dynamic(() => import("@/features/design-edit/design-edit").then((m) => m.DesignEditWorkspace), { ssr: false, loading });
 
-type View = "revision" | "cambios" | "3d";
+type View = "revision" | "cambios" | "3d" | "editar";
 const VIEWS: Record<View, { label: string; description: string }> = {
   revision: {
     label: "Revisión",
@@ -24,6 +25,10 @@ const VIEWS: Record<View, { label: string; description: string }> = {
   "3d": {
     label: "Modelo 3D",
     description: "El IFC generado, su paso del holograma al acero y una galería de equipos ilustrativos.",
+  },
+  editar: {
+    label: "Proponer cambios",
+    description: "Cambia el diseño de un equipo o boquilla: se valida el lote, se previsualiza el IFC y, al confirmar, nace una revisión DRAFT nueva.",
   },
 };
 
@@ -47,7 +52,7 @@ export function ModelWorkbench() {
           options={(Object.keys(VIEWS) as View[]).map((value) => ({ value, label: VIEWS[value].label }))}
         />
       </header>
-      {active === "revision" ? <Review /> : active === "cambios" ? <Changes /> : <Model />}
+      {active === "revision" ? <Review /> : active === "cambios" ? <Changes /> : active === "editar" ? <DesignEdit /> : <Model />}
     </div>
   );
 }

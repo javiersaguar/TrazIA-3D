@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useState } from "react";
 
 import { IfcViewer } from "@/components/three";
@@ -41,6 +42,9 @@ export function ModelWorkspace() {
         actions={
           <>
             <span className="text-[12px] text-warning">Datos sintéticos · V-101 · IFC DRAFT</span>
+            <Link href="/modelo?vista=editar" className="rounded-[var(--radius-control)] border border-border px-2.5 py-1 text-xs hover:bg-surface-sunken">
+              {selected?.startsWith("nozzle:") ? `Proponer cambios en ${selected.slice(7)}` : "Proponer cambios"}
+            </Link>
             <Segmented
               label="Revisión del modelo"
               value={revision}
