@@ -319,6 +319,13 @@ def create_app(
         }
 
         def action(session):
+            from .change_proposals import is_derived_report
+
+            # Un plano derivado no puede entrar como original de extracción.
+            if is_derived_report(session, digest):
+                raise HTTPException(
+                    422, "Es un documento derivado de una propuesta de diseño, no un original"
+                )
             request.app.state.store.put(content)
             record = DocumentRecord(
                 id=str(uuid4()),

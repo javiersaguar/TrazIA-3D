@@ -588,3 +588,36 @@ def test_chat_endpoint_never_writes(client):
     with Session(client.app.state.store.engine) as session:
         assert len(session.exec(select(ChangeProposalRecord)).all()) == before
     assert client.get("/equipment/V-101/revisions/B").json()["equipment"]["height"]["value"] == 6500
+
+
+# --- K.6 · plano derivado -----------------------------------------------------------------
+
+from trazia.design.report import locations  # noqa: E402
+
+
+def test_changes_without_a_verifiable_region_are_declared_pending():
+    evaluation, content = run([{"target": "attributes.material", "value": "SA-516 Gr.70"}])
+    content["operations"][0]["before_source"]["bbox"] = None
+    marks = locations(evaluation.candidate, content)
+    assert marks[0]["document"] is None and "región" in marks[0]["pending"]
+
+
+def test_derived_report_is_separate_from_the_original(client):
+    proposal = previewed(client)
+    assert apply(client, proposal).status_code == 201
+    identity = "DEMO-PLANT:vessel-001:B-D1"
+    original = client.get(f"/revisions/{identity}/documents/GA-V101").content
+    report = client.get(f"/revisions/{identity}/design-report.pdf")
+    assert report.status_code == 200 and report.content.startswith(b"%PDF")
+    assert report.headers["x-derived-document"] == "true"
+    assert b"DERIVADO" in report.content
+    assert client.get(f"/revisions/{identity}/documents/GA-V101").content == original
+    kinds = {a["kind"] for a in client.get(f"/revisions/{identity}/artifacts").json()["artifacts"]}
+    assert "informe_pdf" in kinds
+    refused = client.post(
+        "/documents",
+        files={"file": ("derivado.pdf", report.content, "application/pdf")},
+        headers=headers(),
+    )
+    assert refused.status_code == 422
+    assert client.get("/revisions/B/design-report.pdf").status_code == 404

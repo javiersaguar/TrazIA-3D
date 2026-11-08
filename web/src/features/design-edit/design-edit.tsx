@@ -18,7 +18,7 @@ import { useDemoUser } from "@/lib/session";
 import { useSelection } from "@/stores/selection";
 
 import {
-  STATUS_LABEL, applyProposal, interpretRequest, createProposal, discardProposal, getCatalog, getProposal, listProposals,
+  STATUS_LABEL, applyProposal, designReportUrl, interpretRequest, createProposal, discardProposal, getCatalog, getProposal, listProposals,
   previewIfcUrl, replaceProposal, revertProposal, revisionIdentity, revisionIfcUrl, startPreview,
   type Datum, type IntentDraft, type Issue, type Proposal, type Target,
 } from "./api";
@@ -409,6 +409,10 @@ function Summary({ proposal, dirty }: { proposal: Proposal; dirty: boolean }) {
       {proposal.status === "applied" && <p className="text-approved">
         Aplicada en {proposal.target_revision}. Nace DRAFT y no hereda aprobación: la revisión técnica sigue pendiente.
       </p>}
+      {proposal.status === "applied" && proposal.applied_revision_id && <a className="text-[12px] text-accent-text underline"
+        href={designReportUrl(proposal.applied_revision_id)} download>
+        Descargar plano derivado (PDF anotado, documento aparte del original)
+      </a>}
     </section>
   );
 }

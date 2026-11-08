@@ -706,6 +706,89 @@ def artifacts(request: Request, identity: str):
         }
 
 
+@router.get("/revisions/{identity}/design-report.pdf")
+def design_report_pdf(request: Request, identity: str):
+    """PDF derivado con la tabla de cambios y anotaciones; el original no se modifica."""
+    from trazia.design.report import design_report
+
+    store = request.app.state.store
+    with Session(store.engine) as session:
+        record = get_revision(session, identity)
+        model = Revision.model_validate_json(record.payload)
+        if model.derived_from is None:
+            raise HTTPException(404, "Esta revisión no procede de una orden de diseño")
+        proposal = session.get(ChangeProposalRecord, model.derived_from.proposal_id)
+        if proposal is None:
+            raise HTTPException(409, "Falta la propuesta que originó la revisión")
+        content = json.loads(proposal.content_json)
+        artifact = session.exec(
+            select(RevisionArtifactRecord).where(
+                RevisionArtifactRecord.revision_id == record.id,
+                RevisionArtifactRecord.kind == "ifc",
+            )
+        ).first()
+        order = next(d for d in model.documents if d.id == model.derived_from.order_document_id)
+        originals = {}
+        for document in model.documents:
+            if document.role is None and document.filename.lower().endswith(".pdf"):
+                try:
+                    originals[document.sha256] = store.read(document.sha256)
+                except (OSError, ValueError):
+                    continue  # se declara pendiente; nunca se anota un original no verificado
+        meta = {
+            "generated_at": stamp(proposal.updated_at),
+            "order_sha256": order.sha256,
+            "ifc_sha256": artifact.sha256 if artifact else "—",
+        }
+        try:
+            content_pdf = design_report(model, content, originals, meta=meta)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from error
+        sha = store.put(content_pdf)
+        exists = session.exec(
+            select(RevisionArtifactRecord).where(
+                RevisionArtifactRecord.revision_id == record.id,
+                RevisionArtifactRecord.kind == "informe_pdf",
+                RevisionArtifactRecord.sha256 == sha,
+            )
+        ).first()
+        if exists is None:
+            session.add(
+                RevisionArtifactRecord(
+                    revision_id=record.id,
+                    kind="informe_pdf",
+                    sha256=sha,
+                    media_type="application/pdf",
+                    input_sha256=model.fingerprint(),
+                    generator_version=f"informe-derivado-1; motor {ENGINE_VERSION}",
+                    proposal_id=proposal.id,
+                )
+            )
+            session.commit()
+    name = f"{model.equipment.tag.value}_{model.revision}_DERIVADO_DRAFT.pdf"
+    return Response(
+        content_pdf,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{name}"',
+            "X-Content-SHA256": sha,
+            "X-Derived-Document": "true",
+        },
+    )
+
+
+def is_derived_report(session: Session, sha: str) -> bool:
+    return (
+        session.exec(
+            select(RevisionArtifactRecord).where(
+                RevisionArtifactRecord.sha256 == sha,
+                RevisionArtifactRecord.kind == "informe_pdf",
+            )
+        ).first()
+        is not None
+    )
+
+
 def published_ifc(session: Session, record: RevisionRecord, model: Revision) -> str | None:
     """SHA del IFC publicado con la revisión, si sigue correspondiendo a sus datos."""
     row = session.exec(

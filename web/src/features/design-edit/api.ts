@@ -135,3 +135,5 @@ export const interpretRequest = async (revisionId: string, text: string, selecte
   (await send<IntentDraft>("/copiloto/design-proposals", {
     method: "POST", body: JSON.stringify({ revision_id: revisionId, text, selected_id: selectedId, use_model: useModel }),
   })).data;
+
+export const designReportUrl = (revisionId: string) => apiURL(`/revisions/${id(revisionId)}/design-report.pdf`);
