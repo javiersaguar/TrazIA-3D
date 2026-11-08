@@ -20,8 +20,8 @@ export function PlanSection() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
   // Termina un poco antes de soltar la sección para que el modelo final se vea quieto
   const progress = useTransform(scrollYProgress, [0.04, 0.88], [0, 1], { clamp: true });
-  // Se monta media pantalla antes de llegar: el PDF y el IFC tardan en leerse
-  const near = useInView(ref, { margin: "0px 0px 60% 0px", once: true });
+  // Se monta poco antes de llegar: el PDF y el IFC tardan en leerse
+  const near = useInView(ref, { margin: "0px 0px 15% 0px", once: true });
 
   return (
     <section id="del-plano" ref={ref} aria-labelledby="plano-titulo" className="relative h-[240vh] scroll-mt-16">
@@ -38,7 +38,7 @@ export function PlanSection() {
           </div>
 
           <div className="relative h-[min(62vh,560px)] lg:order-first" data-testid="landing-signature">
-            {near ? <Signature progress={progress} /> : null}
+            {near ? <Signature pixelBudget={650_000} progress={progress} /> : null}
           </div>
         </div>
       </div>

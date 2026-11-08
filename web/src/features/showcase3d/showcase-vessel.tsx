@@ -22,7 +22,7 @@ export const EQUIPMENT_LABELS: Record<EquipmentKind, string> = {
 export type ShowcaseVesselProps = {
   kind?: EquipmentKind; mode?: "particles" | "hologram" | "real"; interactive?: boolean;
   onKindChange?(kind: EquipmentKind): void; hud?: boolean; className?: string;
-  measureKey?: number; onMeasure?(sample: PerformanceSample): void; rotationControl?: boolean;
+  measureKey?: number; onMeasure?(sample: PerformanceSample): void; rotationControl?: boolean; pixelBudget?: number;
 };
 export type EquipmentThumbProps = { kind: EquipmentKind; size?: number };
 
@@ -68,7 +68,7 @@ function EquipmentScene({ kind, mode, interactive, onBearing, measureKey, onMeas
   </>;
 }
 
-export function ShowcaseVessel({ kind, mode = "real", interactive = true, onKindChange, hud = true, className, measureKey, onMeasure, rotationControl = true }: ShowcaseVesselProps) {
+export function ShowcaseVessel({ kind, mode = "real", interactive = true, onKindChange, hud = true, className, measureKey, onMeasure, rotationControl = true, pixelBudget }: ShowcaseVesselProps) {
   const [localKind, setKind] = useState<EquipmentKind>("vertical");
   const current = kind ?? localKind;
   const bearing = useRef<HTMLSpanElement>(null), pointer = useRef({ x: 0, y: 0 });
@@ -78,7 +78,7 @@ export function ShowcaseVessel({ kind, mode = "real", interactive = true, onKind
       onPointerUp={e => {
         if (interactive && Math.hypot(e.clientX - pointer.current.x, e.clientY - pointer.current.y) < 4) select(EQUIPMENT_KINDS[(EQUIPMENT_KINDS.indexOf(current) + 1) % EQUIPMENT_KINDS.length]!);
       }}>
-      <SceneCanvas rotationControl={rotationControl} label={`${EQUIPMENT_LABELS[current]} ilustrativo, no procede de un IFC`}>
+      <SceneCanvas pixelBudget={pixelBudget} rotationControl={rotationControl} label={`${EQUIPMENT_LABELS[current]} ilustrativo, no procede de un IFC`}>
         <EquipmentScene kind={current} mode={mode} interactive={interactive} onBearing={value => { if (bearing.current) bearing.current.textContent = value; }} measureKey={measureKey} onMeasure={onMeasure} />
       </SceneCanvas>
     </div>

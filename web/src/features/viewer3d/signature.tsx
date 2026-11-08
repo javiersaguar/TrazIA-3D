@@ -5,7 +5,7 @@ import { BRAND } from "@/lib/brand";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
 import { cubicBezier, useReducedMotion, type MotionValue } from "motion/react";
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { CanvasTexture, Group, Mesh, MeshStandardMaterial, SRGBColorSpace } from "three";
 import type { Bounds } from "@/workers/ifc-protocol";
 import { useIfcModel, usePreparedModel, type PreparedProduct } from "./model-resource";
@@ -68,6 +68,17 @@ function LiftScene({ products, drawing, timeline, onPhase, onFinish, reduced, pl
   const model = useRef<Group>(null), steel = useRef<Group>(null), wire = useRef<Group>(null), lights = useRef<Group>(null);
   const phase = useRef(-1), { invalidate } = useThree();
   const paper = useRef<Mesh>(null);
+  const materials = useRef<{steel:MeshStandardMaterial[]; wire:MeshStandardMaterial[]}>({steel:[],wire:[]});
+  const lastProgress = useRef(-1);
+  useLayoutEffect(() => {
+    const collect = (group: Group | null) => {
+      const list: MeshStandardMaterial[] = [];
+      group?.traverse(object => { if (object instanceof Mesh) list.push(object.material as MeshStandardMaterial); });
+      return list;
+    };
+    materials.current = {steel:collect(steel.current),wire:collect(wire.current)};
+    lastProgress.current = -1;
+  }, [products]);
   useEffect(() => { invalidate(); }, [playing, reduced, invalidate]);
   // Con «progress», el scroll de la página es el avance de la secuencia: cada cambio pide un fotograma
   useEffect(() => scroll?.on("change", () => invalidate()), [scroll, invalidate]);
@@ -77,19 +88,22 @@ function LiftScene({ products, drawing, timeline, onPhase, onFinish, reduced, pl
     if (scroll) t.seek(scroll.get(), reduced);
     else if (t.playing) t.advance(delta, reduced);
     const progress = t.progress, q = ease(Math.max(0, (progress - .28) / .72));
+    if (progress !== lastProgress.current) {
+    lastProgress.current = progress;
     if (model.current) {
       model.current.rotation.x = -(1 - q) * Math.PI / 2;
       model.current.position.set(-3.3 * (1 - q), .04, 2.6 * (1 - q));
       model.current.scale.set(.78 + .22 * q, .65 + .35 * q, .025 + .975 * q);
     }
-    steel.current?.traverse(object => { if (object instanceof Mesh) { const material = object.material as MeshStandardMaterial; material.opacity = q; material.depthWrite = q > .99; } });
-    wire.current?.traverse(object => { if (object instanceof Mesh) { const material = object.material as MeshStandardMaterial; material.opacity = (1 - q) * .85; } });
+    for (const material of materials.current.steel) material.setValues({opacity:q,depthWrite:q>.99});
+    for (const material of materials.current.wire) material.setValues({opacity:(1-q)*.85});
     lights.current?.children.forEach((object, index) => {
       const material = (object as Mesh).material as MeshStandardMaterial;
       const active = progress < .32 && index === Math.min(drawing.evidence.length - 1, Math.floor(progress / .32 * drawing.evidence.length));
       material.opacity = active ? .55 : progress < .32 && index < progress / .32 * drawing.evidence.length ? .15 : .02;
     });
     if (paper.current) (paper.current.material as MeshStandardMaterial).opacity = 1 - q * .72;
+    }
     const nextPhase = progress < SIGNATURE_PHASES[1].at ? 0 : progress < SIGNATURE_PHASES[2].at ? 1 : 2;
     if (phase.current !== nextPhase) { phase.current = nextPhase; onPhase(nextPhase); }
     if (t.playing && progress >= 1) { t.pause(); onFinish(); }
@@ -117,7 +131,7 @@ function LiftScene({ products, drawing, timeline, onPhase, onFinish, reduced, pl
 }
 
 /** Sin «progress» se reproduce con sus botones; con él, avanza con el scroll y sin controles propios. */
-export function Signature({ progress }: { progress?: MotionValue<number> } = {}) {
+export function Signature({ progress, pixelBudget }: { progress?: MotionValue<number>; pixelBudget?: number } = {}) {
   const scroll = !!progress;
   const load = useIfcModel("/demo/ifc/rev_a.ifc"), products = usePreparedModel(load.model);
   const { drawing, error } = useDrawing();
@@ -128,7 +142,7 @@ export function Signature({ progress }: { progress?: MotionValue<number> } = {})
   const ready = !!load.model && !!drawing;
   const pause = () => { timeline.current.playing = false; setPlaying(false); };
   return <div className={styles.frame} ref={container} data-testid="signature" data-phase={ready ? "ready" : "loading"} data-step={phase}>
-    {ready ? <SceneCanvas label="Secuencia sintética: evidencia del plano y geometría del IFC" rotationControl={!scroll}>
+    {ready ? <SceneCanvas pixelBudget={pixelBudget} label="Secuencia sintética: evidencia del plano y geometría del IFC" rotationControl={!scroll}>
       <Studio effects={false} />
       <CameraRig bounds={SIGNATURE_BOUNDS} handle={camera} onUserControl={pause} interactive={!scroll} orbit={!scroll} />
       <LiftScene key={version} products={products} drawing={drawing} timeline={timeline} onPhase={setPhase} onFinish={() => setPlaying(false)} reduced={!!reduced} playing={playing} progress={progress} />

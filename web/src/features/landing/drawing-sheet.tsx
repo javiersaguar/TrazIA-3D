@@ -548,6 +548,7 @@ export function DrawingSheet({
               }}
             >
               <ShowcaseVessel
+                pixelBudget={650_000}
                 rotationControl={false}
                 mode="particles"
                 interactive

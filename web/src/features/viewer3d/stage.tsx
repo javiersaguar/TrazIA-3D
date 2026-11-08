@@ -80,6 +80,7 @@ const OverlayContext = createContext<RefObject<HTMLDivElement | null> | null>(
   null,
 );
 
+const PixelBudgetContext = createContext(1_000_000);
 const OrbitContext = createContext({ enabled: true, pause: () => {} });
 export const ORBIT_SECONDS = 60;
 
@@ -423,12 +424,13 @@ export function CameraRig({
 
 function AdaptiveResolution() {
   const { size, setDpr } = useThree();
+  const pixelBudget = useContext(PixelBudgetContext);
   const quality = useThree((state) => state.performance.current);
   useEffect(() => {
     // Presupuesto de píxeles: el coste del posprocesado no crece sin límite al maximizar.
-    const budget = Math.sqrt(1_000_000 / Math.max(1, size.width * size.height));
+    const budget = Math.sqrt(pixelBudget / Math.max(1, size.width * size.height));
     setDpr(Math.min(window.devicePixelRatio, 1.6, budget) * quality);
-  }, [size.width, size.height, quality, setDpr]);
+  }, [size.width, size.height, quality, setDpr, pixelBudget]);
   return null;
 }
 
@@ -623,7 +625,9 @@ export function SceneCanvas({
   rotating: controlledRotating,
   onRotationChange,
   rotationControl = true,
+  pixelBudget = 1_000_000,
 }: {
+  pixelBudget?: number;
   children: ReactNode;
   label: string;
   rotationControl?: boolean;
@@ -658,6 +662,8 @@ export function SceneCanvas({
   return (
     <div
       ref={root}
+      data-scene-active={active}
+      data-pixel-budget={pixelBudget}
       style={{ position: "relative", height: "100%", width: "100%" }}
     >
       <RenderBoundary>
@@ -677,11 +683,13 @@ export function SceneCanvas({
           aria-label={label}
         >
           <Selection>
+            <PixelBudgetContext.Provider value={pixelBudget}>
             <OrbitContext.Provider value={rotation}>
               <OverlayContext.Provider value={portal}>
                 {children}
               </OverlayContext.Provider>
             </OrbitContext.Provider>
+            </PixelBudgetContext.Provider>
           </Selection>
         </Canvas>
         <div ref={portal} className={styles.labels} />

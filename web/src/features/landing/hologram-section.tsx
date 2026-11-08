@@ -54,7 +54,7 @@ export function HologramSection() {
           <div className="relative h-[min(62vh,560px)] overflow-hidden rounded-[16px] border border-border bg-surface-sunken">
             {/* El aviso «Ilustrativo» y el avance ya los pinta HologramToReal (arriba y abajo) */}
             {near ? (
-              <HologramToReal source="procedural" layout="side" progressValue={scrollYProgress} controls={false} callouts className="h-full w-full" />
+              <HologramToReal pixelBudget={650_000} source="procedural" layout="side" progressValue={scrollYProgress} controls={false} callouts className="h-full w-full" />
             ) : null}
           </div>
         </div>

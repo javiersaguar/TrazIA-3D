@@ -45,6 +45,7 @@ import { ParticleFlow } from "./particle-flow";
 import styles from "./hologram.module.css";
 
 export type HologramToRealProps = {
+  pixelBudget?: number;
   source: "procedural" | "ifc";
   layout?: "side" | "inplace";
   progress?: number;
