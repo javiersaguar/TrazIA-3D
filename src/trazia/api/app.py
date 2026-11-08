@@ -194,6 +194,9 @@ def create_app(
 
     app.include_router(snapshots_router)
     app.include_router(proposals_router)
+    from .design_drawings import router as drawings_router
+
+    app.include_router(drawings_router)
     app.add_middleware(UploadLimit, limit=MAX_UPLOAD + 1024 * 1024)
     app.add_middleware(
         CORSMiddleware,

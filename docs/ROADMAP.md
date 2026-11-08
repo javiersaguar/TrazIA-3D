@@ -1155,7 +1155,8 @@ web): contrato, matriz, API, cola de previsualización, confirmación, deshacer,
 cambios, chat de borradores y PDF derivado ([contrato, API y medidas](EDICION_ASISTIDA.md)).
 Se cierran K.0, K.1, K.3 y K.6. Siguen abiertas K.2 y K.4, porque falta que una persona compruebe
 en el visor el antes/después y la revisión nueva al recargar, y K.5, porque falta medir el modelo
-local; el chat solo se ha probado con un proveedor inyectado. K.7 sigue abierto y K.8 sin empezar.
+local; el chat solo se ha probado con un proveedor inyectado. K.7 sigue abierto. K.8 implementado y verificado con sintéticos CPU: altas/bajas reversibles,
+matriz de familias ampliada y GA nuevos desde IFC ([evidencias y límites](evidencias/k8/README.md)).
 Formulario y chat comparten un motor controlado de propuestas; confirmar crea una revisión DRAFT
 nueva. La previsualización lee IFC y las órdenes de diseño no alimentan el aprendizaje de extracción.
 
@@ -1169,7 +1170,7 @@ nueva. La previsualización lee IFC y las órdenes de diseño no alimentan el ap
 | [ ] | **K.5 · Chat de cambios** | Copiloto + Frontend | Interpreta intención, aclara ambigüedades y prepara el mismo lote; no escribe ni confirma por sí solo |
 | [x] | **K.6 · PDF derivado** | Plataforma + Frontend | Anotaciones y tabla de cambios trazables; original intacto y ubicaciones desconocidas declaradas |
 | [ ] | **K.7 · Validación del recorrido** | Equipo | Evidencias sintéticas, pruebas de fallos/concurrencia, tiempos medidos y declaración de trabajo previo |
-| [ ] | **K.8 · Ampliación opcional** | Plataforma + 3D | Altas/bajas y otras familias verificadas; planos nuevos solo tras validar su generación |
+| [x] | **K.8 · Piezas, familias y GA nuevos** | Plataforma + 3D | Altas/bajas, fixtures por familia y GA vectoriales desde IFC verificados; multiequipo/RBAC evaluados y aplazados; no certifica fabricación |
 
 Orden recomendado: K.0 → K.1 → K.2 → K.3 → K.4; después K.5/K.6 y K.7.
 Las pruebas de cada subtarea se ejecutan al cerrarla. K.8 queda fuera del MVP. El contraste TR y

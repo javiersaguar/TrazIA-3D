@@ -2,8 +2,8 @@
 
 Fecha: 08/11/2026. Estado: **K.0, K.1, K.3 y K.6 cerrados**: integrados en `main` (f2e8d25)
 con la suite en verde en CI (Ubuntu y Windows, web incluida). K.2, K.4 y K.5 están implementados,
-pero falta la comprobación con una persona o con el modelo local. K.7 sigue abierto y K.8 sin
-empezar. Contrato, API y medidas en [EDICION_ASISTIDA.md](EDICION_ASISTIDA.md).
+pero falta la comprobación con una persona o con el modelo local. K.7 sigue abierto. K.8 implementado con pruebas sintéticas CPU y
+[evidencias de piezas, familias y GA nuevos](evidencias/k8/README.md). Contrato, API y medidas en [EDICION_ASISTIDA.md](EDICION_ASISTIDA.md).
 Workstream K del [ROADMAP](ROADMAP.md#k-edición-asistida-del-modelo-planificada).
 
 ## Resultado de producto
@@ -196,15 +196,17 @@ evidencias, y el roadmap separa lo implementado de lo validado con datos/persona
 
 ### K.8 · Ampliación opcional — después del MVP
 
-- [ ] Añadir/eliminar boquillas con identidad estable, reglas de colocación y delta correcto.
-- [ ] Extender la matriz a cada familia soportada, con fixtures de sus parámetros específicos.
-- [ ] Evaluar generar vistas 2D desde la geometría IFC y acotarlas para producir un GA nuevo.
+- [x] Añadir/eliminar boquillas con identidad estable, reglas de colocación y delta correcto.
+- [x] Extender la matriz a cada familia soportada, con fixtures de sus parámetros específicos.
+- [x] Evaluar generar vistas 2D desde la geometría IFC y acotarlas para producir un GA nuevo.
   Validar proyección, cotas, escalas, cajetín y legibilidad antes de llamarlo plano técnico.
-- [ ] Evaluar operaciones en varios equipos, permisos por rol y aprobación según disciplina.
+- [x] Evaluar operaciones en varios equipos, permisos por rol y aprobación según disciplina.
+  Decisión: mantener una revisión por orden; implementación multiequipo/RBAC aplazada,
+  con motivos en [evidencias K8](evidencias/k8/README.md). No se presenta como funcionalidad disponible.
 
-## Interfaces propuestas, no existentes
+## Interfaces implementadas
 
-Los nombres se concretan en K.1; esta tabla no describe endpoints ya disponibles.
+Contrato vigente y detalles de K8 en [API.md](API.md) y [EDICION_ASISTIDA.md](EDICION_ASISTIDA.md).
 
 | Operación | Propuesta de interfaz | Garantía |
 | --- | --- | --- |

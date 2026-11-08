@@ -7,8 +7,6 @@ redibuja el recipiente: si cambia la geometría, el dibujo deja de estar a escal
 """
 
 import io
-import textwrap
-from datetime import datetime
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -99,100 +97,6 @@ def _banner(draw: ImageDraw.ImageDraw, width: int, lines: list[str]):
         )
 
 
-def _cover(revision: Revision, content: dict, marks: list[dict], meta: dict) -> Image.Image:
-    image = Image.new("RGB", PAGE, "white")
-    draw = ImageDraw.Draw(image)
-    _banner(
-        draw,
-        PAGE[0],
-        [
-            "DOCUMENTO DERIVADO · PROPUESTA DE REVISIÓN DE DISEÑO · DRAFT",
-            "No es un plano original ni de fabricación. El original se conserva intacto.",
-        ],
-    )
-    y = 110
-    title = (
-        f"{revision.equipment.tag.value} · Rev {content['base']['revision']} → Rev "
-        f"{revision.revision}"
-    )
-    draw.text((60, y), title, fill=INK, font=_font(40, bold=True))
-    y += 64
-    kind = "Deshacer una orden anterior" if content["kind"] == "reversion" else "Cambio de diseño"
-    for line in (
-        f"{kind} · propuesta {content['proposal_id'][:12]} · origen {content['origin']}",
-        f"Autor: {content['actor']} · preparada {content['created_at']} · "
-        f"informe {meta['generated_at']}",
-        f"Motivo: {content['reason']}",
-        f"Revisión base {content['base']['revision_id']} · huella "
-        f"{content['base']['input_sha256'][:16]}",
-        f"IFC publicado {meta.get('ifc_sha256', '—')[:16]} · orden {meta['order_sha256'][:16]}",
-        f"Conjunto de datos: {revision.dataset}"
-        + (" (sintético, no procede de TR)" if revision.dataset == "synthetic" else ""),
-    ):
-        for wrapped in textwrap.wrap(line, 120) or [""]:
-            draw.text((60, y), wrapped, fill=MUTED, font=_font(22))
-            y += 32
-    y += 18
-    columns = (60, 160, 700, 960, 1220)
-    for x, head in zip(columns, ("Marca", "Campo", "Antes", "Después", "Ubicación en el plano")):
-        draw.text((x, y), head, fill=INK, font=_font(22, bold=True))
-    y += 38
-    draw.line((60, y - 6, PAGE[0] - 60, y - 6), fill=MUTED, width=1)
-    for mark in marks:
-        operation = mark["operation"]
-        where = (
-            f"{mark['document'].id} p. {mark['page']}"
-            if mark["document"] is not None
-            else f"Pendiente de delineación: {mark['pending']}"
-        )
-        cells = (
-            mark["mark"],
-            operation["label"],
-            _value(operation["before"]),
-            _value(operation["after"]),
-            where,
-        )
-        height = 1
-        for x, text, width in zip(columns, cells, (8, 40, 18, 18, 38)):
-            lines = textwrap.wrap(text, width) or [""]
-            height = max(height, len(lines))
-            for row, line in enumerate(lines):
-                draw.text((x, y + 30 * row), line, fill=MARK if x == 60 else INK, font=_font(22))
-        y += 30 * height + 12
-        if operation.get("resolution"):
-            draw.text((160, y - 8), operation["resolution"][:150], fill=MUTED, font=_font(18))
-            y += 26
-    geometric = [
-        m
-        for m in marks
-        if m["operation"]["target"] in GEOMETRY
-        or m["operation"]["target"].endswith((".elevation", ".azimuth", ".diameter", ".projection"))
-    ]
-    y += 20
-    notes = []
-    if geometric:
-        notes.append(
-            "Aviso de escala: cambian cotas o posiciones, así que el dibujo original ya no "
-            "representa a escala la geometría nueva. Las marcas señalan dónde cambia el dato; "
-            "no redibujan el recipiente. La geometría vigente es la del IFC publicado."
-        )
-    if any(m["document"] is None for m in marks):
-        notes.append(
-            "Los cambios sin región verificable en el plano figuran solo en esta tabla; "
-            "no se dibuja una ubicación supuesta."
-        )
-    notes.append(
-        "La coherencia de parámetros e IFC no acredita cálculo resistente, proceso ni "
-        "cumplimiento normativo. La aprobación técnica es una acción humana posterior."
-    )
-    for note in notes:
-        for wrapped in textwrap.wrap(note, 130):
-            draw.text((60, y), wrapped, fill=INK, font=_font(20))
-            y += 28
-        y += 10
-    return image
-
-
 def _annotated(data: bytes, page: int, marks: list[dict], document, scale_warning: bool):
     drawing = _render(data, page)
     image = Image.new("RGB", PAGE, "white")
@@ -244,32 +148,131 @@ def design_report(
         if document is not None and document.sha256 not in originals:
             mark["document"], mark["pending"] = None, "original no disponible para verificar"
     geometric = any(
-        m["operation"]["target"] in GEOMETRY
+        "collection" in m["operation"]
+        or m["operation"]["target"].startswith(
+            ("horizontal.", "column.", "tank.", "envelope.", "platforms.", "ladders.")
+        )
+        or m["operation"]["target"] in GEOMETRY
         or m["operation"]["target"].endswith((".elevation", ".azimuth", ".diameter", ".projection"))
         for m in marks
     )
-    pages = [_cover(revision, content, marks, meta)]
-    grouped: dict[tuple, list[dict]] = {}
-    for mark in marks:
-        if mark["document"] is not None:
-            grouped.setdefault((mark["document"].id, mark["page"]), []).append(mark)
-    for (_, page), items in sorted(grouped.items()):
-        document = items[0]["document"]
-        pages.append(_annotated(originals[document.sha256], page, items, document, geometric))
+    return _paginated_report(revision, content, marks, originals, meta, geometric)
+
+
+def _paginated_report(revision, content, marks, originals, meta, geometric):
+    """Tablas largas con repetición de cabecera; ninguna operación queda fuera de página."""
+    from html import escape
+
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A4, landscape
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.lib.units import mm
+    from reportlab.platypus import Image as PDFImage
+    from reportlab.platypus import (
+        LongTable,
+        PageBreak,
+        Paragraph,
+        SimpleDocTemplate,
+        Spacer,
+        TableStyle,
+    )
+
     buffer = io.BytesIO()
-    created = datetime.fromisoformat(meta["generated_at"].replace("Z", "+00:00"))
-    pages[0].save(
+    document = SimpleDocTemplate(
         buffer,
-        "PDF",
-        save_all=True,
-        append_images=pages[1:],
-        resolution=150,
+        pagesize=landscape(A4),
+        topMargin=12 * mm,
+        bottomMargin=12 * mm,
+        leftMargin=12 * mm,
+        rightMargin=12 * mm,
         title=f"DERIVADO · {revision.equipment.tag.value} Rev {revision.revision} · DRAFT",
         author=content["actor"],
-        subject="Propuesta de revisión de diseño; no es un original",
-        keywords=f"trazia-derivado;propuesta={content['proposal_id']}",
-        creator="TrazIA-3D",
-        creationDate=created.utctimetuple(),
-        modDate=created.utctimetuple(),
+        subject="trazia-derivado; no es un original",
     )
+    styles = getSampleStyleSheet()
+    cell = ParagraphStyle("celda", parent=styles["Normal"], fontSize=8, leading=11)
+
+    def paragraph(text):
+        return Paragraph(escape(str(text)), cell)
+
+    story = [Paragraph("DOCUMENTO DERIVADO - REVISION DE DISEÑO - DRAFT", styles["Heading1"])]
+    for line in [
+        f"{revision.equipment.tag.value} · {content['base']['revision']} → {revision.revision}",
+        f"Autor: {content['actor']} · fecha: {meta['generated_at']}",
+        f"Motivo: {content['reason']}",
+        f"Orden SHA-256: {meta['order_sha256']}",
+        f"IFC SHA-256: {meta.get('ifc_sha256', '—')}",
+        f"Dataset: {revision.dataset}. Original conservado. Pendiente de revisión técnica.",
+    ]:
+        story += [paragraph(line), Spacer(1, 3 * mm)]
+    rows = [[paragraph(t) for t in ("Marca", "Campo", "Antes", "Después", "Ubicación")]]
+    for index, mark in enumerate(marks, 1):
+        op = mark["operation"]
+        where = (
+            f"{mark['document'].id} p. {mark['page']}"
+            if mark["document"]
+            else f"Pendiente de delineación: {mark['pending']}"
+        )
+        rows.append(
+            [
+                paragraph(t)
+                for t in (
+                    f"D{index}",
+                    op["label"],
+                    _value(op["before"]),
+                    _value(op["after"]),
+                    where,
+                )
+            ]
+        )
+    table = LongTable(
+        rows, colWidths=[14 * mm, 72 * mm, 40 * mm, 40 * mm, 103 * mm], repeatRows=1, splitInRow=1
+    )
+    table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#eef2f7")),
+                ("GRID", (0, 0), (-1, -1), 0.3, colors.lightgrey),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("TOPPADDING", (0, 0), (-1, -1), 6),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+            ]
+        )
+    )
+    story += [table, Spacer(1, 5 * mm)]
+    if geometric:
+        story += [
+            paragraph(
+                "Aviso: cambian cotas o posiciones. El dibujo original ya "
+                "no representa a escala la geometría nueva; las anotaciones no lo redibujan."
+            )
+        ]
+    story += [
+        paragraph(
+            "No certifica fabricación ni cálculo resistente. La geometría "
+            "vigente es la del IFC asociado."
+        )
+    ]
+    grouped = {}
+    for mark in marks:
+        if mark["document"]:
+            grouped.setdefault((mark["document"].id, mark["page"]), []).append(mark)
+    for (_, page), items in sorted(grouped.items()):
+        doc = items[0]["document"]
+        image = _annotated(originals[doc.sha256], page, items, doc, geometric)
+        stream = io.BytesIO()
+        image.save(stream, format="PNG")
+        stream.seek(0)
+        story += [
+            PageBreak(),
+            PDFImage(stream, width=250 * mm, height=250 * PAGE[1] / PAGE[0] * mm),
+        ]
+
+    def footer(canvas, doc):
+        canvas.setFont("Helvetica", 8)
+        canvas.drawString(
+            12 * mm, 6 * mm, f"TrazIA-3D · documento derivado DRAFT · página {doc.page}"
+        )
+
+    document.build(story, onFirstPage=footer, onLaterPages=footer)
     return buffer.getvalue()

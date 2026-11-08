@@ -514,6 +514,17 @@ def apply(
         # inmutables, nunca una revisión a medias.
         store.put(payload)
         store.read(record.preview_ifc_sha256)
+        # CAS sin cambiar la versión: bloquea la base hasta el commit y comprueba
+        # de nuevo el ETag después de preparar los blobs. También funciona en SQLite.
+        guarded = session.exec(
+            update(RevisionRecord)
+            .where(
+                RevisionRecord.id == base_record.id, RevisionRecord.version == record.base_version
+            )
+            .values(version=RevisionRecord.version)
+        )
+        if guarded.rowcount != 1:
+            raise HTTPException(412, "La revisión base cambió durante la confirmación")
         now = time.time()
         claimed = session.exec(
             update(ChangeProposalRecord)
@@ -757,7 +768,7 @@ def design_report_pdf(request: Request, identity: str):
         exists = session.exec(
             select(RevisionArtifactRecord).where(
                 RevisionArtifactRecord.revision_id == record.id,
-                RevisionArtifactRecord.kind == "informe_pdf",
+                RevisionArtifactRecord.kind.in_(["informe_pdf", "ga_pdf", "ga_svg"]),
                 RevisionArtifactRecord.sha256 == sha,
             )
         ).first()
@@ -791,7 +802,7 @@ def is_derived_report(session: Session, sha: str) -> bool:
         session.exec(
             select(RevisionArtifactRecord).where(
                 RevisionArtifactRecord.sha256 == sha,
-                RevisionArtifactRecord.kind == "informe_pdf",
+                RevisionArtifactRecord.kind.in_(["informe_pdf", "ga_pdf", "ga_svg"]),
             )
         ).first()
         is not None
@@ -881,6 +892,10 @@ def build_preview(store: Store, job_id: str, config: dict) -> dict:
     by_path = {}
     for operation in evaluation.operations:
         by_path.setdefault(operation["path"], []).append(operation["id"])
+        if "collection" in operation:
+            for change in delta["changes"]:
+                if change["path"].startswith(operation["path"] + "."):
+                    by_path.setdefault(change["path"], []).append(operation["id"])
     changes = [
         {**change, "operation_ids": by_path.get(change["path"], [])} for change in delta["changes"]
     ]
@@ -922,12 +937,14 @@ def element_map(base: Revision, candidate: Revision, evaluation, model) -> list[
     from trazia.ifc import stable_guid
 
     before = {p.id: p for p in parts(base.equipment)}
-    after = parts(candidate.equipment)
+    after_list = parts(candidate.equipment)
+    after = {p.id: p for p in after_list}
+    ordered = [*after_list, *[p for key, p in before.items() if key not in after]]
     effects = {e["part"]: e for e in evaluation.effects}
     conflicts = {i.get("nozzle_id") for i in evaluation.issues if i["code"] == "nozzle_conflict"}
     key = f"{candidate.project_id}/equipment/{candidate.equipment.id}"
     result = []
-    for index, part in enumerate(after):
+    for index, part in enumerate(ordered):
         guid = stable_guid(key if index == 0 else f"{key}/{part.guid_key}")
         try:
             present = model.by_guid(guid) is not None
@@ -938,11 +955,16 @@ def element_map(base: Revision, candidate: Revision, evaluation, model) -> list[
             {
                 "part": part.id,
                 "semantic_id": SEMANTIC.get(part.id)
-                or (f"nozzle:{part.id}" if part.ifc_class == "IfcPipeSegment" else part.id),
+                or (
+                    f"nozzle:{part.id}"
+                    if part.ifc_class == "IfcPipeSegment"
+                    else f"element:{part.id}"
+                ),
                 "global_id": guid,
                 "in_ifc": present,
                 "existed_before": part.id in before,
-                "geometry_changed": before.get(part.id) != part,
+                "geometry_changed": before.get(part.id) != after.get(part.id),
+                "removed": part.id not in after,
                 "conflict": part.id in conflicts,
                 "operations": effect.get("operations", []),
             }
@@ -1006,6 +1028,18 @@ async def run_preview_job(store: Store, job_id: str):
                 record.proposal_sha256 != result["proposal_sha256"]
             ):
                 raise ValueError("La propuesta cambió durante la previsualización; repítela")
+            locked = session.exec(
+                update(JobRecord)
+                .where(
+                    JobRecord.id == job_id,
+                    JobRecord.status == "running",
+                    JobRecord.cancel_requested.is_(False),
+                )
+                .values(status="done")
+            )
+            if locked.rowcount != 1:
+                raise ValueError("Trabajo cancelado; no se publica el resultado")
+            job.status = "done"
             previous = record.preview_ifc_sha256
             record.status = "previewed"
             record.preview_ifc_sha256 = sha

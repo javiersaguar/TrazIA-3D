@@ -216,15 +216,55 @@ def _attribute_target(path: str, label: str, group: str, attribute) -> Target:
 
 
 def geometry_supported(equipment: Equipment) -> bool:
-    return equipment.kind == "vertical_vessel" and equipment.lod >= 2
+    return equipment.lod == 1 or equipment.kind in {
+        "vertical_vessel",
+        "horizontal_vessel",
+        "column",
+        "tank",
+    }
 
 
 def targets(equipment: Equipment) -> dict[str, Target]:
+    from trazia.model import fields
+
     result: list[Target] = []
-    if geometry_supported(equipment):
+    if equipment.kind == "vertical_vessel" and equipment.lod >= 2:
         result += VESSEL
-        for nozzle in equipment.nozzles:
-            result += _nozzle_targets(equipment, nozzle)
+    for nozzle in equipment.nozzles if equipment.lod >= 2 else []:
+        result += _nozzle_targets(equipment, nozzle)
+    prefixes = ("horizontal.", "column.", "tank.", "envelope.", "platforms.", "ladders.")
+    for path, value in fields(equipment).items():
+        if path.startswith(prefixes) or ".position." in path or ".direction." in path:
+            group = "equipo"
+            if path.startswith(("platforms.", "ladders.")):
+                group = "pieza:" + ":".join(path.split(".")[:2])
+            elif path.startswith("nozzles."):
+                group = "boquilla:" + path.split(".")[1]
+            signed = ".origin." in path or ".position." in path or ".direction." in path
+            minimum = None if signed else 0
+            result.append(
+                Target(
+                    path,
+                    path,
+                    path,
+                    group,
+                    value.unit,
+                    "length" if value.unit == "mm" else None,
+                    "Validación conjunta de dimensiones, soportes y continuidad de la familia.",
+                    minimum,
+                    not signed and not path.endswith("roof_height"),
+                    affects=(
+                        (path.split(".")[1],)
+                        if path.startswith("nozzles.")
+                        else (
+                            ("platform-" if path.startswith("platforms.") else "ladder-")
+                            + path.split(".")[1],
+                        )
+                        if path.startswith(("platforms.", "ladders."))
+                        else ("*family",)
+                    ),
+                )
+            )
     for key, attribute in equipment.attributes.items():
         result.append(
             _attribute_target(f"attributes.{key}", key.replace("_", " "), "atributos", attribute)
@@ -232,10 +272,31 @@ def targets(equipment: Equipment) -> dict[str, Target]:
     return {t.target: t for t in result}
 
 
+def part_capabilities(equipment: Equipment) -> dict:
+    supported = equipment.lod >= 2 and equipment.kind in {
+        "vertical_vessel",
+        "horizontal_vessel",
+        "column",
+        "tank",
+    }
+    return {
+        "collections": ["nozzles", "platforms", "ladders"] if supported else [],
+        "requires_lod3": ["platforms", "ladders"],
+        "existing": {
+            name: [item.id for item in getattr(equipment, name)]
+            for name in ("nozzles", "platforms", "ladders")
+        },
+        "notice": "Piezas paramétricas, no edición libre. Plataformas y "
+        "escaleras requieren aceptar LOD 3.",
+    }
+
+
 FAMILY_MATRIX = {
-    "vertical_vessel (LOD 2/3)": "Geometría de virola, fondos y faldón; diámetro, proyección, "
-    "elevación y azimut de boquillas radiales existentes; atributos.",
-    "vertical_vessel (LOD 1)": "Solo atributos: la envolvente no se edita en el MVP.",
-    "horizontal_vessel, column, tank": "Solo atributos hasta probar cada familia (K.8).",
-    "pump, compressor, generic": "Solo atributos.",
+    "vertical_vessel (LOD 2/3)": "Virola, fondos, faldón, boquillas, plataformas y escaleras.",
+    "horizontal_vessel (LOD 2/3)": "Dimensiones y silletas; piezas con posición explícita.",
+    "column (LOD 2/3)": "Dimensiones de tramos y continuidad; piezas con posición explícita.",
+    "tank (LOD 2/3)": "Dimensiones y altura del techo existente; piezas con posición explícita.",
+    "cualquier familia (LOD 1)": "Origen y tamaño de la envolvente; sin piezas detalladas.",
+    "pump, compressor, generic": "Envolvente LOD 1 y atributos; no se "
+    "inventan interiores mecánicos.",
 }

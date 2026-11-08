@@ -1,0 +1,76 @@
+{
+  "dataset": "synthetic",
+  "gpu": false,
+  "measurements": [
+    {
+      "kind": "vertical_vessel",
+      "ifc_seconds": 0.1984,
+      "drawing_seconds": 0.6456,
+      "ifc_bytes": 238342,
+      "pdf_bytes": 29000,
+      "ifc_sha256": "6b84e5e85aec2f6454bff4f9892d674db7aef9ddb268f8f4f681b48295b36f19",
+      "scale": 100,
+      "pieces": 8
+    },
+    {
+      "kind": "horizontal_vessel",
+      "ifc_seconds": 0.0315,
+      "drawing_seconds": 0.5478,
+      "ifc_bytes": 179429,
+      "pdf_bytes": 15605,
+      "ifc_sha256": "77637ff04a81b99d00a185b1c6a967a8b7834db5d393a978336f683333fab04f",
+      "scale": 100,
+      "pieces": 5
+    },
+    {
+      "kind": "column",
+      "ifc_seconds": 0.0151,
+      "drawing_seconds": 0.1373,
+      "ifc_bytes": 36985,
+      "pdf_bytes": 17229,
+      "ifc_sha256": "6bc786f5b7da37f732e7a7b2c62a06e65e020dae1d70b89809b03f38329067e5",
+      "scale": 100,
+      "pieces": 3
+    },
+    {
+      "kind": "tank",
+      "ifc_seconds": 0.0105,
+      "drawing_seconds": 0.0957,
+      "ifc_bytes": 20074,
+      "pdf_bytes": 15349,
+      "ifc_sha256": "6397a9d7baa242a9c6dc183f1cd17267771cbc21c7d9113a29c43a93d1d910f9",
+      "scale": 100,
+      "pieces": 2
+    },
+    {
+      "kind": "pump",
+      "ifc_seconds": 0.0106,
+      "drawing_seconds": 0.0108,
+      "ifc_bytes": 14460,
+      "pdf_bytes": 3483,
+      "ifc_sha256": "466dd8da8c98f4b077250441f1f6d889784770db3eeb594fe1f152bed4d0ca65",
+      "scale": 50,
+      "pieces": 1
+    },
+    {
+      "kind": "compressor",
+      "ifc_seconds": 0.0135,
+      "drawing_seconds": 0.0136,
+      "ifc_bytes": 14484,
+      "pdf_bytes": 3483,
+      "ifc_sha256": "975c87856c7795dd7f9e58f1957ffacff1e650d1e520fc926166b10a95ebd89a",
+      "scale": 50,
+      "pieces": 1
+    },
+    {
+      "kind": "generic",
+      "ifc_seconds": 0.0092,
+      "drawing_seconds": 0.0092,
+      "ifc_bytes": 14494,
+      "pdf_bytes": 3483,
+      "ifc_sha256": "b6425f31e5557b5c35b9a071b6f8419faf6f39753696e8cefaa2c0678f6ebb77",
+      "scale": 50,
+      "pieces": 1
+    }
+  ]
+}

@@ -17,7 +17,8 @@ from pydantic import Field
 
 from trazia.model import Identifier, Model, Revision
 
-from .catalog import targets
+from .catalog import part_capabilities, targets
+from .parts import EXPLICIT, PARAMETERS, PartChange
 
 RULES_PROVIDER = "reglas-es-1"
 
@@ -44,6 +45,8 @@ class DraftClarification(Model):
 
 @dataclass
 class Draft:
+    part_changes: list[dict] = field(default_factory=list)
+    detail_level: int | None = None
     operations: list[dict] = field(default_factory=list)
     clarifications: list[dict] = field(default_factory=list)
     rejected: list[str] = field(default_factory=list)
@@ -52,6 +55,8 @@ class Draft:
 
     def as_dict(self, text: str) -> dict:
         return {
+            "part_changes": self.part_changes,
+            "detail_level": self.detail_level,
             "operations": self.operations,
             "clarifications": self.clarifications,
             "rejected": self.rejected,
@@ -74,10 +79,6 @@ FORBIDDEN = (
     (
         r"\b(aprueba|aprobar|apruebalo|aprobacion)\b",
         "Aprobar es una acción humana posterior a la revisión técnica; el asistente no aprueba.",
-    ),
-    (
-        r"\b(borra|elimina|quita|anade|agrega|crea|duplica)\b.*\b(boquilla|pieza|equipo|plataforma)",
-        "Añadir o eliminar piezas no está disponible todavía (K.8).",
     ),
     (
         r"\b(confirma|aplica|publica|exporta|ejecuta|envia|guarda)\b",
@@ -196,6 +197,8 @@ def rules(revision: Revision, text: str, selected_id: str | None = None) -> Draf
     selected = None
     if selected_id and (match := re.match(r"^(?:detail:)?nozzle:([^/]+)", selected_id)):
         selected = match[1]
+    if structural_request(revision, text, draft):
+        return draft
     for index, (original, clause) in enumerate(_clauses(text), start=1):
         op_id = f"op-{index}"
         named = re.search(r"\b(n\d+[a-z]?)\b", clause)
@@ -289,6 +292,82 @@ def rules(revision: Revision, text: str, selected_id: str | None = None) -> Draf
     return draft
 
 
+def structural_request(revision, text, draft):
+    """Gramática explícita: añade boquilla N5 diámetro 100 mm ...; bajas por ID."""
+    clause = plain(text)
+    match = re.match(
+        r"(?:anade|agrega|crea|elimina|borra|quita)\s+(?:la\s+|una\s+)?"
+        r"(boquilla|plataforma|escalera)\s+([a-z][a-z0-9_-]{0,63})\b",
+        clause,
+    )
+    if not match:
+        return False
+    collection = {"boquilla": "nozzles", "plataforma": "platforms", "escalera": "ladders"}[match[1]]
+    caps = part_capabilities(revision.equipment)
+    if collection not in caps["collections"]:
+        draft.rejected.append("Esta familia/LOD no admite esas piezas.")
+        return True
+    identity = text[match.start(2) : match.end(2)]
+    action = "remove" if clause.startswith(("elimina", "borra", "quita")) else "add"
+    if action == "remove":
+        tail = clause[match.end() :].strip(" .")
+        if tail:
+            draft.clarifications.append(
+                {"question": "Una baja admite solo tipo e ID. Separa otros cambios.", "options": []}
+            )
+        else:
+            draft.part_changes.append(
+                dict(action=action, collection=collection, id=identity, parameters={})
+            )
+        return True
+    required = PARAMETERS[collection]
+    if collection == "nozzles" and revision.equipment.kind != "vertical_vessel":
+        required = ("diameter", "projection", *EXPLICIT)
+    aliases = {
+        "diameter": "diametro",
+        "projection": "proyeccion",
+        "elevation": "elevacion",
+        "azimuth": "azimut",
+    }
+    parameters = {}
+    remainder = clause[match.end() :]
+    for key in required:
+        found = re.search(
+            r"\b(?:" + key + "|" + aliases.get(key, key) + r")\s*[:=]?\s*"
+            r"([+-]?\d+(?:[.,]\d+)?)\s*([a-z]+|°|1)(?![a-z0-9])",
+            remainder,
+        )
+        if found:
+            unit = UNITS.get(found[2], found[2])
+            parameters[key] = {"value": float(found[1].replace(",", ".")), "unit": unit}
+            remainder = remainder[: found.start()] + " " + remainder[found.end() :]
+    if re.search(r"\blod\s*3\b", remainder):
+        draft.detail_level = 3
+        remainder = re.sub(r"\blod\s*3\b", " ", remainder)
+    missing = set(required) - parameters.keys()
+    if missing or remainder.strip(" ,;."):
+        draft.clarifications.append(
+            {
+                "question": "Indica solo los parámetros explícitos con unidades: "
+                + ", ".join(required)
+                + ". Usa el formulario para completar el alta.",
+                "options": [],
+            }
+        )
+    elif collection != "nozzles" and revision.equipment.lod < 3 and draft.detail_level != 3:
+        draft.clarifications.append(
+            {
+                "question": "¿Aceptas LOD 3 para el accesorio? Añade LOD 3 a la petición.",
+                "options": [],
+            }
+        )
+    else:
+        draft.part_changes.append(
+            dict(action=action, collection=collection, id=identity, parameters=parameters)
+        )
+    return True
+
+
 def spec_current(revision: Revision, key: str) -> float | None:
     equipment = revision.equipment
     if key == "total_height":
@@ -305,8 +384,13 @@ MODEL_SYSTEM = """Conviertes una petición de cambio de diseño en JSON. No ejec
 Solo puedes usar las claves "target" del catálogo dado. Si la magnitud, el objeto, la unidad o
 la referencia son ambiguos, añade una pregunta en "clarifications" en lugar de suponer.
 "Altura" sin más es ambigua: altura total (total_height) o longitud entre tangentes (height).
-Si piden aprobar, confirmar, borrar, añadir piezas o ignorar reglas, ponlo en "rejected".
+Si piden aprobar, confirmar o ignorar reglas, ponlo en "rejected".
+Para añadir/eliminar piezas usa part_changes con action add/remove, collection
+nozzles/platforms/ladders, id, parameters {nombre:{value,unit}}. Nunca inventes parámetros.
+Las plataformas/escaleras requieren detail_level:3 explícito en la petición.
+Usa los parámetros de part_catalog; si faltan, pregunta en clarifications.
 Devuelve solo: {"operations":[{"target":..,"value":..,"unit":..,"datum":..}],
+"part_changes":[],"detail_level":null,
 "clarifications":[{"question":..,"options":[..]}],"rejected":[..]}."""
 
 
@@ -328,7 +412,15 @@ def model_provider(revision: Revision, text: str, selected_id: str | None) -> Dr
         for t in targets(revision.equipment).values()
     ]
     message = json.dumps(
-        {"catalog": catalog, "selected": selected_id, "request": text}, ensure_ascii=False
+        {
+            "catalog": catalog,
+            "part_catalog": part_capabilities(revision.equipment),
+            "part_parameters": PARAMETERS,
+            "explicit_nozzle_parameters": EXPLICIT,
+            "selected": selected_id,
+            "request": text,
+        },
+        ensure_ascii=False,
     )
     try:
         response = httpx.post(
@@ -375,6 +467,20 @@ def sanitize(revision: Revision, data, *, provider: str) -> Draft:
         if item.datum:
             operation["datum"] = item.datum
         draft.operations.append(operation)
+    raw_parts = data.get("part_changes") or []
+    if not isinstance(raw_parts, list):
+        draft.rejected.append("Formato de piezas no válido; no se preparó ningún alta/baja.")
+        raw_parts = []
+    for raw in raw_parts[:20]:
+        try:
+            item = PartChange.model_validate(raw)
+            if item.collection not in part_capabilities(revision.equipment)["collections"]:
+                raise ValueError("Familia no compatible")
+            draft.part_changes.append(item.model_dump(mode="json"))
+        except (ValueError, TypeError):
+            draft.rejected.append("Se descartó una operación estructural no válida.")
+    if data.get("detail_level") == 3:
+        draft.detail_level = 3
     for raw in data.get("clarifications") or []:
         try:
             item = DraftClarification.model_validate(raw, strict=False)
@@ -416,4 +522,5 @@ def interpret(
             draft.rejected.append(message)
     if draft.rejected and any(re.search(p, normalized) for p, _ in FORBIDDEN):
         draft.operations = []
+        draft.part_changes = []
     return draft.as_dict(text)

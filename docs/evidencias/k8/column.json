@@ -1,0 +1,69 @@
+{
+  "schema": "ga-1",
+  "generator": "ga-ifc-1",
+  "dataset": "synthetic",
+  "draft": true,
+  "input_sha256": "6e7df43846539638bf31273ee07c50064de4432031e9266a3e0ec274a6eecadd",
+  "ifc_sha256": "6bc786f5b7da37f732e7a7b2c62a06e65e020dae1d70b89809b03f38329067e5",
+  "scale": 100,
+  "paper_mm": [
+    420.0,
+    297.0
+  ],
+  "units": "mm",
+  "world_bounds_mm": {
+    "min": [
+      -1000.0,
+      -1000.0,
+      0.0
+    ],
+    "max": [
+      1000.0,
+      1000.0,
+      8000.0
+    ],
+    "size": [
+      2000.0,
+      2000.0,
+      8000.0
+    ]
+  },
+  "views": [
+    {
+      "name": "Alzado · XZ",
+      "axes": [
+        0,
+        2
+      ]
+    },
+    {
+      "name": "Perfil · YZ",
+      "axes": [
+        1,
+        2
+      ]
+    },
+    {
+      "name": "Planta · XY",
+      "axes": [
+        0,
+        1
+      ]
+    }
+  ],
+  "pieces": [
+    {
+      "guid": "2qA3HuPtPMcRhJSNZubSfS",
+      "component": "section-transition"
+    },
+    {
+      "guid": "3eAVqyMWrIhhPrC11P_oQZ",
+      "component": "section-upper"
+    },
+    {
+      "guid": "2Kkc6N$SDRMOoFMhUVIg1N",
+      "component": "shell"
+    }
+  ],
+  "limits": "Proyección sin líneas ocultas; cotas exteriores teseladas. No certifica fabricación ni cálculo resistente."
+}

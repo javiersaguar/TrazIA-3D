@@ -137,6 +137,7 @@ export async function getStudy(): Promise<StudyResponse> {
 }
 
 export type EquipmentRow = {
+  project_id?: string; equipment_id?: string;
   tag: string;
   kind: string;
   area: string;

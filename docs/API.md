@@ -583,3 +583,48 @@ Propuestas de cambio de diseño: `GET /revisions/{id}/design-operations`,
 `GET /revisions/{id}/artifacts`, `GET /revisions/{id}/design-report.pdf` y
 `POST /copiloto/design-proposals`, que solo devuelve un borrador. Aplicar crea una revisión DRAFT
 nueva; nunca edita la base. Detalle y garantías en [EDICION_ASISTIDA.md](EDICION_ASISTIDA.md).
+
+
+## K8 · piezas y planos GA nuevos (08/11)
+
+`POST /revisions/{id}/change-proposals` admite, además de las operaciones de campo:
+
+```json
+{
+  "actor": "Revisor local",
+  "reason": "Añadir conexión de prueba sintética",
+  "part_changes": [{
+    "action": "add", "collection": "nozzles", "id": "N5",
+    "parameters": {
+      "diameter": {"value": 100, "unit": "mm"},
+      "projection": {"value": 200, "unit": "mm"},
+      "elevation": {"value": 4500, "unit": "mm"},
+      "azimuth": {"value": 45, "unit": "deg"}
+    }
+  }]
+}
+```
+
+`remove` lleva colección e ID, sin parámetros. Máximo 20 cambios en total. El catálogo
+`GET /revisions/{id}/design-operations` incluye capacidades por familia y LOD. Plataformas
+(x/y/z, size_x/y/z) y escaleras (x/y/z, width, height, rail_diameter, rung_spacing) requieren
+LOD 3 explícito; en una base LOD 2 se envía `detail_level: 3`. En conexiones de horizontal,
+columna y tanque se usan diámetro, proyección, x/y/z y dx/dy/dz (unidad `1`).
+Las reglas validan el candidato completo y no mueven conexiones para ocultar errores.
+Previsualizar, aplicar y deshacer conservan sus endpoints, ETag e idempotencia.
+
+- `POST /revisions/{id}/ga-drawings`: `{}` o `{"scale":100}`, `If-Match` e
+  `Idempotency-Key` obligatorios. Responde 202 con `job_id`; seguimiento/cancelación por los
+  endpoints existentes de trabajos y SSE. Tiempo máximo 240 s, publicación condicionada al ETag.
+- `GET /revisions/{id}/ga-drawings`: enlaces de los cuatro artefactos vigentes (`pdf`, `svg`,
+  `manifest`, `ifc`), con SHA-256. Una revisión sin plano devuelve `files: {}`.
+- `GET /revisions/{id}/ga-drawings/{formato}?sha=<sha>`: descarga un artefacto histórico
+  registrado para esa revisión. Cabeceras `X-Derived-Document: true` y `X-Content-SHA256`.
+
+El PDF vectorial y SVG son A3 apaisado, con escala común admitida, alzado, perfil, planta,
+cotas exteriores y cajetín DRAFT. El manifiesto vincula revisión, versión, huella de datos,
+IFC exacto, dimensiones mm y GUID. No se modifica el PDF original. La subida de documentos
+rechaza el GA registrado/identificado como derivado. No hay ocultación de líneas ni validación
+resistente o de fabricación. ReportLab pasa también al extra `api`; `uv.lock` mantiene las
+versiones anteriores. Cancelar impide publicar, aunque un hilo de cálculo nativo ya iniciado
+puede acabar en segundo plano. [Evidencias reproducibles](evidencias/k8/README.md).

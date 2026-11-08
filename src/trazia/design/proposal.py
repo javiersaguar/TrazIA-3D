@@ -26,9 +26,10 @@ from trazia.model import (
 )
 from trazia.units import UnitError, normalize
 
-from .catalog import AZIMUTH_NORTH, DATUM_TANGENT, Target, targets
+from .catalog import AZIMUTH_NORTH, DATUM_TANGENT, Target, part_capabilities, targets
+from .parts import PartChange, apply_changes, attachment_issues, restore_change
 
-ENGINE_VERSION = "k1-1"
+ENGINE_VERSION = "k8-1"
 Datum = Literal["suelo", "tangente_inferior", "interno", "norte"]
 Origin = Literal["formulario", "chat", "deshacer"]
 
@@ -54,6 +55,8 @@ class ProposalInput(Model):
     actor: str = Field(min_length=2, max_length=100)
     origin: Origin = "formulario"
     request_text: str | None = Field(default=None, max_length=2000)
+    part_changes: list[PartChange] = Field(default_factory=list, max_length=20)
+    detail_level: Literal[2, 3] | None = None
     clarifications: list[Clarification] = Field(default_factory=list, max_length=6)
 
 
@@ -127,10 +130,12 @@ def catalog(revision: Revision) -> dict:
     values = current_values(equipment)
     return {
         "equipment_id": equipment.id,
+        "dataset": revision.dataset,
+        "parts": part_capabilities(equipment),
         "kind": equipment.kind,
         "lod": equipment.lod,
         "datum": {
-            "elevation": "Suelo local: z = 0 en la base del faldón.",
+            "elevation": "Origen local IFC: cotas Z en milímetros; no es el Norte de planta.",
             "azimuth": "0° = +X, 90° = +Y, antihorario visto desde +Z. Norte de planta no "
             "verificado.",
             "shell_bottom_mm": equipment.shell_bottom,
@@ -161,7 +166,9 @@ def _normalize(spec: Target, operation: OperationInput, op_id: str):
             )
         return (text, text, None), None
     if spec.magnitude is None:
-        if isinstance(operation.value, str):
+        try:
+            number = float(operation.value)
+        except (TypeError, ValueError):
             return None, issue(
                 "error",
                 "number_type",
@@ -327,11 +334,23 @@ def evaluate(
                     options=item.options,
                 )
             )
-    if not body.operations and not body.clarifications:
+    if not body.operations and not body.part_changes and not body.clarifications:
         issues.append(issue("error", "empty", "La propuesta no contiene operaciones."))
+    if len(body.operations) + len(body.part_changes) > 20:
+        issues.append(issue("error", "limit", "El lote admite como máximo 20 operaciones."))
     resolved, seen_paths = [], {}
+    seen_ids = set()
     for index, operation in enumerate(body.operations, start=1):
         op_id = operation.id or f"op-{index}"
+        if op_id in seen_ids or op_id.startswith(("part-", "derived-")):
+            issues.append(issue("error", "operation_id", "ID de operación repetido o reservado."))
+            continue
+        seen_ids.add(op_id)
+        if any(operation.target.startswith(f"{p.collection}.{p.id}.") for p in body.part_changes):
+            issues.append(
+                issue("error", "part_overlap", "No edites y elimines/añadas la misma pieza.")
+            )
+            continue
         spec = specs.get(operation.target)
         if spec is None:
             reason = (
@@ -388,7 +407,7 @@ def evaluate(
     candidate = Revision.model_validate_json(base.model_dump_json())
     new = candidate.equipment
     # Primero el equipo; después las boquillas, cuya referencia puede depender de él.
-    resolved.sort(key=lambda item: item[1].group != "equipo")
+    resolved.sort(key=lambda item: 2 if item[1].group != "equipo" else int(item[1].derived))
     pending, order_operations = [], []
     for op_id, spec, value, text, unit_original, datum in resolved:
         before = resolve(spec.path, equipment)
@@ -432,7 +451,7 @@ def evaluate(
                 issue(
                     "warning",
                     "no_change",
-                    f"{spec.label}: ya vale {stored:g}.",
+                    f"{spec.label}: ya vale {stored}.",
                     path=spec.path,
                     operation_id=op_id,
                 )
@@ -447,7 +466,74 @@ def evaluate(
         )
         evaluation.operations.append(operation)
         pending.append((op_id, spec, stored, text, unit_original))
+        # Resolver las referencias posteriores con el candidato, no con la base.
+        target = resolve(spec.path, new)
+        target.value, target.unit = stored, spec.unit
 
+    # La posición explícita gobierna la geometría; su cota y azimut son metadatos derivados.
+    for nozzle in new.nozzles:
+        if nozzle.position is None:
+            continue
+        prefix = f"nozzles.{nozzle.id}"
+        touched = [p for p in pending if p[1].path.startswith(prefix + ".")]
+        for suffix, stored, unit in (
+            ("elevation", nozzle.position.z.value, "mm"),
+            (
+                "azimuth",
+                math.degrees(math.atan2(nozzle.direction.y.value, nozzle.direction.x.value)) % 360,
+                "deg",
+            ),
+        ):
+            path = f"{prefix}.{suffix}"
+            before = resolve(path, equipment)
+            if not touched or before.value == stored:
+                continue
+            op_id = f"derived-{nozzle.id}-{suffix}"
+            item = {
+                "id": op_id,
+                "target": touched[0][1].target,
+                "path": path,
+                "label": f"{nozzle.id}: {suffix} derivado de posición/dirección",
+                "input": {"text": "derivado", "unit_original": unit, "datum": None},
+                "before": {"value": before.value, "unit": before.unit},
+                "after": {"value": stored, "unit": unit},
+                "resolution": "Metadato calculado desde el vector explícito; no mueve la pieza.",
+            }
+            evaluation.operations.append(item)
+            order_operations.append(
+                {
+                    **item,
+                    "before_source": before.source.model_dump(mode="json"),
+                    "before_state": before.state,
+                }
+            )
+            _assign(
+                new,
+                path,
+                stored,
+                unit,
+                _design_source(proposal_id, op_id, f"ORD-{proposal_id[:12]}", "derivado", unit),
+                body.reason,
+            )
+
+    structural = apply_changes(
+        equipment,
+        new,
+        body.part_changes,
+        body.detail_level,
+        lambda op: _design_source(proposal_id, op, f"ORD-{proposal_id[:12]}", body.reason, None),
+        evaluation,
+    )
+    if new.lod != equipment.lod:
+        issues.append(
+            issue(
+                "warning",
+                "detail_level",
+                f"Nivel de detalle: {equipment.lod} → {new.lod}; se regeneran los detalles.",
+                path="lod",
+            )
+        )
+    order_operations.extend(structural)
     proposal_content = {
         "proposal_id": proposal_id,
         "kind": kind,
@@ -462,6 +548,8 @@ def evaluate(
         "request_text": body.request_text,
         "created_at": created_at,
         "operations": order_operations,
+        "before_lod": equipment.lod,
+        "after_lod": new.lod,
     }
     document, _ = order_document(proposal_content)
     for op_id, spec, stored, text, unit_original in pending:
@@ -488,6 +576,24 @@ def evaluate(
 def _check_nozzles(base: Revision, candidate: Revision, evaluation: Evaluation):
     """Informa de cada boquilla que el lote deja fuera de la virola; no la desplaza."""
     old, new = base.equipment, candidate.equipment
+    for identifier, message in attachment_issues(new):
+        evaluation.issues.append(
+            issue(
+                "error",
+                "attachment",
+                f"{identifier}: {message}",
+                path=f"nozzles.{identifier}",
+                nozzle_id=identifier,
+            )
+        )
+    if candidate.unplaced_nozzles:
+        evaluation.issues.append(
+            issue(
+                "error",
+                "unplaced",
+                "Hay boquillas leídas sin resolver; resuélvelas antes de cambiar el diseño.",
+            )
+        )
     if new.kind != "vertical_vessel" or new.lod < 2:
         return
     touched = {
@@ -541,10 +647,23 @@ def _effects(base: Revision, candidate: Revision, evaluation: Evaluation):
     by_op = {}
     specs = targets(old)
     for operation in evaluation.operations:
+        if "collection" in operation:
+            collection, identifier = operation["collection"], operation["part_id"]
+            part = (
+                identifier
+                if collection == "nozzles"
+                else ("platform-" if collection == "platforms" else "ladder-") + identifier
+            )
+            by_op.setdefault(part, set()).add(operation["id"])
+            continue
         spec = specs[operation["target"]]
         for part in spec.affects:
             ids = (
-                [n.id for n in new.nozzles if n.position is None] if part == "*nozzles" else [part]
+                [n.id for n in new.nozzles if n.position is None]
+                if part == "*nozzles"
+                else [p.id for p in parts(new)]
+                if part == "*family"
+                else [part]
             )
             for identifier in ids:
                 by_op.setdefault(identifier, set()).add(operation["id"])
@@ -623,6 +742,11 @@ def evaluate_reversion(
     candidate = Revision.model_validate_json(current.model_dump_json())
     order_operations = []
     for operation in applied["operations"]:
+        if "collection" in operation:
+            inverse = restore_change(candidate, operation, evaluation)
+            if inverse:
+                order_operations.append(inverse)
+            continue
         path, op_id = operation["path"], operation["id"]
         now = resolve(path, current.equipment)
         restored = resolve(path, snapshot.equipment)
@@ -671,6 +795,23 @@ def evaluate_reversion(
                 "before_state": now.state,
             }
         )
+    if "before_lod" in applied and current.equipment.lod == applied["after_lod"]:
+        if applied["before_lod"] < 3 and (
+            candidate.equipment.platforms or candidate.equipment.ladders
+        ):
+            evaluation.issues.append(
+                issue(
+                    "error",
+                    "lod_conflict",
+                    "Quedan accesorios LOD 3 ajenos a la orden; no se ocultan al deshacer.",
+                )
+            )
+        else:
+            candidate.equipment.lod = applied["before_lod"]
+    # Las colecciones restauradas conservan el orden de la base.
+    for name in ("nozzles", "platforms", "ladders"):
+        order = {item.id: index for index, item in enumerate(getattr(snapshot.equipment, name))}
+        getattr(candidate.equipment, name).sort(key=lambda item: order.get(item.id, len(order)))
     content = {
         "proposal_id": proposal_id,
         "kind": "reversion",

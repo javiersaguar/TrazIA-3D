@@ -18,15 +18,18 @@ export type Target = {
 };
 
 export type DesignCatalog = {
-  equipment_id: string; kind: string; lod: number; revision_id: string; revision: string;
+  dataset?: "synthetic" | "real"; equipment_id: string; kind: string; lod: number; revision_id: string; revision: string;
   version: number; geometry_supported: boolean; targets: Target[];
   datum: { elevation: string; azimuth: string; shell_bottom_mm: number };
   families: Record<string, string>;
+  parts: { collections: string[]; requires_lod3: string[]; existing: Record<string, string[]>; notice: string };
   derived_from: { kind: string; revision_id: string; proposal_id: string } | null;
 };
 
 export type OperationInput = { id?: string; target: string; value: number | string; unit?: string; datum?: Datum };
+export type PartChange = { action: "add" | "remove"; collection: "nozzles" | "platforms" | "ladders"; id: string; parameters: Record<string, {value: number; unit: string}> };
 export type ProposalInput = {
+  part_changes?: PartChange[]; detail_level?: 2 | 3;
   operations: OperationInput[]; reason: string; actor: string;
   origin?: "formulario" | "chat"; request_text?: string | null;
   clarifications?: { question: string; options: string[]; operation_id?: string | null }[];
@@ -45,7 +48,7 @@ export type Operation = {
 };
 export type Element = {
   part: string; semantic_id: string; global_id: string; in_ifc: boolean; existed_before: boolean;
-  geometry_changed: boolean; conflict: boolean; operations: string[];
+  removed?: boolean; geometry_changed: boolean; conflict: boolean; operations: string[];
 };
 export type Change = {
   path: string; operation: string; before: { value: number | string; unit: string } | null;
@@ -92,9 +95,9 @@ async function send<T>(path: string, init: RequestInit & { etag?: string; key?: 
 
 const id = (identity: string) => encodeURIComponent(identity);
 
-export async function revisionIdentity(tag: string, label: string) {
+export async function revisionIdentity(tag: string, label: string, projectId = "DEMO-PLANT") {
   const { data, etag } = await send<{ project_id: string; revision: string; equipment: { id: string } }>(
-    `/equipment/${encodeURIComponent(tag)}/revisions/${encodeURIComponent(label)}`);
+    `/equipment/${encodeURIComponent(tag)}/revisions/${encodeURIComponent(label)}?project_id=${encodeURIComponent(projectId)}`);
   return { identity: `${data.project_id}:${data.equipment.id}:${data.revision}`, etag: etag ?? '"0"' };
 }
 
@@ -124,6 +127,7 @@ export const revisionIfcUrl = (identity: string, version: number) =>
 export const previewIfcUrl = (preview: Preview) => apiURL(`${preview.ifc_url}?sha=${preview.ifc_sha256.slice(0, 12)}`);
 
 export type IntentDraft = {
+  part_changes: PartChange[]; detail_level: 2 | 3 | null;
   operations: (OperationInput & { id: string })[];
   clarifications: { question: string; options: string[]; operation_id?: string | null }[];
   rejected: string[]; notes: string[]; provider: string; request_text: string;
@@ -137,3 +141,8 @@ export const interpretRequest = async (revisionId: string, text: string, selecte
   })).data;
 
 export const designReportUrl = (revisionId: string) => apiURL(`/revisions/${id(revisionId)}/design-report.pdf`);
+
+export type DrawingFiles = {revision_id:string; input_sha256:string; draft:true; files:Record<string,{sha256:string;url:string}>};
+export const startDrawing = async (identity:string,etag:string) => (await send<{job_id:string}>(`/revisions/${id(identity)}/ga-drawings`,{method:"POST",etag,body:"{}"})).data;
+export const getDrawings = async (identity:string) => (await send<DrawingFiles>(`/revisions/${id(identity)}/ga-drawings`)).data;
+export const drawingDownloadUrl = (url:string) => apiURL(url);

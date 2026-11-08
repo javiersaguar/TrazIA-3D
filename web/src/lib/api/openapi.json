@@ -731,6 +731,175 @@
         }
       }
     },
+    "/revisions/{identity}/ga-drawings": {
+      "post": {
+        "summary": "Create Drawing",
+        "operationId": "create_drawing_revisions__identity__ga_drawings_post",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DrawingInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Drawings",
+        "operationId": "drawings_revisions__identity__ga_drawings_get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/revisions/{identity}/ga-drawings/{extension}": {
+      "get": {
+        "summary": "Drawing File",
+        "operationId": "drawing_file_revisions__identity__ga_drawings__extension__get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          },
+          {
+            "name": "extension",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Extension"
+            }
+          },
+          {
+            "name": "sha",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sha"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/reference-system": {
       "get": {
         "summary": "Reference System",
@@ -3314,6 +3483,26 @@
         ],
         "title": "Document"
       },
+      "DrawingInput": {
+        "properties": {
+          "scale": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10000,
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scale"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "DrawingInput"
+      },
       "Elevation": {
         "properties": {
           "source": {
@@ -4225,6 +4414,75 @@
         ],
         "title": "OperationInput"
       },
+      "PartChange": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "add",
+              "remove"
+            ],
+            "title": "Action"
+          },
+          "collection": {
+            "type": "string",
+            "enum": [
+              "nozzles",
+              "platforms",
+              "ladders"
+            ],
+            "title": "Collection"
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Id"
+          },
+          "parameters": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/PartValue"
+            },
+            "type": "object",
+            "maxProperties": 16,
+            "title": "Parameters"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "action",
+          "collection",
+          "id"
+        ],
+        "title": "PartChange"
+      },
+      "PartValue": {
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "value",
+          "unit"
+        ],
+        "title": "PartValue"
+      },
       "PlatformParameters": {
         "properties": {
           "id": {
@@ -4377,6 +4635,29 @@
               }
             ],
             "title": "Request Text"
+          },
+          "part_changes": {
+            "items": {
+              "$ref": "#/components/schemas/PartChange"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Part Changes"
+          },
+          "detail_level": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "enum": [
+                  2,
+                  3
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail Level"
           },
           "clarifications": {
             "items": {

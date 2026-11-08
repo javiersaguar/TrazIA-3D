@@ -23,7 +23,9 @@ export function unitsFor(target: Target): string[] {
 /** Grupo de la selección 3D: "nozzle:N3" → boquilla N3; el resto, el equipo. */
 export function groupForSelection(selectedId: string | null | undefined): string {
   const nozzle = selectedId?.match(/^(?:detail:)?nozzle:([^/]+)/);
-  return nozzle ? `boquilla:${nozzle[1]}` : "equipo";
+  if (nozzle) return `boquilla:${nozzle[1]}`;
+  const piece = selectedId?.match(/^element:(platform|ladder)-(.+)$/);
+  return piece ? `pieza:${piece[1] === "platform" ? "platforms" : "ladders"}:${piece[2]}` : "equipo";
 }
 
 export function groups(targets: Target[]): { id: string; label: string }[] {
@@ -32,7 +34,7 @@ export function groups(targets: Target[]): { id: string; label: string }[] {
     if (seen.has(target.group)) continue;
     seen.set(target.group, target.group === "equipo" ? "Equipo"
       : target.group === "atributos" ? "Atributos técnicos"
-        : `Boquilla ${target.group.slice("boquilla:".length)}`);
+        : target.group.startsWith("pieza:") ? `Pieza ${target.group.slice(6)}` : `Boquilla ${target.group.slice("boquilla:".length)}`);
   }
   return [...seen].map(([id, label]) => ({ id, label }));
 }

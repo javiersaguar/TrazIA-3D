@@ -1,0 +1,89 @@
+{
+  "schema": "ga-1",
+  "generator": "ga-ifc-1",
+  "dataset": "synthetic",
+  "draft": true,
+  "input_sha256": "353a20673af5900cae47107222dbdf46c1718408bccff86527900f3f6a357f05",
+  "ifc_sha256": "6b84e5e85aec2f6454bff4f9892d674db7aef9ddb268f8f4f681b48295b36f19",
+  "scale": 100,
+  "paper_mm": [
+    420.0,
+    297.0
+  ],
+  "units": "mm",
+  "world_bounds_mm": {
+    "min": [
+      -1350.0,
+      -1300.0,
+      0.0
+    ],
+    "max": [
+      1400.0,
+      1300.0,
+      8350.0
+    ],
+    "size": [
+      2750.0,
+      2600.0,
+      8350.0
+    ]
+  },
+  "views": [
+    {
+      "name": "Alzado · XZ",
+      "axes": [
+        0,
+        2
+      ]
+    },
+    {
+      "name": "Perfil · YZ",
+      "axes": [
+        1,
+        2
+      ]
+    },
+    {
+      "name": "Planta · XY",
+      "axes": [
+        0,
+        1
+      ]
+    }
+  ],
+  "pieces": [
+    {
+      "guid": "1fCbNYLIXJpBJdap_2s_Ir",
+      "component": "bottom_head"
+    },
+    {
+      "guid": "0ZHCZByc9OYQCjqCOEKVlG",
+      "component": "top_head"
+    },
+    {
+      "guid": "0iFPiPfwjTHwyaW0VA6qeq",
+      "component": "skirt"
+    },
+    {
+      "guid": "1fYIjtO2jHVvWoC_Gze6x9",
+      "component": "N1"
+    },
+    {
+      "guid": "1puBiiXiTSwf9bAr72pY$U",
+      "component": "N2"
+    },
+    {
+      "guid": "1Ia_o6VBPG4v$3H9Pu27rb",
+      "component": "N3"
+    },
+    {
+      "guid": "3f5r8B8nrK6Bgpa7eqqWZK",
+      "component": "N4"
+    },
+    {
+      "guid": "2LWeWJOpTHLgKbI2kTXlHK",
+      "component": "shell"
+    }
+  ],
+  "limits": "Proyección sin líneas ocultas; cotas exteriores teseladas. No certifica fabricación ni cálculo resistente."
+}

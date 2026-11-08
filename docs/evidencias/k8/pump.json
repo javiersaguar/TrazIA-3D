@@ -1,0 +1,61 @@
+{
+  "schema": "ga-1",
+  "generator": "ga-ifc-1",
+  "dataset": "synthetic",
+  "draft": true,
+  "input_sha256": "3b4218c0b3e17e768e1b76c0be8f1cc931361a9a60449318018f83fa5613e4ad",
+  "ifc_sha256": "466dd8da8c98f4b077250441f1f6d889784770db3eeb594fe1f152bed4d0ca65",
+  "scale": 50,
+  "paper_mm": [
+    420.0,
+    297.0
+  ],
+  "units": "mm",
+  "world_bounds_mm": {
+    "min": [
+      -1000.0,
+      500.0,
+      0.0
+    ],
+    "max": [
+      1000.0,
+      3500.0,
+      4000.0
+    ],
+    "size": [
+      2000.0,
+      3000.0,
+      4000.0
+    ]
+  },
+  "views": [
+    {
+      "name": "Alzado · XZ",
+      "axes": [
+        0,
+        2
+      ]
+    },
+    {
+      "name": "Perfil · YZ",
+      "axes": [
+        1,
+        2
+      ]
+    },
+    {
+      "name": "Planta · XY",
+      "axes": [
+        0,
+        1
+      ]
+    }
+  ],
+  "pieces": [
+    {
+      "guid": "2Kkc6N$SDRMOoFMhUVIg1N",
+      "component": "shell"
+    }
+  ],
+  "limits": "Proyección sin líneas ocultas; cotas exteriores teseladas. No certifica fabricación ni cálculo resistente."
+}

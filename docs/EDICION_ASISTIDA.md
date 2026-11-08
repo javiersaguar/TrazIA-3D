@@ -5,9 +5,9 @@ Workstream K. Plan: [PLAN_EDICION_ASISTIDA.md](PLAN_EDICION_ASISTIDA.md). Fecha:
 **Estado:** K.0–K.6 integrados en `main` (f2e8d25). Las pruebas
 (`tests/test_edicion_asistida.py` y `web/src/features/design-edit/form.test.ts`) y la suite
 completa pasan en CI en Ubuntu y Windows, con typecheck, lint, pruebas unitarias y build de la
-web. No se ejecutaron en el portátil de desarrollo porque le falta memoria. Quedan pendientes el
-recorrido con una persona (K.2 y K.4), la medida del modelo local (K.5) y el cierre de K.7. K.8 no
-se ha empezado. Todos los ejemplos son sintéticos (V-101) y no hay datos de TR.
+web. La ampliación K8 se ha verificado también en el portátil, con Python en un contenedor CPU y la web en Windows. Quedan pendientes el
+recorrido con una persona (K.2 y K.4), la medida del modelo local (K.5) y el cierre de K.7. K.8 implementado el 08/11: piezas reversibles, matriz ampliada y GA desde IFC;
+[medidas, evidencias y límites](evidencias/k8/README.md). Todos los ejemplos son sintéticos y no hay datos de TR.
 
 ## 1. Orden de diseño frente a corrección de lectura (K.0)
 
@@ -52,9 +52,9 @@ anteriores de cada operación. Es la evidencia de la orden y nunca una lectura.
 | Familia | Operaciones admitidas |
 | --- | --- |
 | `vertical_vessel` LOD 2/3 | `diameter`, `height` (longitud entre tangentes), `total_height` (derivada), `head_depth`, `skirt_height`, `skirt_thickness`; por boquilla radial existente: `diameter`, `projection`, `elevation`, `azimuth`; `service`/`rating` si existen; atributos |
-| `vertical_vessel` LOD 1 | Solo atributos; la envolvente no se edita |
-| `horizontal_vessel`, `column`, `tank` | Solo atributos hasta probar cada familia (K.8) |
-| `pump`, `compressor`, `generic` | Solo atributos |
+| Cualquier familia LOD 1 | Origen y tamaño de la envolvente, atributos; sin piezas detalladas |
+| `horizontal_vessel`, `column`, `tank` LOD 2/3 | Dimensiones propias, silletas/tramos/techo existente; conexiones con posición/dirección explícitas; plataformas y escaleras LOD 3 |
+| `pump`, `compressor`, `generic` | Envolvente LOD 1 y atributos; sin interiores mecánicos |
 
 Restricciones que se validan sobre el **lote completo**, no campo a campo:
 
@@ -138,8 +138,8 @@ de Ollama (`use_model`), y si no está disponible se vuelve a las reglas, avisan
 devuelve el modelo se filtra contra el catálogo: no puede proponer otras rutas ni acciones.
 El intérprete solo recibe la petición y el catálogo, **nunca el texto de los documentos**, de
 modo que una instrucción escrita en un PDF no llega a él. Pide aclaración cuando la altura, la
-unidad, el objeto o el valor son ambiguos. Rechaza aprobar, confirmar, publicar, añadir o
-eliminar piezas y desactivar reglas. El borrador rellena el mismo formulario y sigue el mismo
+unidad, el objeto o el valor son ambiguos. Rechaza aprobar, confirmar, publicar y desactivar reglas. K8 admite preparar altas/bajas
+de piezas con todos sus parámetros; si faltan, pide aclaración. No ejecuta la orden. El borrador rellena el mismo formulario y sigue el mismo
 recorrido de validar, previsualizar y confirmar por una persona.
 
 ## 4. Plano derivado (K.6)
@@ -150,8 +150,8 @@ donde la lectura anterior tenía página y región en un PDF original verificado
 figura como «pendiente de delineación» y no se inventa ninguna región. Si cambian cotas o
 posiciones, se avisa de que el dibujo deja de estar a escala, porque una anotación no redibuja
 el recipiente. El original no se modifica. El PDF se registra como artefacto y la subida de
-documentos lo rechaza como original de extracción. Se genera como raster con Pillow y
-pypdfium2, sin dependencias nuevas.
+documentos lo rechaza como original de extracción. La tabla se pagina con ReportLab y repite cabecera; las páginas originales anotadas
+se rasterizan con Pillow/pypdfium2. ReportLab se incorpora al extra `api` (ya estaba en `dev`).
 
 ## 5. Interfaz (K.4)
 
@@ -186,3 +186,31 @@ no se ha medido (aciertos, aclaraciones, latencia): solo está probado con un pr
   cancelación, descarte y deshacer.
 - [ ] Reabrir en un visor externo un IFC de revisión derivada y comprobar los GUID persistentes.
 - [ ] Medir el chat con el modelo local disponible.
+
+
+## 8. Piezas y GA nuevos (K8)
+
+El cuerpo de la propuesta añade `part_changes` y `detail_level` opcionales. El límite conjunto
+es 20 operaciones. El catálogo enumera colecciones, IDs existentes y parámetros editables.
+La misma pieza no puede editarse por campos y añadirse/eliminarse en una sola orden.
+
+- `nozzles`: alta vertical con diámetro, proyección, elevación y azimut. En horizontal,
+  columna y tanque: diámetro, proyección, x/y/z y dx/dy/dz explícitos, con unidad `1` para
+  dirección. La superficie se valida sin ajustar silenciosamente coordenadas.
+- `platforms`: x/y/z y size_x/size_y/size_z. `ladders`: x/y/z, width, height,
+  rail_diameter, rung_spacing. Requieren aceptar `detail_level: 3` cuando la base es LOD 2.
+- Una baja lleva tipo e ID, sin parámetros. Se preservan snapshots, identidad y fuentes;
+  deshacer devuelve la pieza anterior. Una edición posterior incompatible bloquea la reversión.
+- Las altas conservan valor/unidad originales y fuente `diseno`, citando su propia orden.
+  La cota/azimut de una conexión explícita se derivan del vector y se muestran como operaciones
+  adicionales auditadas; no son parámetros geométricos independientes.
+
+Ejemplos de chat determinista: `Elimina boquilla N4` o
+`Añade boquilla N5 diámetro 100 mm proyección 200 mm elevación 4500 mm azimut 45 deg`.
+El modelo local no es necesario. Las órdenes pasan por validar, IFC temporal y confirmación.
+
+En Modelo → Proponer cambios se elige equipo y revisión. «Generar GA nuevo» actúa sobre
+la revisión persistida seleccionada o recién confirmada, nunca sobre entradas sin confirmar.
+PDF y SVG contienen alzado, perfil y planta con escala física común; el manifiesto contiene
+GUID completos, cotas de envolvente y SHA del IFC descargable. Este plano nuevo es distinto
+al informe de anotaciones K6. [Evidencias y límites](evidencias/k8/README.md).

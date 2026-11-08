@@ -11,13 +11,15 @@ import { FullscreenFrame } from "@/components/shell/fullscreen";
 import { Segmented } from "@/components/ui/controls";
 import { Badge, Button, EmptyState, Icon, Panel, PanelHeader, Skeleton } from "@/components/ui/primitives";
 import { apiEnabled } from "@/lib/api/config";
-import { getJob, subscribeJob } from "@/lib/api/client";
+import { cancelJob, getJob, subscribeJob } from "@/lib/api/client";
+import { PartsEditor } from "./parts-editor";
 import { formatValue } from "@/lib/format";
 import { useEquipment } from "@/lib/queries";
 import { useDemoUser } from "@/lib/session";
 import { useSelection } from "@/stores/selection";
 
 import {
+  startDrawing, getDrawings, drawingDownloadUrl, type DrawingFiles, type PartChange,
   STATUS_LABEL, applyProposal, designReportUrl, interpretRequest, createProposal, discardProposal, getCatalog, getProposal, listProposals,
   previewIfcUrl, replaceProposal, revertProposal, revisionIdentity, revisionIfcUrl, startPreview,
   type Datum, type IntentDraft, type Issue, type Proposal, type Target,
@@ -49,15 +51,21 @@ export function DesignEditWorkspace({ tag = "V-101" }: { tag?: string }) {
   return <Workspace tag={tag} />;
 }
 
-function Workspace({ tag }: { tag: string }) {
+function Workspace({ tag: initialTag }: { tag: string }) {
+  const [tag, setTag] = useState(initialTag);
+  const [projectId, setProjectId] = useState("DEMO-PLANT");
   const qc = useQueryClient();
   const user = useDemoUser();
   const selectedId = useSelection((s) => s.selectedId);
   const select = useSelection((s) => s.setSelected);
   const equipment = useEquipment();
-  const labels = equipment.data?.find((row) => row.tag === tag)?.revisions ?? ["B"];
-  const [label, setLabel] = useState<string>("B");
-  const identity = useQuery({ queryKey: ["design-identity", tag, label], queryFn: () => revisionIdentity(tag, label) });
+  const rows = equipment.data ?? [];
+  const selectedEquipment = rows.find(row => row.tag === tag && (row.project_id ?? "DEMO-PLANT") === projectId);
+  const equipmentKey = (row: (typeof rows)[number]) => `${row.project_id ?? "DEMO-PLANT"}:${row.tag}`;
+  const labels: string[] = selectedEquipment?.revisions ?? ["B"];
+  const [chosenLabel, setLabel] = useState<string>("B");
+  const label = labels.includes(chosenLabel) ? chosenLabel : labels[labels.length - 1] ?? "B";
+  const identity = useQuery({ queryKey: ["design-identity", projectId, tag, label], queryFn: () => revisionIdentity(tag, label, projectId) });
   const catalog = useQuery({
     queryKey: ["design-catalog", identity.data?.identity, identity.data?.etag],
     queryFn: () => getCatalog(identity.data!.identity), enabled: !!identity.data,
@@ -71,9 +79,14 @@ function Workspace({ tag }: { tag: string }) {
   const [choice, setChoice] = useState<{ group: string; selection: string | null } | null>(null);
   const group = choice && choice.selection === selectedId ? choice.group : groupForSelection(selectedId);
   const [drafts, setDrafts] = useState<Drafts>({});
+  const [partChanges,setPartChanges] = useState<PartChange[]>([]);
+  const [detailLevel,setDetailLevel] = useState<2|3|undefined>();
+  const [drawing,setDrawing] = useState<DrawingFiles|null>(null);
+  const [activeJob,setActiveJob] = useState<string|null>(null);
   const [reason, setReason] = useState("");
   const [actorInput, setActor] = useState<string | null>(null);
   const actor = actorInput ?? user ?? "";
+  const name = actor.trim();
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [signature, setSignature] = useState("");
   const [steps, setSteps] = useState<string[]>([]);
@@ -89,13 +102,14 @@ function Workspace({ tag }: { tag: string }) {
 
   // Cambiar de base empieza de cero: una propuesta pertenece a una revisión concreta.
   function changeBase(next: string, carried: Proposal | null = null) {
-    setLabel(next); setProposal(carried); setDrafts({}); setSteps([]); setIntent(null);
+    setChoice(null); setLabel(next); setProposal(carried); setDrafts({}); setPartChanges([]); setDetailLevel(undefined); setDrawing(null); setSteps([]); setIntent(null);
   }
 
   const targets = useMemo(() => catalog.data?.targets ?? [], [catalog.data]);
   const visible = targets.filter((t) => t.group === group);
   const operations = toOperations(drafts, targets);
-  const dirty = !!proposal && proposal.kind === "cambio_diseno" && signature !== draftSignature(operations, reason);
+  const currentSignature = draftSignature(operations, reason) + JSON.stringify([partChanges,detailLevel,name,intent?.clarifications,intent?.rejected]);
+  const dirty = !!proposal && proposal.kind === "cambio_diseno" && signature !== currentSignature;
   const editable = !proposal || (proposal.kind === "cambio_diseno" && EDITABLE.has(proposal.status));
   const preview = proposal?.preview && !dirty ? proposal.preview : null;
   const issues = useMemo(() => proposal?.issues ?? [], [proposal]);
@@ -104,8 +118,7 @@ function Workspace({ tag }: { tag: string }) {
     ? { revision_id: identity.data.identity, version: catalog.data.version, revision: catalog.data.revision } : null);
   const ifcUrl = preview && side === "despues" ? previewIfcUrl(preview)
     : base ? revisionIfcUrl(base.revision_id, base.version) : "";
-  const name = actor.trim();
-  const canValidate = editable && name.length >= 2 && reason.trim().length >= 3 && operations.length > 0 && !busy;
+  const canValidate = editable && name.length >= 2 && reason.trim().length >= 3 && (operations.length > 0 || partChanges.length > 0) && !intent?.clarifications.length && !intent?.rejected.length && !busy;
 
   function setDraft(target: Target, patch: Partial<Drafts[string]>) {
     setDrafts((old) => ({ ...old, [target.target]: {
@@ -126,13 +139,14 @@ function Workspace({ tag }: { tag: string }) {
     // Si el lote viene del chat se conserva la petición original; el contenido es el del formulario.
     const fromChat = !!intent && intent.request_text.trim() !== "";
     const body = {
-      operations, reason: reason.trim(), actor: name, origin: fromChat ? "chat" as const : "formulario" as const,
+      operations, part_changes: partChanges, detail_level: detailLevel, reason: reason.trim(), actor: name, origin: fromChat ? "chat" as const : "formulario" as const,
       request_text: fromChat ? intent?.request_text ?? null : null,
+      clarifications: fromChat ? intent?.clarifications ?? [] : [],
     };
     const result = proposal && proposal.kind === "cambio_diseno" && EDITABLE.has(proposal.status)
       ? await replaceProposal(proposal.id, body)
       : await createProposal(identity.data.identity, identity.data.etag, body);
-    setProposal(result); setSignature(draftSignature(operations, reason)); setSteps([]);
+    setProposal(result); setSignature(currentSignature); setSteps([]);
     applyKey.current = null;
   });
 
@@ -140,8 +154,9 @@ function Workspace({ tag }: { tag: string }) {
     if (!proposal) return;
     const job = await startPreview(proposal.id);
     setSteps([]);
+    setActiveJob(job.job_id);
     setBusy("previsualizar");
-    await new Promise<void>((resolve) => {
+    await new Promise<void>((resolve,reject) => {
       stopStream.current?.();
       stopStream.current = subscribeJob(job.job_id,
         (event) => { if (event.stage !== "job") setSteps((old) => [...old, event.detail]); },
@@ -150,10 +165,11 @@ function Workspace({ tag }: { tag: string }) {
             const detail = (await getJob(job.job_id).catch(() => null))?.error;
             toast.error(detail ?? `Previsualización ${status}`, { description: "La revisión base no ha cambiado." });
           }
-          setProposal(await getProposal(proposal.id));
-          resolve();
+          try { setProposal(await getProposal(proposal.id)); resolve(); }
+          catch (failure) { reject(failure); }
+          finally { setActiveJob(null); }
         },
-        () => { toast.error("Se perdió el seguimiento; recarga la propuesta"); resolve(); });
+        () => { toast.error("Seguimiento interrumpido; intentando reconectar. Puedes cancelar el trabajo."); });
     });
     setSide("despues");
   });
@@ -164,7 +180,7 @@ function Workspace({ tag }: { tag: string }) {
     if (applyKey.current?.id !== proposal.id + proposal.preview.ifc_sha256)
       applyKey.current = { id: proposal.id + proposal.preview.ifc_sha256, key: crypto.randomUUID() };
     const result = await applyProposal(proposal, name, applyKey.current.key);
-    setProposal(result.proposal);
+    setProposal(result.proposal); setDrawing(null);
     toast.success(`Revisión ${result.proposal.target_revision} creada como DRAFT`, {
       description: "La revisión base se conserva. La aprobación técnica sigue siendo una acción posterior.",
     });
@@ -176,6 +192,9 @@ function Workspace({ tag }: { tag: string }) {
     if (!identity.data || !text.trim()) return;
     const result = await interpretRequest(identity.data.identity, text.trim(), selectedId, useModel);
     setIntent(result);
+    setPartChanges(result.part_changes ?? []); setDetailLevel(result.detail_level ?? undefined);
+    if (result.part_changes?.length && !reason.trim()) setReason(`Petición: «${text.trim().slice(0, 200)}»`);
+    if (!result.operations.length) setDrafts({});
     if (result.operations.length) {
       const filled = draftsFromOperations(result.operations, targets);
       setDrafts(filled);
@@ -193,11 +212,28 @@ function Workspace({ tag }: { tag: string }) {
 
   const undo = (applied: Proposal) => run("deshacer", async () => {
     const target = applied.target_revision;
-    const current = await revisionIdentity(tag, target);
+    const current = await revisionIdentity(tag, target, projectId);
     const reversion = await revertProposal(applied.id, current.etag, name || applied.actor,
       `Deshacer la orden ${applied.id.slice(0, 8)} sobre ${applied.base.revision}`);
     // La propuesta de deshacer pertenece a la revisión derivada.
     changeBase(target, reversion);
+  });
+
+  const makeDrawing = () => run("plano", async () => {
+    const target=proposal?.status==="applied"?proposal.target_revision:label;
+    const current=await revisionIdentity(tag,target,projectId);
+    const job=await startDrawing(current.identity,current.etag);
+    setActiveJob(job.job_id);setSteps([]);
+    try {
+      await new Promise<void>((resolve,reject)=>{
+        stopStream.current?.();
+        stopStream.current=subscribeJob(job.job_id,event=>setSteps(old=>[...old,event.detail]),status=>{
+          if(status==="done")resolve();else reject(new Error(`Generación del plano: ${status}. La revisión no se ha modificado.`));
+        },()=>toast.error("Seguimiento interrumpido; intentando reconectar."));
+      });
+      setDrawing(await getDrawings(current.identity));
+      toast.success("Plano GA nuevo generado desde el IFC");
+    } finally {setActiveJob(null);}
   });
 
   if (identity.isLoading || catalog.isLoading) return <Skeleton className="h-[620px]" />;
@@ -215,14 +251,14 @@ function Workspace({ tag }: { tag: string }) {
           : "Revisión base. Valida y previsualiza para ver el IFC de la propuesta."}
         height="h-[min(72vh,760px)] min-h-[460px]"
         actions={<>
-          <span className="text-[12px] text-warning">Datos sintéticos · {tag} · DRAFT</span>
+          <span className="text-[12px] text-warning">{catalog.data?.dataset === "real" ? "Datos de la revisión" : "Datos sintéticos"} · {tag} · DRAFT</span>
           <Segmented<"antes" | "despues"> label="Revisión mostrada" value={preview ? side : "antes"} onChange={setSide}
             options={[{ value: "antes", label: `Antes · ${base?.revision ?? label}` },
               { value: "despues", label: preview ? `Después · ${preview.target_revision}` : "Después" }]} />
         </>}
       >
         {ifcUrl ? <IfcViewer ifcUrl={ifcUrl} selectedId={selectedId ?? undefined} onSelect={(id) => select(id)}
-          elementStates={side === "despues" ? states : undefined} /> : <Skeleton className="h-full" />}
+          elementStates={states} /> : <Skeleton className="h-full" />}
       </FullscreenFrame>
 
       <Panel className="flex min-h-0 flex-col">
@@ -231,13 +267,21 @@ function Workspace({ tag }: { tag: string }) {
           actions={proposal ? <Badge tone={tone(proposal.status)}>{STATUS_LABEL[proposal.status]}</Badge> : null} />
         <div className="space-y-4 overflow-y-auto px-5 pb-5 text-[13px]">
           <div className="grid grid-cols-2 gap-2">
+            <label className="space-y-1"><span className="text-muted">Equipo</span>
+              <select aria-label="Equipo" className={control} value={`${projectId}:${tag}`} disabled={!!busy} onChange={e => {
+                const next = rows.find(row => equipmentKey(row) === e.target.value);
+                if (next) { setTag(next.tag); setProjectId(next.project_id ?? "DEMO-PLANT"); changeBase(""); select(null); }
+              }}>
+                {rows.map(row => <option key={equipmentKey(row)} value={equipmentKey(row)}>{row.tag} · {row.kind} · {row.project_id ?? "DEMO-PLANT"}</option>)}
+              </select>
+            </label>
             <label className="space-y-1"><span className="text-muted">Revisión base</span>
-              <select className={control} value={label} onChange={(e) => changeBase(e.target.value)} disabled={!!busy}>
+              <select aria-label="Revisión base" className={control} value={label} onChange={(e) => changeBase(e.target.value)} disabled={!!busy}>
                 {labels.map((rev) => <option key={rev} value={rev}>Rev {rev}</option>)}
               </select>
             </label>
             <label className="space-y-1"><span className="text-muted">Elemento</span>
-              <select className={control} value={group} onChange={(e) => {
+              <select aria-label="Elemento" className={control} value={group} onChange={(e) => {
                 const nozzle = e.target.value.startsWith("boquilla:") ? `nozzle:${e.target.value.slice(9)}` : null;
                 select(nozzle);
                 setChoice({ group: e.target.value, selection: nozzle });
@@ -267,6 +311,7 @@ function Workspace({ tag }: { tag: string }) {
             </div>
             {intent && <div className="space-y-1 text-[12px]" aria-live="polite">
               <p className="text-muted">{intent.notice} · {intent.provider}</p>
+              <Button size="sm" variant="ghost" onClick={() => { setIntent(null); setDrafts({}); setPartChanges([]); }}>Descartar borrador del chat</Button>
               {intent.operations.length > 0 && <p>Formulario rellenado con {intent.operations.length} cambio(s): revísalos abajo y valida.</p>}
               {intent.notes.map((note, i) => <p key={`n${i}`} className="text-muted">{note}</p>)}
               {intent.rejected.map((message, i) => <p key={`r${i}`} role="alert" className="text-danger">{message}</p>)}
@@ -327,6 +372,7 @@ function Workspace({ tag }: { tag: string }) {
             </label>
           </fieldset>
 
+          <PartsEditor key={identity.data?.identity} catalog={catalog.data} changes={partChanges} onChange={setPartChanges} detailLevel={detailLevel} onDetailLevel={setDetailLevel} disabled={!editable || !!busy} />
           <p className="text-[12px] text-muted">
             ¿El plano dice otra cosa? Eso es <Link className="text-accent-text underline" href="/modelo?vista=revision">corregir la lectura</Link>,
             no cambiar el diseño: las órdenes de diseño no entran en el aprendizaje de extracción.
@@ -363,6 +409,13 @@ function Workspace({ tag }: { tag: string }) {
             </Button>}
           </div>
 
+          {activeJob && <Button size="sm" variant="ghost" onClick={()=>void cancelJob(activeJob)}>Cancelar trabajo en curso</Button>}
+          <section aria-label="Plano GA nuevo" className="space-y-2 border-t border-border pt-3">
+            <h3 className="font-semibold">Generar plano nuevo desde IFC</h3>
+            <p className="text-xs text-muted">Alzado, perfil y planta en A3, cotas exteriores y cajetín. DRAFT con escala física; proyección sin ocultación. Se usa la revisión persistida {proposal?.status==="applied"?proposal.target_revision:label}, no cambios sin confirmar.</p>
+            <Button disabled={!!busy} onClick={makeDrawing}>{busy==="plano"?"Generando plano…":"Generar GA nuevo"}</Button>
+            {drawing && <div className="flex flex-wrap gap-3 text-sm">{Object.entries(drawing.files).map(([key,file])=><a key={key} className="text-accent-text underline" href={drawingDownloadUrl(file.url)} download>Descargar {key.toUpperCase()}</a>)}</div>}
+          </section>
           <HistoryList proposals={history.data ?? []} busy={!!busy} onUndo={undo} />
         </div>
       </Panel>

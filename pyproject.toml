@@ -23,6 +23,7 @@ dependencies = [
 [project.optional-dependencies]
 api = [
   "trazia-3d[geo]",
+  "reportlab>=4,<5", # Planos GA vectoriales derivados del IFC. Ya fijado en dev.
   "pytest>=8,<10", # IfcOpenShell EXPRESS usa _pytest.assertion en producción.
   "fastapi>=0.115,<1", "sqlmodel>=0.0.24,<0.1", "alembic>=1.15,<2",
   "uvicorn>=0.34,<1", "python-multipart>=0.0.20,<1", "httpx>=0.28,<1",

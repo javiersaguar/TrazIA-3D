@@ -144,6 +144,11 @@ async def run_job(store: Store, job_id: str):
         job = session.get(JobRecord, job_id)
         study = job is not None and job.kind == "study"
         preview = job is not None and job.kind == "design_preview"
+        drawing = job is not None and job.kind == "ga_drawing"
+    if drawing:
+        from .design_drawings import run_drawing_job
+
+        return await run_drawing_job(store, job_id)
     if preview:
         from .change_proposals import run_preview_job
 

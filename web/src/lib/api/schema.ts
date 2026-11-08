@@ -215,6 +215,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/revisions/{identity}/ga-drawings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Drawings */
+        get: operations["drawings_revisions__identity__ga_drawings_get"];
+        put?: never;
+        /** Create Drawing */
+        post: operations["create_drawing_revisions__identity__ga_drawings_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/revisions/{identity}/ga-drawings/{extension}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Drawing File */
+        get: operations["drawing_file_revisions__identity__ga_drawings__extension__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reference-system": {
         parameters: {
             query?: never;
@@ -1084,6 +1119,11 @@ export interface components {
             /** Role */
             role?: "orden_diseno" | null;
         };
+        /** DrawingInput */
+        DrawingInput: {
+            /** Scale */
+            scale?: number | null;
+        };
         /** Elevation */
         Elevation: {
             source: components["schemas"]["Source"];
@@ -1334,6 +1374,32 @@ export interface components {
             /** Datum */
             datum?: ("suelo" | "tangente_inferior" | "interno" | "norte") | null;
         };
+        /** PartChange */
+        PartChange: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "add" | "remove";
+            /**
+             * Collection
+             * @enum {string}
+             */
+            collection: "nozzles" | "platforms" | "ladders";
+            /** Id */
+            id: string;
+            /** Parameters */
+            parameters?: {
+                [key: string]: components["schemas"]["PartValue"];
+            };
+        };
+        /** PartValue */
+        PartValue: {
+            /** Value */
+            value: number | string;
+            /** Unit */
+            unit: string;
+        };
         /** PlatformParameters */
         PlatformParameters: {
             /** Id */
@@ -1393,6 +1459,10 @@ export interface components {
             origin?: "formulario" | "chat" | "deshacer";
             /** Request Text */
             request_text?: string | null;
+            /** Part Changes */
+            part_changes?: components["schemas"]["PartChange"][];
+            /** Detail Level */
+            detail_level?: (2 | 3) | null;
             /** Clarifications */
             clarifications?: components["schemas"]["Clarification"][];
         };
@@ -2087,6 +2157,109 @@ export interface operations {
             header?: never;
             path: {
                 identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    drawings_revisions__identity__ga_drawings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_drawing_revisions__identity__ga_drawings_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-match"?: string | null;
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DrawingInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    drawing_file_revisions__identity__ga_drawings__extension__get: {
+        parameters: {
+            query: {
+                sha: string;
+            };
+            header?: never;
+            path: {
+                identity: string;
+                extension: string;
             };
             cookie?: never;
         };
