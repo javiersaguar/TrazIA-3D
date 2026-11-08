@@ -596,7 +596,8 @@ from trazia.design.report import locations  # noqa: E402
 
 
 def test_changes_without_a_verifiable_region_are_declared_pending():
-    evaluation, content = run([{"target": "attributes.material", "value": "SA-516 Gr.70"}])
+    evaluation, content = run([{"target": "height", "value": 7000, "unit": "mm"}])
+    assert locations(evaluation.candidate, content)[0]["document"] is not None
     content["operations"][0]["before_source"]["bbox"] = None
     marks = locations(evaluation.candidate, content)
     assert marks[0]["document"] is None and "región" in marks[0]["pending"]
@@ -610,7 +611,9 @@ def test_derived_report_is_separate_from_the_original(client):
     report = client.get(f"/revisions/{identity}/design-report.pdf")
     assert report.status_code == 200 and report.content.startswith(b"%PDF")
     assert report.headers["x-derived-document"] == "true"
-    assert b"DERIVADO" in report.content
+    import pypdfium2 as pdfium
+
+    assert "DERIVADO" in pdfium.PdfDocument(report.content).get_metadata_dict()["Title"]
     assert client.get(f"/revisions/{identity}/documents/GA-V101").content == original
     kinds = {a["kind"] for a in client.get(f"/revisions/{identity}/artifacts").json()["artifacts"]}
     assert "informe_pdf" in kinds
