@@ -92,6 +92,8 @@ test("la landing conserva el recorrido y pausa las escenas fuera de pantalla",as
   await expect(hero).toHaveAttribute("data-scene-active","false");
   await expect(page.locator('[data-source="procedural"] canvas')).toBeVisible({timeout:45_000});
   await expect(page.locator('[data-source="procedural"] [data-pixel-budget]')).toHaveAttribute("data-pixel-budget","650000");
+  await expect(page.getByText("Brida de boquilla",{exact:true})).toBeVisible({timeout:45_000});
+  await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));
   await expect(page.getByRole("heading",{name:"Cómo funciona",exact:true})).toBeAttached();
   mkdirSync(output,{recursive:true});
   writeFileSync(resolve(output,"render.json"),JSON.stringify({renderer:"SwiftShader CPU",pixelBudget:650000,
