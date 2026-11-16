@@ -95,6 +95,12 @@ def main(argv=None) -> int:
     batch.add_argument("--tag", action="append", dest="tags")
     batch.add_argument("--procesos", type=int, default=1)
     batch.add_argument("--trabajo", type=Path, help="Carpeta de cachés (por defecto, en la salida)")
+    profile = commands.add_parser(
+        "perfil", help="Recuentos agregados de una carpeta de documentos, sin nombres ni textos"
+    )
+    profile.add_argument("entrada", type=Path)
+    profile.add_argument("--max-paginas", type=int, default=30)
+    profile.add_argument("--output", "-o", type=Path)
     args = parser.parse_args(argv)
     try:
         if args.command == "schema":
@@ -207,6 +213,11 @@ def main(argv=None) -> int:
                 f"Resumen en {args.output / 'resumen.csv'}"
             )
             return 1 if fallos or not filas else 0
+        elif args.command == "perfil":
+            from .perfil import avisos, perfilar
+
+            perfil = perfilar(args.entrada, max_paginas=args.max_paginas)
+            write_json({**perfil, "avisos": avisos(perfil)}, args.output)
         elif args.command == "serve":
             app = Path(__file__).with_name("app.py")
             return subprocess.call(

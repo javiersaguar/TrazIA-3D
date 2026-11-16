@@ -35,7 +35,7 @@ Cómo encajan los asistentes de código con la plataforma: [FLUJO_IA.md](FLUJO_I
 
 ## Notebooks de Databricks (preparados el 16/11)
 
-En `databricks/` hay dos notebooks en formato fuente de Databricks (`.py` con `# COMMAND`)
+En `databricks/` hay cuatro notebooks en formato fuente de Databricks (`.py` con `# COMMAND`)
 y las dependencias fijadas. El día 25 solo cambia la ruta de entrada.
 
 | Archivo | Qué hace |
@@ -43,6 +43,8 @@ y las dependencias fijadas. El día 25 solo cambia la ruta de entrada.
 | `databricks/requirements.txt` | Versiones exactas de `uv.lock` para el motor (extras `geo` y `ocr`, y `pytest`, que la validación EXPRESS usa al ejecutar). No incluye Streamlit, pandas ni pyarrow, para no pisar los del runtime |
 | `databricks/00_comprobar_entorno.py` | `%pip install`, versiones, importaciones, carga del OCR y prueba con `examples/documents` (B y D). Si acaba en verde, el entorno sirve |
 | `databricks/01_procesar_lote.py` | Widgets `entrada`, `salida`, `estrategia`, `dataset`, `tags`, `procesos`, `proveedores` y `trabajo`. Procesa la carpeta, muestra el resumen y una versión agregada para el asistente de código |
+| `databricks/02_perfil_dataset.py` | Recuentos de la carpeta antes del lote: equipos, revisiones, tipos, PDF vectoriales o escaneados, formatos y giros de página, unidades, notación de boquillas, idioma, XLSX e IFC. Sin nombres ni textos, se puede pasar al asistente. También `trazia perfil <carpeta>` |
+| `databricks/03_evaluar_contra_tr.py` | Compara la salida de `01` con los IFC de referencia de TR: dimensiones, boquillas, convenio de azimut por exclusión de uno, distancia entre superficies y mapa de calor 3D. Sin IFC de TR hace un ensayo con referencias fabricadas. También `python -m bench.evaluar` |
 | `src/trazia/lote.py` y `trazia lote` | El mismo lote sin notebook: `uv run trazia lote <carpeta> -o <salida> --estrategia d_hibrido` |
 
 Cómo agrupa el lote: por el nombre de cada archivo (`GAD_<TAG>_rev<R>.pdf`,
@@ -72,6 +74,8 @@ sin `generated/` (como una carpeta Git recién clonada), con un `/Volumes/...` s
 | `00_comprobar_entorno` | 16 paquetes en la versión fijada; V-101 A y B correctos con B (4 s) y D (6 s), 8 cambios A→B |
 | `01_procesar_lote`, D, un equipo | 2 de 2 revisiones en 7 s; no se escribe nada dentro del repo |
 | `01_procesar_lote`, B, dos equipos, `procesos=2` | 4 de 4 revisiones en 5 s |
+| `02_perfil_dataset` con `examples/documents` (repetido el 16/11 por la noche, venv de pruebas de WSL) | 0,1 s; 1 equipo, 2 revisiones, 2 PDF vectoriales y 2 XLSX |
+| `03_evaluar_contra_tr` en ensayo, sobre la salida de `01` | V-101 rev B: 4 de 4 boquillas, error 0 mm; mapa HTML de 300 kB |
 
 ### El día 25, en la plataforma
 
@@ -79,10 +83,15 @@ sin `generated/` (como una carpeta Git recién clonada), con un `/Volumes/...` s
    GitLab que nos den (o a GitHub mientras tanto).
 2. Abrir `databricks/00_comprobar_entorno` y ejecutarlo entero. Anotar el runtime y la versión
    de Python que muestra.
-3. Abrir `databricks/01_procesar_lote`, poner en `entrada` la ruta del volumen con los datos del
+3. `databricks/02_perfil_dataset` con `entrada` = volumen del reto. Sus avisos dicen qué
+   preparar (escaneados, giros, pulgadas, nombres fuera de la convención) y el perfil se pasa al
+   asistente para que prepare casos sintéticos parecidos.
+4. Abrir `databricks/01_procesar_lote`, poner en `entrada` la ruta del volumen con los datos del
    reto, en `salida` una carpeta de un volumen nuestro, `dataset = real` y ejecutar. Empezar con
    `tags` = un equipo para medir el tiempo y después el lote completo.
-4. Con datos de TR, `proveedores` vacío salvo que los mentores confirmen que el servicio de IA de
+5. En cuanto haya IFC de TR, `databricks/03_evaluar_contra_tr` con `lote` = la salida de 01 y
+   `referencias` = la carpeta de esos IFC. La cifra que vale es la de exclusión de uno.
+6. Con datos de TR, `proveedores` vacío salvo que los mentores confirmen que el servicio de IA de
    la plataforma puede recibirlos.
 
 ### Ensayo antes del 25 en Databricks Free Edition
