@@ -1,9 +1,11 @@
 "use client";
 
+import { Search } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 
 import { EASE_OUT } from "@/components/motion/reveal";
-import { Badge, Panel } from "@/components/ui/primitives";
+import { Badge, Icon, Panel } from "@/components/ui/primitives";
 import { FamilyThumb } from "@/features/bocetos/thumb";
 import { cn } from "@/lib/cn";
 import { familyInfo, industrialFamily, useCatalogue } from "./catalogue";
@@ -12,15 +14,34 @@ import { projectFamilies } from "./projects-tab";
 
 const TONE = { Disponible: "approved", "En desarrollo": "warning", Planificada: "neutral" } as const;
 
+function normalizeName(name: string) {
+  return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+}
+
 export function FamiliesTab({ selected, onOpen }: { selected: string; onOpen: (family: string, view: "documentos" | "proyectos") => void }) {
   const catalogue = useCatalogue();
+  const [query, setQuery] = useState("");
+  const name = normalizeName(query);
+  const families = catalogue.families.filter((family) => normalizeName(family.name).includes(name));
+
   return (
     <div className="space-y-3">
+      <label className="relative flex h-9 w-full items-center sm:max-w-[320px]">
+        <span className="sr-only">Buscar familias</span>
+        <Icon icon={Search} className="pointer-events-none absolute left-3 text-faint" />
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Buscar por nombre"
+          className="h-full w-full rounded-[var(--radius-control)] border border-border bg-surface pr-3 pl-9 text-[13px] text-text outline-none placeholder:text-faint focus-visible:border-accent"
+        />
+      </label>
       <p className="text-[13px] text-muted">
         Despliega una familia para consultar sus diseños, abrir los planos y ver los modelos 3D disponibles.
       </p>
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-3">
-        {catalogue.families.map((f, i) => {
+        {families.map((f, i) => {
           const info = familyInfo(f.id);
           const industrial = industrialFamily(f.id);
           const designs = catalogue.designs.filter((d) => d.family === f.id);
@@ -87,6 +108,11 @@ export function FamiliesTab({ selected, onOpen }: { selected: string; onOpen: (f
           );
         })}
       </ul>
+      {families.length === 0 && (
+        <p role="status" className="py-10 text-center text-[13px] text-muted">
+          Ninguna familia coincide con la búsqueda.
+        </p>
+      )}
     </div>
   );
 }
