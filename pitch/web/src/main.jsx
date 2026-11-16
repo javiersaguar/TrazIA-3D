@@ -9,7 +9,8 @@ import "@fontsource/dm-sans/latin-500.css";
 import "@fontsource/dm-sans/latin-700.css";
 import { pitch, chapters, scenes } from "./pitch-data.js";
 import { buildTimeline, sceneIndex, clock } from "./timeline.js";
-import { asset, ease, Slide } from "./scenes.jsx";
+import { asset, ease, easeInOut, useFx, usePreloadScene } from "./fx.jsx";
+import { Slide, SourceNote } from "./scenes.jsx";
 import "./styles.css";
 
 const timeline = buildTimeline(scenes);
@@ -21,18 +22,18 @@ function readClock(rehearsal, now) {
   return Math.min(duration, rehearsal.offset + played);
 }
 
-function SceneFrame({ scene, chapter, reduced }) {
+function SceneFrame({ scene, chapter, reduced, fx, crossing }) {
   const present = useIsPresent();
   return (
     <m.main
-      className={`slide slide--${scene.id}`}
+      className={`slide slide--${scene.id}${fx ? " slide--fx" : ""}`}
       data-scene={scene.id}
       aria-hidden={present ? undefined : true}
       inert={!present}
-      initial={reduced ? false : { opacity: 0, transform: "translateY(11px) scale(.99)" }}
-      animate={{ opacity: 1, transform: "translateY(0px) scale(1)" }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: reduced ? 0 : 0.32, ease }}
+      initial={reduced ? false : { opacity: 0, transform: fx ? "translateY(11px)" : "translateY(11px) scale(.99)" }}
+      animate={{ opacity: 1, transform: fx ? "translateY(0px)" : "translateY(0px) scale(1)" }}
+      exit={{ opacity: 0, ...(fx && { transition: { duration: 0.18, ease: "easeIn" } }) }}
+      transition={{ duration: reduced ? 0 : fx ? 0.37 : 0.32, ease, delay: crossing ? 0.17 : 0 }}
     >
       <div className="slide-top">
         <span>{chapter}</span>
@@ -43,19 +44,67 @@ function SceneFrame({ scene, chapter, reduced }) {
   );
 }
 
+function SceneCut({ kind }) {
+  return kind === "curtain" ? (
+    <m.div className="fx-curtain" aria-hidden="true"
+      initial={{ clipPath: "inset(0% 100% 0% 0%)" }}
+      animate={{ clipPath: ["inset(0% 100% 0% 0%)", "inset(0% 0% 0% 0%)", "inset(0% 0% 0% 100%)"] }}
+      transition={{ duration: 0.74, times: [0, 0.42, 1], ease: easeInOut }}
+    />
+  ) : (
+    <m.div className="fx-cut-line" aria-hidden="true"
+      initial={{ transform: "translateY(-100%)", opacity: 0 }}
+      animate={{ transform: ["translateY(-100%)", "translateY(0%)"], opacity: [0, 0.88, 0.88, 0] }}
+      transition={{
+        transform: { duration: 0.55, ease: "linear" },
+        opacity: { duration: 0.55, times: [0, 0.12, 0.85, 1], ease: "linear" },
+      }}
+    />
+  );
+}
+
+function SceneIndex({ index, fx }) {
+  const label = String(index + 1).padStart(2, "0");
+  const end = String(timeline.length).padStart(2, "0");
+  if (!fx) return <span className="slide-index">{label} <span>/</span> {end}</span>;
+  return (
+    <span className="slide-index fx-slide-index" aria-label={`${label} / ${end}`}>
+      <span className="fx-odometer" aria-hidden="true">
+        <AnimatePresence initial={false}>
+          <m.span key={index}
+            initial={{ transform: "translateY(108%)", opacity: 0 }}
+            animate={{ transform: "translateY(0%)", opacity: 1 }}
+            exit={{ transform: "translateY(-108%)", opacity: 0 }}
+            transition={{ duration: 0.13, ease }}
+          >{label}</m.span>
+        </AnimatePresence>
+      </span>
+      <span aria-hidden="true">/</span> <span className="fx-scene-total" aria-hidden="true">{end}</span>
+    </span>
+  );
+}
+
 function App() {
   const reduced = useReducedMotion();
+  const fx = useFx();
   const [rehearsal, setRehearsal] = useState({ offset: 0, started: null });
   const [now, setNow] = useState(0);
   const [notes, showNotes] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [fullscreenError, setFullscreenError] = useState("");
+  const [replay, setReplay] = useState(0);
   const elapsed = readClock(rehearsal, now);
   const index = sceneIndex(timeline, elapsed);
   const scene = timeline[index];
   const currentChapter = chapters.find(({ id }) => id === scene.chapter);
   const playing = rehearsal.started !== null;
   const demoUrl = pitch.demoOrigin && scene.demoPath ? new URL(scene.demoPath, pitch.demoOrigin).href : "";
+  const sceneKey = `${scene.id}-${replay}`;
+  const [cut, setCut] = useState({ key: sceneKey, chapter: scene.chapter, kind: null });
+  if (cut.key !== sceneKey) {
+    setCut({ key: sceneKey, chapter: scene.chapter, kind: cut.chapter === scene.chapter ? "line" : "curtain" });
+  }
+  usePreloadScene(timeline[index + 1]?.id);
 
   useEffect(() => {
     if (!playing) return;
@@ -67,11 +116,15 @@ function App() {
     return () => window.clearInterval(timer);
   }, [playing, rehearsal]);
 
-  const goTo = useCallback((target) => {
-    const position = timeline[Math.max(0, Math.min(timeline.length - 1, target))].start;
+  const goTo = useCallback((target, relative = false) => {
     const stamp = performance.now();
     setNow(stamp);
-    setRehearsal((current) => ({ offset: position, started: current.started === null ? null : stamp }));
+    setRehearsal((current) => {
+      const currentIndex = sceneIndex(timeline, readClock(current, stamp));
+      const next = Math.max(0, Math.min(timeline.length - 1, relative ? currentIndex + target : target));
+      if (relative && next === currentIndex) return current;
+      return { offset: timeline[next].start, started: current.started === null ? null : stamp };
+    });
   }, []);
 
   const toggleClock = useCallback(() => {
@@ -102,20 +155,21 @@ function App() {
 
   useEffect(() => {
     function key(event) {
-      if (event.altKey || event.ctrlKey || event.metaKey || event.target?.closest("input, textarea, select, video, [contenteditable]")) return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (event.altKey || event.ctrlKey || event.metaKey || target?.closest("input, textarea, select, video, [contenteditable]")) return;
       if (event.key === "Escape" && notes) showNotes(false);
-      if (event.key === " " && event.target?.closest("button, a")) return;
+      if (event.key === " " && target?.closest("button, a")) return;
       switch (event.key.toLowerCase()) {
         case "arrowright":
         case "pagedown":
         case " ":
           event.preventDefault();
-          if (index < timeline.length - 1) goTo(index + 1);
+          goTo(1, true);
           break;
         case "arrowleft":
         case "pageup":
           event.preventDefault();
-          if (index > 0) goTo(index - 1);
+          goTo(-1, true);
           break;
         case "home":
           event.preventDefault();
@@ -128,14 +182,16 @@ function App() {
         case "p": toggleClock(); break;
         case "n": showNotes((previous) => !previous); break;
         case "f": void toggleFullscreen(); break;
+        case "r": if (!event.repeat) setReplay((value) => value + 1); break;
         default: break;
       }
     }
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
-  }, [index, notes, goTo, reset, toggleClock, toggleFullscreen]);
+  }, [notes, goTo, reset, toggleClock, toggleFullscreen]);
 
-  const frame = <SceneFrame key={scene.id} scene={scene} chapter={currentChapter.name} reduced={reduced} />;
+  const frame = <SceneFrame key={sceneKey} scene={scene} chapter={currentChapter.name}
+    reduced={reduced} fx={fx} crossing={fx && cut.kind === "curtain"} />;
 
   return (
     <div className="deck">
@@ -148,9 +204,11 @@ function App() {
         <span className="dataset"><i />{pitch.dataset}</span>
       </header>
 
-      <div className="deck-stage">
+      <div className="deck-stage" data-scene-index={index + 1}>
         <span className="sr-only" aria-live="polite">Escena {index + 1} de {timeline.length}. {scene.title} {scene.accent}</span>
         {reduced ? frame : <AnimatePresence>{frame}</AnimatePresence>}
+        {fx && cut.kind && <SceneCut key={cut.key} kind={cut.kind} />}
+        {fx && <SourceNote id={scene.id} pinned />}
         {notes && <aside className="speaker-notes" aria-label="Notas de exposición">
           <div><h2>Guion de exposición</h2><span>{clock(scene.seconds)} por escena</span></div>
           <p>{scene.notes}</p>
@@ -171,10 +229,28 @@ function App() {
             >
               <span>{name}</span>
               <small>{clock(timeline[chapterStarts[chapterIndex]].start)}</small>
+              {fx && id === scene.chapter && (
+                <m.i className="fx-chapter-underline" aria-hidden="true"
+                  initial={{ transform: "scaleX(0.03)" }}
+                  animate={{ transform: "scaleX(1)" }}
+                  transition={{ duration: 0.37, ease }}
+                />
+              )}
             </button>
           ))}
         </nav>
-        <div className="track" aria-hidden="true"><i style={{ transform: `scaleX(${elapsed / duration})` }} /></div>
+        <div className={fx ? "track fx-track" : "track"} aria-hidden="true">
+          <i style={{ transform: `scaleX(${elapsed / duration})` }} />
+          {fx && (
+            <span className="fx-track-cursor" style={{ transform: `translateX(${elapsed / duration * 100}%)` }}>
+              <m.span className="fx-track-pulse" key={sceneKey}
+                initial={{ transform: "scale(1)" }}
+                animate={{ transform: ["scale(1)", "scale(1.36)", "scale(1)"] }}
+                transition={{ duration: 0.72, repeat: 1, ease: easeInOut }}
+              />
+            </span>
+          )}
+        </div>
         <div className="control-row">
           <div className="playback">
             <button type="button" className="play-control" onClick={toggleClock} aria-pressed={playing}>
@@ -184,9 +260,9 @@ function App() {
             <button type="button" className="icon-button reset" onClick={reset} aria-label="Reiniciar ensayo" title="Reiniciar (Inicio)"><RotateCcw size={16} /></button>
           </div>
           <div className="paging">
-            <button type="button" className="icon-button" onClick={() => goTo(index - 1)} disabled={index === 0} aria-label="Escena anterior"><ArrowLeft size={18} /></button>
-            <span className="slide-index">{String(index + 1).padStart(2, "0")} <span>/</span> {String(timeline.length).padStart(2, "0")}</span>
-            <button type="button" className="icon-button" onClick={() => goTo(index + 1)} disabled={index === timeline.length - 1} aria-label="Escena siguiente"><ArrowRight size={18} /></button>
+            <button type="button" className="icon-button" onClick={() => goTo(-1, true)} disabled={index === 0} aria-label="Escena anterior"><ArrowLeft size={18} /></button>
+            <SceneIndex index={index} fx={fx} />
+            <button type="button" className="icon-button" onClick={() => goTo(1, true)} disabled={index === timeline.length - 1} aria-label="Escena siguiente"><ArrowRight size={18} /></button>
           </div>
           <div className="extras">
             {demoUrl && <a className="demo-link" href={demoUrl} target="_blank" rel="noreferrer" aria-label="Abrir demo"><ExternalLink size={15} /> <span>Abrir demo</span></a>}

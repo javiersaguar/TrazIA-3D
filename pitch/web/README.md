@@ -21,9 +21,27 @@ modo manual. **Ensayar** activa el paso automático y termina en 6:00. Se puede
 pausar con P, ver el guion con N, activar pantalla completa con F y reiniciar
 con Inicio o el botón de reinicio.
 
+**R** repite la entrada de la escena activa sin mover el reloj. Abre
+`/?fx=0` para usar las transiciones originales. La preferencia del sistema
+de movimiento reducido también desactiva los nuevos efectos.
+
 El build incorpora imágenes, fuentes y texto. Una vez preparado `dist/`, el
 servidor de presentación y las escenas funcionan sin Internet ni API.
 **Abrir demo** enlaza con la aplicación si está levantada por separado.
+
+## Comparar las animaciones en desarrollo
+
+Genera el build original desde un worktree en el commit `10aa32a` y copia
+su carpeta `dist/` como `boceto/` dentro de `pitch/web/` en este checkout.
+La carpeta `boceto/` se ignora en Git.
+
+```powershell
+corepack pnpm@10.18.0 dev --port 5173 --strictPort
+```
+
+Abre [comparar.html](http://127.0.0.1:5173/comparar.html). La selección y el avance
+se sincronizan entre ambos paneles. **Repetir (R)** vuelve a mostrar la escena
+seleccionada y la casilla **?fx=0** cambia solo el panel Actual.
 
 ## Actualizar durante el evento
 
