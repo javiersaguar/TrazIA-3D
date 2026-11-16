@@ -30,6 +30,7 @@ conservan su criterio de cierre; no se consideran trabajo previo atrasado ni se 
 - [Declaración de trabajo previo, pendiente de cerrar](../PREVIOUS_WORK.md).
 - [Instalación en cuatro portátiles y material](PREPARACION_PORTATILES.md).
 - [Plataforma IndesIA, Kit del Participante y calendario](PLATAFORMA_INDESIA.md).
+- [Flujo de trabajo con asistentes de IA y Databricks](FLUJO_IA.md).
 - [Revisión de licencias](LICENCIAS_BORRADOR.md).
 
 ## 3.8 no depende solo de pulsar «aprobar»

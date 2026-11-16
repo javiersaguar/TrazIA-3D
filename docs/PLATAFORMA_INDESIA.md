@@ -31,6 +31,8 @@ Pendiente de confirmar en la formación o con los mentores, sin suponerlo antes:
 - Qué servicios de IA generativa hay (modelo, visión, límites) y si los planos de TR pueden enviarse.
 - Si el repositorio de GitLab lo crea la organización o el equipo, y si admite subir el historial previo.
 
+Cómo encajan los asistentes de código con la plataforma: [FLUJO_IA.md](FLUJO_IA.md).
+
 ## Notebooks de Databricks (preparados el 16/11)
 
 En `databricks/` hay dos notebooks en formato fuente de Databricks (`.py` con `# COMMAND`)
@@ -40,7 +42,7 @@ y las dependencias fijadas. El día 25 solo cambia la ruta de entrada.
 | --- | --- |
 | `databricks/requirements.txt` | Versiones exactas de `uv.lock` para el motor (extras `geo` y `ocr`, y `pytest`, que la validación EXPRESS usa al ejecutar). No incluye Streamlit, pandas ni pyarrow, para no pisar los del runtime |
 | `databricks/00_comprobar_entorno.py` | `%pip install`, versiones, importaciones, carga del OCR y prueba con `examples/documents` (B y D). Si acaba en verde, el entorno sirve |
-| `databricks/01_procesar_lote.py` | Widgets `entrada`, `salida`, `estrategia`, `dataset`, `tags`, `procesos`, `proveedores` y `trabajo`. Procesa la carpeta y muestra el resumen |
+| `databricks/01_procesar_lote.py` | Widgets `entrada`, `salida`, `estrategia`, `dataset`, `tags`, `procesos`, `proveedores` y `trabajo`. Procesa la carpeta, muestra el resumen y una versión agregada para el asistente de código |
 | `src/trazia/lote.py` y `trazia lote` | El mismo lote sin notebook: `uv run trazia lote <carpeta> -o <salida> --estrategia d_hibrido` |
 
 Cómo agrupa el lote: por el nombre de cada archivo (`GAD_<TAG>_rev<R>.pdf`,
