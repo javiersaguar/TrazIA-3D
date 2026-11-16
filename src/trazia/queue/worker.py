@@ -1,5 +1,6 @@
 """Arranque: uv run --extra api arq trazia.queue.worker.WorkerSettings."""
 
+import asyncio
 import os
 from pathlib import Path
 
@@ -11,9 +12,11 @@ from trazia.store import Store
 
 
 async def startup(context):
-    from trazia.runtime import configure_offline
+    from trazia.runtime import configure_offline, warm_up
 
     configure_offline()
+    # El worker no toma trabajos hasta terminar: el primero ya no paga la carga en frío.
+    await asyncio.to_thread(warm_up)
     context["store"] = Store(
         Path(os.getenv("TRAZIA_DATA", "data")), os.getenv("TRAZIA_DATABASE_URL")
     )

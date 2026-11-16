@@ -75,7 +75,9 @@ def render_page(page, dpi):
         temporary = path.with_name(path.name + "." + uuid4().hex + ".tmp")
         try:
             path.parent.mkdir(parents=True, exist_ok=True)
-            image.save(temporary, format="PNG")
+            # PNG sin pérdida con compresión mínima: los píxeles son los mismos y guardar la
+            # página A3 a 200 ppp pasa de ~0,8 s a una fracción (el archivo ocupa algo más).
+            image.save(temporary, format="PNG", compress_level=1)
             os.replace(temporary, path)
         except OSError:
             pass
