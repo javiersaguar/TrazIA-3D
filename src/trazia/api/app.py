@@ -3,6 +3,7 @@ import hashlib
 import json
 import logging
 import os
+import threading
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -172,6 +173,11 @@ def create_app(
             )
         elif queue_mode == "process":
             queue = ProcessQueue(lambda identity: run_job(store, identity))
+            # Los trabajos corren en este proceso: precarga OCR y módulos pesados en segundo
+            # plano para que el primero no pague la carga en frío. La API responde mientras.
+            from trazia.runtime import warm_up
+
+            threading.Thread(target=warm_up, name="trazia-warm-up", daemon=True).start()
         else:
             raise ValueError("TRAZIA_QUEUE debe ser process o redis")
         app.state.queue = queue
