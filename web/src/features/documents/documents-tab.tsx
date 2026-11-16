@@ -8,7 +8,8 @@ import { toast } from "sonner";
 import { Badge, Button, Icon, Panel, PanelHeader } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 import type { DocStage } from "@/lib/mock/bocetos";
-import { kindFromFilename, loadDocument, saveDocument, sketchPdfUrl, tagFromFilename, useCatalogue, type Design } from "./catalogue";
+import { kindFromFilename, loadDocument, saveDocument, sketchAssets, tagFromFilename, useCatalogue, type Design } from "./catalogue";
+import { SketchModelDialog } from "./sketch-model-dialog";
 
 const fieldBase =
   "h-9 rounded-[var(--radius-control)] border border-border-strong bg-surface px-3 text-[13px] text-text outline-none focus-visible:border-accent";
@@ -36,17 +37,19 @@ function StageTrack({ stage }: { stage: DocStage }) {
   );
 }
 
-function SketchPdfLink({ design }: { design: Design }) {
-  const pdf = sketchPdfUrl(design.id);
-  if (pdf) {
-    return (
-      <a href={pdf} target="_blank" rel="noopener" aria-label={`Abrir PDF de ${design.tag} (pestaña nueva)`}
+function SketchActions({ design }: { design: Design }) {
+  const assets = sketchAssets(design.id);
+  if (!assets) return null;
+  const tag = design.tag ?? design.name;
+  return (
+    <span className="flex gap-3">
+      <a href={assets.pdf} target="_blank" rel="noopener" aria-label={`Abrir PDF de ${tag} (pestaña nueva)`}
         className="text-[12px] text-accent-text underline-offset-2 hover:underline">
         Abrir PDF
       </a>
-    );
-  }
-  return null;
+      {assets.ifc && <SketchModelDialog tag={tag} name={design.name} ifc={assets.ifc} />}
+    </span>
+  );
 }
 
 const today = () => new Date().toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -263,7 +266,7 @@ export function DocumentsTab({
                         Abrir en Modelo
                       </Link>
                     ) : d.kind === "Boceto GA" ? (
-                      <SketchPdfLink design={d} />
+                      <SketchActions design={d} />
                     ) : d.example ? (
                       <Badge tone="warning">ejemplo</Badge>
                     ) : d.filename ? (

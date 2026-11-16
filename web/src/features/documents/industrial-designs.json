@@ -1,0 +1,242 @@
+{
+  "families": [
+    {
+      "id": "air-cooler",
+      "name": "Aeroenfriadores",
+      "parts": [
+        "Haz aleteado",
+        "Colectores",
+        "Ventiladores",
+        "Apoyos"
+      ]
+    },
+    {
+      "id": "evaporator",
+      "name": "Evaporadores",
+      "parts": [
+        "Calandria",
+        "Separador",
+        "Conducto de vapor"
+      ]
+    },
+    {
+      "id": "filter",
+      "name": "Filtros industriales",
+      "parts": [
+        "Carcasa",
+        "Tapa",
+        "Colector",
+        "Bancada"
+      ]
+    },
+    {
+      "id": "centrifuge",
+      "name": "Centrífugas",
+      "parts": [
+        "Carcasa",
+        "Motor",
+        "Soporte",
+        "Descarga"
+      ]
+    },
+    {
+      "id": "cyclone",
+      "name": "Separadores ciclónicos",
+      "parts": [
+        "Cuerpo",
+        "Cono",
+        "Entrada lateral",
+        "Descarga"
+      ]
+    },
+    {
+      "id": "dryer",
+      "name": "Secadores industriales",
+      "parts": [
+        "Cámara",
+        "Alimentación",
+        "Salida de producto"
+      ]
+    },
+    {
+      "id": "static-mixer",
+      "name": "Mezcladores estáticos",
+      "parts": [
+        "Camisa",
+        "Bridas",
+        "Ramal opcional"
+      ]
+    },
+    {
+      "id": "dosing-skid",
+      "name": "Módulos de dosificación",
+      "parts": [
+        "Panel",
+        "Bombas",
+        "Colector",
+        "Armario"
+      ]
+    },
+    {
+      "id": "cooling-tower",
+      "name": "Torres de refrigeración",
+      "parts": [
+        "Balsa",
+        "Carcasa",
+        "Ventilador",
+        "Entrada de aire"
+      ]
+    },
+    {
+      "id": "mixer-settler",
+      "name": "Mezcladores-decantadores",
+      "parts": [
+        "Cámara de mezcla",
+        "Decantador",
+        "Accionamiento"
+      ]
+    }
+  ],
+  "designs": [
+    {
+      "tag": "BC-AC101",
+      "family": "air-cooler",
+      "name": "Aeroenfriador de tiro inducido",
+      "filename": "BC-AC101-A.pdf",
+      "ifc": "BC-AC101-A.ifc"
+    },
+    {
+      "tag": "BC-AC102",
+      "family": "air-cooler",
+      "name": "Aeroenfriador de tiro forzado doble",
+      "filename": "BC-AC102-A.pdf",
+      "ifc": "BC-AC102-A.ifc"
+    },
+    {
+      "tag": "BC-EV101",
+      "family": "evaporator",
+      "name": "Evaporador de película descendente",
+      "filename": "BC-EV101-A.pdf",
+      "ifc": "BC-EV101-A.ifc"
+    },
+    {
+      "tag": "BC-EV102",
+      "family": "evaporator",
+      "name": "Evaporador de circulación forzada",
+      "filename": "BC-EV102-A.pdf",
+      "ifc": "BC-EV102-A.ifc"
+    },
+    {
+      "tag": "BC-FI101",
+      "family": "filter",
+      "name": "Filtro de bolsa simple",
+      "filename": "BC-FI101-A.pdf",
+      "ifc": "BC-FI101-A.ifc"
+    },
+    {
+      "tag": "BC-FI102",
+      "family": "filter",
+      "name": "Filtro dúplex de bolsas",
+      "filename": "BC-FI102-A.pdf",
+      "ifc": "BC-FI102-A.ifc"
+    },
+    {
+      "tag": "BC-CE101",
+      "family": "centrifuge",
+      "name": "Centrífuga decantadora horizontal",
+      "filename": "BC-CE101-A.pdf",
+      "ifc": "BC-CE101-A.ifc"
+    },
+    {
+      "tag": "BC-CE102",
+      "family": "centrifuge",
+      "name": "Separador centrífugo de discos",
+      "filename": "BC-CE102-A.pdf",
+      "ifc": "BC-CE102-A.ifc"
+    },
+    {
+      "tag": "BC-CY101",
+      "family": "cyclone",
+      "name": "Ciclón de una cámara",
+      "filename": "BC-CY101-A.pdf",
+      "ifc": "BC-CY101-A.ifc"
+    },
+    {
+      "tag": "BC-CY102",
+      "family": "cyclone",
+      "name": "Batería de dos ciclones",
+      "filename": "BC-CY102-A.pdf",
+      "ifc": "BC-CY102-A.ifc"
+    },
+    {
+      "tag": "BC-SE101",
+      "family": "dryer",
+      "name": "Secador por atomización",
+      "filename": "BC-SE101-A.pdf",
+      "ifc": "BC-SE101-A.ifc"
+    },
+    {
+      "tag": "BC-SE102",
+      "family": "dryer",
+      "name": "Secador de lecho fluido",
+      "filename": "BC-SE102-A.pdf",
+      "ifc": "BC-SE102-A.ifc"
+    },
+    {
+      "tag": "BC-ME101",
+      "family": "static-mixer",
+      "name": "Mezclador estático en línea",
+      "filename": "BC-ME101-A.pdf",
+      "ifc": "BC-ME101-A.ifc"
+    },
+    {
+      "tag": "BC-ME102",
+      "family": "static-mixer",
+      "name": "Mezclador en línea con ramal",
+      "filename": "BC-ME102-A.pdf",
+      "ifc": "BC-ME102-A.ifc"
+    },
+    {
+      "tag": "BC-DO101",
+      "family": "dosing-skid",
+      "name": "Panel de dosificación simple",
+      "filename": "BC-DO101-A.pdf",
+      "ifc": "BC-DO101-A.ifc"
+    },
+    {
+      "tag": "BC-DO102",
+      "family": "dosing-skid",
+      "name": "Panel de dosificación dúplex",
+      "filename": "BC-DO102-A.pdf",
+      "ifc": "BC-DO102-A.ifc"
+    },
+    {
+      "tag": "BC-TR101",
+      "family": "cooling-tower",
+      "name": "Torre de refrigeración de tiro inducido",
+      "filename": "BC-TR101-A.pdf",
+      "ifc": "BC-TR101-A.ifc"
+    },
+    {
+      "tag": "BC-TR102",
+      "family": "cooling-tower",
+      "name": "Torre de refrigeración de tiro forzado",
+      "filename": "BC-TR102-A.pdf",
+      "ifc": "BC-TR102-A.ifc"
+    },
+    {
+      "tag": "BC-EX101",
+      "family": "mixer-settler",
+      "name": "Mezclador-decantador de una etapa",
+      "filename": "BC-EX101-A.pdf",
+      "ifc": "BC-EX101-A.ifc"
+    },
+    {
+      "tag": "BC-EX102",
+      "family": "mixer-settler",
+      "name": "Batería de extracción de dos etapas",
+      "filename": "BC-EX102-A.pdf",
+      "ifc": "BC-EX102-A.ifc"
+    }
+  ]
+}

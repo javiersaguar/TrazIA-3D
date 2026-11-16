@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 
 import { DOCUMENTS, FAMILIES as FAMILY_INFO, PROJECTS as SAMPLE_PROJECTS, type DocStage, type SketchFamily } from "@/lib/mock/bocetos";
 import sketches from "./sketches.json";
+import industrial from "./industrial-designs.json";
 
 /*
   Catálogo de Documentos: familias, proyectos y diseños, guardado en este navegador.
@@ -42,7 +43,14 @@ export const FAMILIES: Family[] = [
   { id: "pump", name: "Bombas" },
   { id: "compressor", name: "Compresores" },
   { id: "generic", name: "Envolventes de reserva" },
+  ...industrial.families.map(({ id, name }) => ({ id, name })),
 ];
+
+const industrialFamilies = new Map(industrial.families.map((family) => [family.id, family]));
+
+export function industrialFamily(id: string) {
+  return industrialFamilies.get(id);
+}
 
 /** Ficha de cada familia: piezas, estado y campos de revisión. */
 export type FamilyInfo = Omit<SketchFamily, "kind" | "name">;
@@ -101,21 +109,19 @@ const SEED_DESIGNS: Design[] = DOCUMENTS.map((d) => {
     received: d.received,
   };
 });
-SEED_DESIGNS.push(...sketches.map((sketch): Design => ({
-  ...sketch,
-  id: `sketch-${sketch.tag}`,
-  project: SKETCH_PROJECT.id,
-  example: true,
-  kind: "Boceto GA",
-  rev: "A",
-  pages: 1,
-})));
+const sketchFiles = new Map<string, { pdf: string; ifc?: string }>();
+for (const entry of [...sketches, ...industrial.designs]) {
+  const { tag, family, name, filename } = entry;
+  const id = `sketch-${tag}`;
+  SEED_DESIGNS.push({ id, tag, family, name, filename, project: SKETCH_PROJECT.id,
+    example: true, kind: "Boceto GA", rev: "A", pages: 1 });
+  sketchFiles.set(id, "ifc" in entry
+    ? { pdf: `/demo/industriales/${filename}`, ifc: `/demo/industriales/${entry.ifc}` }
+    : { pdf: `/demo/bocetos/${filename}` });
+}
 
-const sketchFiles = new Map(sketches.map(({ tag, filename }) => [`sketch-${tag}`, filename]));
-
-export function sketchPdfUrl(id: string): string | undefined {
-  const file = sketchFiles.get(id);
-  return file ? `/demo/bocetos/${file}` : undefined;
+export function sketchAssets(id: string) {
+  return sketchFiles.get(id);
 }
 
 /** Equipo leído del nombre del archivo (GAD_V-101_revB.pdf → V-101), si lo trae. */
@@ -164,7 +170,7 @@ export const useCatalogue = create<Catalogue>()(
     }),
     {
       name: "trazia.catalogue.v1",
-      version: 3,
+      version: 4,
       // Añadir las nuevas fichas sin reemplazar documentos ni asignaciones guardadas.
       migrate: (stored, version) => {
         const s = stored as Persisted;
@@ -173,7 +179,7 @@ export const useCatalogue = create<Catalogue>()(
           ? s.projects.map((p) => SEED_PROJECTS.find((q) => q.id === p.id) ?? p)
           : s.projects;
         return {
-          families: s.families,
+          families: [...s.families, ...FAMILIES.filter((f) => !s.families.some((stored) => stored.id === f.id))],
           projects: [...projects, ...SEED_PROJECTS.filter((p) => !projects.some((q) => q.id === p.id))],
           designs: [...designs, ...SEED_DESIGNS.filter((d) => !designs.some((q) => q.id === d.id))],
         };

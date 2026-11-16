@@ -60,6 +60,8 @@ En la web, **Documentos → Biblioteca de bocetos** reúne láminas sintéticas 
 clasificadas por familia. Cada PDF contiene un alzado conceptual y cotas nominales.
 La colección vive fuera del dataset y del banco de pruebas. Para regenerar los PDF
 y su índice, ejecuta `uv run --extra dev python scripts/make_design_sketches.py`.
+La [biblioteca industrial](docs/BIBLIOTECA_INDUSTRIAL.md) incorpora también modelos IFC
+conceptuales con sus planos generados desde la misma geometría.
 
 ```powershell
 uv run trazia validate examples/vessel_rev_a.json

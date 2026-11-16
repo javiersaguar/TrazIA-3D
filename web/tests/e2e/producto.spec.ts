@@ -121,7 +121,7 @@ test("la biblioteca de bocetos añade los PDF sin desplazar documentos ya guarda
     const key = "trazia.catalogue.v1";
     if (localStorage.getItem(key)) return;
     localStorage.setItem(key, JSON.stringify({
-      version: 2,
+      version: 3,
       state: {
         families: [{ id: "custom", name: "Familia propia" }, { id: "pump", name: "Bombas" }],
         projects: [{ id: "custom-project", name: "Proyecto propio" }],
@@ -131,15 +131,15 @@ test("la biblioteca de bocetos añade los PDF sin desplazar documentos ya guarda
   });
   await page.goto("/documentos");
   const links = page.getByRole("link", { name: /Abrir PDF de BC-/ });
-  await expect(links).toHaveCount(16);
+  await expect(links).toHaveCount(36);
   await expect(page.getByText("Mi diseño", { exact: true })).toBeVisible();
   await page.reload();
-  await expect(links).toHaveCount(16);
+  await expect(links).toHaveCount(36);
   await expect(page.getByLabel("Familia de Mi diseño")).toHaveValue("custom");
 
   await page.getByRole("radio", { name: "Proyectos", exact: true }).click();
   await page.getByRole("button", { name: /Biblioteca de bocetos/ }).click();
-  await expect(links).toHaveCount(16);
+  await expect(links).toHaveCount(36);
   await expect(page.getByText("Mi diseño", { exact: true })).toHaveCount(0);
   await page.getByRole("navigation", { name: "Familias de documentos" }).getByRole("button", { name: /Bombas/ }).click();
   await expect(links).toHaveCount(2);
@@ -151,6 +151,28 @@ test("la biblioteca de bocetos añade los PDF sin desplazar documentos ya guarda
     expect(pdf.headers()["content-type"]).toContain("application/pdf");
     expect((await pdf.body()).subarray(0, 5).toString()).toBe("%PDF-");
   }
+});
+
+test("los separadores ciclónicos se abren como modelos IFC conceptuales", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/documentos?vista=familias");
+  const family = page.getByRole("listitem").filter({ has: page.getByRole("heading", { name: "Separadores ciclónicos" }) });
+  await expect(family.getByText("Conceptual 3D")).toBeVisible();
+  await family.getByRole("button", { name: "2 documentos" }).click();
+  await expect(page.getByRole("link", { name: /Abrir PDF de BC-CY/ })).toHaveCount(2);
+  const trigger = page.getByRole("button", { name: "Ver 3D de BC-CY101" });
+  await trigger.click();
+  const dialog = page.getByRole("dialog", { name: "Ciclón de una cámara" });
+  const viewer = dialog.getByTestId("ifc-viewer");
+  await expect(viewer).toHaveAttribute("data-phase", "ready", { timeout: 25_000 });
+  await expect(viewer).toHaveAttribute("data-products", "5");
+  await expect(viewer).toHaveAttribute("data-provenance", "Datos sintéticos");
+  await expect(viewer.locator("canvas")).toBeVisible();
+  const download = dialog.getByRole("link", { name: "Descargar IFC" });
+  await expect(download).toHaveAttribute("href", "/demo/industriales/BC-CY101-A.ifc");
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
+  await expect(trigger).toBeFocused();
 });
 
 test("Modelo conserva el holograma, la galería y la pantalla completa con F",async({page})=>{

@@ -6,7 +6,7 @@ import { EASE_OUT } from "@/components/motion/reveal";
 import { Badge, Panel } from "@/components/ui/primitives";
 import { FamilyThumb } from "@/features/bocetos/thumb";
 import { cn } from "@/lib/cn";
-import { familyInfo, useCatalogue } from "./catalogue";
+import { familyInfo, industrialFamily, useCatalogue } from "./catalogue";
 import { projectFamilies } from "./projects-tab";
 
 const TONE = { Disponible: "approved", "En desarrollo": "warning", Planificada: "neutral" } as const;
@@ -21,6 +21,7 @@ export function FamiliesTab({ selected, onOpen }: { selected: string; onOpen: (f
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-3">
         {catalogue.families.map((f, i) => {
           const info = familyInfo(f.id);
+          const industrial = industrialFamily(f.id);
           const documents = catalogue.designs.filter((d) => d.family === f.id).length;
           const projects = catalogue.projects.filter((p) => projectFamilies(p, catalogue.designs).includes(f.id)).length;
           return (
@@ -35,14 +36,14 @@ export function FamiliesTab({ selected, onOpen }: { selected: string; onOpen: (f
                 <div className="flex min-w-0 flex-1 flex-col">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="text-[15px] font-semibold text-strong">{f.name}</h3>
-                    <Badge tone={info ? TONE[info.status] : "neutral"}>{info?.status ?? "Propia"}</Badge>
+                    <Badge tone={info ? TONE[info.status] : "neutral"}>{industrial ? "Conceptual 3D" : info?.status ?? "Propia"}</Badge>
                   </div>
                   <p className="mt-0.5 text-[12px] text-muted">
                     {info && info.phase !== "—" ? <span className="font-mono text-faint">{info.phase} </span> : null}
-                    {info?.fields != null ? `${info.fields} campos de revisión` : "Campos por definir"}
+                    {industrial ? "Planos e IFC sintéticos" : info?.fields != null ? `${info.fields} campos de revisión` : "Campos por definir"}
                   </p>
                   <ul className="mt-3 flex flex-wrap gap-1.5">
-                    {(info?.parts ?? ["Piezas por definir"]).map((part) => (
+                    {(industrial?.parts ?? info?.parts ?? ["Piezas por definir"]).map((part) => (
                       <li key={part} className="rounded-[6px] border border-border bg-surface-sunken px-2 py-0.5 text-[12px] text-muted">
                         {part}
                       </li>
