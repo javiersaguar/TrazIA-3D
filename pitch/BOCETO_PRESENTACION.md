@@ -3,6 +3,9 @@
 Documento editable previo. La versión final depende del producto, las pruebas y los datos
 del evento. Las cifras actuales solo son referencia sintética. No hay vídeo final grabado.
 
+La [presentación web de ensayo](web/README.md) sigue los cortes de tiempo de la pág. 15
+del enunciado. Esta tabla sirve de guía para grabar y montar las tomas.
+
 | Tiempo | Diapositiva / escena | Mensaje | Imagen y medio |
 | --- | --- | --- | --- |
 | 0:00–0:25 | El trabajo del ingeniero | Un cambio en un plano exige localizar, interpretar y comprobar datos | Cámara y micro. Plano real solo con permiso; mientras, sintético |
