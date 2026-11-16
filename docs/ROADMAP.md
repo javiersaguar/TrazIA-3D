@@ -725,7 +725,7 @@ Es nuestra arma principal: **llegamos al jurado con su propia rúbrica ya medida
 
 - [ ] **G.1 GT automática desde el IFC de referencia:** con IfcOpenShell extraer del `<TAG>.ifc` de TR
   bounding boxes, ejes, radios de virola, posiciones y direcciones de boquillas (identificar elementos
-  por nombre/tipo/Pset; si no, por geometría). *Parcial 31/10:* `bench/referencia.py` lee el IFC por geometría, sin suponer nombres, y compara una revisión con él; probado solo con IFC nuestros con los nombres borrados. Falta el IFC de TR.
+  por nombre/tipo/Pset; si no, por geometría). *Parcial 31/10:* `bench/referencia.py` lee el IFC por geometría, sin suponer nombres, y compara una revisión con él; probado solo con IFC nuestros con los nombres borrados. Falta el IFC de TR. *16/11:* `bench/evaluar.py` y `databricks/03_evaluar_contra_tr` lo aplican a un lote entero, con emparejado por tag, superficie y resumen compartible ([BENCH.md](BENCH.md#evaluación-contra-los-ifc-de-tr-g1-g3-g5-16112026)).
 - [ ] **G.2 GT manual** para atributos (HDM) y para equipos sin IFC: hoja `bench/gt/<TAG>.yaml` con valor,
   unidad y evidencia. Doble revisión por dos miembros. *31/10:* sin empezar: necesita el dataset.
 - [ ] **G.3 Métricas:**
@@ -737,12 +737,12 @@ Es nuestra arma principal: **llegamos al jurado con su propia rúbrica ya medida
   | Delta 20 % | Precisión, recall y F1 de cambios; error en la magnitud del cambio; falsos cambios por ruido |
   | Escala 10 % | s/equipo, €/equipo, tokens, equipos/hora en lote, tasa de aciertos de caché |
 
-  *Parcial 31/10:* en `bench/metrics.py`, `report.py` y `estudio.py` ya están error por dimensión, precisión/recall de boquillas, IoU volumétrico, exactitud por campo, abstención, ECE, Brier, F1 y magnitud del cambio, s/equipo, €/equipo y equipos/hora; la caché y el lote los mide Plataforma (3.7). Faltan Hausdorff/Chamfer de malla y el error de orientación por boquilla frente a un IFC real.
+  *Parcial 31/10:* en `bench/metrics.py`, `report.py` y `estudio.py` ya están error por dimensión, precisión/recall de boquillas, IoU volumétrico, exactitud por campo, abstención, ECE, Brier, F1 y magnitud del cambio, s/equipo, €/equipo y equipos/hora; la caché y el lote los mide Plataforma (3.7). Faltan Hausdorff/Chamfer de malla y el error de orientación por boquilla frente a un IFC real. *16/11:* Hausdorff muestreado, P95 y Chamfer entre nuestro IFC y el de referencia, y error de azimut por boquilla, en `bench.evaluar`; pendiente de medirlos con IFC de TR.
 
 - [ ] **G.4** Informe `bench/report.md` + JSON + página "Calidad" en la web con **mapa de calor 3D del
-  error** sobre la malla (color por distancia a la referencia). *Parcial 31/10:* `python -m bench` escribe `report.md` y JSON, y la web tiene la página Bench con el diagrama de fiabilidad; falta el mapa de calor 3D.
+  error** sobre la malla (color por distancia a la referencia). *Parcial 31/10:* `python -m bench` escribe `report.md` y JSON, y la web tiene la página Bench con el diagrama de fiabilidad; falta el mapa de calor 3D. *16/11:* mapa de calor HTML por equipo en `bench.evaluar` y en `03_evaluar_contra_tr`; falta llevarlo a la web.
 - [ ] **G.5** Anti-sobreajuste: con 4 IFC de referencia, validación **dejando uno fuera**; sintéticos
-  como conjunto grande; reportar siempre por separado sintético / real. *Parcial 31/10:* con sintéticos ya se separa todo (S-reservado con proveedores que no ve el ajuste, informes marcados como sintéticos); la exclusión de uno con IFC reales necesita el dataset.
+  como conjunto grande; reportar siempre por separado sintético / real. *Parcial 31/10:* con sintéticos ya se separa todo (S-reservado con proveedores que no ve el ajuste, informes marcados como sintéticos); la exclusión de uno con IFC reales necesita el dataset. *16/11:* `bench.evaluar` ya fija el convenio de azimut de cada equipo por exclusión de uno.
 - [x] **G.6** El bench corre en CI sobre sintéticos (regresiones = PR rojo). *Verificado 28/10:* CI ejecuta `test_bench.py`: genera sintéticos, corre el banco real y exige exactitud/IFC/F1 en los casos de referencia; una regresión falla pytest.
 - [x] **G.0** Bench v0 y generador v1 hechos ([BENCH.md](BENCH.md)).
 - [x] **G.7** **Generador v2** (DEC-21): 8 o más estilos de proveedor (2 reservados), niveles de

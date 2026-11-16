@@ -131,6 +131,9 @@ def read_reference(model: ifcopenshell.file) -> dict:
         diameter=body["diameter"],
         shell_length=body["top"] - body["bottom"],
         overall_height=float(np.ptp(every[:, axis])),
+        # Marco del equipo (mm): eje del cuerpo en `across` y cota más baja. bench.evaluar lo usa
+        # para superponer dos IFC con orígenes distintos.
+        frame={"across": across, "center": [float(c) for c in center], "base": base},
     )
     if len(meshes) == 1:
         notes.append("Un solo elemento con geometría: las boquillas no se pueden separar.")

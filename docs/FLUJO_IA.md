@@ -27,9 +27,10 @@ Complementa a [PLATAFORMA_INDESIA.md](PLATAFORMA_INDESIA.md) (acceso, notebooks 
    `revision.json`, `modelo.ifc` o `eventos.json` del lote real, ni valores de cotas o boquillas.
 2. No se bajan datos ni salidas reales al portátil: ni con la CLI de Databricks, ni con Databricks
    Connect, ni con la extensión de VS Code, salvo autorización escrita de la organización.
-3. Lo único que cruza hacia el agente es la celda «Resumen para el asistente» de
-   `01_procesar_lote` (`trazia.lote.resumen_compartible`) y lo que una persona escriba con sus
-   palabras, sin valores.
+3. Lo único que cruza hacia el agente es: la celda «Resumen para el asistente» de
+   `01_procesar_lote` (`trazia.lote.resumen_compartible`) y de `03_evaluar_contra_tr`
+   (`bench.evaluar.resumen_compartible`), el perfil de `02_perfil_dataset` y lo que una persona
+   escriba con sus palabras, sin valores.
 4. El asistente integrado de Databricks está dentro de la plataforma, pero hasta que los
    mentores confirmen si puede tratar datos de TR se usa solo con código y sintéticos.
 
@@ -39,7 +40,7 @@ equipos a `E01`, `E02`… y reduce cada error a su categoría (`ifc_invalido`, `
 
 | Se puede pegar al agente | Hay que reescribirlo antes | No se pega nunca |
 | --- | --- | --- |
-| Resumen para el asistente, versiones de paquetes, tiempos, trazas de error de nuestro código sin valores | Mensajes de error y avisos (pueden citar tags o cotas): se describen sin datos | Documentos, capturas de planos, JSON o IFC del lote real, nombres de archivo del dataset |
+| Resumen para el asistente (01 y 03), perfil del dataset (02), versiones de paquetes, tiempos, trazas de error de nuestro código sin valores | Mensajes de error y avisos (pueden citar tags o cotas): se describen sin datos | Documentos, capturas de planos, JSON o IFC del lote real, nombres de archivo del dataset |
 
 ## El ciclo de trabajo
 

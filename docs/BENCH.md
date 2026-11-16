@@ -340,6 +340,32 @@ vocabulario), con la misma biblioteca de S-dev y la calibración v6. En el produ
 - **Decisión.** Queda integrado y probado, pero apagado. Volver a medirlo con los GA reales
   (R-ref), donde los proveedores no siguen plantillas sintéticas.
 
+## Evaluación contra los IFC de TR (G.1, G.3-G.5, 16/11/2026)
+
+`python -m bench.evaluar <salida del lote> <carpeta de IFC> [--mapas DIR] [--compartible]`, o el
+notebook `databricks/03_evaluar_contra_tr`. Por cada equipo cuyo tag completo aparece en el
+nombre de un IFC (`V-7` no casa con `V-70`), toma la última revisión correcta del lote y mide:
+
+| Medida | Cómo |
+| --- | --- |
+| Diámetro y longitud de virola | `bench.referencia` sobre el IFC de TR, por geometría y sin suponer nombres; error en mm y relativo |
+| Boquillas | Emparejamiento húngaro de caras; emparejadas, faltan y sobran, recall, precisión, error de posición (mm), azimut (°), DN y sesgo de cota |
+| Convenio de azimut | El que encaja en el equipo (optimista) y el más frecuente en los demás equipos (**exclusión de uno**, G.5). Con un solo equipo la cifra queda marcada `ajustada_en_el_equipo` |
+| Superficie | Los dos IFC al mismo marco (eje del cuerpo en z, centro en planta, cota más baja en 0) y el convenio aplicado al nuestro. Distancias muestreadas en los dos sentidos: Hausdorff, percentil 95 y Chamfer en mm, IoU de cajas |
+| Mapa de calor | HTML de Plotly: nuestro modelo coloreado de 0 a `escala_mm` (50 por defecto, igual para todos) sobre la referencia en gris |
+
+`resumen_compartible` deja alias `E01`… (los mismos que el lote), errores relativos de las
+dimensiones (sin el error en mm: juntos darían la dimensión real) y errores en mm de boquillas y
+superficie.
+
+Probado solo con IFC nuestros disfrazados: sin nombres, trasladados (12, −3,5, 104) m y girados
+90° (`bench.evaluar.disfrazar`). Un lote perfecto da error < 1 mm y Hausdorff < 5 mm con el giro
+descubierto por exclusión de uno, y un diámetro con 200 mm de más aparece como tal y con Chamfer
+> 20 mm (`tests/test_bench_evaluar.py`). Límites conocidos: un IFC de TR con más elementos que el
+equipo (plataformas, escaleras, cimentación) desplaza la cota más baja y sube el Hausdorff; la
+longitud de virola depende de que el cuerpo sea un solo elemento; los horizontales no se han
+probado.
+
 ## Hallazgos para el núcleo
 
 1. **Un texto fuera de la página tumbaba la ingesta del PDF.** `ingest_bytes` limitaba la caja a
