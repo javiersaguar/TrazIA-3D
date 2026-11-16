@@ -111,3 +111,55 @@ def test_un_equipo_roto_no_detiene_el_lote(tmp_path):
     resumen = json.loads((tmp_path / "salida" / "resumen.json").read_text(encoding="utf-8"))
     assert resumen[0]["tag"] == "X-1"
     assert (tmp_path / "salida" / "X-1" / "rev1" / "eventos.json").is_file()
+
+
+def test_resumen_compartible_no_lleva_datos_del_plano():
+    filas = [
+        lote.Fila(
+            "V-9001",
+            "A",
+            ["GAD_V-9001_revA.pdf"],
+            "ok",
+            familia="column",
+            lod=2,
+            boquillas=5,
+            campos=30,
+            pendientes=4,
+            avisos=1,
+            segundos=2.0,
+            carpeta="/Volumes/tr/V-9001/revA",
+        ),
+        lote.Fila(
+            "V-9001",
+            "B",
+            ["GAD_V-9001_revB.pdf"],
+            "error",
+            error="Falta el diámetro 2400 mm de V-9001",
+            segundos=1.0,
+        ),
+        lote.Fila(
+            "P-17",
+            "1",
+            ["GAD_P-17_rev1.pdf"],
+            "error",
+            error="ValueError: cota 1250 fuera de rango",
+            segundos=3.0,
+        ),
+        lote.Fila(
+            "P-17",
+            "2",
+            ["GAD_P-17_rev2.pdf"],
+            "error",
+            error="IFC inválido: IfcCartesianPoint 1250",
+            segundos=4.0,
+        ),
+    ]
+    resumen = lote.resumen_compartible(filas)
+    texto = json.dumps(resumen, ensure_ascii=False)
+    for secreto in ("V-9001", "P-17", "2400", "1250", "GAD_", "/Volumes", "diámetro"):
+        assert secreto not in texto
+    assert resumen["equipos"] == 2 and resumen["revisiones"] == 4
+    assert resumen["estado"] == {"error": 3, "ok": 1}
+    assert resumen["errores"] == {"ValueError": 1, "ifc_invalido": 1, "pipeline": 1}
+    assert [r["equipo"] for r in resumen["por_revision"]] == ["E01", "E01", "E02", "E02"]
+    assert resumen["segundos"] == {"total": 10.0, "mediana": 3.0, "max": 4.0}

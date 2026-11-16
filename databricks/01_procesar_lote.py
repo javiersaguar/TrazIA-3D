@@ -153,3 +153,21 @@ try:
 except NameError:
     for fila in filas:
         print(" | ".join(celda(fila, c) for c in COLUMNAS))
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Resumen para el asistente de código
+# MAGIC
+# MAGIC Solo agregados: estados, familias, categorías de error, contadores y tiempos, con los
+# MAGIC equipos renombrados a `E01`, `E02`… Es lo único de este notebook que se puede pegar en
+# MAGIC Claude Code, Codex u otro asistente externo (ver `docs/FLUJO_IA.md`). Léelo antes de
+# MAGIC copiarlo.
+
+# COMMAND ----------
+
+import json  # noqa: E402
+
+from trazia.lote import resumen_compartible  # noqa: E402
+
+print(json.dumps(resumen_compartible(filas), ensure_ascii=False, indent=1))

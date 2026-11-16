@@ -6,6 +6,9 @@ Producto del reto GA2MODEL de IndesIAhack 2026. El código Python vive en `src/t
 - Verificar: `uv run ruff check .`, `uv run ruff format --check .`, `uv run pytest -q`.
 - Arrancar: `uv run trazia serve` (aplicación local en 127.0.0.1).
 - Datos privados en `data/private/`; nunca subir originales reales ni claves al repositorio.
+- En el evento los datos de TR viven solo en Databricks: no leer, pedir ni reconstruir
+  documentos o salidas reales. Trabajar con sintéticos y con el resumen agregado del lote
+  (`docs/FLUJO_IA.md`).
 - Los ejemplos públicos son sintéticos. Conservar su etiquetado explícito.
 - El baseline de etiquetas no es un extractor IA. No presentar resultados sintéticos como
   precisión medida sobre planos del organizador.

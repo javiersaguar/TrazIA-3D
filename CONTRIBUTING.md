@@ -41,6 +41,7 @@ con revisión de los dueños afectados.
 
 ## Datos
 
+- Durante el evento: flujo con asistentes de IA y Databricks en [docs/FLUJO_IA.md](docs/FLUJO_IA.md).
 - El dataset de Técnicas Reunidas va en `data/private/` y **nunca** se sube.
 - Todo lo que hay en el repositorio es sintético y se rotula como tal.
 - No subir claves: usa `.env` (ignorado) y documenta las variables en `.env.example`.

@@ -23,7 +23,7 @@ import json
 import os
 import re
 import time
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -274,3 +274,58 @@ def escribir_resumen(filas: list[Fila], salida: Path):
         writer.writeheader()
         for fila in datos:
             writer.writerow({**fila, "documentos": "; ".join(fila["documentos"])})
+
+
+def _tipo_error(error: str | None) -> str | None:
+    """Categoría del error sin su texto, que puede citar valores o tags del plano."""
+    if not error:
+        return None
+    if error.startswith("IFC inválido"):
+        return "ifc_invalido"
+    clase = re.match(r"^([A-Z]\w*(?:Error|Exception|Failure|Unavailable))\b", error)
+    return clase[1] if clase else "pipeline"
+
+
+def resumen_compartible(filas: list[Fila]) -> dict:
+    """Agregados del lote que se pueden pegar al asistente de código (docs/FLUJO_IA.md).
+
+    Sin nombres de archivo, rutas, tags reales ni textos de error o avisos: cada equipo pasa a
+    `E01`, `E02`… en el orden del lote y los errores quedan como categoría.
+    """
+    alias = {tag: f"E{i:02d}" for i, tag in enumerate(dict.fromkeys(f.tag for f in filas), 1)}
+    segundos = sorted(f.segundos for f in filas)
+
+    def cuenta(valores):
+        return dict(sorted(Counter(str(v) for v in valores if v is not None).items()))
+
+    return {
+        "revisiones": len(filas),
+        "equipos": len(alias),
+        "estado": cuenta(f.estado for f in filas),
+        "familia": cuenta(f.familia for f in filas),
+        "lod": cuenta(f.lod for f in filas),
+        "errores": cuenta(_tipo_error(f.error) for f in filas),
+        "avisos": sum(f.avisos for f in filas),
+        "segundos": {
+            "total": round(sum(segundos), 1),
+            "mediana": round(segundos[len(segundos) // 2], 1) if segundos else 0,
+            "max": round(segundos[-1], 1) if segundos else 0,
+        },
+        "por_revision": [
+            {
+                "equipo": alias[f.tag],
+                "orden": i,
+                "estado": f.estado,
+                "error": _tipo_error(f.error),
+                "familia": f.familia,
+                "lod": f.lod,
+                "boquillas": f.boquillas,
+                "campos": f.campos,
+                "pendientes": f.pendientes,
+                "avisos": f.avisos,
+                "cambios": f.cambios,
+                "segundos": f.segundos,
+            }
+            for i, f in enumerate(filas, 1)
+        ],
+    }
