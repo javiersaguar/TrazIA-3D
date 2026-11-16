@@ -83,6 +83,18 @@ def main(argv=None) -> int:
     approval.add_argument("--output", "-o", type=Path, required=True)
     serve = commands.add_parser("serve", help="Abrir el espacio de revisión local")
     serve.add_argument("--port", type=int, default=8501)
+    batch = commands.add_parser(
+        "lote", help="Procesar una carpeta (p. ej. un volumen /Volumes/...) por equipo y revisión"
+    )
+    batch.add_argument("entrada", type=Path)
+    batch.add_argument("--output", "-o", type=Path, required=True)
+    batch.add_argument("--estrategia", default="d_hibrido")
+    batch.add_argument("--proyecto", default="INDESIAHACK")
+    batch.add_argument("--dataset", choices=("real", "synthetic"), default="real")
+    batch.add_argument("--proveedor", action="append", dest="proveedores")
+    batch.add_argument("--tag", action="append", dest="tags")
+    batch.add_argument("--procesos", type=int, default=1)
+    batch.add_argument("--trabajo", type=Path, help="Carpeta de cachés (por defecto, en la salida)")
     args = parser.parse_args(argv)
     try:
         if args.command == "schema":
@@ -175,6 +187,26 @@ def main(argv=None) -> int:
                 originals[key] = Path(path).read_bytes()
             revision = approve(load_revision(args.input), args.reviewer, originals)
             write_json(revision.model_dump(mode="json"), args.output)
+        elif args.command == "lote":
+            from .lote import procesar_carpeta
+
+            filas = procesar_carpeta(
+                args.entrada,
+                args.output,
+                proyecto=args.proyecto,
+                estrategia=args.estrategia,
+                proveedores=args.proveedores,
+                dataset=args.dataset,
+                trabajo=args.trabajo,
+                procesos=args.procesos,
+                tags=args.tags,
+            )
+            fallos = [f for f in filas if f.estado != "ok"]
+            print(
+                f"Lote: {len(filas) - len(fallos)} de {len(filas)} revisiones correctas. "
+                f"Resumen en {args.output / 'resumen.csv'}"
+            )
+            return 1 if fallos or not filas else 0
         elif args.command == "serve":
             app = Path(__file__).with_name("app.py")
             return subprocess.call(
