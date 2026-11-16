@@ -170,7 +170,7 @@ export const useCatalogue = create<Catalogue>()(
     }),
     {
       name: "trazia.catalogue.v1",
-      version: 4,
+      version: 5,
       // Añadir las nuevas fichas sin reemplazar documentos ni asignaciones guardadas.
       migrate: (stored, version) => {
         const s = stored as Persisted;

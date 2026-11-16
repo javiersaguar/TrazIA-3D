@@ -1,8 +1,9 @@
 # Biblioteca industrial de TrazIA-3D
 
-La ampliación reúne veinte diseños conceptuales de diez familias que se usan en plantas
-industriales. Cada diseño tiene una lámina A3 con alzado y planta y un IFC4 DRAFT con
-componentes exteriores. Las cotas son sintéticas y describen la envolvente del modelo.
+La biblioteca contiene 72 diseños conceptuales de 18 familias, cuatro por familia.
+Desde **Documentos → Familias** se puede desplegar cada ficha y abrir sus diseños.
+Hay 56 parejas de lámina A3 e IFC4 DRAFT con componentes exteriores, además de los
+16 bocetos PDF originales. Las cotas son sintéticas y describen la envolvente del modelo.
 
 Para un diseño nuevo, las plantillas geométricas parten de parámetros conocidos. La
 generación calcula las dos vistas del PDF y el IFC a partir de los mismos vértices. La
@@ -35,7 +36,7 @@ uv run --extra dev python scripts/make_industrial_designs.py
 node web/scripts/export-industrial-ifc.mjs
 ```
 
-Las plantillas editables están en `scripts/industrial_designs.py`. El exportador vuelve a
+Las plantillas editables están en `scripts/industrial_designs.py` y `scripts/design_variants.py`. El exportador vuelve a
 abrir cada IFC con WebIFC y comprueba que todos sus componentes se pueden renderizar
 antes de actualizar el índice. Estos IFC se abren en el visor de Documentos. Las nuevas
 familias del catálogo no amplían el conjunto de plantillas de edición K.8.

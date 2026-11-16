@@ -237,6 +237,258 @@
       "name": "Batería de extracción de dos etapas",
       "filename": "BC-EX102-A.pdf",
       "ifc": "BC-EX102-A.ifc"
+    },
+    {
+      "tag": "BC-V103",
+      "family": "vertical",
+      "name": "Recipiente agitado sobre patas",
+      "filename": "BC-V103-A.pdf",
+      "ifc": "BC-V103-A.ifc"
+    },
+    {
+      "tag": "BC-V104",
+      "family": "vertical",
+      "name": "Separador vertical de doble entrada",
+      "filename": "BC-V104-A.pdf",
+      "ifc": "BC-V104-A.ifc"
+    },
+    {
+      "tag": "BC-H103",
+      "family": "horizontal",
+      "name": "Separador horizontal con bota",
+      "filename": "BC-H103-A.pdf",
+      "ifc": "BC-H103-A.ifc"
+    },
+    {
+      "tag": "BC-H104",
+      "family": "horizontal",
+      "name": "Recipiente horizontal sobre tres silletas",
+      "filename": "BC-H104-A.pdf",
+      "ifc": "BC-H104-A.ifc"
+    },
+    {
+      "tag": "BC-C103",
+      "family": "column",
+      "name": "Columna de relleno con registros",
+      "filename": "BC-C103-A.pdf",
+      "ifc": "BC-C103-A.ifc"
+    },
+    {
+      "tag": "BC-C104",
+      "family": "column",
+      "name": "Columna con rehervidor lateral",
+      "filename": "BC-C104-A.pdf",
+      "ifc": "BC-C104-A.ifc"
+    },
+    {
+      "tag": "BC-E103",
+      "family": "exchanger",
+      "name": "Intercambiador tubular vertical",
+      "filename": "BC-E103-A.pdf",
+      "ifc": "BC-E103-A.ifc"
+    },
+    {
+      "tag": "BC-E104",
+      "family": "exchanger",
+      "name": "Intercambiador espiral compacto",
+      "filename": "BC-E104-A.pdf",
+      "ifc": "BC-E104-A.ifc"
+    },
+    {
+      "tag": "BC-T103",
+      "family": "tank",
+      "name": "Tanque atmosférico de techo abovedado",
+      "filename": "BC-T103-A.pdf",
+      "ifc": "BC-T103-A.ifc"
+    },
+    {
+      "tag": "BC-T104",
+      "family": "tank",
+      "name": "Tanque rectangular con rigidizadores",
+      "filename": "BC-T104-A.pdf",
+      "ifc": "BC-T104-A.ifc"
+    },
+    {
+      "tag": "BC-P103",
+      "family": "pump",
+      "name": "Bomba horizontal de engranajes",
+      "filename": "BC-P103-A.pdf",
+      "ifc": "BC-P103-A.ifc"
+    },
+    {
+      "tag": "BC-P104",
+      "family": "pump",
+      "name": "Bomba vertical multietapa",
+      "filename": "BC-P104-A.pdf",
+      "ifc": "BC-P104-A.ifc"
+    },
+    {
+      "tag": "BC-K103",
+      "family": "compressor",
+      "name": "Compresor centrífugo de una etapa",
+      "filename": "BC-K103-A.pdf",
+      "ifc": "BC-K103-A.ifc"
+    },
+    {
+      "tag": "BC-K104",
+      "family": "compressor",
+      "name": "Módulo de compresión dúplex",
+      "filename": "BC-K104-A.pdf",
+      "ifc": "BC-K104-A.ifc"
+    },
+    {
+      "tag": "BC-G103",
+      "family": "generic",
+      "name": "Envolvente de caseta con marquesina",
+      "filename": "BC-G103-A.pdf",
+      "ifc": "BC-G103-A.ifc"
+    },
+    {
+      "tag": "BC-G104",
+      "family": "generic",
+      "name": "Reserva de implantación en dos niveles",
+      "filename": "BC-G104-A.pdf",
+      "ifc": "BC-G104-A.ifc"
+    },
+    {
+      "tag": "BC-AC103",
+      "family": "air-cooler",
+      "name": "Aeroenfriador inducido de tres ventiladores",
+      "filename": "BC-AC103-A.pdf",
+      "ifc": "BC-AC103-A.ifc"
+    },
+    {
+      "tag": "BC-AC104",
+      "family": "air-cooler",
+      "name": "Dos haces de aeroenfriamiento en paralelo",
+      "filename": "BC-AC104-A.pdf",
+      "ifc": "BC-AC104-A.ifc"
+    },
+    {
+      "tag": "BC-EV103",
+      "family": "evaporator",
+      "name": "Evaporador de doble efecto",
+      "filename": "BC-EV103-A.pdf",
+      "ifc": "BC-EV103-A.ifc"
+    },
+    {
+      "tag": "BC-EV104",
+      "family": "evaporator",
+      "name": "Evaporador compacto con separador elevado",
+      "filename": "BC-EV104-A.pdf",
+      "ifc": "BC-EV104-A.ifc"
+    },
+    {
+      "tag": "BC-FI103",
+      "family": "filter",
+      "name": "Banco de filtros de tres carcasas",
+      "filename": "BC-FI103-A.pdf",
+      "ifc": "BC-FI103-A.ifc"
+    },
+    {
+      "tag": "BC-FI104",
+      "family": "filter",
+      "name": "Filtro horizontal de cartuchos",
+      "filename": "BC-FI104-A.pdf",
+      "ifc": "BC-FI104-A.ifc"
+    },
+    {
+      "tag": "BC-CE103",
+      "family": "centrifuge",
+      "name": "Centrífuga vertical con descarga inferior",
+      "filename": "BC-CE103-A.pdf",
+      "ifc": "BC-CE103-A.ifc"
+    },
+    {
+      "tag": "BC-CE104",
+      "family": "centrifuge",
+      "name": "Decantador con motor acoplado",
+      "filename": "BC-CE104-A.pdf",
+      "ifc": "BC-CE104-A.ifc"
+    },
+    {
+      "tag": "BC-CY103",
+      "family": "cyclone",
+      "name": "Separador multiciclónico de tres cámaras",
+      "filename": "BC-CY103-A.pdf",
+      "ifc": "BC-CY103-A.ifc"
+    },
+    {
+      "tag": "BC-CY104",
+      "family": "cyclone",
+      "name": "Ciclón con tolva de recogida",
+      "filename": "BC-CY104-A.pdf",
+      "ifc": "BC-CY104-A.ifc"
+    },
+    {
+      "tag": "BC-SE103",
+      "family": "dryer",
+      "name": "Secador rotativo sobre rodillos",
+      "filename": "BC-SE103-A.pdf",
+      "ifc": "BC-SE103-A.ifc"
+    },
+    {
+      "tag": "BC-SE104",
+      "family": "dryer",
+      "name": "Lecho fluido con módulo de salida",
+      "filename": "BC-SE104-A.pdf",
+      "ifc": "BC-SE104-A.ifc"
+    },
+    {
+      "tag": "BC-ME103",
+      "family": "static-mixer",
+      "name": "Mezclador estático vertical",
+      "filename": "BC-ME103-A.pdf",
+      "ifc": "BC-ME103-A.ifc"
+    },
+    {
+      "tag": "BC-ME104",
+      "family": "static-mixer",
+      "name": "Mezclador en línea de dos etapas",
+      "filename": "BC-ME104-A.pdf",
+      "ifc": "BC-ME104-A.ifc"
+    },
+    {
+      "tag": "BC-DO103",
+      "family": "dosing-skid",
+      "name": "Dosificación con depósito de preparación",
+      "filename": "BC-DO103-A.pdf",
+      "ifc": "BC-DO103-A.ifc"
+    },
+    {
+      "tag": "BC-DO104",
+      "family": "dosing-skid",
+      "name": "Módulo de dosificación con dos circuitos",
+      "filename": "BC-DO104-A.pdf",
+      "ifc": "BC-DO104-A.ifc"
+    },
+    {
+      "tag": "BC-TR103",
+      "family": "cooling-tower",
+      "name": "Torre inducida de dos celdas",
+      "filename": "BC-TR103-A.pdf",
+      "ifc": "BC-TR103-A.ifc"
+    },
+    {
+      "tag": "BC-TR104",
+      "family": "cooling-tower",
+      "name": "Torre de tiro forzado con ventilación doble",
+      "filename": "BC-TR104-A.pdf",
+      "ifc": "BC-TR104-A.ifc"
+    },
+    {
+      "tag": "BC-EX103",
+      "family": "mixer-settler",
+      "name": "Batería de extracción de tres etapas",
+      "filename": "BC-EX103-A.pdf",
+      "ifc": "BC-EX103-A.ifc"
+    },
+    {
+      "tag": "BC-EX104",
+      "family": "mixer-settler",
+      "name": "Mezclador-decantador con depósito auxiliar",
+      "filename": "BC-EX104-A.pdf",
+      "ifc": "BC-EX104-A.ifc"
     }
   ]
 }

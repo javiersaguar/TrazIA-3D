@@ -121,7 +121,7 @@ test("la biblioteca de bocetos añade los PDF sin desplazar documentos ya guarda
     const key = "trazia.catalogue.v1";
     if (localStorage.getItem(key)) return;
     localStorage.setItem(key, JSON.stringify({
-      version: 3,
+      version: 4,
       state: {
         families: [{ id: "custom", name: "Familia propia" }, { id: "pump", name: "Bombas" }],
         projects: [{ id: "custom-project", name: "Proyecto propio" }],
@@ -131,21 +131,21 @@ test("la biblioteca de bocetos añade los PDF sin desplazar documentos ya guarda
   });
   await page.goto("/documentos");
   const links = page.getByRole("link", { name: /Abrir PDF de BC-/ });
-  await expect(links).toHaveCount(36);
+  await expect(links).toHaveCount(72);
   await expect(page.getByText("Mi diseño", { exact: true })).toBeVisible();
   await page.reload();
-  await expect(links).toHaveCount(36);
+  await expect(links).toHaveCount(72);
   await expect(page.getByLabel("Familia de Mi diseño")).toHaveValue("custom");
 
   await page.getByRole("radio", { name: "Proyectos", exact: true }).click();
   await page.getByRole("button", { name: /Biblioteca de bocetos/ }).click();
-  await expect(links).toHaveCount(36);
+  await expect(links).toHaveCount(72);
   await expect(page.getByText("Mi diseño", { exact: true })).toHaveCount(0);
   await page.getByRole("navigation", { name: "Familias de documentos" }).getByRole("button", { name: /Bombas/ }).click();
-  await expect(links).toHaveCount(2);
+  await expect(links).toHaveCount(4);
   for (const link of await links.all()) {
     const url = await link.getAttribute("href");
-    expect(url).toMatch(/^\/demo\/bocetos\/BOC_BC-P10[12]_revA\.pdf$/);
+    expect(url).toMatch(/^\/demo\/(?:bocetos\/BOC_BC-P10[12]_revA|industriales\/BC-P10[34]-A)\.pdf$/);
     const pdf = await page.request.get(url!);
     expect(pdf.ok()).toBe(true);
     expect(pdf.headers()["content-type"]).toContain("application/pdf");
@@ -153,23 +153,38 @@ test("la biblioteca de bocetos añade los PDF sin desplazar documentos ya guarda
   }
 });
 
+test("las 18 fichas de familia muestran sus cuatro diseños sin cambiar de pestaña", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/documentos?vista=familias");
+  const galleries = page.locator("details").filter({ has: page.locator("ul[aria-label^='Diseños de ']") });
+  await expect(galleries).toHaveCount(18);
+  for (const gallery of await galleries.all()) {
+    await gallery.locator("summary").click();
+    const links = gallery.getByRole("link", { name: /Abrir PDF de BC-/ });
+    await expect(links).toHaveCount(4);
+    await expect(links.last()).toBeVisible();
+    await gallery.locator("summary").click();
+  }
+  await expect(page).toHaveURL(/vista=familias/);
+});
+
 test("los separadores ciclónicos se abren como modelos IFC conceptuales", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/documentos?vista=familias");
   const family = page.getByRole("listitem").filter({ has: page.getByRole("heading", { name: "Separadores ciclónicos" }) });
   await expect(family.getByText("Conceptual 3D")).toBeVisible();
-  await family.getByRole("button", { name: "2 documentos" }).click();
-  await expect(page.getByRole("link", { name: /Abrir PDF de BC-CY/ })).toHaveCount(2);
-  const trigger = page.getByRole("button", { name: "Ver 3D de BC-CY101" });
+  await family.getByText("Ver 4 diseños", { exact: true }).click();
+  await expect(family.getByRole("link", { name: /Abrir PDF de BC-CY/ })).toHaveCount(4);
+  const trigger = family.getByRole("button", { name: "Ver 3D de BC-CY104" });
   await trigger.click();
-  const dialog = page.getByRole("dialog", { name: "Ciclón de una cámara" });
+  const dialog = page.getByRole("dialog", { name: "Ciclón con tolva de recogida" });
   const viewer = dialog.getByTestId("ifc-viewer");
   await expect(viewer).toHaveAttribute("data-phase", "ready", { timeout: 25_000 });
-  await expect(viewer).toHaveAttribute("data-products", "5");
+  await expect(viewer).toHaveAttribute("data-products", "7");
   await expect(viewer).toHaveAttribute("data-provenance", "Datos sintéticos");
   await expect(viewer.locator("canvas")).toBeVisible();
   const download = dialog.getByRole("link", { name: "Descargar IFC" });
-  await expect(download).toHaveAttribute("href", "/demo/industriales/BC-CY101-A.ifc");
+  await expect(download).toHaveAttribute("href", "/demo/industriales/BC-CY104-A.ifc");
   await page.keyboard.press("Escape");
   await expect(dialog).not.toBeVisible();
   await expect(trigger).toBeFocused();

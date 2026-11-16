@@ -1,15 +1,14 @@
 "use client";
 
 import { FileUp } from "lucide-react";
-import Link from "next/link";
 import { useRef, useState, type DragEvent } from "react";
 import { toast } from "sonner";
 
 import { Badge, Button, Icon, Panel, PanelHeader } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 import type { DocStage } from "@/lib/mock/bocetos";
-import { kindFromFilename, loadDocument, saveDocument, sketchAssets, tagFromFilename, useCatalogue, type Design } from "./catalogue";
-import { SketchModelDialog } from "./sketch-model-dialog";
+import { kindFromFilename, saveDocument, tagFromFilename, useCatalogue } from "./catalogue";
+import { DocumentActions } from "./document-actions";
 
 const fieldBase =
   "h-9 rounded-[var(--radius-control)] border border-border-strong bg-surface px-3 text-[13px] text-text outline-none focus-visible:border-accent";
@@ -34,21 +33,6 @@ function StageTrack({ stage }: { stage: DocStage }) {
       ))}
       <span className="ml-1.5 text-[12px] text-muted capitalize">{stage}</span>
     </div>
-  );
-}
-
-function SketchActions({ design }: { design: Design }) {
-  const assets = sketchAssets(design.id);
-  if (!assets) return null;
-  const tag = design.tag ?? design.name;
-  return (
-    <span className="flex gap-3">
-      <a href={assets.pdf} target="_blank" rel="noopener" aria-label={`Abrir PDF de ${tag} (pestaña nueva)`}
-        className="text-[12px] text-accent-text underline-offset-2 hover:underline">
-        Abrir PDF
-      </a>
-      {assets.ifc && <SketchModelDialog tag={tag} name={design.name} ifc={assets.ifc} />}
-    </span>
   );
 }
 
@@ -123,21 +107,6 @@ export function DocumentsTab({
     e.preventDefault();
     setOver(false);
     void add(e.dataTransfer.files);
-  }
-
-  async function download(d: Design) {
-    try {
-      const blob = await loadDocument(d.id);
-      if (!blob) throw new Error("El documento no está disponible en este navegador. Vuelve a añadirlo.");
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = d.filename!;
-      link.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "No se pudo abrir el documento");
-    }
   }
 
   return (
@@ -261,19 +230,7 @@ export function DocumentsTab({
                 <tr key={d.id} className="animate-[row-in_var(--dur-slow)_var(--ease-out)]">
                   <td className="border-b border-border px-3 py-2.5 whitespace-nowrap">
                     <span className="block font-medium text-strong">{d.name}</span>
-                    {d.demo ? (
-                      <Link className="text-[12px] text-accent-text underline-offset-2 hover:underline" href="/modelo">
-                        Abrir en Modelo
-                      </Link>
-                    ) : d.kind === "Boceto GA" ? (
-                      <SketchActions design={d} />
-                    ) : d.example ? (
-                      <Badge tone="warning">ejemplo</Badge>
-                    ) : d.filename ? (
-                      <button className="font-mono text-[12px] text-accent-text underline-offset-2 hover:underline" onClick={() => void download(d)}>
-                        {d.filename}
-                      </button>
-                    ) : null}
+                    <DocumentActions design={d} />
                   </td>
                   <td className="border-b border-border px-3 py-2.5 text-muted">{d.kind ?? "—"}</td>
                   <td className="border-b border-border px-3 py-2.5 font-mono text-[12px]">{d.tag ?? "—"}</td>

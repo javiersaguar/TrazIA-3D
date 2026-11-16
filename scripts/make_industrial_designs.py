@@ -4,6 +4,7 @@ import json
 import math
 from pathlib import Path
 
+from design_variants import BASE_FAMILY_NAMES, VARIANTS
 from industrial_designs import FAMILIES, Design, Part, Point
 from reportlab.lib.units import mm
 from reportlab.pdfgen.canvas import Canvas
@@ -121,24 +122,31 @@ def main():
     families = []
     designs = []
     solids = {}
-    for family in FAMILIES:
-        families.append({"id": family.id, "name": family.name, "parts": family.parts})
-        for design in family.designs:
+    groups = [(family.id, family.name, family.designs) for family in FAMILIES]
+    names = {family.id: family.name for family in FAMILIES} | BASE_FAMILY_NAMES
+    groups.extend(
+        (family_id, names[family_id], variants) for family_id, variants in VARIANTS.items()
+    )
+    for family_id, family_name, variants in groups:
+        for design in variants:
             if design.tag in solids:
                 raise ValueError(f"Etiqueta repetida: {design.tag}")
             parts = [mesh(part, design.size) for part in design.parts]
             filename = f"{design.tag}-A.pdf"
-            render_pdf(OUT / filename, family.name, design, parts)
+            render_pdf(OUT / filename, family_name, design, parts)
             designs.append(
                 {
                     "tag": design.tag,
-                    "family": family.id,
+                    "family": family_id,
                     "name": design.name,
                     "filename": filename,
                     "ifc": f"{design.tag}-A.ifc",
                 }
             )
             solids[design.tag] = parts
+    families = [
+        {"id": family.id, "name": family.name, "parts": family.parts} for family in FAMILIES
+    ]
     indexed = {"families": families, "designs": designs}
     (work / "industrial-meshes.json").write_text(json.dumps(solids), encoding="utf8")
     # El exportador publica el índice después de validar los archivos IFC.
