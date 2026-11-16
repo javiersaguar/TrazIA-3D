@@ -16,8 +16,7 @@ export function FamiliesTab({ selected, onOpen }: { selected: string; onOpen: (f
   return (
     <div className="space-y-3">
       <p className="text-[13px] text-muted">
-        Las miniaturas son ilustrativas, no proceden del IFC. Hoy el recipiente vertical es la familia con plantilla geométrica completa; las
-        familias nuevas sirven para clasificar documentos y su plantilla se revisa por separado.
+        Las miniaturas son ilustrativas. Abre los documentos de cada familia para consultar sus bocetos y planos.
       </p>
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-3">
         {catalogue.families.map((f, i) => {

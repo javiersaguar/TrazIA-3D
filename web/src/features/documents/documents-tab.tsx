@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Badge, Button, Icon, Panel, PanelHeader } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 import type { DocStage } from "@/lib/mock/bocetos";
-import { kindFromFilename, loadDocument, saveDocument, tagFromFilename, useCatalogue, type Design } from "./catalogue";
+import { kindFromFilename, loadDocument, saveDocument, sketchPdfUrl, tagFromFilename, useCatalogue, type Design } from "./catalogue";
 
 const fieldBase =
   "h-9 rounded-[var(--radius-control)] border border-border-strong bg-surface px-3 text-[13px] text-text outline-none focus-visible:border-accent";
@@ -34,6 +34,19 @@ function StageTrack({ stage }: { stage: DocStage }) {
       <span className="ml-1.5 text-[12px] text-muted capitalize">{stage}</span>
     </div>
   );
+}
+
+function SketchPdfLink({ design }: { design: Design }) {
+  const pdf = sketchPdfUrl(design.id);
+  if (pdf) {
+    return (
+      <a href={pdf} target="_blank" rel="noopener" aria-label={`Abrir PDF de ${design.tag} (pestaña nueva)`}
+        className="text-[12px] text-accent-text underline-offset-2 hover:underline">
+        Abrir PDF
+      </a>
+    );
+  }
+  return null;
 }
 
 const today = () => new Date().toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -200,7 +213,7 @@ export function DocumentsTab({
       <Panel>
         <PanelHeader
           title="Bandeja de documentos"
-          description="Cada documento pasa por recibido, leído y revisado. Cambia su familia o proyecto desde la tabla."
+          description="Filtra planos y bocetos por familia o proyecto. Puedes cambiar su clasificación desde la tabla."
           actions={
             <input
               type="search"
@@ -249,6 +262,8 @@ export function DocumentsTab({
                       <Link className="text-[12px] text-accent-text underline-offset-2 hover:underline" href="/modelo">
                         Abrir en Modelo
                       </Link>
+                    ) : d.kind === "Boceto GA" ? (
+                      <SketchPdfLink design={d} />
                     ) : d.example ? (
                       <Badge tone="warning">ejemplo</Badge>
                     ) : d.filename ? (
@@ -261,7 +276,9 @@ export function DocumentsTab({
                   <td className="border-b border-border px-3 py-2.5 font-mono text-[12px]">{d.tag ?? "—"}</td>
                   <td className="border-b border-border px-3 py-2.5">{d.rev ?? "—"}</td>
                   <td className="border-b border-border px-3 py-2.5">
-                    <StageTrack stage={d.stage ?? "recibido"} />
+                    {d.kind === "Boceto GA" ? <Badge tone="warning">Boceto sintético</Badge> : (
+                      <StageTrack stage={d.stage ?? "recibido"} />
+                    )}
                   </td>
                   <td className="border-b border-border px-3 py-2.5">
                     <select

@@ -116,6 +116,43 @@ test("Documentos reúne documentos, proyectos y familias y acepta soltar archivo
  await expect(page.getByText("22 campos de revisión")).toBeVisible();
 });
 
+test("la biblioteca de bocetos añade los PDF sin desplazar documentos ya guardados", async ({ page }) => {
+  await page.addInitScript(() => {
+    const key = "trazia.catalogue.v1";
+    if (localStorage.getItem(key)) return;
+    localStorage.setItem(key, JSON.stringify({
+      version: 2,
+      state: {
+        families: [{ id: "custom", name: "Familia propia" }, { id: "pump", name: "Bombas" }],
+        projects: [{ id: "custom-project", name: "Proyecto propio" }],
+        designs: [{ id: "custom-design", name: "Mi diseño", family: "custom", project: "custom-project" }],
+      },
+    }));
+  });
+  await page.goto("/documentos");
+  const links = page.getByRole("link", { name: /Abrir PDF de BC-/ });
+  await expect(links).toHaveCount(16);
+  await expect(page.getByText("Mi diseño", { exact: true })).toBeVisible();
+  await page.reload();
+  await expect(links).toHaveCount(16);
+  await expect(page.getByLabel("Familia de Mi diseño")).toHaveValue("custom");
+
+  await page.getByRole("radio", { name: "Proyectos", exact: true }).click();
+  await page.getByRole("button", { name: /Biblioteca de bocetos/ }).click();
+  await expect(links).toHaveCount(16);
+  await expect(page.getByText("Mi diseño", { exact: true })).toHaveCount(0);
+  await page.getByRole("navigation", { name: "Familias de documentos" }).getByRole("button", { name: /Bombas/ }).click();
+  await expect(links).toHaveCount(2);
+  for (const link of await links.all()) {
+    const url = await link.getAttribute("href");
+    expect(url).toMatch(/^\/demo\/bocetos\/BOC_BC-P10[12]_revA\.pdf$/);
+    const pdf = await page.request.get(url!);
+    expect(pdf.ok()).toBe(true);
+    expect(pdf.headers()["content-type"]).toContain("application/pdf");
+    expect((await pdf.body()).subarray(0, 5).toString()).toBe("%PDF-");
+  }
+});
+
 test("Modelo conserva el holograma, la galería y la pantalla completa con F",async({page})=>{
  await page.emulateMedia({reducedMotion:"reduce"});
  await page.goto("/modelo?vista=3d");

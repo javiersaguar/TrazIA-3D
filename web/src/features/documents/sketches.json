@@ -1,0 +1,98 @@
+[
+  {
+    "tag": "BC-V101",
+    "family": "vertical",
+    "name": "Separador vertical",
+    "filename": "BOC_BC-V101_revA.pdf"
+  },
+  {
+    "tag": "BC-V102",
+    "family": "vertical",
+    "name": "Pulmón vertical compacto",
+    "filename": "BOC_BC-V102_revA.pdf"
+  },
+  {
+    "tag": "BC-H101",
+    "family": "horizontal",
+    "name": "Tambor horizontal de separación",
+    "filename": "BOC_BC-H101_revA.pdf"
+  },
+  {
+    "tag": "BC-H102",
+    "family": "horizontal",
+    "name": "Acumulador horizontal de retorno",
+    "filename": "BOC_BC-H102_revA.pdf"
+  },
+  {
+    "tag": "BC-C101",
+    "family": "column",
+    "name": "Columna recta de destilación",
+    "filename": "BOC_BC-C101_revA.pdf"
+  },
+  {
+    "tag": "BC-C102",
+    "family": "column",
+    "name": "Columna con transición cónica",
+    "filename": "BOC_BC-C102_revA.pdf"
+  },
+  {
+    "tag": "BC-E101",
+    "family": "exchanger",
+    "name": "Intercambiador de carcasa y tubos",
+    "filename": "BOC_BC-E101_revA.pdf"
+  },
+  {
+    "tag": "BC-E102",
+    "family": "exchanger",
+    "name": "Intercambiador de placas",
+    "filename": "BOC_BC-E102_revA.pdf"
+  },
+  {
+    "tag": "BC-T101",
+    "family": "tank",
+    "name": "Tanque con techo cónico",
+    "filename": "BOC_BC-T101_revA.pdf"
+  },
+  {
+    "tag": "BC-T102",
+    "family": "tank",
+    "name": "Tanque con techo plano",
+    "filename": "BOC_BC-T102_revA.pdf"
+  },
+  {
+    "tag": "BC-P101",
+    "family": "pump",
+    "name": "Bomba centrífuga horizontal",
+    "filename": "BOC_BC-P101_revA.pdf"
+  },
+  {
+    "tag": "BC-P102",
+    "family": "pump",
+    "name": "Bomba vertical en línea",
+    "filename": "BOC_BC-P102_revA.pdf"
+  },
+  {
+    "tag": "BC-K101",
+    "family": "compressor",
+    "name": "Compresor de tornillo",
+    "filename": "BOC_BC-K101_revA.pdf"
+  },
+  {
+    "tag": "BC-K102",
+    "family": "compressor",
+    "name": "Compresor alternativo",
+    "filename": "BOC_BC-K102_revA.pdf"
+  },
+  {
+    "tag": "BC-G101",
+    "family": "generic",
+    "name": "Módulo rectangular de proceso",
+    "filename": "BOC_BC-G101_revA.pdf"
+  },
+  {
+    "tag": "BC-G102",
+    "family": "generic",
+    "name": "Armario vertical de servicios",
+    "filename": "BOC_BC-G102_revA.pdf"
+  }
+]

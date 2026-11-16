@@ -56,6 +56,11 @@ Los archivos de `examples/documents/` son **PDF y Excel sintéticos que sí exis
 Los JSON de ejemplo se han extraído de esos archivos con el mismo pipeline de la aplicación;
 incluyen hashes y localizadores reales y comienzan sin aprobación.
 
+En la web, **Documentos → Biblioteca de bocetos** reúne láminas sintéticas de diseño
+clasificadas por familia. Cada PDF contiene un alzado conceptual y cotas nominales.
+La colección vive fuera del dataset y del banco de pruebas. Para regenerar los PDF
+y su índice, ejecuta `uv run --extra dev python scripts/make_design_sketches.py`.
+
 ```powershell
 uv run trazia validate examples/vessel_rev_a.json
 uv run trazia export examples/vessel_rev_a.json --draft -o generated/rev_a.ifc

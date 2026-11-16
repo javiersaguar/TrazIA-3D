@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 import { DOCUMENTS, FAMILIES as FAMILY_INFO, PROJECTS as SAMPLE_PROJECTS, type DocStage, type SketchFamily } from "@/lib/mock/bocetos";
+import sketches from "./sketches.json";
 
 /*
   Catálogo de Documentos: familias, proyectos y diseños, guardado en este navegador.
@@ -11,8 +12,8 @@ import { DOCUMENTS, FAMILIES as FAMILY_INFO, PROJECTS as SAMPLE_PROJECTS, type D
 export type Family = { id: string; name: string; custom?: boolean };
 export type ProjectStatus = "En revisión" | "Aprobado" | "Sin empezar";
 export type ProjectStats = { equipment: number; withData: number; reviewed: number; status: ProjectStatus; updated: string };
-export type Project = { id: string; name: string; code?: string; example?: boolean; stats?: ProjectStats };
-export type DocKind = "Plano GA" | "Hoja de datos" | "Lista de boquillas" | "Otro";
+export type Project = { id: string; name: string; code?: string; example?: boolean; stats?: ProjectStats; collection?: boolean };
+export type DocKind = "Plano GA" | "Boceto GA" | "Hoja de datos" | "Lista de boquillas" | "Otro";
 export type Design = {
   id: string;
   name: string;
@@ -63,6 +64,14 @@ const SEED_PROJECTS: Project[] = SAMPLE_PROJECTS.map((p) => ({
   example: p.example,
   stats: { equipment: p.equipment, withData: p.withData, reviewed: p.reviewed, status: p.status, updated: p.updated },
 }));
+const SKETCH_PROJECT: Project = {
+  id: "catalogo-bocetos",
+  name: "Biblioteca de bocetos",
+  code: "BOCETOS",
+  example: true,
+  collection: true,
+};
+SEED_PROJECTS.push(SKETCH_PROJECT);
 /** Familias de los proyectos de ejemplo, aunque aún no tengan documentos en el catálogo. */
 export const PROJECT_KINDS: Record<string, string[]> = Object.fromEntries(
   SAMPLE_PROJECTS.map((p) => [PROJECT_IDS[p.code] ?? p.code.toLowerCase(), p.kinds]),
@@ -92,6 +101,22 @@ const SEED_DESIGNS: Design[] = DOCUMENTS.map((d) => {
     received: d.received,
   };
 });
+SEED_DESIGNS.push(...sketches.map((sketch): Design => ({
+  ...sketch,
+  id: `sketch-${sketch.tag}`,
+  project: SKETCH_PROJECT.id,
+  example: true,
+  kind: "Boceto GA",
+  rev: "A",
+  pages: 1,
+})));
+
+const sketchFiles = new Map(sketches.map(({ tag, filename }) => [`sketch-${tag}`, filename]));
+
+export function sketchPdfUrl(id: string): string | undefined {
+  const file = sketchFiles.get(id);
+  return file ? `/demo/bocetos/${file}` : undefined;
+}
 
 /** Equipo leído del nombre del archivo (GAD_V-101_revB.pdf → V-101), si lo trae. */
 export function tagFromFilename(filename: string): string | undefined {
@@ -139,13 +164,14 @@ export const useCatalogue = create<Catalogue>()(
     }),
     {
       name: "trazia.catalogue.v1",
-      version: 2,
-      // v1 solo traía DEMO-PLANT y un diseño de V-101: se añaden los ejemplos sin tocar lo del usuario
+      version: 3,
+      // Añadir las nuevas fichas sin reemplazar documentos ni asignaciones guardadas.
       migrate: (stored, version) => {
         const s = stored as Persisted;
-        if (version >= 2) return s;
-        const designs = s.designs.filter((d) => d.id !== "demo-v101");
-        const projects = s.projects.map((p) => SEED_PROJECTS.find((q) => q.id === p.id) ?? p);
+        const designs = version < 2 ? s.designs.filter((d) => d.id !== "demo-v101") : s.designs;
+        const projects = version < 2
+          ? s.projects.map((p) => SEED_PROJECTS.find((q) => q.id === p.id) ?? p)
+          : s.projects;
         return {
           families: s.families,
           projects: [...projects, ...SEED_PROJECTS.filter((p) => !projects.some((q) => q.id === p.id))],

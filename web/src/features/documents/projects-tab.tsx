@@ -23,7 +23,7 @@ export function projectFamilies(project: Project, designs: Design[]): string[] {
 
 function statsOf(project: Project, designs: Design[]): ProjectStats {
   if (project.stats) return project.stats;
-  const mine = designs.filter((d) => d.project === project.id);
+  const mine = designs.filter((d) => d.project === project.id && d.kind !== "Boceto GA");
   const reviewed = mine.filter((d) => d.stage === "revisado").length;
   const equipment = new Set(mine.map((d) => d.tag ?? d.name)).size;
   return {
@@ -35,7 +35,7 @@ function statsOf(project: Project, designs: Design[]): ProjectStats {
   };
 }
 
-function ProjectCard({ p, kinds, stats, documents, onOpen }: { p: Project; kinds: string[]; stats: ProjectStats; documents: number; onOpen: () => void }) {
+function ProjectCard({ p, kinds, stats, documents, sketches, onOpen }: { p: Project; kinds: string[]; stats: ProjectStats; documents: number; sketches: number; onOpen: () => void }) {
   const progress = stats.withData ? stats.reviewed / stats.withData : 0;
   const demo = p.id === "demo";
   const body = (
@@ -49,44 +49,52 @@ function ProjectCard({ p, kinds, stats, documents, onOpen }: { p: Project; kinds
             <p className="truncate text-[15px] font-semibold text-strong">{p.name}</p>
             <p className="font-mono text-[11px] text-faint">{p.code ?? "Proyecto propio"}</p>
           </div>
-          <Badge tone={STATUS_TONE[stats.status]}>{stats.status}</Badge>
+          {p.collection ? <Badge tone="warning">Sintética</Badge> : <Badge tone={STATUS_TONE[stats.status]}>{stats.status}</Badge>}
         </div>
-        <div className="mt-4">
-          <div className="flex justify-between text-[12px] text-muted">
-            <span>Equipos revisados</span>
-            <span className="tabular-nums">
-              {stats.reviewed} de {stats.withData}
-            </span>
-          </div>
-          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-sunken">
-            <motion.div
-              className="h-full origin-left rounded-full bg-accent"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: progress }}
-              transition={{ duration: 0.7, delay: 0.15, ease: EASE_OUT }}
-            />
-          </div>
-        </div>
-        <dl className="mt-4 grid grid-cols-4 gap-2 text-[12px]">
-          <div>
-            <dt className="text-faint">Equipos</dt>
-            <dd className="text-text tabular-nums">{stats.equipment}</dd>
-          </div>
-          <div>
-            <dt className="text-faint">Con datos</dt>
-            <dd className="text-text tabular-nums">{stats.withData}</dd>
-          </div>
-          <div>
-            <dt className="text-faint">Documentos</dt>
-            <dd className="text-text tabular-nums">{documents}</dd>
-          </div>
-          <div>
-            <dt className="text-faint">Actualizado</dt>
-            <dd className="text-text tabular-nums">{stats.updated}</dd>
-          </div>
-        </dl>
+        {p.collection ? (
+          <p className="mt-4 text-[13px] text-muted">
+            {sketches} {sketches === 1 ? "boceto sintético" : "bocetos sintéticos"} · {kinds.length} {kinds.length === 1 ? "familia" : "familias"}
+          </p>
+        ) : (
+          <>
+            <div className="mt-4">
+              <div className="flex justify-between text-[12px] text-muted">
+                <span>Equipos revisados</span>
+                <span className="tabular-nums">
+                  {stats.reviewed} de {stats.withData}
+                </span>
+              </div>
+              <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-sunken">
+                <motion.div
+                  className="h-full origin-left rounded-full bg-accent"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: progress }}
+                  transition={{ duration: 0.7, delay: 0.15, ease: EASE_OUT }}
+                />
+              </div>
+            </div>
+            <dl className="mt-4 grid grid-cols-4 gap-2 text-[12px]">
+              <div>
+                <dt className="text-faint">Equipos</dt>
+                <dd className="text-text tabular-nums">{stats.equipment}</dd>
+              </div>
+              <div>
+                <dt className="text-faint">Con datos</dt>
+                <dd className="text-text tabular-nums">{stats.withData}</dd>
+              </div>
+              <div>
+                <dt className="text-faint">Documentos</dt>
+                <dd className="text-text tabular-nums">{documents}</dd>
+              </div>
+              <div>
+                <dt className="text-faint">Actualizado</dt>
+                <dd className="text-text tabular-nums">{stats.updated}</dd>
+              </div>
+            </dl>
+          </>
+        )}
         <p className={cn("mt-3 text-[12px]", demo ? "text-accent-text" : "text-faint")}>
-          {demo ? "Abrir el proyecto de la demo" : p.example ? "Proyecto de ejemplo · ver sus documentos" : "Ver sus documentos"}
+          {demo ? "Abrir el proyecto de la demo" : p.collection ? "Ver sus bocetos" : p.example ? "Proyecto de ejemplo · ver sus documentos" : "Ver sus documentos"}
         </p>
       </div>
     </Panel>
@@ -158,6 +166,7 @@ export function ProjectsTab({ family, onOpenProject }: { family: string; onOpenP
                 kinds={kinds}
                 stats={stats}
                 documents={catalogue.designs.filter((d) => d.project === p.id).length}
+                sketches={catalogue.designs.filter((d) => d.project === p.id && d.kind === "Boceto GA").length}
                 onOpen={() => onOpenProject(p.id)}
               />
             </motion.li>

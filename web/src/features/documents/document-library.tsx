@@ -95,7 +95,7 @@ export function DocumentLibrary() {
         <div>
           <h1 className="text-2xl font-semibold text-strong">Documentos</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted">
-            Documentos, proyectos y familias en un mismo lugar. Cada diseño se clasifica en una familia y un proyecto. Los archivos se conservan
+            Documentos, proyectos y familias en un mismo lugar. Cada diseño se clasifica en una familia y un proyecto. Los archivos que añades se conservan
             en este navegador y no se envían a servicios externos.
           </p>
         </div>
