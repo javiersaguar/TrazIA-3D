@@ -6,7 +6,7 @@ conservan su criterio de cierre; no se consideran trabajo previo atrasado ni se 
 | Tarea | Estado / momento | Preparación disponible |
 | --- | --- | --- |
 | 0.1 | Registro de los cuatro confirmado. Reto presencial | Confirmación del equipo; elección al llegar |
-| 0.2 | Sin entorno IndesIA; portátiles propios | Lista de instalación reproducible |
+| 0.2 | Plataforma IndesIA obligatoria (bases): Azure Databricks, volúmenes de Unity Catalog y GitLab; acceso el día 25 (actualizado 16/11) | [Guía de la plataforma y adaptación](PLATAFORMA_INDESIA.md); lista de instalación local para la demo |
 | 0.3 | Dataset al comenzar | Inventario y validadores preparados; ningún original anticipado |
 | 0.4 | Acuerdo general del equipo confirmado | Roadmap común, reparto ajustable |
 | 0.9 | Consulta al mentor en el evento | Preguntas preparadas en el guion de preguntas |
@@ -29,6 +29,7 @@ conservan su criterio de cierre; no se consideran trabajo previo atrasado ni se 
 - [Preguntas y respuestas](../pitch/PREGUNTAS_BORRADOR.md).
 - [Declaración de trabajo previo, pendiente de cerrar](../PREVIOUS_WORK.md).
 - [Instalación en cuatro portátiles y material](PREPARACION_PORTATILES.md).
+- [Plataforma IndesIA, Kit del Participante y calendario](PLATAFORMA_INDESIA.md).
 - [Revisión de licencias](LICENCIAS_BORRADOR.md).
 
 ## 3.8 no depende solo de pulsar «aprobar»
