@@ -34,6 +34,7 @@ Desde la raíz, con las dependencias web instaladas:
 ```powershell
 uv run --extra dev python scripts/make_industrial_designs.py
 node web/scripts/export-industrial-ifc.mjs
+uv run --extra dev python scripts/make_family_thumbnails.py
 ```
 
 Las plantillas editables están en `scripts/industrial_designs.py` y `scripts/design_variants.py`. El exportador vuelve a

@@ -1,0 +1,20 @@
+{
+  "air-cooler": "BC-AC104",
+  "centrifuge": "BC-CE104",
+  "column": "BC-C104",
+  "compressor": "BC-K103",
+  "cooling-tower": "BC-TR103",
+  "cyclone": "BC-CY102",
+  "dosing-skid": "BC-DO103",
+  "dryer": "BC-SE101",
+  "evaporator": "BC-EV101",
+  "exchanger": "BC-E103",
+  "filter": "BC-FI102",
+  "generic": "BC-G103",
+  "horizontal": "BC-H103",
+  "mixer-settler": "BC-EX103",
+  "pump": "BC-P103",
+  "static-mixer": "BC-ME104",
+  "tank": "BC-T103",
+  "vertical": "BC-V103"
+}
