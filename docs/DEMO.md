@@ -1,5 +1,8 @@
 # Guion de la demo · 6 minutos
 
+Recorrido técnico de la app. El guion completo, con la voz de cada uno, las tomas de cámara y los
+clips generados con IA, está en [GUION_DEMO.md](GUION_DEMO.md).
+
 Sigue la estructura de [ROADMAP J.1](ROADMAP.md#j-pitch-presentación-y-negocio): plano → dato →
 modelo → cambio → decisión. Es el guion de la web; Streamlit (`uv run trazia serve`) queda solo
 como reserva interna.

@@ -439,7 +439,7 @@ agente de Fase 2; no se editan las estrategias ni sus carpetas.
   *02/11:* evaluación sintética adicional cerrada; prioridades empeoran el conjunto reservado y quedan rechazadas, recalibración B+OCR aislada mejora ECE externa sin alcanzar 0,05, D sin propuesta por su ruta de fusión. Cero sesiones humanas. [Ablaciones](evidencias/fase3/02nov-aprendizaje/README.md); no se cierra la evaluación representativa.
 - [x] **3.9 (I)** Vista Cambios con morph 3D por GUID, fantasma rev1, marcadores Δ y grafo de impacto.
 - [x] **3.10 (I)** Momento firma «del plano al modelo» (`/lab/firma`).
-- [ ] **3.11 (J)** Guion de 6 min v1 + `.pptx` v0 con la diapositiva «Elegimos con datos».
+- [ ] **3.11 (J)** Guion de 6 min v1 + `.pptx` v0 con la diapositiva «Elegimos con datos». *16/11:* guion v1 en [GUION_DEMO.md](GUION_DEMO.md) (voz, pantallas, tomas y clips de IA); falta el `.pptx`.
   - [x] Boceto previo: [storyboard de seis minutos](../pitch/BOCETO_PRESENTACION.md) y plan de pantalla/Recordly, webcam, cámara, micros, vídeos ilustrativos y montaje. No es el `.pptx` ni la edición final.
 
 ### Fase 4 · Endurecer (22 – 24 nov)
@@ -452,7 +452,7 @@ agente de Fase 2; no se editan las estrategias ni sus carpetas.
   - [x] [Declaración previa en borrador](../PREVIOUS_WORK.md); commit, tag e inventario definitivo se cerrarán allí.
 - [ ] **4.5** Instalación en limpio en **los 4 portátiles** (Windows y Linux) siguiendo solo el README, incluidos los modelos locales descargados de antemano.
   - [x] [Checklist de instalación por compañero](PREPARACION_PORTATILES.md). Sigue pendiente ejecutarla en cada portátil.
-- [ ] **4.6** Vídeo de respaldo de la demo (1080p, 60 fps).
+- [ ] **4.6** Vídeo de respaldo de la demo (1080p, 60 fps). *16/11:* guion de grabación y montaje en [GUION_DEMO.md](GUION_DEMO.md), a 30 fps como el vídeo de 45 s.
 - [ ] **4.7** Lista de preguntas difíciles y respuestas (J.5).
   - [x] [Borrador de preguntas y respuestas](../pitch/PREGUNTAS_BORRADOR.md); respuestas con datos reales después del evento.
 - [ ] **4.8** Kit físico: cargadores, regleta, adaptador HDMI/USB-C, ratón, hotspot móvil.
