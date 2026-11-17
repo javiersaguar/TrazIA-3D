@@ -109,7 +109,8 @@ def especificaciones() -> dict:
 def main():
     datos = especificaciones()
     DESTINO.parent.mkdir(parents=True, exist_ok=True)
-    DESTINO.write_text(json.dumps(datos, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    contenido = json.dumps(datos, ensure_ascii=False, indent=1) + "\n"
+    DESTINO.write_text(contenido, encoding="utf-8", newline="\n")
     print(f"{len(datos['designs'])} diseños en {DESTINO.relative_to(ROOT)}")
 
 
