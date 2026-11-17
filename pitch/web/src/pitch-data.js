@@ -11,6 +11,8 @@ export const pitch = {
     evidence: "media/evidence.webp",
     ifcA: "media/ifc-a.webp",
     ifcB: "media/ifc-b.webp",
+    // Centro de la brida N4 proyectado con la cámara que generó esta imagen.
+    revisionDetail: { image: "media/ifc-b.webp", field: "Boquilla N4", label: "N4", x: 0.42353, y: 0.30686 },
     outline: "media/ifc-contour.webp",
     // Rutas en public/. Dejar "" hasta incorporar una grabación autorizada.
     modelVideo: "",

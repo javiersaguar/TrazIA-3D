@@ -1,25 +1,29 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { AnimatePresence, LazyMotion, MotionConfig, domAnimation, m, useIsPresent, useReducedMotion } from "motion/react";
-import { ArrowLeft, ArrowRight, ExternalLink, Maximize, Minimize, NotebookPen, Pause, Play, RotateCcw } from "lucide-react";
+import { ExternalLink, NotebookPen, Timer } from "lucide-react";
 import "@fontsource/barlow-condensed/latin-700.css";
 import "@fontsource/barlow-condensed/latin-800.css";
 import "@fontsource/dm-sans/latin-400.css";
 import "@fontsource/dm-sans/latin-500.css";
 import "@fontsource/dm-sans/latin-700.css";
 import { pitch, chapters, scenes } from "./pitch-data.js";
-import { buildTimeline, sceneIndex, clock } from "./timeline.js";
+import { buildTimeline, sceneIndex, clock, idleStopwatch, stopwatchSeconds, updateStopwatch } from "./timeline.js";
 import { asset, ease, easeInOut, useFx, usePreloadScene } from "./fx.jsx";
 import { Slide, SourceNote } from "./scenes.jsx";
 import "./styles.css";
+import "./presentation-head.css";
 
 const timeline = buildTimeline(scenes);
 const duration = timeline.at(-1).end;
-const chapterStarts = chapters.map(({ id }) => timeline.findIndex(({ chapter }) => chapter === id));
 
 function readClock(rehearsal, now) {
   const played = rehearsal.started === null ? 0 : Math.max(0, now - rehearsal.started) / 1000;
   return Math.min(duration, rehearsal.offset + played);
+}
+
+function destination(index, target, relative) {
+  return Math.max(0, Math.min(timeline.length - 1, relative ? index + target : target));
 }
 
 function SceneFrame({ scene, chapter, reduced, fx, crossing }) {
@@ -63,24 +67,21 @@ function SceneCut({ kind }) {
   );
 }
 
-function SceneIndex({ index, fx }) {
-  const label = String(index + 1).padStart(2, "0");
-  const end = String(timeline.length).padStart(2, "0");
-  if (!fx) return <span className="slide-index">{label} <span>/</span> {end}</span>;
+function Stopwatch({ state, onToggle }) {
+  const [now, setNow] = useState(() => performance.now());
+  useEffect(() => {
+    if (state.started === null) return;
+    const timer = window.setInterval(() => setNow(performance.now()), 250);
+    return () => window.clearInterval(timer);
+  }, [state.started]);
+  const label = { idle: "Iniciar", running: "Pausar", paused: "Reanudar" }[state.status];
   return (
-    <span className="slide-index fx-slide-index" aria-label={`${label} / ${end}`}>
-      <span className="fx-odometer" aria-hidden="true">
-        <AnimatePresence initial={false}>
-          <m.span key={index}
-            initial={{ transform: "translateY(108%)", opacity: 0 }}
-            animate={{ transform: "translateY(0%)", opacity: 1 }}
-            exit={{ transform: "translateY(-108%)", opacity: 0 }}
-            transition={{ duration: 0.13, ease }}
-          >{label}</m.span>
-        </AnimatePresence>
-      </span>
-      <span aria-hidden="true">/</span> <span className="fx-scene-total" aria-hidden="true">{end}</span>
-    </span>
+    <button className="presentation-timer" data-status={state.status} type="button"
+      onClick={onToggle} title={label + " cronómetro (T)"} aria-keyshortcuts="T">
+      <Timer size={15} aria-hidden="true" />
+      <span className="sr-only">{label} cronómetro de exposición. Tiempo transcurrido </span>
+      <span role="timer" aria-live="off">{clock(stopwatchSeconds(state, now))}</span>
+    </button>
   );
 }
 
@@ -89,6 +90,10 @@ function App() {
   const fx = useFx();
   const [rehearsal, setRehearsal] = useState({ offset: 0, started: null });
   const [now, setNow] = useState(0);
+  const [stopwatch, dispatchStopwatch] = useReducer(updateStopwatch, idleStopwatch);
+  const touchStart = useRef(null);
+  const notesButton = useRef(null);
+  const notesPanel = useRef(null);
   const [notes, showNotes] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [fullscreenError, setFullscreenError] = useState("");
@@ -116,36 +121,62 @@ function App() {
     return () => window.clearInterval(timer);
   }, [playing, rehearsal]);
 
+  const present = useCallback((type, stamp) => {
+    if (stopwatch.status === "idle" && index === 0) setReplay(value => value + 1);
+    dispatchStopwatch({ type, now: stamp });
+  }, [index, stopwatch.status]);
+
+  const toggleStopwatch = useCallback(() => {
+    present("toggle", performance.now());
+  }, [present]);
+
+  const closeNotes = useCallback(() => {
+    showNotes(false);
+    notesButton.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (notes) notesPanel.current?.focus();
+  }, [notes]);
+
   const goTo = useCallback((target, relative = false) => {
     const stamp = performance.now();
+    if (destination(index, target, relative) !== index) dispatchStopwatch({ type: "start", now: stamp });
     setNow(stamp);
     setRehearsal((current) => {
       const currentIndex = sceneIndex(timeline, readClock(current, stamp));
-      const next = Math.max(0, Math.min(timeline.length - 1, relative ? currentIndex + target : target));
+      const next = destination(currentIndex, target, relative);
       if (relative && next === currentIndex) return current;
       return { offset: timeline[next].start, started: current.started === null ? null : stamp };
     });
-  }, []);
+  }, [index]);
 
   const toggleClock = useCallback(() => {
     const stamp = performance.now();
+    present("start", stamp);
     setNow(stamp);
     setRehearsal((current) => current.started === null
       ? { offset: current.offset >= duration ? 0 : current.offset, started: stamp }
       : { offset: readClock(current, stamp), started: null });
-  }, []);
+  }, [present]);
 
-  const reset = useCallback(() => setRehearsal({ offset: 0, started: null }), []);
+  const reset = useCallback(() => {
+    dispatchStopwatch({ type: "reset" });
+    setRehearsal({ offset: 0, started: null });
+  }, []);
 
   const toggleFullscreen = useCallback(async () => {
     setFullscreenError("");
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
-      else await document.documentElement.requestFullscreen();
+      else {
+        present("start", performance.now());
+        await document.documentElement.requestFullscreen();
+      }
     } catch {
       setFullscreenError("El navegador no pudo abrir la pantalla completa.");
     }
-  }, []);
+  }, [present]);
 
   useEffect(() => {
     const watch = () => setFullscreen(Boolean(document.fullscreenElement));
@@ -157,7 +188,8 @@ function App() {
     function key(event) {
       const target = event.target instanceof Element ? event.target : null;
       if (event.altKey || event.ctrlKey || event.metaKey || target?.closest("input, textarea, select, video, [contenteditable]")) return;
-      if (event.key === "Escape" && notes) showNotes(false);
+      if (event.key === "Escape" && notes) closeNotes();
+      if (event.repeat && ["p", "n", "f", "r", "t"].includes(event.key.toLowerCase())) return;
       if (event.key === " " && target?.closest("button, a")) return;
       switch (event.key.toLowerCase()) {
         case "arrowright":
@@ -180,7 +212,8 @@ function App() {
           goTo(timeline.length - 1);
           break;
         case "p": toggleClock(); break;
-        case "n": showNotes((previous) => !previous); break;
+        case "t": toggleStopwatch(); break;
+        case "n": if (notes) closeNotes(); else showNotes(true); break;
         case "f": void toggleFullscreen(); break;
         case "r": if (!event.repeat) setReplay((value) => value + 1); break;
         default: break;
@@ -188,7 +221,24 @@ function App() {
     }
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
-  }, [notes, goTo, reset, toggleClock, toggleFullscreen]);
+  }, [closeNotes, notes, goTo, reset, toggleClock, toggleFullscreen, toggleStopwatch]);
+
+  function beginSwipe(event) {
+    touchStart.current = null;
+    if (event.touches.length !== 1 || event.target.closest("button, a, input, video[controls], aside")) return;
+    const { clientX, clientY, identifier } = event.touches[0];
+    touchStart.current = { clientX, clientY, identifier };
+  }
+
+  function endSwipe(event) {
+    const start = touchStart.current;
+    touchStart.current = null;
+    const end = event.changedTouches[0];
+    if (!start || !end || end.identifier !== start.identifier || event.touches.length) return;
+    const dx = end.clientX - start.clientX;
+    const dy = end.clientY - start.clientY;
+    if (Math.abs(dx) > 54 && Math.abs(dx) > Math.abs(dy) * 1.5) goTo(dx < 0 ? 1 : -1, true);
+  }
 
   const frame = <SceneFrame key={sceneKey} scene={scene} chapter={currentChapter.name}
     reduced={reduced} fx={fx} crossing={fx && cut.kind === "curtain"} />;
@@ -201,78 +251,41 @@ function App() {
           <span>TrazIA <b>3D</b></span>
         </div>
         <span className="challenge">{pitch.challenge}</span>
-        <span className="dataset"><i />{pitch.dataset}</span>
+        <div className="presentation-tools">
+          <span className="dataset"><i />{pitch.dataset}</span>
+          <Stopwatch state={stopwatch} onToggle={toggleStopwatch} />
+          <button ref={notesButton} type="button" className="presentation-notes-toggle"
+            aria-expanded={notes} aria-controls={notes ? "speaker-notes" : undefined} aria-keyshortcuts="N"
+            title="Guion y controles (N)" aria-label="Guion y controles" onClick={() => showNotes(!notes)}>
+            <NotebookPen size={16} aria-hidden="true" />
+          </button>
+        </div>
       </header>
 
-      <div className="deck-stage" data-scene-index={index + 1}>
+      <div className="deck-stage" data-scene-index={index + 1} data-rehearsing={playing}
+        onTouchStart={beginSwipe} onTouchEnd={endSwipe} onTouchCancel={() => { touchStart.current = null; }}>
         <span className="sr-only" aria-live="polite">Escena {index + 1} de {timeline.length}. {scene.title} {scene.accent}</span>
         {reduced ? frame : <AnimatePresence>{frame}</AnimatePresence>}
         {fx && cut.kind && <SceneCut key={cut.key} kind={cut.kind} />}
         {fx && <SourceNote id={scene.id} pinned />}
-        {notes && <aside className="speaker-notes" aria-label="Notas de exposición">
+        {notes && <aside id="speaker-notes" className="speaker-notes" aria-label="Notas de exposición" tabIndex={-1} ref={notesPanel}>
           <div><h2>Guion de exposición</h2><span>{clock(scene.seconds)} por escena</span></div>
           <p>{scene.notes}</p>
-          <button type="button" className="text-link" onClick={() => showNotes(false)}>Ocultar notas</button>
+          <nav className="presentation-actions" aria-label="Controles de presentación">
+            <button type="button" onClick={() => goTo(-1, true)} disabled={index === 0}>← Anterior</button>
+            <button type="button" onClick={() => goTo(1, true)} disabled={index === timeline.length - 1}>Siguiente →</button>
+            <button type="button" onClick={() => void toggleFullscreen()}><kbd>F</kbd> {fullscreen ? "Salir de pantalla completa" : "Pantalla completa"}</button>
+            <button type="button" onClick={toggleClock} aria-pressed={playing}><kbd>P</kbd> {playing ? "Pausar ensayo" : "Ensayar"}</button>
+            <button type="button" onClick={toggleStopwatch}><kbd>T</kbd> {stopwatch.status === "running" ? "Pausar" : stopwatch.status === "paused" ? "Reanudar" : "Iniciar"} cronómetro</button>
+            <button type="button" onClick={() => setReplay(value => value + 1)}><kbd>R</kbd> Repetir entrada</button>
+            <button type="button" onClick={reset}><kbd>Inicio</kbd> Reiniciar</button>
+            {demoUrl && <a href={demoUrl} target="_blank" rel="noreferrer"><ExternalLink size={14} /> Abrir demo</a>}
+          </nav>
+          <button type="button" className="text-link" onClick={closeNotes}>Ocultar notas</button>
         </aside>}
         {fullscreenError && <p role="status" className="fullscreen-error">{fullscreenError}</p>}
       </div>
 
-      <footer className="transport">
-        <nav className="timeline" aria-label="Bloques de la presentación">
-          {chapters.map(({ id, name }, chapterIndex) => (
-            <button
-              key={id}
-              onClick={() => goTo(chapterStarts[chapterIndex])}
-              type="button"
-              className={id === scene.chapter ? "current" : ""}
-              aria-current={id === scene.chapter ? "step" : undefined}
-            >
-              <span>{name}</span>
-              <small>{clock(timeline[chapterStarts[chapterIndex]].start)}</small>
-              {fx && id === scene.chapter && (
-                <m.i className="fx-chapter-underline" aria-hidden="true"
-                  initial={{ transform: "scaleX(0.03)" }}
-                  animate={{ transform: "scaleX(1)" }}
-                  transition={{ duration: 0.37, ease }}
-                />
-              )}
-            </button>
-          ))}
-        </nav>
-        <div className={fx ? "track fx-track" : "track"} aria-hidden="true">
-          <i style={{ transform: `scaleX(${elapsed / duration})` }} />
-          {fx && (
-            <span className="fx-track-cursor" style={{ transform: `translateX(${elapsed / duration * 100}%)` }}>
-              <m.span className="fx-track-pulse" key={sceneKey}
-                initial={{ transform: "scale(1)" }}
-                animate={{ transform: ["scale(1)", "scale(1.36)", "scale(1)"] }}
-                transition={{ duration: 0.72, repeat: 1, ease: easeInOut }}
-              />
-            </span>
-          )}
-        </div>
-        <div className="control-row">
-          <div className="playback">
-            <button type="button" className="play-control" onClick={toggleClock} aria-pressed={playing}>
-              {playing ? <Pause size={16} /> : <Play size={16} />} {playing ? "Pausar" : "Ensayar"}
-            </button>
-            <span className="clock">{clock(elapsed)} <span>/</span> {clock(duration)}</span>
-            <button type="button" className="icon-button reset" onClick={reset} aria-label="Reiniciar ensayo" title="Reiniciar (Inicio)"><RotateCcw size={16} /></button>
-          </div>
-          <div className="paging">
-            <button type="button" className="icon-button" onClick={() => goTo(-1, true)} disabled={index === 0} aria-label="Escena anterior"><ArrowLeft size={18} /></button>
-            <SceneIndex index={index} fx={fx} />
-            <button type="button" className="icon-button" onClick={() => goTo(1, true)} disabled={index === timeline.length - 1} aria-label="Escena siguiente"><ArrowRight size={18} /></button>
-          </div>
-          <div className="extras">
-            {demoUrl && <a className="demo-link" href={demoUrl} target="_blank" rel="noreferrer" aria-label="Abrir demo"><ExternalLink size={15} /> <span>Abrir demo</span></a>}
-            <button type="button" className="icon-button" onClick={() => showNotes(!notes)} aria-label="Notas de exposición" aria-pressed={notes} title="Notas (N)"><NotebookPen size={17} /></button>
-            <button type="button" className="icon-button" onClick={() => void toggleFullscreen()} aria-label={fullscreen ? "Salir de pantalla completa" : "Pantalla completa"} title="Pantalla completa (F)">
-              {fullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
-            </button>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

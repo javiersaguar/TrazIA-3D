@@ -38,15 +38,18 @@ async function sync(panel, target) {
   const doc = panel.frame.contentDocument;
   const serial = ++panel.serial;
   panel.driving = true;
+  function press(key) {
+    doc.body.dispatchEvent(new doc.defaultView.KeyboardEvent("keydown", { key, bubbles: true }));
+  }
   try {
     const ready = await waitFor(() => serial !== panel.serial || active(doc));
     if (serial !== panel.serial || ready === target) return;
     doc.querySelector('.play-control[aria-pressed="true"]')?.click();
+    if (doc.querySelector('.deck-stage[data-rehearsing="true"]')) press("p");
     let index = active(doc);
     while (serial === panel.serial && index !== target) {
-      const label = index < target ? "Escena siguiente" : "Escena anterior";
-      doc.querySelector(`button[aria-label="${label}"]`)?.click();
       const former = index;
+      press(index < target ? "ArrowRight" : "ArrowLeft");
       await waitFor(() => serial !== panel.serial || active(doc) !== former);
       index = active(doc);
     }

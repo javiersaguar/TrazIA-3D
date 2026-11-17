@@ -1,0 +1,73 @@
+.scale-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, .7fr);
+  align-items: center;
+  gap: clamp(24px, 6vw, 120px);
+}
+.batch-marks { margin: 0; width: 100%; max-width: 410px; justify-self: end; }
+.batch-marks svg { display: block; width: 100%; }
+.batch-marks figcaption {
+  display: flex; justify-content: space-between; padding: 8px 2px 0;
+  font: 11px var(--mono); color: #364c60;
+}
+.batch-marks figcaption span { display: inline-flex; align-items: center; gap: 6px; }
+.batch-marks figcaption i { width: 7px; height: 7px; background: #07578e; }
+.batch-marks figcaption b { font-size: 16px; line-height: 8px; }
+.slide--fx .batch-filled { animation: batch-pass 1.45s var(--ease-out) .28s both; }
+@keyframes batch-pass { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
+
+.slide--close .close-layout {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, .77fr);
+  grid-template-rows: auto auto auto;
+  column-gap: clamp(24px, 4.5vw, 86px);
+  align-items: center;
+}
+.close-layout > .story, .close-layout > .end-flow, .close-layout > .next-measures { grid-column: 1; }
+.close-layout > .story { grid-row: 1; }
+.close-layout > .end-flow { grid-row: 2; }
+.close-layout > .next-measures { grid-row: 3; }
+.slide--close .story h1 { font-size: clamp(57px, 8.4vw, 158px); }
+.close-layout .end-flow > div { font-size: clamp(16px, 2.15vw, 40px); }
+.closing-plate {
+  grid-column: 2; grid-row: 1 / 4; width: 100%; align-self: center; margin: 0;
+  color: #f4f8fb; background: #101b26; border: 1px solid #45647b;
+}
+.closing-print {
+  position: relative; isolation: isolate; overflow: hidden; height: clamp(210px, 35vh, 450px);
+  background-color: #134d76;
+  background-image: linear-gradient(#8ed7fe28 1px, transparent 1px), linear-gradient(90deg, #8ed7fe28 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.closing-sheet { position: absolute; top: -5%; left: -20%; width: 68%; height: 115%; object-fit: cover; transform: rotate(-7deg); }
+.closing-positive, .closing-negative { position: absolute; inset: 4% -2% 4% 17%; }
+.closing-positive img, .closing-negative img { width: 100%; height: 100%; object-fit: contain; }
+.closing-negative { opacity: .66; transform: translateX(-12%); }
+.closing-plate-id { position: absolute; top: 12px; right: 12px; background: #103955; padding: 4px 6px; font: 10px var(--mono); }
+.closing-plate figcaption { display: flex; justify-content: space-between; align-items: end; gap: 12px; padding: clamp(12px, 1.4vw, 24px); }
+.closing-plate figcaption span:first-child { color: #b5c9d9; font-size: clamp(12px, 1vw, 17px); }
+.closing-plate figcaption strong { display: block; color: white; font: 700 clamp(39px, 4.8vw, 82px)/1 var(--display); }
+.closing-plate figcaption small { font-size: .45em; color: var(--sky); }
+.closing-plate figcaption span:last-child { text-align: right; font: 11px/1.6 var(--mono); color: var(--sky); }
+.slide--fx .closing-plate { animation: plate-arrive .75s var(--ease-out) .12s both; }
+.slide--fx .closing-sheet { animation: plate-paper 1.15s var(--ease-out) .3s both; }
+.slide--fx .closing-positive { animation: plate-develop 1.35s var(--ease-in-out) .4s both; }
+.slide--fx .closing-negative { animation: plate-register 1.5s var(--ease-out) .58s both; }
+@keyframes plate-arrive { from { opacity: 0; transform: translateY(18px) rotate(2deg); } }
+@keyframes plate-paper { from { transform: translateX(14%) rotate(0deg); } }
+@keyframes plate-develop { from { clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); } to { clip-path: polygon(0 0, 140% 0, 100% 100%, 0 100%); } }
+@keyframes plate-register { from { transform: translateX(0); opacity: .95; } }
+@media (max-width: 700px) {
+  .scale-overview { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .batch-marks { justify-self: start; width: min(48vw, 220px); }
+  .batch-marks figcaption { font-size: 10px; }
+  .slide--close .close-layout { grid-template-columns: 1fr; }
+  .close-layout > .closing-plate { grid-column: 1; grid-row: 2; width: min(78vw, 380px); }
+  .close-layout > .end-flow { grid-row: 3; }
+  .close-layout > .next-measures { grid-row: 4; }
+  .closing-print { height: clamp(108px, 18vh, 180px); }
+  .closing-plate figcaption { padding: 6px 12px; }
+  .closing-plate figcaption strong { font-size: 28px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide--fx :is(.batch-filled, .closing-plate, .closing-sheet, .closing-positive, .closing-negative) { animation: none; }
+}

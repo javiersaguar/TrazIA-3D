@@ -16,10 +16,18 @@ corepack pnpm@10.18.0 build
 corepack pnpm@10.18.0 preview --port 4173
 ```
 
-Abrir [localhost:4173](http://127.0.0.1:4173/). Las flechas y Espacio avanzan en
-modo manual. **Ensayar** activa el paso automático y termina en 6:00. Se puede
-pausar con P, ver el guion con N, activar pantalla completa con F y reiniciar
-con Inicio o el botón de reinicio.
+Abrir [localhost:4173](http://127.0.0.1:4173/) y pulsar **F** al empezar a hablar.
+El cronómetro de la cabecera cuenta el tiempo real de exposición, también al
+volver a una escena anterior o al superar los seis minutos.
+
+| Acción | Control |
+| --- | --- |
+| Avanzar o retroceder | Flechas ← y → o deslizar horizontalmente en una pantalla táctil |
+| Entrar o salir de pantalla completa | F |
+| Iniciar, pausar o reanudar el cronómetro | T o pulsar el reloj |
+| Ensayar con avance automático hasta 6:00 o pausar el avance | P |
+| Consultar el guion y los controles | N |
+| Volver a la primera escena y poner los relojes a cero | Inicio |
 
 **R** repite la entrada de la escena activa sin mover el reloj. Abre
 `/?fx=0` para usar las transiciones originales. La preferencia del sistema
@@ -27,7 +35,14 @@ de movimiento reducido también desactiva los nuevos efectos.
 
 El build incorpora imágenes, fuentes y texto. Una vez preparado `dist/`, el
 servidor de presentación y las escenas funcionan sin Internet ni API.
-**Abrir demo** enlaza con la aplicación si está levantada por separado.
+El enlace a la demo en las notas abre la aplicación si está levantada por separado.
+
+La apertura dedica unos doce segundos a tres diseños del catálogo sintético
+antes de llegar al caso V-101. Cada clip pasa del alzado de su GA a una órbita
+corta de su propio IFC. Los originales BC-CY102, BC-P103 y BC-AC104 están en
+[`web/public/demo/industriales`](../../web/public/demo/industriales). Para
+cambiar la selección, editar `designs` en `src/design-showcase.jsx` y colocar
+en `public/media/catalogo/` un WebM y su fotograma WebP con el tag del equipo.
 
 ## Comparar las animaciones en desarrollo
 
@@ -50,6 +65,9 @@ seleccionada y la casilla **?fx=0** cambia solo el panel Actual.
 2. Dejar las imágenes o grabaciones autorizadas en `public/media/`. El archivo
    de datos apunta a las rutas de los medios. Si se rellena `modelVideo` o
    `changesVideo`, aparece el botón **Ver grabación** en esa escena.
+   El marcador `revisionDetail` identifica una pieza en un fotograma concreto.
+   Al sustituirlo, actualizar el campo y sus coordenadas normalizadas en la
+   imagen nueva, o quitar el marcador.
 3. Indicar el alcance de los datos de evento donde corresponda. Conservar la
    marca sintética en el material de ensayo que se reutilice y publicar solo
    agregados y medios que el organizador autorice.

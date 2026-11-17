@@ -5,6 +5,9 @@ import {
   FileText, GitCompareArrows, Layers, Play, ScanLine, Workflow,
 } from "lucide-react";
 import { pitch } from "./pitch-data.js";
+import { DesignShowcase } from "./design-showcase.jsx";
+import { ModelExposure, RevisionExposure } from "./model-sequences.jsx";
+import { BatchMarks, ClosingPlate } from "./pitch-figures.jsx";
 import {
   asset, ease, easeInOut, useFx, Barrido, CajaTrazo, Contador, DeltaMarker, Esquinas, PuntoRecorrido,
 } from "./fx.jsx";
@@ -73,23 +76,25 @@ function Hero({ scene }) {
   return (
     <div className="scene-layout hero-layout">
       <Heading scene={scene} />
-      <m.div className="hero-art"
-        initial={fx ? { transform: "scale(1)" } : false}
-        animate={fx ? { transform: "scale(1.04)" } : undefined}
-        transition={{ duration: 20, ease: "linear" }}
-      >
-        <div className="hero-cross" aria-hidden="true" />
-        <Reveal className="hero-paper" from="translate(34px, 44px) rotate(-6deg)" to="translate(0px, 0px) rotate(0deg)" delay={0.16}>
-          <div className="hero-plan-wrap fx-image">
-            <Plan />
-            {fx && <Barrido delay={9} strength={0.23} repeat={1} repeatDelay={8.2} />}
-          </div>
-        </Reveal>
-        <Reveal className="hero-object" from="translate(28px, 28px) scale(.94)" to="translate(0px, 0px) scale(1)" delay={0.34}>
-          <img src={asset(pitch.media.ifcB)} alt={`Recipiente ${pitch.equipment} extraído de su IFC`} />
-        </Reveal>
-        <span className="art-label">{pitch.equipment} / REV. A → B{fx && <Esquinas delay={1.1} />}</span>
-      </m.div>
+      <DesignShowcase>
+        <m.div className="hero-art"
+          initial={fx ? { transform: "scale(1)" } : false}
+          animate={fx ? { transform: "scale(1.04)" } : undefined}
+          transition={{ duration: 20, ease: "linear" }}
+        >
+          <div className="hero-cross" aria-hidden="true" />
+          <Reveal className="hero-paper" from="translate(34px, 44px) rotate(-6deg)" to="translate(0px, 0px) rotate(0deg)" delay={0.16}>
+            <div className="hero-plan-wrap fx-image">
+              <Plan />
+              {fx && <Barrido delay={9} strength={0.23} repeat={1} repeatDelay={8.2} />}
+            </div>
+          </Reveal>
+          <Reveal className="hero-object" from="translate(28px, 28px) scale(.94)" to="translate(0px, 0px) scale(1)" delay={0.34}>
+            <img src={asset(pitch.media.ifcB)} alt={`Recipiente ${pitch.equipment} extraído de su IFC`} />
+          </Reveal>
+          <span className="art-label">{pitch.equipment} / REV. A → B{fx && <Esquinas delay={1.1} />}</span>
+        </m.div>
+      </DesignShowcase>
     </div>
   );
 }
@@ -290,7 +295,7 @@ function Model({ scene }) {
         </div>
       </Heading>
       <MediaSlot path={pitch.media.modelVideo}>
-        <div className="materialize">
+        {fx ? <ModelExposure /> : <div className="materialize">
           <div className="model-grid" aria-hidden="true" />
           <div className="model-sheet"><Plan /></div>
           <div className="model-volume">
@@ -299,7 +304,7 @@ function Model({ scene }) {
             <div className="scan" aria-hidden="true" />
           </div>
           <span className="art-label">{pitch.equipment} / IFC REV. B</span>
-        </div>
+        </div>}
       </MediaSlot>
     </div>
   );
@@ -315,19 +320,15 @@ function Delta({ scene }) {
       <Heading scene={scene} />
       <div className="delta-content">
         <MediaSlot path={pitch.media.changesVideo}>
-          <div className="delta-models">
+          {fx ? <RevisionExposure /> : <div className="delta-models">
             <Reveal className="delta-vessel" delay={0.14} from="translateX(-20px)" to="translateX(0px)">
               <span>REV. A</span><img src={asset(pitch.media.ifcA)} alt="Modelo IFC de la revisión A" />
             </Reveal>
-            <m.div className="delta-arrow" aria-hidden="true"
-              initial={fx ? { transform: "scale(1)" } : false}
-              animate={fx ? { transform: ["scale(1)", "scale(1.19)", "scale(1)"] } : undefined}
-              transition={{ delay: 0.40, duration: 0.46, ease: easeInOut }}
-            ><ArrowRight size={28} /></m.div>
+            <div className="delta-arrow" aria-hidden="true"><ArrowRight size={28} /></div>
             <Reveal className="delta-vessel after" delay={0.29} from="translateX(20px)" to="translateX(0px)">
               <span>REV. B</span><img src={asset(pitch.media.ifcB)} alt="Modelo IFC de la revisión B" />
             </Reveal>
-          </div>
+          </div>}
         </MediaSlot>
         <div className={`delta-table ${fx ? "fx-delta-table" : ""}`} ref={table} aria-label="Cambios detectados">
           {pitch.changes.map(({ field, before, after, delta }, index) => {
@@ -368,7 +369,10 @@ function Scale({ scene }) {
   ];
   return (
     <div className="scale-layout">
-      <Heading scene={scene} />
+      <div className="scale-overview">
+        <Heading scene={scene} />
+        <BatchMarks batch={pitch.batch} />
+      </div>
       <div className="scale-metrics">
         {metrics.map(([value, label, format, text], index) => (
           <Reveal className="factor" delay={0.25 + 0.075 * index} key={label}>
@@ -404,6 +408,7 @@ function Close({ scene }) {
   return (
     <div className="close-layout">
       <Heading scene={scene} />
+      <ClosingPlate />
       <div className="end-flow" ref={flow} aria-label="Recorrido completo">
         {["Plano", "Dato", "Modelo", "Cambio", "Decisión"].map((label, index) => (
           <Reveal key={label} data-fx-step delay={0.24 + index * 0.085}>
