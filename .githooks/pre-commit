@@ -1,0 +1,11 @@
+#!/bin/sh
+# Guardián de datos: bloquea documentos del reto, salidas del lote y claves (scripts/guardian_datos.py).
+# Activar una vez por clon: git config core.hooksPath .githooks
+raiz=$(git rev-parse --show-toplevel)
+for python in python3 python "py -3"; do
+  if $python -c "import sys; sys.exit(sys.version_info < (3, 10))" >/dev/null 2>&1; then
+    exec $python "$raiz/scripts/guardian_datos.py"
+  fi
+done
+echo "Guardián de datos: no encuentro Python 3.10+; instala Python o ejecuta el commit desde 'uv run'." >&2
+exit 1

@@ -15,7 +15,9 @@ material de escala, en [PITCH_ESCALA.md](PITCH_ESCALA.md).
 
 1. **Datos.** Hasta el día 26 todo lo que se ve es sintético y se dice. Las cifras de TR solo
    entran cuando estén medidas en Databricks, y siempre separadas de las sintéticas. En el guion
-   aparecen como **[CIFRA TR]**: si no hay medida, la frase se dice sin cifra o se quita.
+   aparecen como **[CIFRA TR]**: si no hay medida, la frase se dice sin cifra o se quita. Las
+   frases rellenas salen de `python -m bench.cifras aplicar cifras_evento.json`, que también
+   lleva las cifras al pitch ([AUTOMATIZACION.md](AUTOMATIZACION.md)): no se copian a mano.
 2. **Ningún dato de TR fuera de la plataforma.** No se meten planos, capturas ni nombres de TR en
    generadores de vídeo, en Claude, en el repo de GitHub ni en el vídeo publicado. Las tomas que
    enseñen datos de TR se graban y montan en la plataforma o en el portátil de la exposición, y
@@ -145,7 +147,8 @@ sintéticos y así lo mediremos con los vuestros».
 
 Igual que en [DEMO.md](DEMO.md), con estos ajustes para el guion:
 
-1. API en modo offline (`TRAZIA_OFFLINE=1`) y web con `pnpm build; pnpm start`. Si cae la API,
+1. `uv run python scripts/demo.py` arranca la API en modo offline (`TRAZIA_OFFLINE=1`) y la web
+   compilada y abre las pestañas del punto 3 en orden (`--sin-api` para el plan B). Si cae la API,
    la web sigue con los datos de `public/demo/` (plan B). El vídeo, en otra pestaña (plan C).
 2. Navegador a 1920×1080, zoom 100 %, tema oscuro y sin extensiones. Ratón físico.
 3. Pestañas abiertas en el orden del guion: `/documentos`, `/pipeline`, `/modelo?vista=revision`,
@@ -156,10 +159,11 @@ Igual que en [DEMO.md](DEMO.md), con estos ajustes para el guion:
 5. En `/modelo?vista=cambios` no se pulsa Espacio hasta el momento del guion: la reproducción
    empieza desde el principio.
 
-### Capturas para la presentación (.pptx)
+### Capturas para la presentación (pitch web)
 
-Hacerlas el mismo día del ensayo, a 1920×1080 y en tema oscuro. Se guardan en
-`docs/capturas/producto/` con estos nombres:
+La presentación es el pitch en React de `pitch/web`. Las capturas se hacen el mismo día del
+ensayo, a 1920×1080 y en tema oscuro, con `cd web; corepack pnpm capturas:guion`, que deja las
+seis primeras en `docs/capturas/producto/` en el estado de esta tabla:
 
 | Archivo | Ruta | Estado de la pantalla |
 | --- | --- | --- |

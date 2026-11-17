@@ -16,6 +16,7 @@ const formatNumber = (value) => number.format(value);
 const formatScore = (value) => score.format(value);
 const formatSpeedup = (value) => `${decimal.format(value)}×`;
 const formatDelta = (value) => `+${number.format(value)} mm`;
+const formatSeconds = (value) => decimal.format(value);
 
 // Marco azul del recorte de 411 × 147. Se mantiene alineado al cambiar el ancho del recorte.
 const evidenceBox = { left: "4.87%", top: "40.14%", width: "43.31%", height: "19.73%" };
@@ -358,13 +359,15 @@ function Delta({ scene }) {
 function Scale({ scene }) {
   const fx = useFx();
   const architecture = useRef(null);
-  const { population, drafts, errors, speedup } = pitch.batch;
-  const multiplier = speedup.match(/^([\d]+(?:[.,]\d+)?)×$/);
+  const { population, drafts, errors, speedup, medianSeconds } = pitch.batch;
+  const multiplier = speedup?.match(/^([\d]+(?:[.,]\d+)?)×$/);
   const metrics = [
     [population, "revisiones", formatNumber, number.format(population)],
     [drafts, "IFC DRAFT", formatNumber, number.format(drafts)],
     [errors, "errores", formatNumber, number.format(errors)],
-    [multiplier ? Number(multiplier[1].replace(",", ".")) : null, "aceleración", formatSpeedup, speedup],
+    speedup
+      ? [multiplier ? Number(multiplier[1].replace(",", ".")) : null, "aceleración", formatSpeedup, speedup]
+      : [medianSeconds ?? null, "s por revisión (mediana)", formatSeconds, medianSeconds == null ? "—" : formatSeconds(medianSeconds)],
   ];
   return (
     <div className="scale-layout">

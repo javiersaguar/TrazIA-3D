@@ -15,6 +15,7 @@
     "gen:types": "node scripts/gen-types.mjs",
     "test:e2e": "playwright test --project=humo",
     "capturas": "playwright test --project=capturas",
+    "capturas:guion": "playwright test --project=guion",
     "gen:api": "node src/lib/api/generate.mjs"
   },
   "dependencies": {
