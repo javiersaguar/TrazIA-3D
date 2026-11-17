@@ -55,7 +55,7 @@ function release(url: string, resource: Resource) {
   }
 }
 
-export function useIfcModel(url: string): LoadState {
+export function useIfcModel(url: string, holdPrevious = false): LoadState {
   const [state, setState] = useState<LoadState & { url: string }>({ url, model: null, progress: 0, error: null });
   useEffect(() => {
     let live = true;
@@ -64,7 +64,9 @@ export function useIfcModel(url: string): LoadState {
       error => { if (live) setState({ url, model: null, progress: 0, error: String(error.message) }); });
     return () => { live = false; release(url, resource); };
   }, [url]);
-  return state.url === url ? state : { model: null, progress: 0, error: null };
+  if (state.url === url) return state;
+  // Con holdPrevious el modelo anterior sigue en pantalla hasta que el nuevo está listo.
+  return holdPrevious && state.model ? { model: state.model, progress: 1, error: null } : { model: null, progress: 0, error: null };
 }
 
 export function usePreparedModel(model: IfcModel | null): PreparedProduct[] {

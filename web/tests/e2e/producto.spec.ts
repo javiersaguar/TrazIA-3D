@@ -236,3 +236,23 @@ test("en la portada, Del plano al modelo avanza con el scroll",async({page})=>{
  await expect(signature).toHaveAttribute("data-step","2");
  await expect(page.getByRole("heading",{name:"Modelo DRAFT listo para revisar"}).locator("xpath=ancestor::li")).toHaveAttribute("aria-current","step");
 });
+
+test("Modelo › Diseños regenera el IFC en directo al cambiar medidas y piezas",async({page})=>{
+ await page.goto("/modelo?vista=disenos&diseno=BC-AC101");
+ await expect(page.getByRole("navigation",{name:"Catálogo de diseños"}).getByRole("listitem")).toHaveCount(72);
+ const status=page.getByTestId("design-ifc-status");
+ await expect(status).toHaveText("IFC publicado · 8 piezas",{timeout:30_000});
+ const alto=page.getByRole("spinbutton",{name:"Alto",exact:true});
+ await alto.fill("4800");
+ await alto.press("Enter");
+ await expect(status).toHaveAttribute("data-state","ready",{timeout:30_000});
+ await expect(status).toContainText(/IFC regenerado en \d+ ms · 8 piezas/);
+ await expect(page.getByText("Ancho 8200 mm · Fondo 3300 mm · Alto 4800 mm")).toBeVisible();
+ await page.getByRole("button",{name:"Ocultar Colector",exact:true}).click();
+ await expect(status).toContainText(/IFC regenerado en \d+ ms · 7 piezas/);
+ await expect(page.getByRole("link",{name:/Descargar IFC/})).toHaveAttribute("download","BC-AC101-A-editado.ifc");
+ await page.reload();
+ await expect(page.getByRole("spinbutton",{name:"Alto",exact:true})).toHaveValue("4800");
+ await page.getByRole("button",{name:"Restablecer",exact:true}).click();
+ await expect(status).toHaveText("IFC publicado · 8 piezas");
+});

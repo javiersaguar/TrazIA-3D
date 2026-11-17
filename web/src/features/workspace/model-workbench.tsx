@@ -10,9 +10,10 @@ const loading = () => <Skeleton className="h-[620px]" />;
 const Review = dynamic(() => import("@/features/review/review-workspace").then((m) => m.ReviewWorkspace), { ssr: false, loading });
 const Changes = dynamic(() => import("@/features/changes/changes-workspace").then((m) => m.ChangesWorkspace), { ssr: false, loading });
 const Model = dynamic(() => import("@/features/hologram/model-workspace").then((m) => m.ModelWorkspace), { ssr: false, loading });
+const Designs = dynamic(() => import("@/features/model-designs/designs-workspace").then((m) => m.DesignsWorkspace), { ssr: false, loading });
 const DesignEdit = dynamic(() => import("@/features/design-edit/design-edit").then((m) => m.DesignEditWorkspace), { ssr: false, loading });
 
-type View = "revision" | "cambios" | "3d" | "editar";
+type View = "revision" | "cambios" | "3d" | "disenos" | "editar";
 const VIEWS: Record<View, { label: string; description: string }> = {
   revision: {
     label: "Revisión",
@@ -26,13 +27,17 @@ const VIEWS: Record<View, { label: string; description: string }> = {
     label: "Modelo 3D",
     description: "El IFC generado, su paso del holograma al acero y una galería de equipos ilustrativos.",
   },
+  disenos: {
+    label: "Diseños",
+    description: "Todos los diseños del catálogo en 3D. Cambia sus medidas y piezas y el IFC se regenera en directo.",
+  },
   editar: {
     label: "Proponer cambios",
     description: "Cambia el diseño de un equipo o boquilla: se valida el lote, se previsualiza el IFC y, al confirmar, nace una revisión DRAFT nueva.",
   },
 };
 
-/** Revisión, Cambios y Modelo 3D en una sola pestaña, cada uno con todo su contenido. */
+/** Revisión, Cambios, Modelo 3D, Diseños y Proponer cambios en una sola pestaña. */
 export function ModelWorkbench() {
   const params = useSearchParams();
   const router = useRouter();
@@ -52,7 +57,8 @@ export function ModelWorkbench() {
           options={(Object.keys(VIEWS) as View[]).map((value) => ({ value, label: VIEWS[value].label }))}
         />
       </header>
-      {active === "revision" ? <Review /> : active === "cambios" ? <Changes /> : active === "editar" ? <DesignEdit /> : <Model />}
+      {active === "revision" ? <Review /> : active === "cambios" ? <Changes />
+        : active === "editar" ? <DesignEdit /> : active === "disenos" ? <Designs /> : <Model />}
     </div>
   );
 }

@@ -231,3 +231,25 @@ ni se confirman automáticamente. Al volver se consulta de nuevo la propuesta en
 recupera el trabajo de previsualización si estaba en curso. El ETag sigue comprobándose al aplicar.
 
 El Copiloto reserva su propio espacio, sin cubrir el formulario. [Capturas, pruebas y límites](evidencias/web-fluidez/README.md).
+
+## 10. Diseños del catálogo editables en directo (17/11)
+
+Modelo → **Diseños** (`/modelo?vista=disenos&diseno=<tag>`) muestra en 3D los 72 diseños
+conceptuales sintéticos: 56 industriales con IFC publicado y 16 bocetos GA. Desde Documentos,
+cada boceto tiene el enlace «Editar en Modelo».
+
+- **Qué se cambia:** ancho, alto y fondo de la envolvente (del 30 % al 300 % del original), y
+  cada pieza oculta o escalada entre el 50 % y el 150 % sobre su centro.
+- **Cómo se ve:** cada cambio reescribe el IFC4 en un worker con WebIFC y el visor lee ese IFC.
+  No hay una segunda geometría dibujada aparte. El visor mantiene el modelo anterior hasta que
+  llega el nuevo. En el portátil, cada regeneración tarda entre 13 y 90 ms.
+- **De dónde sale:** `scripts/export_design_specs.py` vuelca las piezas paramétricas a
+  `web/src/features/model-designs/design-specs.json`. Los bocetos usan la plantilla de su
+  familia sobre la envolvente declarada.
+- **Comprobación:** sin cambios, la malla de los 56 diseños industriales coincide vértice a
+  vértice con su IFC publicado (`parametric.test.ts`). El e2e `producto.spec.ts` cambia el alto,
+  oculta una pieza, recarga y restablece.
+- **Límites:** los GUID se conservan por tag y pieza. Los cambios se guardan solo en este
+  navegador, no crean una revisión ni pasan por aprobación, y el IFC descargado se llama
+  `<TAG>-A-editado.ifc`. Para una propuesta trazable del V-101 se sigue usando Proponer
+  cambios (sección 9).

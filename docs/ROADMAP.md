@@ -1090,6 +1090,9 @@ Ninguno es decorativo: los cuatro explican algo. Fuera de estos momentos, la int
 - [x] **08/11 · Proponer cambios a todo el ancho:** formulario bajo el IFC, valores actuales,
   recorrido por piezas y borradores por proyecto/equipo/revisión conservados al navegar y
   recargar. [Pruebas y capturas](evidencias/web-fluidez/README.md). No cierra la sesión humana K.4.
+- [x] **17/11 · Modelo › Diseños:** los 72 diseños del catálogo en 3D, con medidas y piezas
+  editables y el IFC regenerado en el navegador en cada cambio. Los cambios son locales y no
+  crean una revisión. [Detalle](EDICION_ASISTIDA.md#10-diseños-del-catálogo-editables-en-directo-1711).
 
 - Contraste AA, foco visible, todo operable con teclado (incluido seleccionar elementos 3D desde el árbol).
 - Presupuestos: JS inicial < 250 KB gz sin el chunk 3D (que se carga en diferido); LCP < 2 s en local;
