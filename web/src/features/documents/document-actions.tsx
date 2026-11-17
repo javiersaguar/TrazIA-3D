@@ -37,6 +37,10 @@ export function DocumentActions({ design }: { design: Design }) {
           Abrir PDF
         </a>
         {assets.ifc && <SketchModelDialog tag={tag} name={design.name} ifc={assets.ifc} />}
+        {design.tag && <Link className={action} href={`/modelo?vista=disenos&diseno=${encodeURIComponent(design.tag)}`}
+          aria-label={`Abrir ${tag} en Modelo › Diseños`}>
+          Editar en Modelo
+        </Link>}
       </span>
     );
   }

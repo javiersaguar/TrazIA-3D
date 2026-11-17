@@ -1,0 +1,9690 @@
+{
+ "families": {
+  "air-cooler": "Aeroenfriadores",
+  "evaporator": "Evaporadores",
+  "filter": "Filtros industriales",
+  "centrifuge": "Centrífugas",
+  "cyclone": "Separadores ciclónicos",
+  "dryer": "Secadores industriales",
+  "static-mixer": "Mezcladores estáticos",
+  "dosing-skid": "Módulos de dosificación",
+  "cooling-tower": "Torres de refrigeración",
+  "mixer-settler": "Mezcladores-decantadores",
+  "vertical": "Recipientes verticales",
+  "horizontal": "Recipientes horizontales",
+  "column": "Columnas",
+  "exchanger": "Intercambiadores",
+  "tank": "Tanques",
+  "pump": "Bombas",
+  "compressor": "Compresores",
+  "generic": "Envolventes de reserva"
+ },
+ "designs": [
+  {
+   "tag": "BC-V101",
+   "family": "vertical",
+   "name": "Separador vertical",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    1800,
+    6300,
+    1800
+   ],
+   "parts": [
+    {
+     "name": "Faldón",
+     "low": [
+      2,
+      2,
+      0
+     ],
+     "high": [
+      98,
+      98,
+      30
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Fondo inferior",
+     "low": [
+      0,
+      0,
+      17
+     ],
+     "high": [
+      100,
+      100,
+      30
+     ],
+     "axis": "z",
+     "ends": [
+      0.45,
+      1
+     ]
+    },
+    {
+     "name": "Virola",
+     "low": [
+      0,
+      0,
+      30
+     ],
+     "high": [
+      100,
+      100,
+      77
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Fondo superior",
+     "low": [
+      0,
+      0,
+      77
+     ],
+     "high": [
+      100,
+      100,
+      88
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.5
+     ]
+    },
+    {
+     "name": "Conexión lateral",
+     "low": [
+      81,
+      41,
+      49
+     ],
+     "high": [
+      100,
+      59,
+      59
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Salida superior",
+     "low": [
+      41,
+      41,
+      88
+     ],
+     "high": [
+      59,
+      59,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Segunda conexión",
+     "low": [
+      0,
+      38,
+      62
+     ],
+     "high": [
+      12,
+      62,
+      72
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-V102",
+   "family": "vertical",
+   "name": "Pulmón vertical compacto",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    2200,
+    4300,
+    2200
+   ],
+   "parts": [
+    {
+     "name": "Faldón",
+     "low": [
+      2,
+      2,
+      0
+     ],
+     "high": [
+      98,
+      98,
+      30
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Fondo inferior",
+     "low": [
+      0,
+      0,
+      17
+     ],
+     "high": [
+      100,
+      100,
+      30
+     ],
+     "axis": "z",
+     "ends": [
+      0.45,
+      1
+     ]
+    },
+    {
+     "name": "Virola",
+     "low": [
+      0,
+      0,
+      30
+     ],
+     "high": [
+      100,
+      100,
+      77
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Fondo superior",
+     "low": [
+      0,
+      0,
+      77
+     ],
+     "high": [
+      100,
+      100,
+      88
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.5
+     ]
+    },
+    {
+     "name": "Conexión lateral",
+     "low": [
+      81,
+      41,
+      49
+     ],
+     "high": [
+      100,
+      59,
+      59
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Salida superior",
+     "low": [
+      41,
+      41,
+      88
+     ],
+     "high": [
+      59,
+      59,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Segunda conexión",
+     "low": [
+      0,
+      38,
+      62
+     ],
+     "high": [
+      12,
+      62,
+      72
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-H101",
+   "family": "horizontal",
+   "name": "Tambor horizontal de separación",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    7400,
+    2900,
+    2200
+   ],
+   "parts": [
+    {
+     "name": "Fondo izquierdo",
+     "low": [
+      0,
+      0,
+      34
+     ],
+     "high": [
+      8,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      0.28,
+      1
+     ]
+    },
+    {
+     "name": "Virola",
+     "low": [
+      8,
+      0,
+      34
+     ],
+     "high": [
+      92,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Fondo derecho",
+     "low": [
+      92,
+      0,
+      34
+     ],
+     "high": [
+      100,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      0.28
+     ]
+    },
+    {
+     "name": "Entrada",
+     "low": [
+      24,
+      37,
+      90
+     ],
+     "high": [
+      30,
+      63,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Salida",
+     "low": [
+      71,
+      41,
+      90
+     ],
+     "high": [
+      77,
+      59,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Silleta 1",
+     "low": [
+      18,
+      18,
+      0
+     ],
+     "high": [
+      26,
+      82,
+      40
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Silleta 2",
+     "low": [
+      74,
+      18,
+      0
+     ],
+     "high": [
+      82,
+      82,
+      40
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-H102",
+   "family": "horizontal",
+   "name": "Acumulador horizontal de retorno",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    5100,
+    2200,
+    1600
+   ],
+   "parts": [
+    {
+     "name": "Fondo izquierdo",
+     "low": [
+      0,
+      0,
+      34
+     ],
+     "high": [
+      8,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      0.28,
+      1
+     ]
+    },
+    {
+     "name": "Virola",
+     "low": [
+      8,
+      0,
+      34
+     ],
+     "high": [
+      92,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Fondo derecho",
+     "low": [
+      92,
+      0,
+      34
+     ],
+     "high": [
+      100,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      0.28
+     ]
+    },
+    {
+     "name": "Entrada",
+     "low": [
+      24,
+      37,
+      90
+     ],
+     "high": [
+      30,
+      63,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Salida",
+     "low": [
+      71,
+      41,
+      90
+     ],
+     "high": [
+      77,
+      59,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Silleta 1",
+     "low": [
+      21,
+      18,
+      0
+     ],
+     "high": [
+      29,
+      82,
+      40
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Silleta 2",
+     "low": [
+      71,
+      18,
+      0
+     ],
+     "high": [
+      79,
+      82,
+      40
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-C101",
+   "family": "column",
+   "name": "Columna recta de destilación",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    1900,
+    16500,
+    1900
+   ],
+   "parts": [
+    {
+     "name": "Torre · Columna",
+     "low": [
+      8.52,
+      12.0,
+      0.0
+     ],
+     "high": [
+      62.48,
+      88.0,
+      91.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Torre · Cabezal",
+     "low": [
+      8.52,
+      12.0,
+      91.0
+     ],
+     "high": [
+      62.48,
+      88.0,
+      100.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.42
+     ]
+    },
+    {
+     "name": "Rehervidor lateral",
+     "low": [
+      75,
+      31,
+      0
+     ],
+     "high": [
+      100,
+      72,
+      37
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Retorno",
+     "low": [
+      60,
+      45,
+      30
+     ],
+     "high": [
+      88,
+      58,
+      35
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-C102",
+   "family": "column",
+   "name": "Columna con transición cónica",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    2900,
+    19100,
+    2900
+   ],
+   "parts": [
+    {
+     "name": "Columna",
+     "low": [
+      12,
+      12,
+      0
+     ],
+     "high": [
+      88,
+      88,
+      91
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cabezal",
+     "low": [
+      12,
+      12,
+      91
+     ],
+     "high": [
+      88,
+      88,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.42
+     ]
+    },
+    {
+     "name": "Brida de registro 1",
+     "low": [
+      0,
+      0,
+      25
+     ],
+     "high": [
+      100,
+      100,
+      26.5
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Brida de registro 2",
+     "low": [
+      0,
+      0,
+      54
+     ],
+     "high": [
+      100,
+      100,
+      55.5
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Brida de registro 3",
+     "low": [
+      0,
+      0,
+      78
+     ],
+     "high": [
+      100,
+      100,
+      79.5
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Entrada lateral",
+     "low": [
+      86,
+      38,
+      19
+     ],
+     "high": [
+      100,
+      62,
+      23
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-E101",
+   "family": "exchanger",
+   "name": "Intercambiador de carcasa y tubos",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    6600,
+    1900,
+    1500
+   ],
+   "parts": [
+    {
+     "name": "Fondo izquierdo",
+     "low": [
+      0,
+      0,
+      34
+     ],
+     "high": [
+      8,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      0.28,
+      1
+     ]
+    },
+    {
+     "name": "Virola",
+     "low": [
+      8,
+      0,
+      34
+     ],
+     "high": [
+      92,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Fondo derecho",
+     "low": [
+      92,
+      0,
+      34
+     ],
+     "high": [
+      100,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      0.28
+     ]
+    },
+    {
+     "name": "Entrada",
+     "low": [
+      24,
+      37,
+      90
+     ],
+     "high": [
+      30,
+      63,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Salida",
+     "low": [
+      71,
+      41,
+      90
+     ],
+     "high": [
+      77,
+      59,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Silleta 1",
+     "low": [
+      16,
+      18,
+      0
+     ],
+     "high": [
+      24,
+      82,
+      40
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Silleta 2",
+     "low": [
+      76,
+      18,
+      0
+     ],
+     "high": [
+      84,
+      82,
+      40
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-E102",
+   "family": "exchanger",
+   "name": "Intercambiador de placas",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    1750,
+    2400,
+    980
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo",
+     "low": [
+      38,
+      23,
+      7
+     ],
+     "high": [
+      62,
+      77,
+      27
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cuerpo espiral",
+     "low": [
+      3,
+      17,
+      20
+     ],
+     "high": [
+      97,
+      83,
+      100
+     ],
+     "axis": "y",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tapa frontal",
+     "low": [
+      0,
+      0,
+      16
+     ],
+     "high": [
+      100,
+      18,
+      100
+     ],
+     "axis": "y",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Conexión central",
+     "low": [
+      35,
+      0,
+      46
+     ],
+     "high": [
+      65,
+      23,
+      68
+     ],
+     "axis": "y",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Conexión posterior",
+     "low": [
+      46,
+      80,
+      66
+     ],
+     "high": [
+      70,
+      100,
+      89
+     ],
+     "axis": "y",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-T101",
+   "family": "tank",
+   "name": "Tanque con techo cónico",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    8400,
+    7100,
+    8400
+   ],
+   "parts": [
+    {
+     "name": "Virola",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      79
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Hombro del domo",
+     "low": [
+      0,
+      0,
+      79
+     ],
+     "high": [
+      100,
+      100,
+      91
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.78
+     ]
+    },
+    {
+     "name": "Corona del domo",
+     "low": [
+      11,
+      11,
+      91
+     ],
+     "high": [
+      89,
+      89,
+      97
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.32
+     ]
+    },
+    {
+     "name": "Respiradero",
+     "low": [
+      43,
+      43,
+      97
+     ],
+     "high": [
+      57,
+      57,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Registro",
+     "low": [
+      7,
+      11,
+      14
+     ],
+     "high": [
+      26,
+      28,
+      24
+     ],
+     "axis": "y",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-T102",
+   "family": "tank",
+   "name": "Tanque con techo plano",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    7100,
+    5000,
+    7100
+   ],
+   "parts": [
+    {
+     "name": "Virola",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      79
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Hombro del domo",
+     "low": [
+      0,
+      0,
+      79
+     ],
+     "high": [
+      100,
+      100,
+      91
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.78
+     ]
+    },
+    {
+     "name": "Corona del domo",
+     "low": [
+      11,
+      11,
+      91
+     ],
+     "high": [
+      89,
+      89,
+      97
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.32
+     ]
+    },
+    {
+     "name": "Respiradero",
+     "low": [
+      43,
+      43,
+      97
+     ],
+     "high": [
+      57,
+      57,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Registro",
+     "low": [
+      7,
+      11,
+      14
+     ],
+     "high": [
+      26,
+      28,
+      24
+     ],
+     "axis": "y",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-P101",
+   "family": "pump",
+   "name": "Bomba centrífuga horizontal",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    2100,
+    1150,
+    780
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa de engranajes",
+     "low": [
+      4,
+      0,
+      9
+     ],
+     "high": [
+      40,
+      100,
+      70
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Acoplamiento",
+     "low": [
+      40,
+      31,
+      25
+     ],
+     "high": [
+      65,
+      69,
+      48
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Motor",
+     "low": [
+      65,
+      18,
+      9
+     ],
+     "high": [
+      100,
+      82,
+      65
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Boquilla superior",
+     "low": [
+      12,
+      30,
+      70
+     ],
+     "high": [
+      31,
+      70,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-P102",
+   "family": "pump",
+   "name": "Bomba vertical en línea",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    1040,
+    1840,
+    650
+   ],
+   "parts": [
+    {
+     "name": "Base de montaje",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      8
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cuerpo vertical",
+     "low": [
+      22,
+      22,
+      8
+     ],
+     "high": [
+      78,
+      78,
+      68
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Motor superior",
+     "low": [
+      18,
+      18,
+      68
+     ],
+     "high": [
+      82,
+      82,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Descarga lateral",
+     "low": [
+      63,
+      36,
+      45
+     ],
+     "high": [
+      100,
+      64,
+      57
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-K101",
+   "family": "compressor",
+   "name": "Compresor de tornillo",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    3050,
+    1640,
+    1250
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Soporte central",
+     "low": [
+      11,
+      16,
+      7
+     ],
+     "high": [
+      47,
+      84,
+      25
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa centrífuga",
+     "low": [
+      0,
+      0,
+      24
+     ],
+     "high": [
+      49,
+      100,
+      82
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Descarga",
+     "low": [
+      16,
+      31,
+      75
+     ],
+     "high": [
+      26,
+      66,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Acoplamiento",
+     "low": [
+      49,
+      38,
+      44
+     ],
+     "high": [
+      68,
+      62,
+      62
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Accionamiento",
+     "low": [
+      68,
+      15,
+      23
+     ],
+     "high": [
+      100,
+      85,
+      83
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Pedestal del accionamiento",
+     "low": [
+      76,
+      33,
+      7
+     ],
+     "high": [
+      92,
+      67,
+      28
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-K102",
+   "family": "compressor",
+   "name": "Compresor alternativo",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    3550,
+    2350,
+    1650
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Soporte central",
+     "low": [
+      11,
+      16,
+      7
+     ],
+     "high": [
+      47,
+      84,
+      25
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa centrífuga",
+     "low": [
+      0,
+      0,
+      24
+     ],
+     "high": [
+      49,
+      100,
+      82
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Descarga",
+     "low": [
+      16,
+      31,
+      75
+     ],
+     "high": [
+      26,
+      66,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Acoplamiento",
+     "low": [
+      49,
+      38,
+      44
+     ],
+     "high": [
+      68,
+      62,
+      62
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Accionamiento",
+     "low": [
+      68,
+      15,
+      23
+     ],
+     "high": [
+      100,
+      85,
+      83
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Pedestal del accionamiento",
+     "low": [
+      76,
+      33,
+      7
+     ],
+     "high": [
+      92,
+      67,
+      28
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-G101",
+   "family": "generic",
+   "name": "Módulo rectangular de proceso",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    4200,
+    2850,
+    2300
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Volumen de proceso",
+     "low": [
+      0,
+      0,
+      7
+     ],
+     "high": [
+      100,
+      100,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-G102",
+   "family": "generic",
+   "name": "Armario vertical de servicios",
+   "origin": "boceto",
+   "ifc": null,
+   "size": [
+    1250,
+    2410,
+    850
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      4
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Armario",
+     "low": [
+      0,
+      6,
+      4
+     ],
+     "high": [
+      100,
+      100,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Puerta frontal",
+     "low": [
+      8,
+      0,
+      10
+     ],
+     "high": [
+      92,
+      6,
+      94
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-AC101",
+   "family": "air-cooler",
+   "name": "Aeroenfriador de tiro inducido",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-AC101-A.ifc",
+   "size": [
+    8200,
+    3300,
+    3300
+   ],
+   "parts": [
+    {
+     "name": "Haz aleteado",
+     "low": [
+      0,
+      0,
+      52
+     ],
+     "high": [
+      100,
+      100,
+      65
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Colector",
+     "low": [
+      0,
+      0,
+      45
+     ],
+     "high": [
+      10,
+      100,
+      63
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Colector opuesto",
+     "low": [
+      90,
+      0,
+      45
+     ],
+     "high": [
+      100,
+      100,
+      63
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo 1",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      6,
+      8,
+      52
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo 2",
+     "low": [
+      94,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      8,
+      52
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo 3",
+     "low": [
+      0,
+      92,
+      0
+     ],
+     "high": [
+      6,
+      100,
+      52
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo 4",
+     "low": [
+      94,
+      92,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      52
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Anillo ventilador 1",
+     "low": [
+      32,
+      9,
+      65
+     ],
+     "high": [
+      68,
+      91,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-AC102",
+   "family": "air-cooler",
+   "name": "Aeroenfriador de tiro forzado doble",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-AC102-A.ifc",
+   "size": [
+    11800,
+    4700,
+    4100
+   ],
+   "parts": [
+    {
+     "name": "Haz aleteado",
+     "low": [
+      0,
+      0,
+      79
+     ],
+     "high": [
+      100,
+      100,
+      92
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Colector",
+     "low": [
+      0,
+      0,
+      72
+     ],
+     "high": [
+      10,
+      100,
+      90
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Colector opuesto",
+     "low": [
+      90,
+      0,
+      72
+     ],
+     "high": [
+      100,
+      100,
+      90
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo 1",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      6,
+      8,
+      79
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo 2",
+     "low": [
+      94,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      8,
+      79
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo 3",
+     "low": [
+      0,
+      92,
+      0
+     ],
+     "high": [
+      6,
+      100,
+      79
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo 4",
+     "low": [
+      94,
+      92,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      79
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Anillo ventilador 1",
+     "low": [
+      9,
+      9,
+      46
+     ],
+     "high": [
+      45,
+      91,
+      79
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Anillo ventilador 2",
+     "low": [
+      55,
+      9,
+      46
+     ],
+     "high": [
+      91,
+      91,
+      79
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-EV101",
+   "family": "evaporator",
+   "name": "Evaporador de película descendente",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-EV101-A.ifc",
+   "size": [
+    4100,
+    9800,
+    3100
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo de calandria",
+     "low": [
+      18,
+      32,
+      7
+     ],
+     "high": [
+      36,
+      68,
+      18
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo de separador",
+     "low": [
+      66,
+      28,
+      7
+     ],
+     "high": [
+      86,
+      72,
+      18
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Calandria",
+     "low": [
+      9,
+      15,
+      18
+     ],
+     "high": [
+      44,
+      85,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Separador",
+     "low": [
+      55,
+      6,
+      18
+     ],
+     "high": [
+      96,
+      94,
+      67
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Conducto de vapor",
+     "low": [
+      40,
+      46,
+      52
+     ],
+     "high": [
+      60,
+      54,
+      60
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Distribuidor",
+     "low": [
+      18,
+      29,
+      91
+     ],
+     "high": [
+      35,
+      71,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-EV102",
+   "family": "evaporator",
+   "name": "Evaporador de circulación forzada",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-EV102-A.ifc",
+   "size": [
+    5600,
+    8100,
+    3700
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo de calandria",
+     "low": [
+      18,
+      32,
+      7
+     ],
+     "high": [
+      36,
+      68,
+      18
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo de separador",
+     "low": [
+      66,
+      28,
+      7
+     ],
+     "high": [
+      86,
+      72,
+      18
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Calandria",
+     "low": [
+      9,
+      15,
+      18
+     ],
+     "high": [
+      44,
+      85,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Separador",
+     "low": [
+      55,
+      6,
+      18
+     ],
+     "high": [
+      96,
+      94,
+      67
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Conducto de vapor",
+     "low": [
+      40,
+      46,
+      52
+     ],
+     "high": [
+      60,
+      54,
+      60
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ramificación inferior",
+     "low": [
+      23,
+      43,
+      11
+     ],
+     "high": [
+      82,
+      57,
+      18
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cuerpo de recirculación",
+     "low": [
+      48,
+      33,
+      7
+     ],
+     "high": [
+      69,
+      67,
+      24
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-FI101",
+   "family": "filter",
+   "name": "Filtro de bolsa simple",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-FI101-A.ifc",
+   "size": [
+    880,
+    1650,
+    640
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Colector",
+     "low": [
+      0,
+      45,
+      33
+     ],
+     "high": [
+      100,
+      55,
+      44
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa 1",
+     "low": [
+      14,
+      0,
+      7
+     ],
+     "high": [
+      42,
+      100,
+      91
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tapa 1",
+     "low": [
+      12,
+      0,
+      91
+     ],
+     "high": [
+      44,
+      100,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-FI102",
+   "family": "filter",
+   "name": "Filtro dúplex de bolsas",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-FI102-A.ifc",
+   "size": [
+    2100,
+    1950,
+    820
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Colector",
+     "low": [
+      0,
+      45,
+      33
+     ],
+     "high": [
+      100,
+      55,
+      44
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa 1",
+     "low": [
+      14,
+      0,
+      7
+     ],
+     "high": [
+      42,
+      100,
+      91
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tapa 1",
+     "low": [
+      12,
+      0,
+      91
+     ],
+     "high": [
+      44,
+      100,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa 2",
+     "low": [
+      58,
+      0,
+      7
+     ],
+     "high": [
+      86,
+      100,
+      91
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tapa 2",
+     "low": [
+      56,
+      0,
+      91
+     ],
+     "high": [
+      88,
+      100,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-CE101",
+   "family": "centrifuge",
+   "name": "Centrífuga decantadora horizontal",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-CE101-A.ifc",
+   "size": [
+    5200,
+    1900,
+    1700
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa horizontal",
+     "low": [
+      0,
+      0,
+      37
+     ],
+     "high": [
+      70,
+      100,
+      100
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Motor",
+     "low": [
+      75,
+      22,
+      32
+     ],
+     "high": [
+      100,
+      78,
+      73
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Pedestal del motor",
+     "low": [
+      79,
+      30,
+      7
+     ],
+     "high": [
+      96,
+      70,
+      32
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Acoplamiento",
+     "low": [
+      70,
+      39,
+      54
+     ],
+     "high": [
+      75,
+      61,
+      67
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Descarga",
+     "low": [
+      12,
+      30,
+      7
+     ],
+     "high": [
+      30,
+      70,
+      38
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Soporte posterior",
+     "low": [
+      59,
+      31,
+      7
+     ],
+     "high": [
+      67,
+      69,
+      39
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-CE102",
+   "family": "centrifuge",
+   "name": "Separador centrífugo de discos",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-CE102-A.ifc",
+   "size": [
+    1800,
+    2250,
+    1600
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Bastidor",
+     "low": [
+      0,
+      0,
+      7
+     ],
+     "high": [
+      100,
+      100,
+      39
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa vertical",
+     "low": [
+      14,
+      9,
+      39
+     ],
+     "high": [
+      86,
+      91,
+      83
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Conexión superior",
+     "low": [
+      38,
+      36,
+      83
+     ],
+     "high": [
+      62,
+      64,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-CY101",
+   "family": "cyclone",
+   "name": "Ciclón de una cámara",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-CY101-A.ifc",
+   "size": [
+    2300,
+    5600,
+    2050
+   ],
+   "parts": [
+    {
+     "name": "Ciclón - cuerpo",
+     "low": [
+      0,
+      5,
+      53
+     ],
+     "high": [
+      100,
+      95,
+      85
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón - cono",
+     "low": [
+      0,
+      5,
+      12
+     ],
+     "high": [
+      100,
+      95,
+      53
+     ],
+     "axis": "z",
+     "ends": [
+      0.2,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón - descarga",
+     "low": [
+      40.0,
+      41,
+      0
+     ],
+     "high": [
+      60.0,
+      59,
+      12
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón - salida superior",
+     "low": [
+      32.0,
+      34,
+      85
+     ],
+     "high": [
+      68.0,
+      66,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón - entrada lateral",
+     "low": [
+      0,
+      0,
+      65
+     ],
+     "high": [
+      100,
+      30,
+      76
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-CY102",
+   "family": "cyclone",
+   "name": "Batería de dos ciclones",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-CY102-A.ifc",
+   "size": [
+    5200,
+    6000,
+    2300
+   ],
+   "parts": [
+    {
+     "name": "Ciclón izquierdo - cuerpo",
+     "low": [
+      0,
+      5,
+      53
+     ],
+     "high": [
+      42,
+      95,
+      85
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón izquierdo - cono",
+     "low": [
+      0,
+      5,
+      12
+     ],
+     "high": [
+      42,
+      95,
+      53
+     ],
+     "axis": "z",
+     "ends": [
+      0.2,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón izquierdo - descarga",
+     "low": [
+      16.8,
+      41,
+      0
+     ],
+     "high": [
+      25.2,
+      59,
+      12
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón izquierdo - salida superior",
+     "low": [
+      13.44,
+      34,
+      85
+     ],
+     "high": [
+      28.560000000000002,
+      66,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón izquierdo - entrada lateral",
+     "low": [
+      0,
+      0,
+      65
+     ],
+     "high": [
+      42,
+      30,
+      76
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón derecho - cuerpo",
+     "low": [
+      58,
+      5,
+      53
+     ],
+     "high": [
+      100,
+      95,
+      85
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón derecho - cono",
+     "low": [
+      58,
+      5,
+      12
+     ],
+     "high": [
+      100,
+      95,
+      53
+     ],
+     "axis": "z",
+     "ends": [
+      0.2,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón derecho - descarga",
+     "low": [
+      74.8,
+      41,
+      0
+     ],
+     "high": [
+      83.2,
+      59,
+      12
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón derecho - salida superior",
+     "low": [
+      71.44,
+      34,
+      85
+     ],
+     "high": [
+      86.56,
+      66,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón derecho - entrada lateral",
+     "low": [
+      58,
+      0,
+      65
+     ],
+     "high": [
+      100,
+      30,
+      76
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Plenum común",
+     "low": [
+      0,
+      8,
+      94
+     ],
+     "high": [
+      100,
+      90,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-SE101",
+   "family": "dryer",
+   "name": "Secador por atomización",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-SE101-A.ifc",
+   "size": [
+    5200,
+    11200,
+    5200
+   ],
+   "parts": [
+    {
+     "name": "Cámara superior",
+     "low": [
+      0,
+      0,
+      49
+     ],
+     "high": [
+      100,
+      100,
+      90
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tolva cónica",
+     "low": [
+      0,
+      0,
+      9
+     ],
+     "high": [
+      100,
+      100,
+      49
+     ],
+     "axis": "z",
+     "ends": [
+      0.26,
+      1
+     ]
+    },
+    {
+     "name": "Cabezal",
+     "low": [
+      36,
+      36,
+      90
+     ],
+     "high": [
+      64,
+      64,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Descarga",
+     "low": [
+      37,
+      37,
+      0
+     ],
+     "high": [
+      63,
+      63,
+      9
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-SE102",
+   "family": "dryer",
+   "name": "Secador de lecho fluido",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-SE102-A.ifc",
+   "size": [
+    6100,
+    2900,
+    1900
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Plenum",
+     "low": [
+      0,
+      0,
+      7
+     ],
+     "high": [
+      100,
+      100,
+      30
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cámara de lecho",
+     "low": [
+      0,
+      0,
+      30
+     ],
+     "high": [
+      100,
+      100,
+      66
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cubierta",
+     "low": [
+      0,
+      0,
+      66
+     ],
+     "high": [
+      100,
+      100,
+      82
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Extracción de aire",
+     "low": [
+      56,
+      19,
+      82
+     ],
+     "high": [
+      68,
+      81,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-ME101",
+   "family": "static-mixer",
+   "name": "Mezclador estático en línea",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-ME101-A.ifc",
+   "size": [
+    1810,
+    370,
+    370
+   ],
+   "parts": [
+    {
+     "name": "Camisa",
+     "low": [
+      0,
+      10,
+      10
+     ],
+     "high": [
+      100,
+      90,
+      76
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Brida de entrada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      6,
+      100,
+      86
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Brida de salida",
+     "low": [
+      94,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      86
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-ME102",
+   "family": "static-mixer",
+   "name": "Mezclador en línea con ramal",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-ME102-A.ifc",
+   "size": [
+    2420,
+    650,
+    510
+   ],
+   "parts": [
+    {
+     "name": "Camisa",
+     "low": [
+      0,
+      10,
+      10
+     ],
+     "high": [
+      100,
+      90,
+      76
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Brida de entrada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      6,
+      100,
+      86
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Brida de salida",
+     "low": [
+      94,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      86
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ramal de adición",
+     "low": [
+      26,
+      30,
+      72
+     ],
+     "high": [
+      40,
+      70,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-DO101",
+   "family": "dosing-skid",
+   "name": "Panel de dosificación simple",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-DO101-A.ifc",
+   "size": [
+    1250,
+    1720,
+    700
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Panel de montaje",
+     "low": [
+      0,
+      86,
+      7
+     ],
+     "high": [
+      100,
+      100,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Armario de control",
+     "low": [
+      64,
+      50,
+      58
+     ],
+     "high": [
+      100,
+      86,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Colector inferior",
+     "low": [
+      0,
+      18,
+      19
+     ],
+     "high": [
+      100,
+      26,
+      26
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Bomba dosificadora 1",
+     "low": [
+      13,
+      0,
+      34
+     ],
+     "high": [
+      38,
+      52,
+      65
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-DO102",
+   "family": "dosing-skid",
+   "name": "Panel de dosificación dúplex",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-DO102-A.ifc",
+   "size": [
+    2350,
+    1880,
+    1000
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Panel de montaje",
+     "low": [
+      0,
+      86,
+      7
+     ],
+     "high": [
+      100,
+      100,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Armario de control",
+     "low": [
+      64,
+      50,
+      58
+     ],
+     "high": [
+      100,
+      86,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Colector inferior",
+     "low": [
+      0,
+      18,
+      19
+     ],
+     "high": [
+      100,
+      26,
+      26
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Bomba dosificadora 1",
+     "low": [
+      10,
+      0,
+      34
+     ],
+     "high": [
+      35,
+      52,
+      65
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Bomba dosificadora 2",
+     "low": [
+      43,
+      0,
+      34
+     ],
+     "high": [
+      68,
+      52,
+      65
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-TR101",
+   "family": "cooling-tower",
+   "name": "Torre de refrigeración de tiro inducido",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-TR101-A.ifc",
+   "size": [
+    4400,
+    5600,
+    4200
+   ],
+   "parts": [
+    {
+     "name": "Balsa",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      18
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa",
+     "low": [
+      0,
+      17,
+      18
+     ],
+     "high": [
+      100,
+      100,
+      82
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Entrada de aire",
+     "low": [
+      6,
+      0,
+      23
+     ],
+     "high": [
+      94,
+      17,
+      37
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ventilador superior",
+     "low": [
+      16,
+      7,
+      82
+     ],
+     "high": [
+      84,
+      93,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-TR102",
+   "family": "cooling-tower",
+   "name": "Torre de refrigeración de tiro forzado",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-TR102-A.ifc",
+   "size": [
+    3900,
+    4700,
+    3600
+   ],
+   "parts": [
+    {
+     "name": "Balsa",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      18
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa",
+     "low": [
+      0,
+      17,
+      18
+     ],
+     "high": [
+      100,
+      100,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Entrada de aire",
+     "low": [
+      6,
+      0,
+      23
+     ],
+     "high": [
+      94,
+      17,
+      37
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ventilador frontal",
+     "low": [
+      26,
+      0,
+      38
+     ],
+     "high": [
+      74,
+      17,
+      75
+     ],
+     "axis": "y",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-EX101",
+   "family": "mixer-settler",
+   "name": "Mezclador-decantador de una etapa",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-EX101-A.ifc",
+   "size": [
+    5300,
+    1850,
+    2100
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Decantador 1",
+     "low": [
+      0.0,
+      0,
+      7
+     ],
+     "high": [
+      100.0,
+      100,
+      55
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cámara de mezcla 1",
+     "low": [
+      2.0,
+      8,
+      55
+     ],
+     "high": [
+      35.0,
+      52,
+      82
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Accionamiento 1",
+     "low": [
+      4.0,
+      17,
+      82
+     ],
+     "high": [
+      23.0,
+      42,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-EX102",
+   "family": "mixer-settler",
+   "name": "Batería de extracción de dos etapas",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-EX102-A.ifc",
+   "size": [
+    10800,
+    2200,
+    2400
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Decantador 1",
+     "low": [
+      0.0,
+      0,
+      7
+     ],
+     "high": [
+      50.0,
+      100,
+      55
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cámara de mezcla 1",
+     "low": [
+      2.0,
+      8,
+      55
+     ],
+     "high": [
+      17.5,
+      52,
+      82
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Accionamiento 1",
+     "low": [
+      4.0,
+      17,
+      82
+     ],
+     "high": [
+      11.5,
+      42,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Decantador 2",
+     "low": [
+      50.0,
+      0,
+      7
+     ],
+     "high": [
+      100.0,
+      100,
+      55
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cámara de mezcla 2",
+     "low": [
+      52.0,
+      8,
+      55
+     ],
+     "high": [
+      67.5,
+      52,
+      82
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Accionamiento 2",
+     "low": [
+      54.0,
+      17,
+      82
+     ],
+     "high": [
+      61.5,
+      42,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-V103",
+   "family": "vertical",
+   "name": "Recipiente agitado sobre patas",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-V103-A.ifc",
+   "size": [
+    1950,
+    5100,
+    1950
+   ],
+   "parts": [
+    {
+     "name": "Pata izquierda",
+     "low": [
+      8,
+      35,
+      0
+     ],
+     "high": [
+      20,
+      61,
+      24
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Pata derecha",
+     "low": [
+      80,
+      35,
+      0
+     ],
+     "high": [
+      92,
+      61,
+      24
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Pata posterior",
+     "low": [
+      44,
+      81,
+      0
+     ],
+     "high": [
+      56,
+      93,
+      24
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Fondo inferior",
+     "low": [
+      0,
+      0,
+      17
+     ],
+     "high": [
+      100,
+      100,
+      30
+     ],
+     "axis": "z",
+     "ends": [
+      0.45,
+      1
+     ]
+    },
+    {
+     "name": "Virola",
+     "low": [
+      0,
+      0,
+      30
+     ],
+     "high": [
+      100,
+      100,
+      77
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Fondo superior",
+     "low": [
+      0,
+      0,
+      77
+     ],
+     "high": [
+      100,
+      100,
+      88
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.5
+     ]
+    },
+    {
+     "name": "Conexión lateral",
+     "low": [
+      81,
+      41,
+      49
+     ],
+     "high": [
+      100,
+      59,
+      59
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Accionamiento",
+     "low": [
+      40,
+      40,
+      88
+     ],
+     "high": [
+      60,
+      60,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-V104",
+   "family": "vertical",
+   "name": "Separador vertical de doble entrada",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-V104-A.ifc",
+   "size": [
+    2400,
+    7900,
+    2400
+   ],
+   "parts": [
+    {
+     "name": "Faldón",
+     "low": [
+      2,
+      2,
+      0
+     ],
+     "high": [
+      98,
+      98,
+      30
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Fondo inferior",
+     "low": [
+      0,
+      0,
+      17
+     ],
+     "high": [
+      100,
+      100,
+      30
+     ],
+     "axis": "z",
+     "ends": [
+      0.45,
+      1
+     ]
+    },
+    {
+     "name": "Virola",
+     "low": [
+      0,
+      0,
+      30
+     ],
+     "high": [
+      100,
+      100,
+      77
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Fondo superior",
+     "low": [
+      0,
+      0,
+      77
+     ],
+     "high": [
+      100,
+      100,
+      88
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.5
+     ]
+    },
+    {
+     "name": "Conexión lateral",
+     "low": [
+      81,
+      41,
+      49
+     ],
+     "high": [
+      100,
+      59,
+      59
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Salida superior",
+     "low": [
+      41,
+      41,
+      88
+     ],
+     "high": [
+      59,
+      59,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Segunda conexión",
+     "low": [
+      0,
+      38,
+      62
+     ],
+     "high": [
+      12,
+      62,
+      72
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-H103",
+   "family": "horizontal",
+   "name": "Separador horizontal con bota",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-H103-A.ifc",
+   "size": [
+    7900,
+    3250,
+    2350
+   ],
+   "parts": [
+    {
+     "name": "Fondo izquierdo",
+     "low": [
+      0,
+      0,
+      34
+     ],
+     "high": [
+      8,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      0.28,
+      1
+     ]
+    },
+    {
+     "name": "Virola",
+     "low": [
+      8,
+      0,
+      34
+     ],
+     "high": [
+      92,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Fondo derecho",
+     "low": [
+      92,
+      0,
+      34
+     ],
+     "high": [
+      100,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      0.28
+     ]
+    },
+    {
+     "name": "Entrada",
+     "low": [
+      24,
+      37,
+      90
+     ],
+     "high": [
+      30,
+      63,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Salida",
+     "low": [
+      71,
+      41,
+      90
+     ],
+     "high": [
+      77,
+      59,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Silleta 1",
+     "low": [
+      19,
+      18,
+      0
+     ],
+     "high": [
+      27,
+      82,
+      40
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Silleta 2",
+     "low": [
+      74,
+      18,
+      0
+     ],
+     "high": [
+      82,
+      82,
+      40
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Bota inferior",
+     "low": [
+      42,
+      28,
+      9
+     ],
+     "high": [
+      57,
+      72,
+      34
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-H104",
+   "family": "horizontal",
+   "name": "Recipiente horizontal sobre tres silletas",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-H104-A.ifc",
+   "size": [
+    11400,
+    3650,
+    2750
+   ],
+   "parts": [
+    {
+     "name": "Fondo izquierdo",
+     "low": [
+      0,
+      0,
+      34
+     ],
+     "high": [
+      8,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      0.28,
+      1
+     ]
+    },
+    {
+     "name": "Virola",
+     "low": [
+      8,
+      0,
+      34
+     ],
+     "high": [
+      92,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Fondo derecho",
+     "low": [
+      92,
+      0,
+      34
+     ],
+     "high": [
+      100,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      0.28
+     ]
+    },
+    {
+     "name": "Entrada",
+     "low": [
+      24,
+      37,
+      90
+     ],
+     "high": [
+      30,
+      63,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Salida",
+     "low": [
+      71,
+      41,
+      90
+     ],
+     "high": [
+      77,
+      59,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Silleta 1",
+     "low": [
+      15,
+      18,
+      0
+     ],
+     "high": [
+      23,
+      82,
+      40
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Silleta 2",
+     "low": [
+      46,
+      18,
+      0
+     ],
+     "high": [
+      54,
+      82,
+      40
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Silleta 3",
+     "low": [
+      77,
+      18,
+      0
+     ],
+     "high": [
+      85,
+      82,
+      40
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-C103",
+   "family": "column",
+   "name": "Columna de relleno con registros",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-C103-A.ifc",
+   "size": [
+    2600,
+    14300,
+    2600
+   ],
+   "parts": [
+    {
+     "name": "Columna",
+     "low": [
+      12,
+      12,
+      0
+     ],
+     "high": [
+      88,
+      88,
+      91
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cabezal",
+     "low": [
+      12,
+      12,
+      91
+     ],
+     "high": [
+      88,
+      88,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.42
+     ]
+    },
+    {
+     "name": "Brida de registro 1",
+     "low": [
+      0,
+      0,
+      25
+     ],
+     "high": [
+      100,
+      100,
+      26.5
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Brida de registro 2",
+     "low": [
+      0,
+      0,
+      54
+     ],
+     "high": [
+      100,
+      100,
+      55.5
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Brida de registro 3",
+     "low": [
+      0,
+      0,
+      78
+     ],
+     "high": [
+      100,
+      100,
+      79.5
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Entrada lateral",
+     "low": [
+      86,
+      38,
+      19
+     ],
+     "high": [
+      100,
+      62,
+      23
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-C104",
+   "family": "column",
+   "name": "Columna con rehervidor lateral",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-C104-A.ifc",
+   "size": [
+    4500,
+    18700,
+    3000
+   ],
+   "parts": [
+    {
+     "name": "Torre · Columna",
+     "low": [
+      8.52,
+      12.0,
+      0.0
+     ],
+     "high": [
+      62.48,
+      88.0,
+      91.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Torre · Cabezal",
+     "low": [
+      8.52,
+      12.0,
+      91.0
+     ],
+     "high": [
+      62.48,
+      88.0,
+      100.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.42
+     ]
+    },
+    {
+     "name": "Rehervidor lateral",
+     "low": [
+      75,
+      31,
+      0
+     ],
+     "high": [
+      100,
+      72,
+      37
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Retorno",
+     "low": [
+      60,
+      45,
+      30
+     ],
+     "high": [
+      88,
+      58,
+      35
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-E103",
+   "family": "exchanger",
+   "name": "Intercambiador tubular vertical",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-E103-A.ifc",
+   "size": [
+    1900,
+    5800,
+    1900
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Pedestal",
+     "low": [
+      29,
+      29,
+      7
+     ],
+     "high": [
+      71,
+      71,
+      17
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa vertical",
+     "low": [
+      12,
+      12,
+      17
+     ],
+     "high": [
+      88,
+      88,
+      83
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Brida inferior",
+     "low": [
+      0,
+      0,
+      17
+     ],
+     "high": [
+      100,
+      100,
+      22
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Brida superior",
+     "low": [
+      0,
+      0,
+      78
+     ],
+     "high": [
+      100,
+      100,
+      83
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Canal superior",
+     "low": [
+      23,
+      23,
+      83
+     ],
+     "high": [
+      77,
+      77,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.52
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-E104",
+   "family": "exchanger",
+   "name": "Intercambiador espiral compacto",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-E104-A.ifc",
+   "size": [
+    2250,
+    2530,
+    1290
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo",
+     "low": [
+      38,
+      23,
+      7
+     ],
+     "high": [
+      62,
+      77,
+      27
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cuerpo espiral",
+     "low": [
+      3,
+      17,
+      20
+     ],
+     "high": [
+      97,
+      83,
+      100
+     ],
+     "axis": "y",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tapa frontal",
+     "low": [
+      0,
+      0,
+      16
+     ],
+     "high": [
+      100,
+      18,
+      100
+     ],
+     "axis": "y",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Conexión central",
+     "low": [
+      35,
+      0,
+      46
+     ],
+     "high": [
+      65,
+      23,
+      68
+     ],
+     "axis": "y",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Conexión posterior",
+     "low": [
+      46,
+      80,
+      66
+     ],
+     "high": [
+      70,
+      100,
+      89
+     ],
+     "axis": "y",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-T103",
+   "family": "tank",
+   "name": "Tanque atmosférico de techo abovedado",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-T103-A.ifc",
+   "size": [
+    9900,
+    7800,
+    9900
+   ],
+   "parts": [
+    {
+     "name": "Virola",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      79
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Hombro del domo",
+     "low": [
+      0,
+      0,
+      79
+     ],
+     "high": [
+      100,
+      100,
+      91
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.78
+     ]
+    },
+    {
+     "name": "Corona del domo",
+     "low": [
+      11,
+      11,
+      91
+     ],
+     "high": [
+      89,
+      89,
+      97
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.32
+     ]
+    },
+    {
+     "name": "Respiradero",
+     "low": [
+      43,
+      43,
+      97
+     ],
+     "high": [
+      57,
+      57,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Registro",
+     "low": [
+      7,
+      11,
+      14
+     ],
+     "high": [
+      26,
+      28,
+      24
+     ],
+     "axis": "y",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-T104",
+   "family": "tank",
+   "name": "Tanque rectangular con rigidizadores",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-T104-A.ifc",
+   "size": [
+    6100,
+    2700,
+    3900
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Depósito",
+     "low": [
+      0,
+      0,
+      7
+     ],
+     "high": [
+      100,
+      100,
+      92
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cubierta",
+     "low": [
+      0,
+      0,
+      92
+     ],
+     "high": [
+      100,
+      100,
+      95
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Acceso",
+     "low": [
+      19,
+      23,
+      95
+     ],
+     "high": [
+      35,
+      47,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Rigidizador 1",
+     "low": [
+      18,
+      0,
+      7
+     ],
+     "high": [
+      21,
+      8,
+      92
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Rigidizador 2",
+     "low": [
+      39,
+      0,
+      7
+     ],
+     "high": [
+      42,
+      8,
+      92
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Rigidizador 3",
+     "low": [
+      60,
+      0,
+      7
+     ],
+     "high": [
+      63,
+      8,
+      92
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Rigidizador 4",
+     "low": [
+      81,
+      0,
+      7
+     ],
+     "high": [
+      84,
+      8,
+      92
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-P103",
+   "family": "pump",
+   "name": "Bomba horizontal de engranajes",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-P103-A.ifc",
+   "size": [
+    1760,
+    1200,
+    840
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa de engranajes",
+     "low": [
+      4,
+      0,
+      9
+     ],
+     "high": [
+      40,
+      100,
+      70
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Acoplamiento",
+     "low": [
+      40,
+      31,
+      25
+     ],
+     "high": [
+      65,
+      69,
+      48
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Motor",
+     "low": [
+      65,
+      18,
+      9
+     ],
+     "high": [
+      100,
+      82,
+      65
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Boquilla superior",
+     "low": [
+      12,
+      30,
+      70
+     ],
+     "high": [
+      31,
+      70,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-P104",
+   "family": "pump",
+   "name": "Bomba vertical multietapa",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-P104-A.ifc",
+   "size": [
+    920,
+    2150,
+    920
+   ],
+   "parts": [
+    {
+     "name": "Base de montaje",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      8
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cuerpo vertical",
+     "low": [
+      22,
+      22,
+      8
+     ],
+     "high": [
+      78,
+      78,
+      68
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Motor superior",
+     "low": [
+      18,
+      18,
+      68
+     ],
+     "high": [
+      82,
+      82,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Descarga lateral",
+     "low": [
+      63,
+      36,
+      45
+     ],
+     "high": [
+      100,
+      64,
+      57
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-K103",
+   "family": "compressor",
+   "name": "Compresor centrífugo de una etapa",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-K103-A.ifc",
+   "size": [
+    3540,
+    2340,
+    1700
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Soporte central",
+     "low": [
+      11,
+      16,
+      7
+     ],
+     "high": [
+      47,
+      84,
+      25
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa centrífuga",
+     "low": [
+      0,
+      0,
+      24
+     ],
+     "high": [
+      49,
+      100,
+      82
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Descarga",
+     "low": [
+      16,
+      31,
+      75
+     ],
+     "high": [
+      26,
+      66,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Acoplamiento",
+     "low": [
+      49,
+      38,
+      44
+     ],
+     "high": [
+      68,
+      62,
+      62
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Accionamiento",
+     "low": [
+      68,
+      15,
+      23
+     ],
+     "high": [
+      100,
+      85,
+      83
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Pedestal del accionamiento",
+     "low": [
+      76,
+      33,
+      7
+     ],
+     "high": [
+      92,
+      67,
+      28
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-K104",
+   "family": "compressor",
+   "name": "Módulo de compresión dúplex",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-K104-A.ifc",
+   "size": [
+    6800,
+    2740,
+    3400
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      4
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tren A · Bancada",
+     "low": [
+      0.0,
+      0.0,
+      4.0
+     ],
+     "high": [
+      100.0,
+      44.0,
+      10.719999999999999
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tren A · Soporte central",
+     "low": [
+      11.0,
+      7.04,
+      10.719999999999999
+     ],
+     "high": [
+      47.0,
+      36.96,
+      28.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tren A · Carcasa centrífuga",
+     "low": [
+      0.0,
+      0.0,
+      27.04
+     ],
+     "high": [
+      49.0,
+      44.0,
+      82.72
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tren A · Descarga",
+     "low": [
+      16.0,
+      13.64,
+      76.0
+     ],
+     "high": [
+      26.0,
+      29.04,
+      100.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tren A · Acoplamiento",
+     "low": [
+      49.0,
+      16.72,
+      46.24
+     ],
+     "high": [
+      68.0,
+      27.28,
+      63.52
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tren A · Accionamiento",
+     "low": [
+      68.0,
+      6.6,
+      26.08
+     ],
+     "high": [
+      100.0,
+      37.4,
+      83.68
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tren A · Pedestal del accionamiento",
+     "low": [
+      76.0,
+      14.52,
+      10.719999999999999
+     ],
+     "high": [
+      92.0,
+      29.48,
+      30.88
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tren B · Bancada",
+     "low": [
+      0.0,
+      56.0,
+      4.0
+     ],
+     "high": [
+      100.0,
+      100.0,
+      10.719999999999999
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tren B · Soporte central",
+     "low": [
+      11.0,
+      63.04,
+      10.719999999999999
+     ],
+     "high": [
+      47.0,
+      92.96000000000001,
+      28.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tren B · Carcasa centrífuga",
+     "low": [
+      0.0,
+      56.0,
+      27.04
+     ],
+     "high": [
+      49.0,
+      100.0,
+      82.72
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tren B · Descarga",
+     "low": [
+      16.0,
+      69.64,
+      76.0
+     ],
+     "high": [
+      26.0,
+      85.03999999999999,
+      100.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tren B · Acoplamiento",
+     "low": [
+      49.0,
+      72.72,
+      46.24
+     ],
+     "high": [
+      68.0,
+      83.28,
+      63.52
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tren B · Accionamiento",
+     "low": [
+      68.0,
+      62.6,
+      26.08
+     ],
+     "high": [
+      100.0,
+      93.4,
+      83.68
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tren B · Pedestal del accionamiento",
+     "low": [
+      76.0,
+      70.52,
+      10.719999999999999
+     ],
+     "high": [
+      92.0,
+      85.48,
+      30.88
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-G103",
+   "family": "generic",
+   "name": "Envolvente de caseta con marquesina",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-G103-A.ifc",
+   "size": [
+    5300,
+    3150,
+    2900
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Volumen de caseta",
+     "low": [
+      4,
+      18,
+      7
+     ],
+     "high": [
+      96,
+      100,
+      91
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Volumen de marquesina",
+     "low": [
+      0,
+      0,
+      91
+     ],
+     "high": [
+      100,
+      100,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-G104",
+   "family": "generic",
+   "name": "Reserva de implantación en dos niveles",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-G104-A.ifc",
+   "size": [
+    6300,
+    4800,
+    3200
+   ],
+   "parts": [
+    {
+     "name": "Nivel inferior",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      54
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Nivel superior retranqueado",
+     "low": [
+      34,
+      13,
+      54
+     ],
+     "high": [
+      100,
+      100,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-AC103",
+   "family": "air-cooler",
+   "name": "Aeroenfriador inducido de tres ventiladores",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-AC103-A.ifc",
+   "size": [
+    16500,
+    4900,
+    4750
+   ],
+   "parts": [
+    {
+     "name": "Haz aleteado",
+     "low": [
+      0,
+      0,
+      52
+     ],
+     "high": [
+      100,
+      100,
+      65
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Colector",
+     "low": [
+      0,
+      0,
+      45
+     ],
+     "high": [
+      10,
+      100,
+      63
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Colector opuesto",
+     "low": [
+      90,
+      0,
+      45
+     ],
+     "high": [
+      100,
+      100,
+      63
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo 1",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      6,
+      8,
+      52
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo 2",
+     "low": [
+      94,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      8,
+      52
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo 3",
+     "low": [
+      0,
+      92,
+      0
+     ],
+     "high": [
+      6,
+      100,
+      52
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo 4",
+     "low": [
+      94,
+      92,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      52
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Anillo ventilador 1",
+     "low": [
+      1,
+      9,
+      65
+     ],
+     "high": [
+      37,
+      91,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Anillo ventilador 2",
+     "low": [
+      32,
+      9,
+      65
+     ],
+     "high": [
+      68,
+      91,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Anillo ventilador 3",
+     "low": [
+      63,
+      9,
+      65
+     ],
+     "high": [
+      99,
+      91,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-AC104",
+   "family": "air-cooler",
+   "name": "Dos haces de aeroenfriamiento en paralelo",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-AC104-A.ifc",
+   "size": [
+    11900,
+    4950,
+    7800
+   ],
+   "parts": [
+    {
+     "name": "Haz A · Haz aleteado",
+     "low": [
+      0.0,
+      0.0,
+      79.0
+     ],
+     "high": [
+      100.0,
+      42.0,
+      92.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz A · Colector",
+     "low": [
+      0.0,
+      0.0,
+      72.0
+     ],
+     "high": [
+      10.0,
+      42.0,
+      90.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz A · Colector opuesto",
+     "low": [
+      90.0,
+      0.0,
+      72.0
+     ],
+     "high": [
+      100.0,
+      42.0,
+      90.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz A · Apoyo 1",
+     "low": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "high": [
+      6.0,
+      3.36,
+      79.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz A · Apoyo 2",
+     "low": [
+      94.0,
+      0.0,
+      0.0
+     ],
+     "high": [
+      100.0,
+      3.36,
+      79.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz A · Apoyo 3",
+     "low": [
+      0.0,
+      38.64,
+      0.0
+     ],
+     "high": [
+      6.0,
+      42.0,
+      79.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz A · Apoyo 4",
+     "low": [
+      94.0,
+      38.64,
+      0.0
+     ],
+     "high": [
+      100.0,
+      42.0,
+      79.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz A · Anillo ventilador 1",
+     "low": [
+      10.0,
+      3.78,
+      46.0
+     ],
+     "high": [
+      46.0,
+      38.22,
+      79.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz A · Anillo ventilador 2",
+     "low": [
+      54.0,
+      3.78,
+      46.0
+     ],
+     "high": [
+      90.0,
+      38.22,
+      79.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz B · Haz aleteado",
+     "low": [
+      0.0,
+      58.0,
+      79.0
+     ],
+     "high": [
+      100.0,
+      100.0,
+      92.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz B · Colector",
+     "low": [
+      0.0,
+      58.0,
+      72.0
+     ],
+     "high": [
+      10.0,
+      100.0,
+      90.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz B · Colector opuesto",
+     "low": [
+      90.0,
+      58.0,
+      72.0
+     ],
+     "high": [
+      100.0,
+      100.0,
+      90.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz B · Apoyo 1",
+     "low": [
+      0.0,
+      58.0,
+      0.0
+     ],
+     "high": [
+      6.0,
+      61.36,
+      79.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz B · Apoyo 2",
+     "low": [
+      94.0,
+      58.0,
+      0.0
+     ],
+     "high": [
+      100.0,
+      61.36,
+      79.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz B · Apoyo 3",
+     "low": [
+      0.0,
+      96.64,
+      0.0
+     ],
+     "high": [
+      6.0,
+      100.0,
+      79.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz B · Apoyo 4",
+     "low": [
+      94.0,
+      96.64,
+      0.0
+     ],
+     "high": [
+      100.0,
+      100.0,
+      79.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz B · Anillo ventilador 1",
+     "low": [
+      10.0,
+      61.78,
+      46.0
+     ],
+     "high": [
+      46.0,
+      96.22,
+      79.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Haz B · Anillo ventilador 2",
+     "low": [
+      54.0,
+      61.78,
+      46.0
+     ],
+     "high": [
+      90.0,
+      96.22,
+      79.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-EV103",
+   "family": "evaporator",
+   "name": "Evaporador de doble efecto",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-EV103-A.ifc",
+   "size": [
+    9200,
+    10000,
+    4450
+   ],
+   "parts": [
+    {
+     "name": "Efecto 1 · Bancada",
+     "low": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "high": [
+      46.0,
+      100.0,
+      7.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Efecto 1 · Apoyo de calandria",
+     "low": [
+      8.28,
+      32.0,
+      7.0
+     ],
+     "high": [
+      16.56,
+      68.0,
+      18.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Efecto 1 · Apoyo de separador",
+     "low": [
+      30.36,
+      28.0,
+      7.0
+     ],
+     "high": [
+      39.56,
+      72.0,
+      18.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Efecto 1 · Calandria",
+     "low": [
+      4.14,
+      15.0,
+      18.0
+     ],
+     "high": [
+      20.24,
+      85.0,
+      100.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Efecto 1 · Separador",
+     "low": [
+      25.3,
+      6.0,
+      18.0
+     ],
+     "high": [
+      44.16,
+      94.0,
+      67.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Efecto 1 · Conducto de vapor",
+     "low": [
+      18.4,
+      46.0,
+      52.0
+     ],
+     "high": [
+      27.6,
+      54.0,
+      60.0
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Efecto 1 · Distribuidor",
+     "low": [
+      8.28,
+      29.0,
+      91.0
+     ],
+     "high": [
+      16.1,
+      71.0,
+      100.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Efecto 2 · Bancada",
+     "low": [
+      52.0,
+      0.0,
+      0.0
+     ],
+     "high": [
+      100.0,
+      100.0,
+      6.16
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Efecto 2 · Apoyo de calandria",
+     "low": [
+      60.64,
+      32.0,
+      6.16
+     ],
+     "high": [
+      69.28,
+      68.0,
+      15.84
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Efecto 2 · Apoyo de separador",
+     "low": [
+      83.68,
+      28.0,
+      6.16
+     ],
+     "high": [
+      93.28,
+      72.0,
+      15.84
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Efecto 2 · Calandria",
+     "low": [
+      56.32,
+      15.0,
+      15.84
+     ],
+     "high": [
+      73.12,
+      85.0,
+      88.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Efecto 2 · Separador",
+     "low": [
+      78.4,
+      6.0,
+      15.84
+     ],
+     "high": [
+      98.08,
+      94.0,
+      58.96
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Efecto 2 · Conducto de vapor",
+     "low": [
+      71.2,
+      46.0,
+      45.76
+     ],
+     "high": [
+      80.8,
+      54.0,
+      52.8
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Efecto 2 · Distribuidor",
+     "low": [
+      60.64,
+      29.0,
+      80.08
+     ],
+     "high": [
+      68.8,
+      71.0,
+      88.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Colector entre efectos",
+     "low": [
+      35,
+      44,
+      50
+     ],
+     "high": [
+      65,
+      56,
+      57
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-EV104",
+   "family": "evaporator",
+   "name": "Evaporador compacto con separador elevado",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-EV104-A.ifc",
+   "size": [
+    4850,
+    11350,
+    3400
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Bastidor del separador",
+     "low": [
+      55,
+      28,
+      7
+     ],
+     "high": [
+      93,
+      72,
+      56
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Calandria",
+     "low": [
+      2,
+      18,
+      7
+     ],
+     "high": [
+      42,
+      82,
+      86
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Separador elevado",
+     "low": [
+      53,
+      0,
+      54
+     ],
+     "high": [
+      100,
+      100,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Interconexión",
+     "low": [
+      36,
+      42,
+      65
+     ],
+     "high": [
+      61,
+      58,
+      71
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-FI103",
+   "family": "filter",
+   "name": "Banco de filtros de tres carcasas",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-FI103-A.ifc",
+   "size": [
+    3000,
+    2070,
+    1000
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Colector",
+     "low": [
+      0,
+      43,
+      39
+     ],
+     "high": [
+      100,
+      57,
+      47
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa 1",
+     "low": [
+      3,
+      0,
+      7
+     ],
+     "high": [
+      26,
+      100,
+      90
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa 2",
+     "low": [
+      38,
+      0,
+      7
+     ],
+     "high": [
+      61,
+      100,
+      90
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa 3",
+     "low": [
+      73,
+      0,
+      7
+     ],
+     "high": [
+      96,
+      100,
+      90
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tapa 1",
+     "low": [
+      1,
+      0,
+      90
+     ],
+     "high": [
+      28,
+      100,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tapa 2",
+     "low": [
+      36,
+      0,
+      90
+     ],
+     "high": [
+      63,
+      100,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tapa 3",
+     "low": [
+      71,
+      0,
+      90
+     ],
+     "high": [
+      98,
+      100,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-FI104",
+   "family": "filter",
+   "name": "Filtro horizontal de cartuchos",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-FI104-A.ifc",
+   "size": [
+    1940,
+    1310,
+    910
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Soporte",
+     "low": [
+      20,
+      23,
+      7
+     ],
+     "high": [
+      72,
+      77,
+      38
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa",
+     "low": [
+      0,
+      4,
+      31
+     ],
+     "high": [
+      92,
+      96,
+      91
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tapa extraíble",
+     "low": [
+      90,
+      0,
+      24
+     ],
+     "high": [
+      100,
+      100,
+      98
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Entrada superior",
+     "low": [
+      27,
+      35,
+      91
+     ],
+     "high": [
+      38,
+      65,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-CE103",
+   "family": "centrifuge",
+   "name": "Centrífuga vertical con descarga inferior",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-CE103-A.ifc",
+   "size": [
+    2820,
+    2800,
+    1850
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Bastidor",
+     "low": [
+      0,
+      11,
+      7
+     ],
+     "high": [
+      100,
+      89,
+      33
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Canasta exterior",
+     "low": [
+      12,
+      0,
+      33
+     ],
+     "high": [
+      79,
+      100,
+      86
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tapa",
+     "low": [
+      12,
+      0,
+      86
+     ],
+     "high": [
+      79,
+      100,
+      95
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Módulo de accionamiento",
+     "low": [
+      74,
+      25,
+      33
+     ],
+     "high": [
+      100,
+      75,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-CE104",
+   "family": "centrifuge",
+   "name": "Decantador con motor acoplado",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-CE104-A.ifc",
+   "size": [
+    5750,
+    2400,
+    1980
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo",
+     "low": [
+      15,
+      24,
+      7
+     ],
+     "high": [
+      92,
+      76,
+      26
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tambor cilíndrico",
+     "low": [
+      0,
+      0,
+      26
+     ],
+     "high": [
+      52,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tramo cónico",
+     "low": [
+      52,
+      0,
+      26
+     ],
+     "high": [
+      70,
+      100,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      0.46
+     ]
+    },
+    {
+     "name": "Acoplamiento",
+     "low": [
+      70,
+      38,
+      47
+     ],
+     "high": [
+      76,
+      62,
+      69
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Motor",
+     "low": [
+      76,
+      21,
+      26
+     ],
+     "high": [
+      100,
+      79,
+      90
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Admisión superior",
+     "low": [
+      29,
+      39,
+      90
+     ],
+     "high": [
+      38,
+      61,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-CY103",
+   "family": "cyclone",
+   "name": "Separador multiciclónico de tres cámaras",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-CY103-A.ifc",
+   "size": [
+    5950,
+    6400,
+    2750
+   ],
+   "parts": [
+    {
+     "name": "Ciclón 1 - cuerpo",
+     "low": [
+      0,
+      5,
+      53
+     ],
+     "high": [
+      28,
+      95,
+      85
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón 1 - cono",
+     "low": [
+      0,
+      5,
+      12
+     ],
+     "high": [
+      28,
+      95,
+      53
+     ],
+     "axis": "z",
+     "ends": [
+      0.2,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón 1 - descarga",
+     "low": [
+      11.200000000000001,
+      41,
+      0
+     ],
+     "high": [
+      16.8,
+      59,
+      12
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón 1 - salida superior",
+     "low": [
+      8.96,
+      34,
+      85
+     ],
+     "high": [
+      19.040000000000003,
+      66,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón 1 - entrada lateral",
+     "low": [
+      0,
+      0,
+      65
+     ],
+     "high": [
+      28,
+      30,
+      76
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón 2 - cuerpo",
+     "low": [
+      36,
+      5,
+      53
+     ],
+     "high": [
+      64,
+      95,
+      85
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón 2 - cono",
+     "low": [
+      36,
+      5,
+      12
+     ],
+     "high": [
+      64,
+      95,
+      53
+     ],
+     "axis": "z",
+     "ends": [
+      0.2,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón 2 - descarga",
+     "low": [
+      47.2,
+      41,
+      0
+     ],
+     "high": [
+      52.8,
+      59,
+      12
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón 2 - salida superior",
+     "low": [
+      44.96,
+      34,
+      85
+     ],
+     "high": [
+      55.040000000000006,
+      66,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón 2 - entrada lateral",
+     "low": [
+      36,
+      0,
+      65
+     ],
+     "high": [
+      64,
+      30,
+      76
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón 3 - cuerpo",
+     "low": [
+      72,
+      5,
+      53
+     ],
+     "high": [
+      100,
+      95,
+      85
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón 3 - cono",
+     "low": [
+      72,
+      5,
+      12
+     ],
+     "high": [
+      100,
+      95,
+      53
+     ],
+     "axis": "z",
+     "ends": [
+      0.2,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón 3 - descarga",
+     "low": [
+      83.2,
+      41,
+      0
+     ],
+     "high": [
+      88.8,
+      59,
+      12
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón 3 - salida superior",
+     "low": [
+      80.96000000000001,
+      34,
+      85
+     ],
+     "high": [
+      91.04,
+      66,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ciclón 3 - entrada lateral",
+     "low": [
+      72,
+      0,
+      65
+     ],
+     "high": [
+      100,
+      30,
+      76
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Conducto común",
+     "low": [
+      0,
+      10,
+      92
+     ],
+     "high": [
+      100,
+      90,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-CY104",
+   "family": "cyclone",
+   "name": "Ciclón con tolva de recogida",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-CY104-A.ifc",
+   "size": [
+    2800,
+    7650,
+    2480
+   ],
+   "parts": [
+    {
+     "name": "Superior · Ciclón - cuerpo",
+     "low": [
+      0.0,
+      5.0,
+      63.34
+     ],
+     "high": [
+      100.0,
+      95.0,
+      88.3
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Superior · Ciclón - cono",
+     "low": [
+      0.0,
+      5.0,
+      31.36
+     ],
+     "high": [
+      100.0,
+      95.0,
+      63.34
+     ],
+     "axis": "z",
+     "ends": [
+      0.2,
+      1
+     ]
+    },
+    {
+     "name": "Superior · Ciclón - descarga",
+     "low": [
+      40.0,
+      41.0,
+      22.0
+     ],
+     "high": [
+      60.0,
+      59.0,
+      31.36
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Superior · Ciclón - salida superior",
+     "low": [
+      32.0,
+      34.0,
+      88.3
+     ],
+     "high": [
+      68.0,
+      66.0,
+      100.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Superior · Ciclón - entrada lateral",
+     "low": [
+      0.0,
+      0.0,
+      72.7
+     ],
+     "high": [
+      100.0,
+      30.0,
+      81.28
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tolva",
+     "low": [
+      21,
+      21,
+      8
+     ],
+     "high": [
+      79,
+      79,
+      22
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.33
+     ]
+    },
+    {
+     "name": "Depósito inferior",
+     "low": [
+      21,
+      21,
+      0
+     ],
+     "high": [
+      79,
+      79,
+      9
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-SE103",
+   "family": "dryer",
+   "name": "Secador rotativo sobre rodillos",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-SE103-A.ifc",
+   "size": [
+    10500,
+    4550,
+    3350
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Tambor",
+     "low": [
+      0,
+      5,
+      21
+     ],
+     "high": [
+      100,
+      95,
+      91
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Aro 1",
+     "low": [
+      22,
+      0,
+      17
+     ],
+     "high": [
+      26,
+      100,
+      95
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Aro 2",
+     "low": [
+      72,
+      0,
+      17
+     ],
+     "high": [
+      76,
+      100,
+      95
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo 1",
+     "low": [
+      18,
+      20,
+      7
+     ],
+     "high": [
+      30,
+      80,
+      26
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Apoyo 2",
+     "low": [
+      68,
+      20,
+      7
+     ],
+     "high": [
+      80,
+      80,
+      26
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Salida de aire",
+     "low": [
+      82,
+      35,
+      89
+     ],
+     "high": [
+      91,
+      65,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-SE104",
+   "family": "dryer",
+   "name": "Lecho fluido con módulo de salida",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-SE104-A.ifc",
+   "size": [
+    7950,
+    3180,
+    2610
+   ],
+   "parts": [
+    {
+     "name": "Principal · Bancada",
+     "low": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "high": [
+      77.0,
+      100.0,
+      7.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Principal · Plenum",
+     "low": [
+      0.0,
+      0.0,
+      7.0
+     ],
+     "high": [
+      77.0,
+      100.0,
+      30.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Principal · Cámara de lecho",
+     "low": [
+      0.0,
+      0.0,
+      30.0
+     ],
+     "high": [
+      77.0,
+      100.0,
+      66.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Principal · Cubierta",
+     "low": [
+      0.0,
+      0.0,
+      66.0
+     ],
+     "high": [
+      77.0,
+      100.0,
+      82.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Principal · Extracción de aire",
+     "low": [
+      43.12,
+      19.0,
+      82.0
+     ],
+     "high": [
+      52.36,
+      81.0,
+      100.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Módulo de salida",
+     "low": [
+      77,
+      8,
+      7
+     ],
+     "high": [
+      100,
+      92,
+      67
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cubierta de descarga",
+     "low": [
+      77,
+      8,
+      67
+     ],
+     "high": [
+      100,
+      92,
+      74
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-ME103",
+   "family": "static-mixer",
+   "name": "Mezclador estático vertical",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-ME103-A.ifc",
+   "size": [
+    740,
+    2450,
+    725
+   ],
+   "parts": [
+    {
+     "name": "Tubo vertical",
+     "low": [
+      13,
+      13,
+      5
+     ],
+     "high": [
+      87,
+      87,
+      95
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Brida inferior",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      5
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Brida superior",
+     "low": [
+      0,
+      0,
+      95
+     ],
+     "high": [
+      100,
+      100,
+      100
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ramal lateral",
+     "low": [
+      77,
+      34,
+      28
+     ],
+     "high": [
+      100,
+      66,
+      38
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-ME104",
+   "family": "static-mixer",
+   "name": "Mezclador en línea de dos etapas",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-ME104-A.ifc",
+   "size": [
+    4350,
+    820,
+    710
+   ],
+   "parts": [
+    {
+     "name": "Etapa A · Camisa",
+     "low": [
+      0.0,
+      10.0,
+      10.0
+     ],
+     "high": [
+      47.0,
+      90.0,
+      76.0
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Etapa A · Brida de entrada",
+     "low": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "high": [
+      2.82,
+      100.0,
+      86.0
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Etapa A · Brida de salida",
+     "low": [
+      44.18,
+      0.0,
+      0.0
+     ],
+     "high": [
+      47.0,
+      100.0,
+      86.0
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Etapa A · Ramal de adición",
+     "low": [
+      12.22,
+      30.0,
+      72.0
+     ],
+     "high": [
+      18.8,
+      70.0,
+      100.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Etapa B · Camisa",
+     "low": [
+      53.0,
+      10.0,
+      10.0
+     ],
+     "high": [
+      100.0,
+      90.0,
+      76.0
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Etapa B · Brida de entrada",
+     "low": [
+      53.0,
+      0.0,
+      0.0
+     ],
+     "high": [
+      55.82,
+      100.0,
+      86.0
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Etapa B · Brida de salida",
+     "low": [
+      97.18,
+      0.0,
+      0.0
+     ],
+     "high": [
+      100.0,
+      100.0,
+      86.0
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Etapa B · Ramal de adición",
+     "low": [
+      65.22,
+      30.0,
+      72.0
+     ],
+     "high": [
+      71.8,
+      70.0,
+      100.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Manguito intermedio",
+     "low": [
+      47,
+      10,
+      10
+     ],
+     "high": [
+      53,
+      90,
+      76
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-DO103",
+   "family": "dosing-skid",
+   "name": "Dosificación con depósito de preparación",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-DO103-A.ifc",
+   "size": [
+    3100,
+    2200,
+    1350
+   ],
+   "parts": [
+    {
+     "name": "Panel · Bancada",
+     "low": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "high": [
+      62.0,
+      100.0,
+      7.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Panel · Panel de montaje",
+     "low": [
+      0.0,
+      86.0,
+      7.0
+     ],
+     "high": [
+      62.0,
+      100.0,
+      100.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Panel · Armario de control",
+     "low": [
+      39.68,
+      50.0,
+      58.0
+     ],
+     "high": [
+      62.0,
+      86.0,
+      100.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Panel · Colector inferior",
+     "low": [
+      0.0,
+      18.0,
+      19.0
+     ],
+     "high": [
+      62.0,
+      26.0,
+      26.0
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Panel · Bomba dosificadora 1",
+     "low": [
+      6.2,
+      0.0,
+      34.0
+     ],
+     "high": [
+      21.7,
+      52.0,
+      65.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Panel · Bomba dosificadora 2",
+     "low": [
+      26.66,
+      0.0,
+      34.0
+     ],
+     "high": [
+      42.16,
+      52.0,
+      65.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Depósito · Virola",
+     "low": [
+      62.0,
+      5.0,
+      0.0
+     ],
+     "high": [
+      100.0,
+      95.0,
+      56.88
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Depósito · Hombro del domo",
+     "low": [
+      62.0,
+      5.0,
+      56.88
+     ],
+     "high": [
+      100.0,
+      95.0,
+      65.52
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.78
+     ]
+    },
+    {
+     "name": "Depósito · Corona del domo",
+     "low": [
+      66.18,
+      14.9,
+      65.52
+     ],
+     "high": [
+      95.82,
+      85.1,
+      69.84
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      0.32
+     ]
+    },
+    {
+     "name": "Depósito · Respiradero",
+     "low": [
+      78.34,
+      43.7,
+      69.84
+     ],
+     "high": [
+      83.66,
+      56.3,
+      72.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Depósito · Registro",
+     "low": [
+      64.66,
+      14.9,
+      10.08
+     ],
+     "high": [
+      71.88,
+      30.2,
+      17.28
+     ],
+     "axis": "y",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-DO104",
+   "family": "dosing-skid",
+   "name": "Módulo de dosificación con dos circuitos",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-DO104-A.ifc",
+   "size": [
+    4900,
+    2350,
+    1750
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      5
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Circuito A · Bancada",
+     "low": [
+      0.0,
+      0.0,
+      5.0
+     ],
+     "high": [
+      48.0,
+      100.0,
+      11.65
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Circuito A · Panel de montaje",
+     "low": [
+      0.0,
+      86.0,
+      11.65
+     ],
+     "high": [
+      48.0,
+      100.0,
+      100.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Circuito A · Armario de control",
+     "low": [
+      30.72,
+      50.0,
+      60.1
+     ],
+     "high": [
+      48.0,
+      86.0,
+      100.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Circuito A · Colector inferior",
+     "low": [
+      0.0,
+      18.0,
+      23.05
+     ],
+     "high": [
+      48.0,
+      26.0,
+      29.7
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Circuito A · Bomba dosificadora 1",
+     "low": [
+      6.24,
+      0.0,
+      37.3
+     ],
+     "high": [
+      18.24,
+      52.0,
+      66.75
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Circuito B · Bancada",
+     "low": [
+      52.0,
+      0.0,
+      5.0
+     ],
+     "high": [
+      100.0,
+      100.0,
+      11.65
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Circuito B · Panel de montaje",
+     "low": [
+      52.0,
+      86.0,
+      11.65
+     ],
+     "high": [
+      100.0,
+      100.0,
+      100.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Circuito B · Armario de control",
+     "low": [
+      82.72,
+      50.0,
+      60.1
+     ],
+     "high": [
+      100.0,
+      86.0,
+      100.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Circuito B · Colector inferior",
+     "low": [
+      52.0,
+      18.0,
+      23.05
+     ],
+     "high": [
+      100.0,
+      26.0,
+      29.7
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Circuito B · Bomba dosificadora 1",
+     "low": [
+      56.8,
+      0.0,
+      37.3
+     ],
+     "high": [
+      68.8,
+      52.0,
+      66.75
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Circuito B · Bomba dosificadora 2",
+     "low": [
+      72.64,
+      0.0,
+      37.3
+     ],
+     "high": [
+      84.64,
+      52.0,
+      66.75
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-TR103",
+   "family": "cooling-tower",
+   "name": "Torre inducida de dos celdas",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-TR103-A.ifc",
+   "size": [
+    9850,
+    6150,
+    5300
+   ],
+   "parts": [
+    {
+     "name": "Celda A · Balsa",
+     "low": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "high": [
+      50.0,
+      100.0,
+      18.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Celda A · Carcasa",
+     "low": [
+      0.0,
+      17.0,
+      18.0
+     ],
+     "high": [
+      50.0,
+      100.0,
+      82.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Celda A · Entrada de aire",
+     "low": [
+      3.0,
+      0.0,
+      23.0
+     ],
+     "high": [
+      47.0,
+      17.0,
+      37.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Celda A · Ventilador superior",
+     "low": [
+      8.0,
+      7.0,
+      82.0
+     ],
+     "high": [
+      42.0,
+      93.0,
+      100.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Celda B · Balsa",
+     "low": [
+      50.0,
+      0.0,
+      0.0
+     ],
+     "high": [
+      100.0,
+      100.0,
+      18.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Celda B · Carcasa",
+     "low": [
+      50.0,
+      17.0,
+      18.0
+     ],
+     "high": [
+      100.0,
+      100.0,
+      82.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Celda B · Entrada de aire",
+     "low": [
+      53.0,
+      0.0,
+      23.0
+     ],
+     "high": [
+      97.0,
+      17.0,
+      37.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Celda B · Ventilador superior",
+     "low": [
+      58.0,
+      7.0,
+      82.0
+     ],
+     "high": [
+      92.0,
+      93.0,
+      100.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-TR104",
+   "family": "cooling-tower",
+   "name": "Torre de tiro forzado con ventilación doble",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-TR104-A.ifc",
+   "size": [
+    6550,
+    4850,
+    4560
+   ],
+   "parts": [
+    {
+     "name": "Balsa",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      18
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Carcasa",
+     "low": [
+      0,
+      17,
+      18
+     ],
+     "high": [
+      100,
+      100,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Entrada de aire",
+     "low": [
+      6,
+      0,
+      23
+     ],
+     "high": [
+      94,
+      17,
+      37
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ventilador izquierdo",
+     "low": [
+      7,
+      0,
+      36
+     ],
+     "high": [
+      41,
+      17,
+      76
+     ],
+     "axis": "y",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Ventilador derecho",
+     "low": [
+      59,
+      0,
+      36
+     ],
+     "high": [
+      93,
+      17,
+      76
+     ],
+     "axis": "y",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-EX103",
+   "family": "mixer-settler",
+   "name": "Batería de extracción de tres etapas",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-EX103-A.ifc",
+   "size": [
+    15700,
+    2530,
+    2740
+   ],
+   "parts": [
+    {
+     "name": "Bancada",
+     "low": [
+      0,
+      0,
+      0
+     ],
+     "high": [
+      100,
+      100,
+      7
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Decantador 1",
+     "low": [
+      0.0,
+      0,
+      7
+     ],
+     "high": [
+      33.333333333333336,
+      100,
+      55
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cámara de mezcla 1",
+     "low": [
+      2.0,
+      8,
+      55
+     ],
+     "high": [
+      11.666666666666666,
+      52,
+      82
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Accionamiento 1",
+     "low": [
+      4.0,
+      17,
+      82
+     ],
+     "high": [
+      7.666666666666668,
+      42,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Decantador 2",
+     "low": [
+      33.333333333333336,
+      0,
+      7
+     ],
+     "high": [
+      66.66666666666667,
+      100,
+      55
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cámara de mezcla 2",
+     "low": [
+      35.333333333333336,
+      8,
+      55
+     ],
+     "high": [
+      45.0,
+      52,
+      82
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Accionamiento 2",
+     "low": [
+      37.333333333333336,
+      17,
+      82
+     ],
+     "high": [
+      41.0,
+      42,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Decantador 3",
+     "low": [
+      66.66666666666667,
+      0,
+      7
+     ],
+     "high": [
+      100.0,
+      100,
+      55
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Cámara de mezcla 3",
+     "low": [
+      68.66666666666667,
+      8,
+      55
+     ],
+     "high": [
+      78.33333333333334,
+      52,
+      82
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Accionamiento 3",
+     "low": [
+      70.66666666666667,
+      17,
+      82
+     ],
+     "high": [
+      74.33333333333334,
+      42,
+      100
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "tag": "BC-EX104",
+   "family": "mixer-settler",
+   "name": "Mezclador-decantador con depósito auxiliar",
+   "origin": "industrial",
+   "ifc": "/demo/industriales/BC-EX104-A.ifc",
+   "size": [
+    7400,
+    2750,
+    2680
+   ],
+   "parts": [
+    {
+     "name": "Extractor · Bancada",
+     "low": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "high": [
+      72.0,
+      100.0,
+      7.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Extractor · Decantador 1",
+     "low": [
+      0.0,
+      0.0,
+      7.0
+     ],
+     "high": [
+      72.0,
+      100.0,
+      55.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Extractor · Cámara de mezcla 1",
+     "low": [
+      1.44,
+      8.0,
+      55.0
+     ],
+     "high": [
+      25.2,
+      52.0,
+      82.0
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Extractor · Accionamiento 1",
+     "low": [
+      2.88,
+      17.0,
+      82.0
+     ],
+     "high": [
+      16.56,
+      42.0,
+      100.0
+     ],
+     "axis": "",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Depósito auxiliar",
+     "low": [
+      77,
+      14,
+      0
+     ],
+     "high": [
+      100,
+      86,
+      75
+     ],
+     "axis": "z",
+     "ends": [
+      1,
+      1
+     ]
+    },
+    {
+     "name": "Interconexión",
+     "low": [
+      68,
+      44,
+      33
+     ],
+     "high": [
+      86,
+      56,
+      43
+     ],
+     "axis": "x",
+     "ends": [
+      1,
+      1
+     ]
+    }
+   ]
+  }
+ ]
+}

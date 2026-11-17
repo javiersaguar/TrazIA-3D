@@ -48,6 +48,8 @@ export type ExtendedViewerProps = IfcViewerProps & {
   onMeasure?(sample: PerformanceSample): void;
   onRequestMeasure?(): void;
   performanceSample?: PerformanceSample | null;
+  /** Mientras carga un IFC nuevo, sigue mostrando el anterior (edición en tiempo real). */
+  holdPrevious?: boolean;
 };
 
 export function IfcViewer({
@@ -64,8 +66,9 @@ export function IfcViewer({
   onMeasure,
   onRequestMeasure,
   performanceSample,
+  holdPrevious = false,
 }: ExtendedViewerProps) {
-  const load = useIfcModel(ifcUrl),
+  const load = useIfcModel(ifcUrl, holdPrevious),
     products = usePreparedModel(load.model);
   const [selection, setSelection] = useState<string>();
   const [hover, setHover] = useState<string | null>(null);
