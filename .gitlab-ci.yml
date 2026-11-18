@@ -1,0 +1,39 @@
+# Comprobaciones en GitLab, por si la organización ofrece runners (docs/FLUJO_IA.md).
+# Sin runners no corre nada: entonces se pasa `uv run python scripts/comprobar.py` en local.
+stages: [datos, pruebas]
+
+guardian:
+  stage: datos
+  image: python:3.12-slim
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq git >/dev/null
+  script:
+    - python scripts/guardian_datos.py --todo
+    - python scripts/guardian_datos.py --historial
+
+python:
+  stage: pruebas
+  image: ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+  variables:
+    UV_CACHE_DIR: .uv-cache
+  cache:
+    key: uv-$CI_COMMIT_REF_SLUG
+    paths: [.uv-cache]
+  script:
+    - uv sync --frozen --extra dev --extra api --extra ocr
+    - uv run ruff check .
+    - uv run ruff format --check .
+    - uv run pytest -q
+    - uv run trazia lote examples/documents -o /tmp/trazia/salida --dataset synthetic
+
+web:
+  stage: pruebas
+  image: node:22-bookworm-slim
+  script:
+    - corepack enable
+    - cd web
+    - corepack pnpm install --frozen-lockfile
+    - corepack pnpm typecheck
+    - corepack pnpm lint
+    - corepack pnpm test:unit
+    - corepack pnpm build

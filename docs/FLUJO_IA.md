@@ -74,6 +74,9 @@ Con eso el agente crea un caso sintético que reproduce el patrón: con el gener
 Nunca copia un fragmento del original. Después escribe la prueba que falla, la arregla, y la
 persona vuelve a lanzar el equipo real en Databricks para confirmar.
 
+`uv run python -m bench.triaje <salida>` (o la celda de triaje de `04_todo`) agrupa los fallos
+por categoría y etapa y deja esta plantilla rellena salvo el patrón.
+
 Plantilla para pedírselo:
 
 ```text
@@ -100,8 +103,9 @@ Reprodúcelo con un caso sintético, añade una prueba que falle y arréglalo si
   hay que usar el mismo nombre y correo que en `.github/autores.txt` (o añadir ese correo). El
   hook de `.githooks` no corre allí, así que nadie añade coautores a mano.
 - **Comprobaciones.** Los workflows de GitHub Actions no se ejecutan en GitLab. Antes de integrar
-  en `main` se pasan en local `ruff check`, `ruff format --check` y `pytest`. Un
-  `.gitlab-ci.yml` solo tiene sentido si la organización ofrece runners: preguntarlo.
+  en `main` se pasa en local `uv run python scripts/comprobar.py` (guardián de datos, ruff,
+  pruebas y lote sintético). El `.gitlab-ci.yml` hace lo mismo si la organización ofrece
+  runners: preguntarlo. Detalle en [AUTOMATIZACION.md](AUTOMATIZACION.md).
 - **Integración.** Una persona integra cada vez y lo avisa en el canal privado del equipo:
   `git pull`, comprobaciones, `merge --no-ff` y push. Recomendación: congelar `main` el viernes a
   las 9:00 para tener margen hasta la entrega de las 10:00.

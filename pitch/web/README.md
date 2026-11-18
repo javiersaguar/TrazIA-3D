@@ -71,7 +71,10 @@ seleccionada y la casilla **?fx=0** cambia solo el panel Actual.
 3. Indicar el alcance de los datos de evento donde corresponda. Conservar la
    marca sintética en el material de ensayo que se reutilice y publicar solo
    agregados y medios que el organizador autorice.
-4. Ejecutar las pruebas y volver a compilar. Ensayar con el portátil y el
+4. Las cifras de TR no se escriben a mano: `uv run python -m bench.cifras aplicar
+   cifras_evento.json` (desde la raíz del repo) genera `src/cifras-evento.js`, que
+   `pitch-data.js` aplica a la escena de escala. Con `null` se ven las sintéticas.
+5. Ejecutar las pruebas y volver a compilar. Ensayar con el portátil y el
    proyector antes de entregar. El mismo guion sirve para montar el PowerPoint.
 
 ## Procedencia del boceto

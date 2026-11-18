@@ -105,8 +105,10 @@ def generate_set(
     output: Path,
     cases: int | None = None,
     degradations: tuple[str, ...] | None = None,
+    spec: SetSpec | None = None,
 ) -> dict:
-    spec = SETS[name]
+    """Genera el conjunto `name` de SETS, o `spec` si se pasa (p. ej. synthetic.desde_perfil)."""
+    spec = spec or SETS[name]
     cases = spec.cases if cases is None else cases
     degradations = degradations or spec.degradations
     rng = random.Random(spec.seed)

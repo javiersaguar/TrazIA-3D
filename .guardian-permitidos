@@ -1,0 +1,19 @@
+# Carpetas y patrones donde pueden versionarse documentos, imágenes y modelos (scripts/guardian_datos.py).
+# Todo lo que hay aquí es nuestro y sintético. Un dato de TR nunca entra en estas carpetas.
+# Añadir una línea exige un commit propio revisado por otra persona.
+examples/
+web/public/demo/
+web/public/brand/
+web/docs/capturas/
+web/docs/capturas-3d/
+docs/capturas/
+docs/evidencias/
+docs/ifc-checks/
+docs/referencias-estilo/
+docs/marca/
+promo/trazia-hackathon/public/
+promo/trazia-hackathon/out/
+pitch/web/public/
+tests/fixtures/
+.agents/skills/
+.claude/skills/

@@ -11,6 +11,7 @@ const root = resolve(__dirname, "..");
   Si no tienes Chrome: PW_CHANNEL=msedge pnpm test:e2e
   - humo: recorre las pantallas y las interacciones clave.
   - capturas: guarda capturas de cada pantalla en oscuro y claro en docs/capturas/.
+  - guion: las capturas de docs/GUION_DEMO.md (1920×1080) en ../docs/capturas/producto/.
 */
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -30,6 +31,7 @@ export default defineConfig({
   projects: [
     { name: "humo", testMatch: /(?:humo|api|study|3d|producto|k8|fluidez|intro)\.spec\.ts/ },
     { name: "capturas", testMatch: /capturas\.spec\.ts/ },
+    { name: "guion", testMatch: /guion\.spec\.ts/ },
   ],
   webServer: [
     ...(connected && !process.env.PW_EXTERNAL_API ? [{

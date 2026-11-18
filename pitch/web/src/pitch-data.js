@@ -1,5 +1,8 @@
 // Punto de edición del pitch. Los resultados de esta versión proceden de sintéticos.
-export const pitch = {
+// Las cifras del evento llegan por cifras-evento.js (python -m bench.cifras aplicar).
+import { cifrasEvento } from "./cifras-evento.js";
+
+const base = {
   brand: "TrazIA·3D",
   challenge: "GA2MODEL · IndesIAhack 2026",
   dataset: "Datos sintéticos",
@@ -60,6 +63,39 @@ export const pitch = {
   },
 };
 
+const formato = (valor, decimales = 0) => valor == null ? "sin medir"
+  : new Intl.NumberFormat("es-ES", { maximumFractionDigits: decimales, useGrouping: "always" }).format(valor);
+
+const porcentaje = (valor) => valor == null ? null : valor * 100;
+
+// Sustituye el lote sintético por el del evento y añade la medida contra los IFC de TR.
+// Sin cifras devuelve el pitch tal cual: nada del evento aparece hasta que se aplica.
+export function conCifras(pitchBase, escenas, cifras) {
+  if (!cifras?.lote) return { pitch: pitchBase, scenes: escenas };
+  const { lote, evaluacion } = cifras;
+  const pitch = {
+    ...pitchBase,
+    dataset: "Sintéticos + agregados del reto",
+    batch: {
+      population: lote.revisiones,
+      drafts: lote.correctas,
+      errors: lote.errores,
+      speedup: null,
+      medianSeconds: lote.segundos_mediana,
+      detail: `Dataset del reto · Azure Databricks · ${cifras.fecha}`,
+    },
+    evaluation: evaluacion ?? null,
+  };
+  const medida = evaluacion?.equipos
+    ? ` Contra los IFC de referencia de TR, en ${evaluacion.equipos} equipos, el error medio del diámetro es del ${formato(porcentaje(evaluacion.error_relativo_diametro), 1)} % y encontramos el ${formato(porcentaje(evaluacion.boquillas_recall))} % de las boquillas.`
+    : " La comparación con los IFC de TR todavía no tiene cifra.";
+  const scenes = escenas.map((scene) => scene.id !== "scale" ? scene : {
+    ...scene,
+    notes: `Con el dataset del reto procesamos ${formato(lote.revisiones)} revisiones de ${formato(lote.equipos)} equipos: ${formato(lote.correctas)} IFC DRAFT y ${formato(lote.errores)} errores, con una mediana de ${formato(lote.segundos_mediana, 1)} segundos por revisión.${medida} Los DRAFT miden cobertura; la fidelidad es la comparación con la referencia.`,
+  });
+  return { pitch, scenes };
+}
+
 export const chapters = [
   { id: "problem", name: "Problema" },
   { id: "input", name: "Entrada" },
@@ -69,7 +105,7 @@ export const chapters = [
   { id: "impact", name: "Impacto" },
 ];
 
-export const scenes = [
+const baseScenes = [
   {
     id: "open", chapter: "problem", seconds: 24,
     title: "Un plano cambia.", accent: "¿Qué más cambia?",
@@ -130,3 +166,5 @@ export const scenes = [
     notes: "Queremos que cada cambio llegue al equipo con la cifra, el plano donde se leyó y la pieza que modifica. La siguiente prueba es medir la fidelidad del IFC sobre la referencia del reto y cronometrar la revisión humana. Con esas dos medidas podremos hablar de ahorro con una base defendible. Gracias.",
   },
 ];
+
+export const { pitch, scenes } = conCifras(base, baseScenes, cifrasEvento);

@@ -16,7 +16,8 @@ Castillo y Alejandro Cuevas Cid**.
   git config user.email "tu-correo@ejemplo.com"
   ```
 
-- Activa el hook que rechaza coautores (una vez por clon):
+- Activa los hooks (una vez por clon): `commit-msg` rechaza coautores y `pre-commit` pasa el
+  guardián de datos ([docs/AUTOMATIZACION.md](docs/AUTOMATIZACION.md)):
 
   ```bash
   git config core.hooksPath .githooks
