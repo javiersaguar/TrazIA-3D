@@ -317,3 +317,40 @@ def test_entrega_detecta_coautores_y_correos_ajenos(monkeypatch, tmp_path, capsy
     entrega.comprobar_autoria(informe)
     salida = capsys.readouterr().out
     assert "✓ Autores" in salida and "✗ Commits con coautor o firma" in salida
+
+
+@pytest.fixture
+def demo(monkeypatch):
+    monkeypatch.syspath_prepend(str(RAIZ / "scripts"))
+    return importlib.import_module("demo")
+
+
+def test_reiniciar_demo_restaura_la_api_sin_borrar_ni_tocar_lo_privado(demo, tmp_path):
+    datos, inicial, apartado = tmp_path / "data", tmp_path / "inicial", tmp_path / "apartado"
+    (datos / "store" / "rev").mkdir(parents=True)
+    (datos / "store" / "rev" / "a.json").write_text("inicial", encoding="utf-8")
+    (datos / "trazia.sqlite3").write_text("base inicial", encoding="utf-8")
+    for intocable in ("private/plano.pdf", "cache/vision.json"):
+        (datos / intocable).parent.mkdir(parents=True, exist_ok=True)
+        (datos / intocable).write_text("no tocar", encoding="utf-8")
+
+    assert demo.reiniciar_api(datos, inicial, apartado) is None  # sin inicial, no hace nada
+    assert demo.guardar_inicial(datos, inicial) == ["trazia.sqlite3", "store"]
+    assert not (inicial / "private").exists() and not (inicial / "cache").exists()
+
+    # Se usa la demo: cambia la base y aparece una revisión nueva
+    (datos / "trazia.sqlite3").write_text("base usada", encoding="utf-8")
+    (datos / "store" / "rev" / "b.json").write_text("nueva", encoding="utf-8")
+    copia = demo.reiniciar_api(datos, inicial, apartado)
+
+    assert (datos / "trazia.sqlite3").read_text(encoding="utf-8") == "base inicial"
+    assert sorted(p.name for p in (datos / "store" / "rev").iterdir()) == ["a.json"]
+    assert (copia / "trazia.sqlite3").read_text(encoding="utf-8") == "base usada"
+    assert (copia / "store" / "rev" / "b.json").is_file()  # lo anterior se aparta, no se borra
+    for intocable in ("private/plano.pdf", "cache/vision.json"):
+        assert (datos / intocable).read_text(encoding="utf-8") == "no tocar"
+
+
+def test_guardar_inicial_sin_estado_de_la_api_avisa(demo, tmp_path):
+    with pytest.raises(SystemExit, match="arranca la demo"):
+        demo.guardar_inicial(tmp_path / "vacio", tmp_path / "inicial")
