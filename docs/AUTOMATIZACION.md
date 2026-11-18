@@ -15,6 +15,9 @@ no improvisarlos. Todos se ejecutan desde la raíz del repo. Las reglas de datos
 | Con las cifras | `uv run python -m bench.cifras aplicar cifras_evento.json` | Cifras de TR al pitch y frases del guion, sin copiarlas a mano |
 | Ensayo y demo | `uv run python scripts/demo.py [--pitch]` | API offline, web compilada y pestañas en el orden del guion |
 | Capturas | `cd web; corepack pnpm capturas:guion` | Las seis capturas del guion a 1920×1080 |
+| Entre ensayos | `uv run python scripts/demo.py --reiniciar` | La API y el navegador vuelven al estado guardado con `--guardar-inicial` |
+| Plan C | `uv run --with imageio-ffmpeg python scripts/video_respaldo.py` | Graba el vídeo de respaldo de la demo, 1080p30 con rótulos |
+| Pitch para enviar | `uv run --with python-pptx python pitch/web/scripts/exportar_pptx.py` | `pitch/TrazIA-3D.pptx` y `.pdf` con el guion en las notas |
 | Viernes, antes de las 9:00 | `uv run python scripts/entrega.py` | Comprueba todo lo que debe estar bien en la entrega |
 
 ## Guardián de datos
@@ -95,6 +98,20 @@ pestañas en el orden del guion. `--sin-api` es el plan B (datos de `web/public/
 sirve además el pitch compilado en el puerto 4173 y `--construir` fuerza recompilar. Ctrl+C para
 todo.
 
+### Reiniciar entre ensayos
+
+Con la demo parada y recién preparada (documentos subidos, cachés hechas),
+`uv run python scripts/demo.py --guardar-inicial` copia el estado de la API (la base SQLite y
+`store/`) a `generated/demo-inicial/`. Después, `--reiniciar` arranca como siempre pero antes:
+
+- aparta el estado actual a `generated/demo-apartado/<fecha>/` (no se borra nada) y copia el
+  guardado;
+- abre primero `/reiniciar?destino=/documentos`, que vacía lo que la web guarda en el navegador:
+  documentos añadidos, familias, borradores, cambios de Diseños y preferencias.
+
+`cache/` y `private/` no se tocan nunca. Sin estado guardado solo se vacía el navegador.
+`/reiniciar` también sirve a mano en cualquier portátil, con o sin API.
+
 ## Capturas del guion
 
 `corepack pnpm capturas:guion` (proyecto `guion` de Playwright) deja en
@@ -103,6 +120,23 @@ tema oscuro, en el estado que pide el guion: documentos recién añadidos, recor
 lectura, diámetro con su cota en el plano, estudio, Rayos X con la N2 y cambios con la N4. Cada
 paso es «si se puede»: si la interfaz cambia, la captura sale igual y un aviso `[guion]` indica
 qué revisar. El mapa de calor (`demo-07`) sale del notebook 03.
+
+## Vídeo de respaldo
+
+`scripts/video_respaldo.py` compila la web, recorre el guion con Playwright (proyecto `video`,
+`web/tests/e2e/video-respaldo.spec.ts`) y graba la pantalla a 1920×1080 con el screencast de
+Chrome. Luego lo codifica con ffmpeg en H.264 a 30 fps en
+`generated/video-respaldo/TrazIA-3D-demo-respaldo.mp4`, que no se versiona. Dura unos dos minutos
+y medio, sin voz. Unos rótulos dicen qué se ve y el cursor se mueve despacio hasta cada control.
+Usa solo la web con los datos de `web/public/demo`. Si un paso falla, el vídeo sale igual y la
+salida dice qué revisar. `--sin-compilar` reutiliza el build.
+
+## Pitch en PowerPoint y PDF
+
+`pitch/web/scripts/exportar_pptx.py` compila el pitch, captura cada escena ya animada a
+1920×1080 y monta `pitch/TrazIA-3D.pptx` con una imagen por diapositiva, el guion de cada escena
+en las notas del orador y `pitch/TrazIA-3D.pdf`. Se regenera después de `bench.cifras aplicar`
+para que lleve las cifras del evento. Detalles en [pitch/web/README.md](../pitch/web/README.md).
 
 ## Entrega del viernes
 

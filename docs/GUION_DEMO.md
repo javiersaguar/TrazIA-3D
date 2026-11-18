@@ -177,6 +177,11 @@ seis primeras en `docs/capturas/producto/` en el estado de esta tabla:
 
 ### Grabación de pantalla para el vídeo
 
+Hay una versión automática, sin voz y con rótulos, que sirve ya como plan C:
+`uv run --with imageio-ffmpeg python scripts/video_respaldo.py` (ver
+[AUTOMATIZACION.md](AUTOMATIZACION.md#vídeo-de-respaldo)). La grabación con OBS de abajo es la
+del montaje final con voz.
+
 - OBS a 1920×1080 y 30 fps (igual que el vídeo de 45 s), sin sonido del sistema.
 - Cursor resaltado y clics visibles. Cada pantalla, en un clip propio con 2 s de margen delante y
   detrás para cortar.
