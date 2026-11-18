@@ -64,6 +64,11 @@ LABELS = {
     "head_depth": ("HEAD_DEPTH", "HEAD DEPTH", "PROFUNDIDAD DE FONDO"),
     "skirt_height": ("SKIRT_HEIGHT", "SKIRT HEIGHT", "ALTURA DE FALDON"),
     "skirt_thickness": ("SKIRT_THICKNESS", "SKIRT THICKNESS", "ESPESOR DE FALDON"),
+    **{
+        f"envelope.{part}.{axis}": (f"ENVELOPE_{part.upper()}_{axis.upper()}",)
+        for part in ("origin", "size")
+        for axis in "xyz"
+    },
 }
 
 

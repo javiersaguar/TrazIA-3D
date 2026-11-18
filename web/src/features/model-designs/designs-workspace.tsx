@@ -58,6 +58,7 @@ function DesignList({ selected, onChoose }: { selected: string; onChoose(tag: st
         <div>
           <h2 className="font-semibold text-strong">Diseños</h2>
           <p className="text-xs text-muted">{DESIGNS.length} equipos conceptuales sintéticos. El V-101 del pipeline está en Revisión.</p>
+          <Link href="/documentos?vista=proyectos" className="mt-1 inline-block text-xs text-accent-text hover:underline">Ver complejos de proceso completos</Link>
         </div>
         <label className="relative block">
           <span className="sr-only">Buscar diseño</span>

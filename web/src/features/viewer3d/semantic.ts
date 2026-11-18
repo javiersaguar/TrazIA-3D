@@ -5,6 +5,7 @@ export function semanticId(
   ifcType: string,
   psets: PropertySets = {},
 ): string {
+  if (psets.TrazIA_Traceability?.ProcessProject) return `element:${name}`;
   const identity = psets.TrazIA_Identity ?? psets.GA2MODEL_Identity;
   const component = String(
     identity?.ComponentId ?? identity?.NozzleId ?? name.split("/").at(-1) ?? "",

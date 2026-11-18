@@ -1,0 +1,808 @@
+[
+  {
+    "id": "plataforma-marina",
+    "code": "SIM-MAR",
+    "name": "Plataforma marina de producción",
+    "setting": "Mar abierto",
+    "description": "Colector de producción, separación de crudo, gas y agua, compresión y bombeo de crudo.",
+    "preset": "ocean",
+    "equipment": [
+      {
+        "tag": "M-101",
+        "name": "Colector de producción",
+        "family": "manifold",
+        "service": "Entrada multifásica"
+      },
+      {
+        "tag": "V-110",
+        "name": "Separador trifásico",
+        "family": "horizontal",
+        "service": "Separación primaria"
+      },
+      {
+        "tag": "V-120",
+        "name": "Depurador de gas",
+        "family": "vertical",
+        "service": "Retención de arrastres"
+      },
+      {
+        "tag": "K-130",
+        "name": "Compresor centrífugo",
+        "family": "compressor",
+        "service": "Gas de exportación"
+      },
+      {
+        "tag": "E-140",
+        "name": "Aeroenfriador de descarga",
+        "family": "air-cooler",
+        "service": "Enfriamiento de gas"
+      },
+      {
+        "tag": "P-150",
+        "name": "Bombeo de crudo",
+        "family": "pump",
+        "service": "Salida de crudo"
+      },
+      {
+        "tag": "H-160",
+        "name": "Hidrociclones de agua",
+        "family": "cyclone",
+        "service": "Agua producida"
+      }
+    ],
+    "lines": [
+      {
+        "tag": "MP-01",
+        "start": "M-101",
+        "end": "V-110",
+        "fluid": "Mezcla"
+      },
+      {
+        "tag": "GS-02",
+        "start": "V-110",
+        "end": "V-120",
+        "fluid": "Gas"
+      },
+      {
+        "tag": "GS-03",
+        "start": "V-120",
+        "end": "K-130",
+        "fluid": "Gas"
+      },
+      {
+        "tag": "GS-04",
+        "start": "K-130",
+        "end": "E-140",
+        "fluid": "Gas"
+      },
+      {
+        "tag": "OL-05",
+        "start": "V-110",
+        "end": "P-150",
+        "fluid": "Crudo"
+      },
+      {
+        "tag": "WP-06",
+        "start": "V-110",
+        "end": "H-160",
+        "fluid": "Agua"
+      }
+    ],
+    "changes": [
+      {
+        "tag": "V-110",
+        "label": "Ampliar la virola del separador",
+        "before": 3.3,
+        "after": 4.1,
+        "unit": "m"
+      },
+      {
+        "tag": "GS-04",
+        "label": "Elevar el tramo en rack del gas de descarga",
+        "before": 4.5,
+        "after": 6.2,
+        "unit": "m"
+      }
+    ],
+    "states": {
+      "00": {
+        "file": "SIM-MAR-A.ifc",
+        "bytes": 643415,
+        "triangles": 15828
+      },
+      "01": {
+        "file": "SIM-MAR-Ensayo-01.ifc",
+        "bytes": 641519,
+        "triangles": 15828
+      },
+      "10": {
+        "file": "SIM-MAR-Ensayo-10.ifc",
+        "bytes": 642077,
+        "triangles": 15828
+      },
+      "11": {
+        "file": "SIM-MAR-B.ifc",
+        "bytes": 643411,
+        "triangles": 15828
+      }
+    },
+    "documents": {
+      "A": {
+        "plan": "GA_SIM-MAR_revA.pdf",
+        "workbook": "Lista_SIM-MAR_revA.xlsx",
+        "equipment": {
+          "M-101": {
+            "plan": "GAD_M-101_revA.pdf",
+            "workbook": "HDM_M-101_revA.xlsx"
+          },
+          "V-110": {
+            "plan": "GAD_V-110_revA.pdf",
+            "workbook": "HDM_V-110_revA.xlsx"
+          },
+          "V-120": {
+            "plan": "GAD_V-120_revA.pdf",
+            "workbook": "HDM_V-120_revA.xlsx"
+          },
+          "K-130": {
+            "plan": "GAD_K-130_revA.pdf",
+            "workbook": "HDM_K-130_revA.xlsx"
+          },
+          "E-140": {
+            "plan": "GAD_E-140_revA.pdf",
+            "workbook": "HDM_E-140_revA.xlsx"
+          },
+          "P-150": {
+            "plan": "GAD_P-150_revA.pdf",
+            "workbook": "HDM_P-150_revA.xlsx"
+          },
+          "H-160": {
+            "plan": "GAD_H-160_revA.pdf",
+            "workbook": "HDM_H-160_revA.xlsx"
+          }
+        },
+        "archive": "SIM-MAR-dossier-A.zip"
+      },
+      "B": {
+        "plan": "GA_SIM-MAR_revB.pdf",
+        "workbook": "Lista_SIM-MAR_revB.xlsx",
+        "equipment": {
+          "M-101": {
+            "plan": "GAD_M-101_revB.pdf",
+            "workbook": "HDM_M-101_revB.xlsx"
+          },
+          "V-110": {
+            "plan": "GAD_V-110_revB.pdf",
+            "workbook": "HDM_V-110_revB.xlsx"
+          },
+          "V-120": {
+            "plan": "GAD_V-120_revB.pdf",
+            "workbook": "HDM_V-120_revB.xlsx"
+          },
+          "K-130": {
+            "plan": "GAD_K-130_revB.pdf",
+            "workbook": "HDM_K-130_revB.xlsx"
+          },
+          "E-140": {
+            "plan": "GAD_E-140_revB.pdf",
+            "workbook": "HDM_E-140_revB.xlsx"
+          },
+          "P-150": {
+            "plan": "GAD_P-150_revB.pdf",
+            "workbook": "HDM_P-150_revB.xlsx"
+          },
+          "H-160": {
+            "plan": "GAD_H-160_revB.pdf",
+            "workbook": "HDM_H-160_revB.xlsx"
+          }
+        },
+        "archive": "SIM-MAR-dossier-B.zip"
+      }
+    }
+  },
+  {
+    "id": "planta-desierto",
+    "code": "SIM-DES",
+    "name": "Planta de tratamiento de gas",
+    "setting": "Desierto",
+    "description": "Recepción de gas húmedo, deshidratación, compresión y recuperación de condensados.",
+    "preset": "desert",
+    "equipment": [
+      {
+        "tag": "V-210",
+        "name": "Separador de entrada",
+        "family": "horizontal",
+        "service": "Gas húmedo y condensado"
+      },
+      {
+        "tag": "F-220",
+        "name": "Filtro coalescente",
+        "family": "vertical",
+        "service": "Protección de la columna"
+      },
+      {
+        "tag": "C-230",
+        "name": "Columna de deshidratación TEG",
+        "family": "column",
+        "service": "Retirada de humedad"
+      },
+      {
+        "tag": "K-240",
+        "name": "Compresor de gas seco",
+        "family": "compressor",
+        "service": "Gas tratado"
+      },
+      {
+        "tag": "E-250",
+        "name": "Banco de aeroenfriamiento",
+        "family": "air-cooler",
+        "service": "Refrigeración por aire"
+      },
+      {
+        "tag": "T-260",
+        "name": "Tanque de condensado",
+        "family": "tank",
+        "service": "Almacenamiento intermedio"
+      },
+      {
+        "tag": "P-270",
+        "name": "Bombas de condensado",
+        "family": "pump",
+        "service": "Trasiego de líquido"
+      }
+    ],
+    "lines": [
+      {
+        "tag": "WG-11",
+        "start": "V-210",
+        "end": "F-220",
+        "fluid": "Gas"
+      },
+      {
+        "tag": "WG-12",
+        "start": "F-220",
+        "end": "C-230",
+        "fluid": "Gas"
+      },
+      {
+        "tag": "DG-13",
+        "start": "C-230",
+        "end": "K-240",
+        "fluid": "Gas"
+      },
+      {
+        "tag": "DG-14",
+        "start": "K-240",
+        "end": "E-250",
+        "fluid": "Gas"
+      },
+      {
+        "tag": "CL-15",
+        "start": "V-210",
+        "end": "T-260",
+        "fluid": "Condensado"
+      },
+      {
+        "tag": "CL-16",
+        "start": "T-260",
+        "end": "P-270",
+        "fluid": "Condensado"
+      }
+    ],
+    "changes": [
+      {
+        "tag": "C-230",
+        "label": "Elevar la columna y su plataforma de acceso",
+        "before": 15,
+        "after": 17.5,
+        "unit": "m"
+      },
+      {
+        "tag": "DG-14",
+        "label": "Sustituir el spool y sus bridas",
+        "before": 450,
+        "after": 600,
+        "unit": "mm"
+      }
+    ],
+    "states": {
+      "00": {
+        "file": "SIM-DES-A.ifc",
+        "bytes": 686268,
+        "triangles": 16728
+      },
+      "01": {
+        "file": "SIM-DES-Ensayo-01.ifc",
+        "bytes": 685490,
+        "triangles": 16728
+      },
+      "10": {
+        "file": "SIM-DES-Ensayo-10.ifc",
+        "bytes": 689690,
+        "triangles": 16888
+      },
+      "11": {
+        "file": "SIM-DES-B.ifc",
+        "bytes": 692142,
+        "triangles": 16888
+      }
+    },
+    "documents": {
+      "A": {
+        "plan": "GA_SIM-DES_revA.pdf",
+        "workbook": "Lista_SIM-DES_revA.xlsx",
+        "equipment": {
+          "V-210": {
+            "plan": "GAD_V-210_revA.pdf",
+            "workbook": "HDM_V-210_revA.xlsx"
+          },
+          "F-220": {
+            "plan": "GAD_F-220_revA.pdf",
+            "workbook": "HDM_F-220_revA.xlsx"
+          },
+          "C-230": {
+            "plan": "GAD_C-230_revA.pdf",
+            "workbook": "HDM_C-230_revA.xlsx"
+          },
+          "K-240": {
+            "plan": "GAD_K-240_revA.pdf",
+            "workbook": "HDM_K-240_revA.xlsx"
+          },
+          "E-250": {
+            "plan": "GAD_E-250_revA.pdf",
+            "workbook": "HDM_E-250_revA.xlsx"
+          },
+          "T-260": {
+            "plan": "GAD_T-260_revA.pdf",
+            "workbook": "HDM_T-260_revA.xlsx"
+          },
+          "P-270": {
+            "plan": "GAD_P-270_revA.pdf",
+            "workbook": "HDM_P-270_revA.xlsx"
+          }
+        },
+        "archive": "SIM-DES-dossier-A.zip"
+      },
+      "B": {
+        "plan": "GA_SIM-DES_revB.pdf",
+        "workbook": "Lista_SIM-DES_revB.xlsx",
+        "equipment": {
+          "V-210": {
+            "plan": "GAD_V-210_revB.pdf",
+            "workbook": "HDM_V-210_revB.xlsx"
+          },
+          "F-220": {
+            "plan": "GAD_F-220_revB.pdf",
+            "workbook": "HDM_F-220_revB.xlsx"
+          },
+          "C-230": {
+            "plan": "GAD_C-230_revB.pdf",
+            "workbook": "HDM_C-230_revB.xlsx"
+          },
+          "K-240": {
+            "plan": "GAD_K-240_revB.pdf",
+            "workbook": "HDM_K-240_revB.xlsx"
+          },
+          "E-250": {
+            "plan": "GAD_E-250_revB.pdf",
+            "workbook": "HDM_E-250_revB.xlsx"
+          },
+          "T-260": {
+            "plan": "GAD_T-260_revB.pdf",
+            "workbook": "HDM_T-260_revB.xlsx"
+          },
+          "P-270": {
+            "plan": "GAD_P-270_revB.pdf",
+            "workbook": "HDM_P-270_revB.xlsx"
+          }
+        },
+        "archive": "SIM-DES-dossier-B.zip"
+      }
+    }
+  },
+  {
+    "id": "terminal-costera",
+    "code": "SIM-GNL",
+    "name": "Terminal costera de almacenamiento",
+    "setting": "Costa",
+    "description": "Muelles, brazos marinos, tanques de GNL, trasiego y tratamiento de gas de evaporación.",
+    "preset": "coast",
+    "equipment": [
+      {
+        "tag": "LA-310",
+        "name": "Brazo marino de descarga",
+        "family": "arm",
+        "service": "Recepción desde buque"
+      },
+      {
+        "tag": "M-320",
+        "name": "Colector criogénico",
+        "family": "manifold",
+        "service": "Distribución de GNL"
+      },
+      {
+        "tag": "T-330",
+        "name": "Tanque criogénico A",
+        "family": "tank",
+        "service": "Contención primaria"
+      },
+      {
+        "tag": "T-340",
+        "name": "Tanque criogénico B",
+        "family": "tank",
+        "service": "Almacenamiento en paralelo"
+      },
+      {
+        "tag": "P-350",
+        "name": "Bombas de trasiego",
+        "family": "pump",
+        "service": "Envío a vaporización"
+      },
+      {
+        "tag": "E-360",
+        "name": "Banco de vaporización",
+        "family": "vaporizer",
+        "service": "Entrega de gas"
+      },
+      {
+        "tag": "K-370",
+        "name": "Compresor de gas de evaporación",
+        "family": "compressor",
+        "service": "Retorno de vapores"
+      }
+    ],
+    "lines": [
+      {
+        "tag": "LNG-21",
+        "start": "LA-310",
+        "end": "M-320",
+        "fluid": "GNL"
+      },
+      {
+        "tag": "LNG-22",
+        "start": "M-320",
+        "end": "T-330",
+        "fluid": "GNL"
+      },
+      {
+        "tag": "LNG-23",
+        "start": "M-320",
+        "end": "T-340",
+        "fluid": "GNL"
+      },
+      {
+        "tag": "LNG-24",
+        "start": "T-330",
+        "end": "P-350",
+        "fluid": "GNL"
+      },
+      {
+        "tag": "LNG-25",
+        "start": "P-350",
+        "end": "E-360",
+        "fluid": "GNL"
+      },
+      {
+        "tag": "BOG-26",
+        "start": "T-340",
+        "end": "K-370",
+        "fluid": "Gas"
+      },
+      {
+        "tag": "BOG-27",
+        "start": "K-370",
+        "end": "M-320",
+        "fluid": "Gas"
+      }
+    ],
+    "changes": [
+      {
+        "tag": "T-340",
+        "label": "Aumentar la envolvente vertical del tanque B",
+        "before": 10.5,
+        "after": 12.1,
+        "unit": "m"
+      },
+      {
+        "tag": "LNG-21",
+        "label": "Desviar el tramo de descarga hacia el borde del muelle",
+        "before": -2.5,
+        "after": -5,
+        "unit": "m"
+      }
+    ],
+    "states": {
+      "00": {
+        "file": "SIM-GNL-A.ifc",
+        "bytes": 695630,
+        "triangles": 17152
+      },
+      "01": {
+        "file": "SIM-GNL-Ensayo-01.ifc",
+        "bytes": 694449,
+        "triangles": 17152
+      },
+      "10": {
+        "file": "SIM-GNL-Ensayo-10.ifc",
+        "bytes": 697246,
+        "triangles": 17232
+      },
+      "11": {
+        "file": "SIM-GNL-B.ifc",
+        "bytes": 699465,
+        "triangles": 17232
+      }
+    },
+    "documents": {
+      "A": {
+        "plan": "GA_SIM-GNL_revA.pdf",
+        "workbook": "Lista_SIM-GNL_revA.xlsx",
+        "equipment": {
+          "LA-310": {
+            "plan": "GAD_LA-310_revA.pdf",
+            "workbook": "HDM_LA-310_revA.xlsx"
+          },
+          "M-320": {
+            "plan": "GAD_M-320_revA.pdf",
+            "workbook": "HDM_M-320_revA.xlsx"
+          },
+          "T-330": {
+            "plan": "GAD_T-330_revA.pdf",
+            "workbook": "HDM_T-330_revA.xlsx"
+          },
+          "T-340": {
+            "plan": "GAD_T-340_revA.pdf",
+            "workbook": "HDM_T-340_revA.xlsx"
+          },
+          "P-350": {
+            "plan": "GAD_P-350_revA.pdf",
+            "workbook": "HDM_P-350_revA.xlsx"
+          },
+          "E-360": {
+            "plan": "GAD_E-360_revA.pdf",
+            "workbook": "HDM_E-360_revA.xlsx"
+          },
+          "K-370": {
+            "plan": "GAD_K-370_revA.pdf",
+            "workbook": "HDM_K-370_revA.xlsx"
+          }
+        },
+        "archive": "SIM-GNL-dossier-A.zip"
+      },
+      "B": {
+        "plan": "GA_SIM-GNL_revB.pdf",
+        "workbook": "Lista_SIM-GNL_revB.xlsx",
+        "equipment": {
+          "LA-310": {
+            "plan": "GAD_LA-310_revB.pdf",
+            "workbook": "HDM_LA-310_revB.xlsx"
+          },
+          "M-320": {
+            "plan": "GAD_M-320_revB.pdf",
+            "workbook": "HDM_M-320_revB.xlsx"
+          },
+          "T-330": {
+            "plan": "GAD_T-330_revB.pdf",
+            "workbook": "HDM_T-330_revB.xlsx"
+          },
+          "T-340": {
+            "plan": "GAD_T-340_revB.pdf",
+            "workbook": "HDM_T-340_revB.xlsx"
+          },
+          "P-350": {
+            "plan": "GAD_P-350_revB.pdf",
+            "workbook": "HDM_P-350_revB.xlsx"
+          },
+          "E-360": {
+            "plan": "GAD_E-360_revB.pdf",
+            "workbook": "HDM_E-360_revB.xlsx"
+          },
+          "K-370": {
+            "plan": "GAD_K-370_revB.pdf",
+            "workbook": "HDM_K-370_revB.xlsx"
+          }
+        },
+        "archive": "SIM-GNL-dossier-B.zip"
+      }
+    }
+  },
+  {
+    "id": "refineria-activa",
+    "code": "SIM-REF",
+    "name": "Ampliación de una refinería",
+    "setting": "Complejo industrial",
+    "description": "Inserción de un tren de tratamiento entre colectores y equipos que ya están en servicio.",
+    "preset": "industrial",
+    "equipment": [
+      {
+        "tag": "M-410",
+        "name": "Colector de alimentación",
+        "family": "manifold",
+        "service": "Entrada de destilados"
+      },
+      {
+        "tag": "P-420",
+        "name": "Bombas de alimentación",
+        "family": "pump",
+        "service": "Impulsión"
+      },
+      {
+        "tag": "E-430",
+        "name": "Intercambiador de recuperación térmica",
+        "family": "horizontal",
+        "service": "Recuperación de calor"
+      },
+      {
+        "tag": "R-440",
+        "name": "Reactor de tratamiento",
+        "family": "column",
+        "service": "Tratamiento de destilado"
+      },
+      {
+        "tag": "V-450",
+        "name": "Separador de producto",
+        "family": "vertical",
+        "service": "Separación"
+      },
+      {
+        "tag": "E-460",
+        "name": "Aeroenfriador de producto",
+        "family": "air-cooler",
+        "service": "Acondicionamiento"
+      },
+      {
+        "tag": "T-470",
+        "name": "Tanque de producto",
+        "family": "tank",
+        "service": "Almacenamiento"
+      }
+    ],
+    "lines": [
+      {
+        "tag": "LP-31",
+        "start": "M-410",
+        "end": "P-420",
+        "fluid": "Crudo"
+      },
+      {
+        "tag": "LP-32",
+        "start": "P-420",
+        "end": "E-430",
+        "fluid": "Crudo"
+      },
+      {
+        "tag": "LP-33",
+        "start": "E-430",
+        "end": "R-440",
+        "fluid": "Crudo"
+      },
+      {
+        "tag": "LP-34",
+        "start": "R-440",
+        "end": "V-450",
+        "fluid": "Crudo"
+      },
+      {
+        "tag": "LP-35",
+        "start": "V-450",
+        "end": "E-460",
+        "fluid": "Condensado"
+      },
+      {
+        "tag": "LP-36",
+        "start": "E-460",
+        "end": "T-470",
+        "fluid": "Condensado"
+      }
+    ],
+    "changes": [
+      {
+        "tag": "R-440",
+        "label": "Elevar la plataforma del reactor",
+        "before": 13,
+        "after": 15,
+        "unit": "m"
+      },
+      {
+        "tag": "LP-33",
+        "label": "Elevar la conexión con la unidad existente",
+        "before": 4.5,
+        "after": 6,
+        "unit": "m"
+      }
+    ],
+    "states": {
+      "00": {
+        "file": "SIM-REF-A.ifc",
+        "bytes": 633932,
+        "triangles": 15552
+      },
+      "01": {
+        "file": "SIM-REF-Ensayo-01.ifc",
+        "bytes": 632328,
+        "triangles": 15552
+      },
+      "10": {
+        "file": "SIM-REF-Ensayo-10.ifc",
+        "bytes": 636562,
+        "triangles": 15652
+      },
+      "11": {
+        "file": "SIM-REF-B.ifc",
+        "bytes": 638186,
+        "triangles": 15652
+      }
+    },
+    "documents": {
+      "A": {
+        "plan": "GA_SIM-REF_revA.pdf",
+        "workbook": "Lista_SIM-REF_revA.xlsx",
+        "equipment": {
+          "M-410": {
+            "plan": "GAD_M-410_revA.pdf",
+            "workbook": "HDM_M-410_revA.xlsx"
+          },
+          "P-420": {
+            "plan": "GAD_P-420_revA.pdf",
+            "workbook": "HDM_P-420_revA.xlsx"
+          },
+          "E-430": {
+            "plan": "GAD_E-430_revA.pdf",
+            "workbook": "HDM_E-430_revA.xlsx"
+          },
+          "R-440": {
+            "plan": "GAD_R-440_revA.pdf",
+            "workbook": "HDM_R-440_revA.xlsx"
+          },
+          "V-450": {
+            "plan": "GAD_V-450_revA.pdf",
+            "workbook": "HDM_V-450_revA.xlsx"
+          },
+          "E-460": {
+            "plan": "GAD_E-460_revA.pdf",
+            "workbook": "HDM_E-460_revA.xlsx"
+          },
+          "T-470": {
+            "plan": "GAD_T-470_revA.pdf",
+            "workbook": "HDM_T-470_revA.xlsx"
+          }
+        },
+        "archive": "SIM-REF-dossier-A.zip"
+      },
+      "B": {
+        "plan": "GA_SIM-REF_revB.pdf",
+        "workbook": "Lista_SIM-REF_revB.xlsx",
+        "equipment": {
+          "M-410": {
+            "plan": "GAD_M-410_revB.pdf",
+            "workbook": "HDM_M-410_revB.xlsx"
+          },
+          "P-420": {
+            "plan": "GAD_P-420_revB.pdf",
+            "workbook": "HDM_P-420_revB.xlsx"
+          },
+          "E-430": {
+            "plan": "GAD_E-430_revB.pdf",
+            "workbook": "HDM_E-430_revB.xlsx"
+          },
+          "R-440": {
+            "plan": "GAD_R-440_revB.pdf",
+            "workbook": "HDM_R-440_revB.xlsx"
+          },
+          "V-450": {
+            "plan": "GAD_V-450_revB.pdf",
+            "workbook": "HDM_V-450_revB.xlsx"
+          },
+          "E-460": {
+            "plan": "GAD_E-460_revB.pdf",
+            "workbook": "HDM_E-460_revB.xlsx"
+          },
+          "T-470": {
+            "plan": "GAD_T-470_revB.pdf",
+            "workbook": "HDM_T-470_revB.xlsx"
+          }
+        },
+        "archive": "SIM-REF-dossier-B.zip"
+      }
+    }
+  }
+]

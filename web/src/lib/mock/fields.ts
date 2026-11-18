@@ -117,6 +117,15 @@ export function flattenRevision(revision: Revision): ReviewField[] {
     if (dimension) out.push(field(d.key, d.label, d.group, d.elementId, d.impact, dimension));
   }
 
+  if (eq.envelope) {
+    for (const part of ["origin", "size"] as const) {
+      for (const axis of ["x", "y", "z"] as const) {
+        out.push(field(`envelope.${part}.${axis}`, `${part === "origin" ? "Origen" : "Dimensión"} ${axis.toUpperCase()}`,
+          "Envolvente", "shell", 0.8, eq.envelope[part][axis]));
+      }
+    }
+  }
+
   for (const nozzle of eq.nozzles) {
     for (const f of NOZZLE_FIELDS) {
       out.push(

@@ -24,6 +24,7 @@ import {
   type ElementState,
 } from "./product-mesh";
 import { IfcInspector } from "./inspector";
+import { ProcessEnvironment } from "./process-environment";
 import { elementLabel, hasAssumption, parentElementId } from "./semantic";
 import { AnimatedSection } from "./section";
 import { ViewBookmarks } from "./view-bookmarks";
@@ -48,8 +49,6 @@ export type ExtendedViewerProps = IfcViewerProps & {
   onMeasure?(sample: PerformanceSample): void;
   onRequestMeasure?(): void;
   performanceSample?: PerformanceSample | null;
-  /** Mientras carga un IFC nuevo, sigue mostrando el anterior (edición en tiempo real). */
-  holdPrevious?: boolean;
 };
 
 export function IfcViewer({
@@ -67,6 +66,7 @@ export function IfcViewer({
   onRequestMeasure,
   performanceSample,
   holdPrevious = false,
+  scenario,
 }: ExtendedViewerProps) {
   const load = useIfcModel(ifcUrl, holdPrevious),
     products = usePreparedModel(load.model);
@@ -156,12 +156,16 @@ export function IfcViewer({
       data-triangles={model?.triangles}
       data-height={model?.bounds.max[1]}
       data-parse-ms={model?.parseMs.toFixed(2)}
+      data-ifc-url={model?.url}
+      data-scenario={scenario}
       data-provenance={model?.products.some(p => p.psets.TrazIA_Traceability?.Dataset === "real") ? "Datos reales" : model?.products.some(p => p.psets.TrazIA_Traceability?.Dataset === "synthetic") ? "Datos sintéticos" : "Procedencia sin declarar"}
       data-approval={model?.products.some(p => p.psets.TrazIA_Traceability?.Draft === true) ? "DRAFT · requiere revisión" : "Consultar aprobación en IFC"}
     >
       {model ? (
-        <SceneCanvas label="Modelo IFC sintético; usa el árbol para seleccionar componentes">
-          <Studio />
+        <SceneCanvas label="Modelo IFC; usa el árbol para seleccionar componentes"
+          initialRotating={!scenario} shadows={!!scenario} pixelBudget={scenario ? 880_000 : undefined}>
+          <Studio effects={!scenario} stage={!scenario} />
+          {scenario ? <ProcessEnvironment id={scenario} /> : null}
           <CameraRig
             bounds={displayBounds ?? model.bounds}
             orbitCenter={displayBounds ? undefined : products.find(product => product.semanticId === "shell")?.center}
@@ -170,7 +174,7 @@ export function IfcViewer({
             measureKey={measureKey}
             onMeasure={onMeasure}
           />
-          <Grid
+          {!scenario ? <Grid
             position={[0, -0.015, 0]}
             args={[20, 20]}
             cellSize={0.5}
@@ -179,7 +183,7 @@ export function IfcViewer({
             sectionColor={BRAND.border}
             fadeDistance={20}
             infiniteGrid
-          />
+          /> : null}
           {visibleProducts.map((product) => {
             const offset = explosionOffset(
               product,
@@ -207,6 +211,7 @@ export function IfcViewer({
                     product.semanticId !== activeId)
                 }
                 state={status}
+                useIfcColors={!!scenario}
                 mode={activeMode}
                 planes={planes}
                 onSelect={select}

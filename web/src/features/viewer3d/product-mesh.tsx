@@ -10,8 +10,10 @@ import { useReducedMotion } from "motion/react";
 import { useEffect, useMemo, useRef } from "react";
 import {
   BackSide,
+  Color,
   Mesh,
   OrthographicCamera,
+  SRGBColorSpace,
   SphereGeometry,
   type Plane,
 } from "three";
@@ -93,6 +95,7 @@ export function ProductMesh({
   onHover,
   onFocus,
   color,
+  useIfcColors = false,
 }: {
   product: PreparedProduct;
   position?: Vec3;
@@ -106,6 +109,7 @@ export function ProductMesh({
   wireframe?: boolean;
   immediate?: boolean;
   color?: string;
+  useIfcColors?: boolean;
   onSelect?(id: string): void;
   onHover?(id: string | null): void;
   onFocus?(id: string): void;
@@ -155,6 +159,8 @@ export function ProductMesh({
           <mesh
             key={i}
             geometry={geometry}
+            castShadow={useIfcColors}
+            receiveShadow={useIfcColors}
             raycast={acceleratedRaycast}
             onClick={interactive ? click : undefined}
             onPointerOver={interactive ? over : undefined}
@@ -162,9 +168,11 @@ export function ProductMesh({
             onDoubleClick={interactive ? focus : undefined}
           >
             <SteelMaterial
-              color={activeColor}
-              metalness={wireframe ? 0 : 0.85}
-              roughness={0.34}
+              color={useIfcColors && state !== "changed" && product.parts[i]
+                ? `#${new Color().setRGB(...product.parts[i].color.slice(0, 3) as Vec3, SRGBColorSpace).getHexString()}`
+                : activeColor}
+              metalness={wireframe ? 0 : useIfcColors ? 0.42 : 0.85}
+              roughness={useIfcColors ? 0.51 : 0.34}
               emissive={selected || hovered ? BRAND.sky : BRAND.black}
               emissiveIntensity={selected ? 0.12 : hovered ? 0.04 : 0}
               transparent

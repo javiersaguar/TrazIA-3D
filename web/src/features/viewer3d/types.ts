@@ -13,6 +13,8 @@ export type Annotation = {
   state?: string;
 };
 
+export type ProcessEnvironmentId = "ocean" | "coast" | "desert" | "industrial";
+
 export type IfcViewerProps = {
   ifcUrl: string;
   selectedId?: string;
@@ -22,6 +24,8 @@ export type IfcViewerProps = {
   annotations?: Annotation[];
   view?: "iso" | "front" | "top";
   mode?: "solid" | "xray" | "exploded";
+  scenario?: ProcessEnvironmentId;
+  holdPrevious?: boolean;
 };
 
 export type PlantEquipment = {

@@ -1,5 +1,31 @@
 import { expect, test } from "@playwright/test";
 
+test("los proyectos de proceso conservan el entorno y aplican cambios IFC por pieza", async ({ page, request }) => {
+  test.setTimeout(90_000);
+  await page.goto("/documentos?vista=proyectos");
+  const cards = page.getByRole("region", { name: "Proyectos 3D de petróleo y gas" });
+  await expect(cards.getByRole("link")).toHaveCount(4);
+  await cards.getByRole("link", { name: /Plataforma marina de producción/ }).click();
+  const viewer = page.getByTestId("ifc-viewer");
+  await expect(viewer).toHaveAttribute("data-ifc-url", /SIM-MAR-A\.ifc$/, { timeout: 30_000 });
+  await expect(viewer).toHaveAttribute("data-scenario", "ocean");
+  await page.getByLabel("Entorno del visor").selectOption("desert");
+  await expect(viewer).toHaveAttribute("data-scenario", "desert");
+  await expect(viewer).toHaveAttribute("data-ifc-url", /SIM-MAR-A\.ifc$/);
+  await page.reload();
+  await expect(viewer).toHaveAttribute("data-scenario", "desert");
+  await page.getByRole("checkbox", { name: /Ampliar la virola/ }).check();
+  await expect(viewer).toHaveAttribute("data-ifc-url", /Ensayo-10\.ifc$/, { timeout: 30_000 });
+  await page.getByRole("checkbox", { name: /Elevar el tramo/ }).check();
+  await expect(viewer).toHaveAttribute("data-ifc-url", /SIM-MAR-B\.ifc$/, { timeout: 30_000 });
+  const drawing = await page.getByRole("link", { name: "PDF de V-110", exact: true }).getAttribute("href");
+  expect(drawing).toMatch(/GAD_V-110_revB\.pdf$/);
+  expect((await request.get(drawing!)).headers()["content-type"]).toContain("application/pdf");
+  const zip = await page.getByRole("link", { name: "Descargar dossier ZIP" }).getAttribute("href");
+  expect(zip).toMatch(/dossier-B\.zip$/);
+  expect((await request.get(zip!)).ok()).toBe(true);
+});
+
 test("navegación de producto agrupada y ajustes en el pie", async ({page})=>{
  await page.goto("/documentos");
  const nav=page.getByRole("navigation",{name:"Navegación principal"});

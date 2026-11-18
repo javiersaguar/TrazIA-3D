@@ -191,6 +191,10 @@ autorizado de Databricks. El formulario está pensado para una revisión por tra
 Para una carpeta con varios equipos y revisiones, usa `databricks/01_procesar_lote.py`
 según [el flujo del evento](FLUJO_IA.md).
 
+También puedes cargar la pareja PDF/XLSX de un equipo de los
+[proyectos sintéticos de petróleo y gas](PROYECTOS_PROCESO.md).
+El resultado contiene sus cotas de envolvente LOD 1 y las fuentes por campo.
+
 `corepack pnpm gen:api` desde web/ exporta `create_app().openapi()` con uv y regenera
 openapi.json y schema.ts con openapi-typescript, sin necesitar un servidor en ejecución.
 `corepack pnpm gen:types` regenera el contrato de revisión desde su JSON Schema.

@@ -503,7 +503,7 @@ function DotBackdrop() {
   return null;
 }
 
-export function Studio({ effects = true }: { effects?: boolean }) {
+export function Studio({ effects = true, stage = true }: { effects?: boolean; stage?: boolean }) {
   const room = useMemo(() => new RoomEnvironment(), []);
   const key = useRef<DirectionalLight>(null),
     rim = useRef<DirectionalLight>(null);
@@ -511,11 +511,19 @@ export function Studio({ effects = true }: { effects?: boolean }) {
   useEffect(() => () => room.dispose(), [room]);
   return (
     <>
-      {light ? <DotBackdrop /> : <color attach="background" args={[BRAND.black]} />}
+      {stage ? (light ? <DotBackdrop /> : <color attach="background" args={[BRAND.black]} />) : null}
       <ambientLight intensity={0.4} color={BRAND.text} />
       <directionalLight
         ref={key}
-        position={[5, 9, 7]}
+        position={stage ? [5, 9, 7] : [38, 75, 40]}
+        castShadow={!stage}
+        shadow-mapSize={[1024, 1024]}
+        shadow-camera-left={-48}
+        shadow-camera-right={48}
+        shadow-camera-top={42}
+        shadow-camera-bottom={-42}
+        shadow-camera-far={155}
+        shadow-normalBias={0.055}
         intensity={2}
         color={BRAND.text}
       />
@@ -557,7 +565,7 @@ export function Studio({ effects = true }: { effects?: boolean }) {
           color={BRAND.text}
         />
       </Environment>
-      <ContactShadows
+      {stage ? <ContactShadows
         position={[0, -0.025, 0]}
         opacity={0.45}
         scale={24}
@@ -566,7 +574,7 @@ export function Studio({ effects = true }: { effects?: boolean }) {
         frames={1}
         resolution={256}
         color={BRAND.black}
-      />
+      /> : null}
       <AdaptiveResolution />
       {effects ? (
         <EffectComposer
@@ -626,18 +634,22 @@ export function SceneCanvas({
   onRotationChange,
   rotationControl = true,
   pixelBudget = 1_000_000,
+  initialRotating = true,
+  shadows = false,
 }: {
   pixelBudget?: number;
   children: ReactNode;
   label: string;
   rotationControl?: boolean;
   rotating?: boolean;
+  initialRotating?: boolean;
+  shadows?: boolean;
   onRotationChange?(value: boolean): void;
 }) {
   const portal = useRef<HTMLDivElement>(null),
     root = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(true);
-  const [localRotating, setLocalRotating] = useState(true);
+  const [localRotating, setLocalRotating] = useState(initialRotating);
   const rotating = controlledRotating ?? localRotating;
   const setRotating = useCallback((value: boolean) => {
     setLocalRotating(value);
@@ -669,12 +681,13 @@ export function SceneCanvas({
       <RenderBoundary>
         <Canvas
           className={styles.canvas}
+          shadows={shadows ? "percentage" : false}
           orthographic
           frameloop={active ? "demand" : "never"}
           dpr={[1, 1.6]}
           camera={{ position: [12, 9, 12], zoom: 50, near: 0.01, far: 1000 }}
           performance={{ min: 0.65 }}
-          gl={{ antialias: false, alpha: false, localClippingEnabled: true }}
+          gl={{ antialias: shadows, alpha: false, localClippingEnabled: true }}
           onCreated={({ gl }) => {
             gl.info.autoReset = false;
             gl.toneMapping = AgXToneMapping;

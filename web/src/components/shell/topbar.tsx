@@ -18,6 +18,7 @@ export function Topbar() {
   useApiSync();
   const pathname = usePathname();
   const item = navItemFor(pathname);
+  const processProject = pathname.startsWith("/proyectos-proceso/");
   const inspectingJob = apiEnabled && (pathname === "/pipeline" || pathname.startsWith("/resultados/"));
   const revision = useUi((s) => s.revision);
   const active = useRevision(revision);
@@ -25,7 +26,9 @@ export function Topbar() {
   const setNavOpen = useUi((s) => s.setNavOpen);
 
   // Fuente de los datos: siempre visible, también en móvil (en corto)
-  const source = apiEnabled
+  const source = processProject
+    ? { long: "Proyecto 3D · datos sintéticos", short: "Sintéticos" }
+    : apiEnabled
     ? inspectingJob
       ? { long: "Origen en cada resultado · API", short: "API" }
       : active.isError
@@ -51,14 +54,14 @@ export function Topbar() {
 
       <nav aria-label="Ruta" className="flex min-w-0 items-center gap-1.5 text-[13px] whitespace-nowrap">
         {/* El proyecto solo cuando sobra sitio: a 1024 px con barra lateral, la pantalla va antes */}
-        <span className="hidden font-mono text-[12px] text-faint xl:inline">DEMO-PLANT</span>
+        <span className="hidden font-mono text-[12px] text-faint xl:inline">{processProject ? "Proyectos" : "DEMO-PLANT"}</span>
         <Icon icon={ChevronRight} size={14} className="hidden text-faint xl:block" />
         {item ? <Icon icon={item.icon} size={15} className="text-muted" /> : null}
-        <span className="truncate font-medium text-text">{item?.label ?? "Inicio"}</span>
+        <span className="truncate font-medium text-text">{processProject ? "Complejo de proceso" : item?.label ?? "Inicio"}</span>
       </nav>
 
       <div className="ml-auto flex items-center gap-2">
-        {inspectingJob ? null : <Tip content="Equipo y revisión activos">
+        {inspectingJob || processProject ? null : <Tip content="Equipo y revisión activos">
           <span className="hidden md:inline-flex">
             <Pill>
               <Icon icon={Database} size={14} />
@@ -66,7 +69,7 @@ export function Topbar() {
             </Pill>
           </span>
         </Tip>}
-        <Tip content={apiEnabled ? "Datos y revisiones servidos por la API configurada; los equipos de la demo siguen siendo sintéticos" : "Archivos sintéticos de la demo offline"}>
+        <Tip content={processProject ? "Proyecto conceptual, planos e IFC sintéticos" : apiEnabled ? "Datos y revisiones servidos por la API configurada; los equipos de la demo siguen siendo sintéticos" : "Archivos sintéticos de la demo offline"}>
           <Pill tone="warning" tabIndex={0}>
             <Icon icon={TriangleAlert} size={14} />
             <span className="hidden sm:inline">{source.long}</span>

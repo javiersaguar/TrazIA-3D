@@ -9,6 +9,7 @@ import { EASE_OUT } from "@/components/motion/reveal";
 import { Segmented } from "@/components/ui/controls";
 import { Badge, Icon, Panel } from "@/components/ui/primitives";
 import { FamilyThumb } from "@/features/bocetos/thumb";
+import { ProcessProjectCards } from "@/features/process-projects/project-cards";
 import { cn } from "@/lib/cn";
 import { PROJECT_KINDS, useCatalogue, type Design, type Project, type ProjectStats } from "./catalogue";
 
@@ -151,6 +152,7 @@ export function ProjectsTab({ family, onOpenProject }: { family: string; onOpenP
         {familyName ? <p className="text-[13px] text-muted">Proyectos con {familyName.toLowerCase()}</p> : null}
       </div>
 
+      {filter === "todos" ? <ProcessProjectCards query={q} family={family} /> : null}
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-3">
         <AnimatePresence mode="popLayout" initial={false}>
           {list.map(({ p, kinds, stats }, i) => (
