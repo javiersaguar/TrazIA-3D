@@ -2,6 +2,7 @@
 
 import { ChevronRight, Info, Play, RotateCcw, X } from "lucide-react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { HealthRing } from "@/components/ui/data";
 import { Tip } from "@/components/ui/controls";
@@ -16,13 +17,14 @@ import { usePipeline, type StageRunState } from "@/stores/pipeline";
 import { useUi } from "@/stores/ui";
 import { STAGE_ICON } from "./stage-meta";
 import type { Strategy } from "./graph-model";
+import { IntakeForm } from "./intake-form";
 
 const PipelineGraph = dynamic(() => import("./pipeline-graph").then((m) => m.PipelineGraph), {
   ssr: false,
   loading: () => <Skeleton className="h-[380px] w-full" />,
 });
 
-export function PipelineWorkspace() {
+export function PipelineWorkspace({ initialJobId }: { initialJobId?: string }) {
   const revision = useUi((s) => s.revision);
   const { data: rev } = useRevision(revision);
   const running = usePipeline((s) => s.running);
@@ -30,11 +32,22 @@ export function PipelineWorkspace() {
   const start = usePipeline((s) => s.start);
   const stages = usePipeline((s) => s.stages);
   const [filter, setFilter] = useState<StageId | null>(null);
-  const [files, setFiles] = useState<File[]>([]);
   const [strategy, setStrategy] = useState<Strategy>("b_reglas");
-  const [dataset, setDataset] = useState<"real" | "synthetic">("real");
   const error = usePipeline(s => s.error);
   const jobId = usePipeline(s => s.jobId);
+  const jobStatus = usePipeline(s => s.jobStatus);
+  const resultId = usePipeline(s => s.resultId);
+  const follow = usePipeline(s => s.follow);
+  useEffect(() => {
+    if (apiEnabled && initialJobId && usePipeline.getState().jobId !== initialJobId) follow(initialJobId);
+  }, [initialJobId, follow]);
+  useEffect(() => {
+    if (!apiEnabled || !jobId || usePipeline.getState().jobId !== jobId) return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("trabajo") === jobId) return;
+    url.searchParams.set("trabajo", jobId);
+    window.history.replaceState(null, "", url);
+  }, [jobId]);
   const run = usePipeline(s => s.jobRun);
   const warnings = usePipeline(s => s.warnings);
   const cancel = usePipeline(s => s.cancel);
@@ -50,28 +63,21 @@ export function PipelineWorkspace() {
 
   return (
     <div className="space-y-5">
-      <SyntheticNotice>
-        {apiEnabled ? "Eventos reales de la API local. La demo usa los originales sintéticos de V-101; los documentos propios conservan el origen que indiques."
-          : `Repetición simulada del pipeline sobre los documentos de V-101 rev ${revision}. Los recuentos salen de esos archivos; el ritmo es artificial y no se muestran latencias ni costes.`}
-      </SyntheticNotice>
-      {apiEnabled ? <Panel className="space-y-3 p-4">
-        <div className="flex flex-wrap items-end gap-4 text-[13px]">
-          <label className="grid gap-1">Documentos de V-101
-            <input aria-label="Documentos para procesar" type="file" multiple accept=".pdf,.xlsx,.png,.jpg,.jpeg"
-              disabled={running} onChange={event => setFiles(Array.from(event.target.files ?? []))} className="max-w-[340px] rounded border border-border bg-surface p-2" />
-          </label>
-          <label className="grid gap-1">Estrategia
-            <select aria-label="Estrategia de lectura" value={strategy} disabled={running} onChange={event => setStrategy(event.target.value as Strategy)} className="rounded border border-border bg-surface p-2">
-              <option value="b_reglas">B · reglas</option><option value="a_vision">A · visión</option>
-              <option value="c_rag">C · recuperación</option><option value="d_hibrido">D · híbrido</option>
-            </select>
-          </label>
-          {files.length ? <label className="grid gap-1">Origen de documentos
-            <select aria-label="Origen de documentos" value={dataset} onChange={event => setDataset(event.target.value as "real" | "synthetic")} className="rounded border border-border bg-surface p-2">
-              <option value="real">Reales</option><option value="synthetic">Sintéticos de prueba</option>
-            </select></label> : <p className="text-muted">Sin archivos: procesa de nuevo los originales sintéticos de la revisión activa.</p>}
+      {apiEnabled ? null : <SyntheticNotice>
+        Repetición simulada del pipeline sobre los documentos de V-101 rev {revision}. Los recuentos salen de esos archivos; el ritmo es artificial.
+      </SyntheticNotice>}
+      {apiEnabled ? <IntakeForm strategy={strategy} setStrategy={setStrategy} /> : null}
+      {apiEnabled && (jobId || running || error) ? <Panel className="space-y-2 p-4">
+        <div className="flex flex-wrap items-center gap-3">
+          {jobId ? <p className="text-xs text-muted">Trabajo <Code>{jobId}</Code></p>
+            : <p role="status" className="text-sm text-muted">{running ? "Subiendo originales…" : "No se inició el trabajo"}</p>}
+          {jobStatus === "done" && resultId ? (
+            <Link href={`/resultados/${encodeURIComponent(resultId)}`} className="text-sm font-medium text-accent-text underline">
+              Ver resultado IFC DRAFT
+            </Link>
+          ) : null}
+          {jobId && error && !running && !resultId ? <Button size="sm" onClick={() => follow(jobId)}>Volver a conectar</Button> : null}
         </div>
-        {jobId ? <p className="text-xs text-muted">Trabajo <Code>{jobId}</Code></p> : null}
         {run ? <p className="text-sm text-muted">{run.seconds.toFixed(2)} s · {run.accounting_complete === false ? "Contabilidad incompleta" : run.cost_eur == null ? "Coste sin medir" : `${run.cost_eur.toFixed(4)} € de proveedor`} · {run.external_calls} llamadas contabilizadas</p> : null}
         {warnings.map(warning => <p key={warning} className="text-xs text-muted">{warning}</p>)}
         {error ? <p role="alert" className="text-sm text-danger">{error}</p> : null}
@@ -84,9 +90,9 @@ export function PipelineWorkspace() {
           actions={
             <div className="flex gap-2">
             {apiEnabled && running && jobId ? <Button size="sm" onClick={cancel}>Cancelar</Button> : null}
-            <Button variant="primary" size="sm" disabled={running || !rev} onClick={() => rev && start(rev, { files, strategy, dataset: files.length ? dataset : rev.dataset })}>
+            <Button variant="primary" size="sm" disabled={running || !rev} onClick={() => rev && start(rev, strategy)}>
               <Icon icon={lastFinishedAt ? RotateCcw : Play} size={14} />
-              {running ? "Procesando…" : apiEnabled ? files.length ? "Procesar documentos" : "Procesar demo" : lastFinishedAt ? "Repetir" : "Procesar"}
+              {running ? "Procesando…" : apiEnabled ? "Procesar demo" : lastFinishedAt ? "Repetir" : "Procesar"}
             </Button>
             </div>
           }

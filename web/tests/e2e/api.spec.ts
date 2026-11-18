@@ -1,3 +1,6 @@
+import { execFileSync } from "node:child_process";
+import { readdirSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { expect, test } from "@playwright/test";
 
 const base = process.env.NEXT_PUBLIC_API_URL;
@@ -78,6 +81,48 @@ test("Pipeline consume SSE y no utiliza el temporizador simulado", async ({ page
   expect(job.status).toBe("done");
   expect(job.run.seconds).toBeGreaterThan(0);
   await expect(page.getByText("Repetición simulada", { exact: false })).toHaveCount(0);
+});
+
+test("carga un equipo nuevo, recupera su trabajo y consulta el IFC y su evidencia", async ({ page, request }, info) => {
+  test.setTimeout(90_000);
+  const fixture = info.outputPath("synthetic");
+  execFileSync("uv", ["run", "python", "-m", "synthetic", "--casos", "1", "--estilos", "rotulado", "--salida", fixture],
+    { cwd: resolve(__dirname, "../../..") });
+  const inputs = resolve(fixture, "rotulado");
+  const [tag] = readdirSync(inputs);
+  const pdf = resolve(inputs, tag!, `GAD_${tag}_rev1.pdf`);
+  const xlsx = resolve(inputs, tag!, `HDM_${tag}_rev1.xlsx`);
+  const project = `ENSAYO-${Date.now()}`;
+
+  await page.goto("/documentos");
+  await page.getByRole("link", { name: "Procesar planos con la API" }).click();
+  await page.getByLabel("Documentos para procesar").setInputFiles([pdf, xlsx]);
+  await expect(page.getByLabel("Tag del equipo")).toHaveValue(tag!);
+  await expect(page.getByLabel("Revisión", { exact: true })).toHaveValue("1");
+  await page.getByLabel("Proyecto", { exact: true }).fill(project);
+  await page.getByRole("button", { name: "Procesar documentos", exact: true }).click();
+  await expect(page).toHaveURL(/trabajo=[\da-f-]+/);
+  await page.reload();
+  const result = page.getByRole("link", { name: "Ver resultado IFC DRAFT" });
+  await expect(result).toBeVisible({ timeout: 25_000 });
+  await expect(page.getByRole("cell", { name: /IFC4 DRAFT almacenado/ })).toBeVisible();
+  await result.click();
+  await expect(page.getByRole("heading", { name: `${tag} · Rev. 1` })).toBeVisible();
+  const identity = `${project}:${tag}:1`;
+  const record = await request.get(`${base}/revisions/${encodeURIComponent(identity)}`);
+  expect(record.ok()).toBe(true);
+  expect(record.headers()["etag"]).toBe('"1"');
+  const revision = await record.json();
+  expect(revision.dataset).toBe("synthetic");
+  expect(revision.approval).toBeNull();
+  const original = await request.get((await page.getByRole("link", { name: `GAD_${tag}_rev1.pdf`, exact: true }).first().getAttribute("href"))!);
+  expect(await original.body()).toEqual(readFileSync(pdf));
+  const ifc = await request.get((await page.getByRole("link", { name: "Descargar IFC DRAFT" }).getAttribute("href"))!);
+  expect(await ifc.text()).toContain("ISO-10303-21;");
+  await expect(page.getByRole("heading", { name: "Campos extraídos" })).toBeVisible();
+  await expect(page.getByRole("cell", { name: /pág\. 1/ }).first()).toBeVisible();
+  await page.getByRole("button", { name: "Ver modelo 3D" }).click();
+  await expect(page.locator('[data-testid="ifc-viewer"][data-phase="ready"]')).toBeVisible({ timeout: 30_000 });
 });
 
 

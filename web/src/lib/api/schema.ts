@@ -420,6 +420,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/revisions/{identity}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Revision By Id */
+        get: operations["revision_by_id_revisions__identity__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/revisions/{identity}/fields": {
         parameters: {
             query?: never;
@@ -584,6 +601,23 @@ export interface paths {
         put?: never;
         /** Create Job */
         post: operations["create_job_equipment__tag__jobs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Equipment Job */
+        post: operations["create_equipment_job_jobs_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1190,6 +1224,61 @@ export interface components {
             };
             /** Nozzles */
             nozzles: components["schemas"]["Nozzle"][];
+        };
+        /** EquipmentJobInput */
+        EquipmentJobInput: {
+            /** Documents */
+            documents: string[];
+            /**
+             * Project Id
+             * @default DEMO-PLANT
+             */
+            project_id?: string;
+            /**
+             * Equipment Id
+             * @description ID estable del equipo; no cambia al renombrar el tag
+             * @default vessel-001
+             */
+            equipment_id?: string;
+            /** Revision */
+            revision: string;
+            /**
+             * Strategy
+             * @default b_reglas
+             */
+            strategy?: string;
+            /**
+             * Use Learning
+             * @default true
+             */
+            use_learning?: boolean;
+            /** Providers */
+            providers?: string[];
+            /**
+             * Dataset
+             * @default synthetic
+             * @enum {string}
+             */
+            dataset?: "synthetic" | "real";
+            /** Previous Id */
+            previous_id?: string | null;
+            /**
+             * Timeout Seconds
+             * @default 300
+             */
+            timeout_seconds?: number;
+            /**
+             * Max Attempts
+             * @default 3
+             */
+            max_attempts?: number;
+            /**
+             * Retry Backoff Seconds
+             * @default 1
+             */
+            retry_backoff_seconds?: number;
+            /** Tag */
+            tag: string;
         };
         /** FieldInput */
         FieldInput: {
@@ -2579,6 +2668,37 @@ export interface operations {
             };
         };
     };
+    revision_by_id_revisions__identity__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Revision"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     review_fields_revisions__identity__fields_get: {
         parameters: {
             query?: never;
@@ -2888,6 +3008,41 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["JobInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_equipment_job_jobs_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EquipmentJobInput"];
             };
         };
         responses: {

@@ -18,6 +18,7 @@ export function Topbar() {
   useApiSync();
   const pathname = usePathname();
   const item = navItemFor(pathname);
+  const inspectingJob = apiEnabled && (pathname === "/pipeline" || pathname.startsWith("/resultados/"));
   const revision = useUi((s) => s.revision);
   const active = useRevision(revision);
   const setCopilotOpen = useUi((s) => s.setCopilotOpen);
@@ -25,7 +26,9 @@ export function Topbar() {
 
   // Fuente de los datos: siempre visible, también en móvil (en corto)
   const source = apiEnabled
-    ? active.isError
+    ? inspectingJob
+      ? { long: "Origen en cada resultado · API", short: "API" }
+      : active.isError
       ? { long: "API local · sin conexión", short: "Sin conexión" }
       : active.data?.dataset === "real"
         ? { long: "Datos reales · API local", short: "Reales" }
@@ -55,14 +58,14 @@ export function Topbar() {
       </nav>
 
       <div className="ml-auto flex items-center gap-2">
-        <Tip content="Equipo y revisión activos">
+        {inspectingJob ? null : <Tip content="Equipo y revisión activos">
           <span className="hidden md:inline-flex">
             <Pill>
               <Icon icon={Database} size={14} />
               V-101 · rev {revision}
             </Pill>
           </span>
-        </Tip>
+        </Tip>}
         <Tip content={apiEnabled ? "Datos y revisiones servidos por la API configurada; los equipos de la demo siguen siendo sintéticos" : "Archivos sintéticos de la demo offline"}>
           <Pill tone="warning" tabIndex={0}>
             <Icon icon={TriangleAlert} size={14} />

@@ -24,6 +24,7 @@ import { useReviewLog } from "@/stores/review-log";
 import { useUi } from "@/stores/ui";
 
 const col = createColumnHelper<EquipmentRow>();
+const isDemo = (row: EquipmentRow) => row.tag === "V-101" && (!row.equipment_id || row.equipment_id === "vessel-001" && row.project_id === "DEMO-PLANT");
 
 export function ProjectWorkspace() {
   const router = useRouter();
@@ -79,7 +80,7 @@ export function ProjectWorkspace() {
       <Panel className="overflow-hidden">
         <PanelHeader
           title="Planta"
-          description="Escena ilustrativa: solo V-101 tiene documentos y datos; el resto de equipos ocupa sitio para enseñar la escala."
+          description="Disposición ilustrativa. Los equipos procesados usan la geometría de su IFC."
           actions={<SyntheticBadge />}
         />
         <div className="h-[440px] px-3 pb-3">
@@ -95,12 +96,16 @@ export function ProjectWorkspace() {
       </Panel>
 
       <Panel className="overflow-hidden">
-        <PanelHeader title="Equipos" description="Ordena por cualquier columna. Abre V-101 para revisar sus campos." />
+        <PanelHeader title="Equipos" description="Abre un equipo para consultar su resultado. La demo V-101 incluye la revisión interactiva de A y B." />
         <EquipmentTable
           rows={equipment.data}
           reviewed={{ reviewed, total }}
           selectedTag={selectedTag}
-          onOpen={(row) => !row.illustrative && router.push("/revision")}
+          onOpen={(row) => {
+            if (row.illustrative) return;
+            if (isDemo(row)) router.push("/revision");
+            else if (row.revision_id) router.push(`/resultados/${encodeURIComponent(row.revision_id)}`);
+          }}
         />
       </Panel>
     </div>
@@ -138,12 +143,12 @@ function EquipmentTable({
         cell: (c) => c.getValue() || <span className="text-faint">—</span>,
       }),
       col.accessor("status", { header: "Estado", cell: (c) => <EquipmentStatus status={c.getValue()} /> }),
-      col.accessor((r) => (r.illustrative ? -1 : reviewed.reviewed), {
+      col.accessor((r) => (isDemo(r) ? reviewed.reviewed : -1), {
         id: "reviewed",
         header: "Campos revisados",
         meta: { numeric: true },
         cell: (c) =>
-          c.row.original.illustrative ? (
+          !isDemo(c.row.original) ? (
             <span className="text-faint">—</span>
           ) : (
             <span>

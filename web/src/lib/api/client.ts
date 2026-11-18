@@ -9,8 +9,10 @@ import type { components } from "./schema";
 
 type FieldInput = components["schemas"]["FieldInput"];
 export type JobInput = components["schemas"]["JobInput"];
+export type EquipmentJobInput = components["schemas"]["EquipmentJobInput"];
 export type StageEvent = { id: number; job_id: string; stage: string; status: "ok" | "omitido" | "error"; file: string; detail: string; created_at: number };
 export type JobStatus = { id: string; status: "queued" | "running" | "done" | "error" | "cancelled" | "timeout"; attempts: number; error: string | null; run: components["schemas"]["RunInfo"] | null; warnings: string[]; created_at: number; revision_id: string | null };
+export type PipelineJob = JobStatus & { kind: string; tag: string; strategy?: string; documents?: string[] };
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) { super(message); this.name = "ApiError"; }
@@ -19,7 +21,9 @@ export class ApiError extends Error {
 async function checked(response: Response) {
   if (response.ok) return response;
   const body = await response.json().catch(() => null);
-  throw new ApiError(response.status, typeof body?.detail === "string" ? body.detail : `La API respondió ${response.status}`);
+  const issues = Array.isArray(body?.detail) ? body.detail.map((issue: { loc?: string[]; msg?: string }) =>
+    [issue.loc?.slice(1).join("."), issue.msg].filter(Boolean).join(" — ")).join("; ") : "";
+  throw new ApiError(response.status, typeof body?.detail === "string" ? body.detail : issues || `La API respondió ${response.status}`);
 }
 
 async function get<T>(path: string): Promise<T> {
@@ -36,6 +40,8 @@ export async function apiRevision(rev: RevisionId): Promise<Revision> {
 export async function apiFields(rev: RevisionId): Promise<ReviewField[]> {
   return flattenRevision(await apiRevision(rev));
 }
+
+export const apiRevisionById = (identity: string) => get<Revision>(`/revisions/${encodeURIComponent(identity)}`);
 
 // Serializar las acciones de una revisión evita que dos pulsaciones rápidas usen el mismo ETag.
 const writes = new Map<string, Promise<unknown>>();
@@ -100,20 +106,21 @@ export async function apiEquipment(): Promise<EquipmentRow[]> {
   return rows.map(row => ({ ...row, kind: labels[row.kind] ?? row.kind, ifcUrl: apiURL(row.ifcUrl) }));
 }
 
-export async function uploadDocument(file: File, documentId?: string, revision = "A"): Promise<{ id: string; filename: string; sha256: string }> {
+export async function uploadDocument(file: File, documentId?: string, revision = "A", key: string = crypto.randomUUID()): Promise<{ id: string; filename: string; sha256: string }> {
   const form = new FormData(); form.append("file", file);
   if (documentId) form.append("document_id", documentId);
   form.append("revision", revision);
   return (await checked(await fetch(apiURL("/documents"), { method: "POST", body: form,
-    headers: { "Idempotency-Key": crypto.randomUUID() } }))).json();
+    headers: { "Idempotency-Key": key } }))).json();
 }
 
-export async function startJob(body: JobInput): Promise<string> {
-  const response = await checked(await fetch(apiURL("/equipment/V-101/jobs"), { method: "POST",
-    headers: { "Content-Type": "application/json", "Idempotency-Key": crypto.randomUUID() }, body: JSON.stringify(body) }));
+export async function startJob(body: EquipmentJobInput, key: string = crypto.randomUUID()): Promise<string> {
+  const response = await checked(await fetch(apiURL("/jobs"), { method: "POST",
+    headers: { "Content-Type": "application/json", "Idempotency-Key": key }, body: JSON.stringify(body) }));
   return (await response.json() as { job_id: string }).job_id;
 }
 export const getJob = (identity: string) => get<JobStatus>(`/jobs/${encodeURIComponent(identity)}`);
+export const getPipelineJob = (identity: string) => get<PipelineJob>(`/jobs/${encodeURIComponent(identity)}`);
 export async function cancelJob(identity: string) {
   await checked(await fetch(apiURL(`/jobs/${encodeURIComponent(identity)}/cancel`), { method: "POST", headers: { "Idempotency-Key": crypto.randomUUID() } }));
 }

@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { apiEnabled, apiURL } from "@/lib/api/config";
-import { cancelJob, getJob, startJob, subscribeJob, uploadDocument, type JobStatus } from "@/lib/api/client";
+import { cancelJob, getPipelineJob, startJob, subscribeJob, uploadDocument, type EquipmentJobInput, type JobStatus } from "@/lib/api/client";
 import type { Revision } from "@/lib/types/revision";
 import { STAGES, type PipelineEvent, type StageId } from "@/lib/mock/pipeline";
 
@@ -58,7 +58,10 @@ export function buildScript(rev: Revision): Step[] {
   return steps;
 }
 
-export type StartOptions = { files?: File[]; strategy?: string; dataset?: "synthetic" | "real" };
+export type PipelineSubmission = {
+  files: File[];
+  input: Omit<EquipmentJobInput, "documents">;
+};
 type PipelineState = {
   running: boolean;
   revision: string | null;
@@ -73,7 +76,10 @@ type PipelineState = {
   inputFiles: string[];
   warnings: string[];
   error: string | null;
-  start: (rev: Revision, options?: StartOptions) => void;
+  resultId: string | null;
+  start: (rev: Revision, strategy?: string) => void;
+  submit: (submission: PipelineSubmission, key: string) => Promise<string | undefined>;
+  follow: (id: string) => void;
   cancel: () => void;
 };
 
@@ -82,44 +88,51 @@ let timer: ReturnType<typeof setInterval> | null = null;
 type Setter = (update: Partial<PipelineState> | ((state: PipelineState) => Partial<PipelineState>)) => void;
 let closeEvents: (() => void) | null = null;
 
-async function startApi(rev: Revision, options: StartOptions, set: Setter) {
+const isRunning = (status: JobStatus["status"]) => status === "queued" || status === "running";
+const message = (error: unknown) => error instanceof Error ? error.message : String(error);
+const freshRun = () => ({
+  running: true, error: null, warnings: [], jobRun: null, jobId: null,
+  jobStatus: "queued", events: [], stages: initialStages(), activeStage: null,
+  resultId: null, lastFinishedAt: null,
+});
+
+async function followJob(id: string, set: Setter, get: () => PipelineState) {
   closeEvents?.();
-  set({ running: true, error: null, warnings: [], jobRun: null, jobId: null, jobStatus: "queued", jobStrategy: options.strategy ?? "b_reglas",
-    inputFiles: options.files?.length ? options.files.map(file => file.name) : rev.documents.map(document => document.filename),
-    revision: rev.revision, events: [], stages: initialStages(), activeStage: null });
+  set({ jobId: id });
   try {
-    const identity = `${rev.project_id}:${rev.equipment.id}:${rev.revision}`;
-    const uploads = options.files?.length ? await Promise.all(options.files.map(file => uploadDocument(file)))
-      : await Promise.all(rev.documents.map(async document => {
-        const response = await fetch(apiURL(`/revisions/${encodeURIComponent(identity)}/documents/${encodeURIComponent(document.id)}`));
-        if (!response.ok) throw new Error(`No se pudo leer ${document.filename}`);
-        return uploadDocument(new File([await response.blob()], document.filename), document.id, document.revision);
-      }));
-    const id = await startJob({ documents: uploads.map(d => d.id), project_id: rev.project_id,
-      equipment_id: rev.equipment.id, revision: `${rev.revision}-run-${Date.now().toString(36)}`,
-      strategy: options.strategy ?? "b_reglas", dataset: options.dataset ?? (options.files?.length ? "real" : rev.dataset) });
-    const job = await getJob(id);
-    set({ jobId: id, jobStatus: job.status });
+    const job = await getPipelineJob(id);
+    if (get().jobId !== id) return;
+    if (job.kind !== "pipeline") throw new Error("El enlace no corresponde a un trabajo del pipeline.");
+    set({ jobStatus: job.status, jobStrategy: job.strategy ?? null, inputFiles: job.documents ?? [] });
+
     closeEvents = subscribeJob(id, event => {
       set(state => {
         if (state.jobId !== id || state.events.some(e => e.id === String(event.id))) return {};
-        const definition = STAGES.find(d => d.id === event.stage);
         const at = Math.max(0, event.created_at - job.created_at);
         const events = [{ ...event, id: String(event.id), at }, ...state.events];
+        const definition = STAGES.find(d => d.id === event.stage);
         if (!definition) return { events };
         const previous = state.stages[definition.id];
         const next: StageRunState = { status: event.status === "omitido" ? "skipped" : "done",
           ok: previous.ok + (event.status === "ok" ? 1 : 0),
           total: previous.total + (event.status === "omitido" ? 0 : 1), lastEventAt: event.created_at * 1000 };
-        return { events, error: null, jobStatus: "running", stages: { ...state.stages, [definition.id]: next }, activeStage: definition.id };
+        return { events, error: null, jobStatus: isRunning(job.status) ? "running" : job.status,
+          stages: { ...state.stages, [definition.id]: next }, activeStage: definition.id };
       });
-    }, status => {
+    }, () => {
+      if (get().jobId !== id) return;
       closeEvents = null;
-      set({ running: false, activeStage: null, jobStatus: status, lastFinishedAt: Date.now() });
-      void getJob(id).then(result => set(state => state.jobId === id ? { jobRun: result.run, jobStatus: result.status, warnings: result.warnings,
-        error: status === "done" ? null : result.error ?? `Trabajo ${status}` } : {})).catch(error => set(state => state.jobId === id ? { error: String(error) } : {}));
-    }, () => set({ error: "Conexión de eventos interrumpida; intentando reanudar con la API." }));
-  } catch (error) { set({ running: false, jobStatus: "error", error: error instanceof Error ? error.message : String(error) }); }
+      void getPipelineJob(id).then(result => set(state => state.jobId === id ? {
+        running: false, activeStage: null, jobStatus: result.status, warnings: result.warnings,
+        lastFinishedAt: Date.now(), resultId: result.revision_id, jobRun: result.run,
+        error: result.status === "done" ? null : result.error ?? (result.status === "cancelled" ? "Trabajo cancelado" : "El trabajo no terminó correctamente."),
+      } : {})).catch(() => set(state => state.jobId === id ? {
+        running: false, activeStage: null, error: "No se pudo recuperar el resultado. Vuelve a conectar el trabajo.",
+      } : {}));
+    }, () => set(state => state.jobId === id ? { error: "Conexión de eventos interrumpida. La API intentará reanudarla." } : {}));
+  } catch (error) {
+    if (get().jobId === id) set({ running: false, jobStatus: "error", error: message(error) });
+  }
 }
 
 export const usePipeline = create<PipelineState>()((set, get) => ({
@@ -130,16 +143,54 @@ export const usePipeline = create<PipelineState>()((set, get) => ({
   stages: initialStages(),
   activeStage: null,
 
-  jobId: null, jobRun: null, jobStatus: null, jobStrategy: null, inputFiles: [], warnings: [], error: null,
+  jobId: null, jobRun: null, jobStatus: null, jobStrategy: null, inputFiles: [], warnings: [], error: null, resultId: null,
   cancel: () => {
     const id = get().jobId;
     if (!id) return;
-    closeEvents?.(); closeEvents = null;
-    void cancelJob(id).then(() => set({ running: false, activeStage: null, jobStatus: "cancelled", error: "Trabajo cancelado" }))
-      .catch(error => set({ error: String(error) }));
+    void cancelJob(id).catch(error => set(state => state.jobId === id ? { error: message(error) } : {}));
   },
-  start: (rev, options = {}) => {
-    if (apiEnabled) { if (!get().running) void startApi(rev, options, set); return; }
+  follow: (id) => {
+    set({ ...freshRun(), revision: null, inputFiles: [], jobStrategy: null });
+    void followJob(id, set, get);
+  },
+  submit: async ({ input, files }, key) => {
+    if (!apiEnabled || get().running) return;
+    set({ ...freshRun(), revision: input.revision ?? null, inputFiles: files.map(file => file.name), jobStrategy: input.strategy ?? null });
+    try {
+      const documents = [];
+      for (const [index, file] of files.entries()) {
+        const doc = await uploadDocument(file, undefined, input.revision, `${key}-${index}`);
+        documents.push(doc.id);
+      }
+      const id = await startJob({ ...input, documents }, key);
+      void followJob(id, set, get);
+      return id;
+    } catch (error) {
+      set({ running: false, jobStatus: "error", error: message(error) });
+    }
+  },
+  start: (rev, strategy = "b_reglas") => {
+    if (apiEnabled) {
+      if (get().running) return;
+      set({ ...freshRun(), inputFiles: rev.documents.map(d => d.filename), revision: rev.revision, jobStrategy: strategy });
+      void (async () => {
+        try {
+          const identity = `${rev.project_id}:${rev.equipment.id}:${rev.revision}`;
+          const revision = `${rev.revision}-run-${Date.now().toString(36)}`;
+          const documents = await Promise.all(rev.documents.map(async document => {
+            const response = await fetch(apiURL(`/revisions/${encodeURIComponent(identity)}/documents/${encodeURIComponent(document.id)}`));
+            if (!response.ok) throw new Error(`No se pudo leer ${document.filename}`);
+            return (await uploadDocument(new File([await response.blob()], document.filename), document.id, document.revision)).id;
+          }));
+          const id = await startJob({ documents, tag: rev.equipment.tag.value, project_id: rev.project_id,
+            equipment_id: rev.equipment.id, revision, strategy, dataset: rev.dataset });
+          void followJob(id, set, get);
+        } catch (error) {
+          set({ running: false, jobStatus: "error", error: message(error) });
+        }
+      })();
+      return;
+    }
     if (get().running) return;
     if (timer) clearInterval(timer);
     const script = buildScript(rev);

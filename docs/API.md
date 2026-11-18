@@ -21,6 +21,7 @@ Las credenciales se configuran por entorno y no se guardan en Git.
 | POST /documents | Multipart file + document_id/revision opcionales; registro y SHA-256 |
 | GET /equipment | Equipos con revisiones persistidas; sin equipos de relleno |
 | GET /equipment/{tag}/revisions/{rev} | Contrato 0.3 y ETag; query project_id |
+| GET /revisions/{id} | Revisión completa y ETag por ID estable, incluidos resultados del pipeline |
 | GET /revisions/{id}/fields | Campos trazables por ruta y ETag |
 | PATCH /revisions/{id}/fields/{path} | Estado/corrección, nueva versión y auditoría |
 | POST /revisions/{id}/approve | Aprobación si todos los campos están aceptados/corregidos y los originales coinciden |
@@ -28,6 +29,7 @@ Las credenciales se configuran por entorno y no se guardan en Git.
 | GET /revisions/{id}/documents/{document_id} | Original comprobado por SHA-256 |
 | GET /revisions/{id}/ifc?draft=true | IFC4 DRAFT; sin draft requiere aprobación |
 | POST /equipment/{tag}/jobs | Procesamiento asíncrono; 202 y job_id |
+| POST /jobs | Procesamiento de cualquier equipo. Mismo contrato con `tag` en el cuerpo |
 | GET /jobs/{id} | Estado, intentos, error y RunInfo |
 | GET /jobs/{id}/events | SSE persistente; eventos stage y complete; admite Last-Event-ID |
 | POST /jobs/{id}/cancel | Cancelación; no se publica un resultado después de cancelar |
@@ -165,11 +167,29 @@ corepack pnpm dev
 
 El cliente no sustituye errores de API por datos simulados. Las ediciones envían ETag e
 Idempotency-Key; se serializan por revisión y un conflicto 412 actualiza la consulta.
-Los IFC llevan una versión en la URL para cargar la geometría vigente sin cambiar el visor.
-Pipeline permite subir documentos de V-101 o reprocesar sus originales, crea una revisión
-nueva y muestra eventos SSE persistidos. La navegación conserva la conexión del trabajo.
-El selector A/B de Revisión sigue limitado a las revisiones de la demo; las revisiones de
-trabajos se consultan por su identificador en la API.
+En **Documentos → Procesar planos con la API**, selecciona los originales de un equipo
+y una revisión. Puedes cargar hasta 30 archivos PDF, XLSX, PNG o JPEG de hasta 25 MiB cada
+uno. El formulario propone tag y revisión para nombres como `GAD_D-100_rev1.pdf` y
+`HDM_D-100_rev1.xlsx`. Comprueba ambos antes de procesar. Si el tag contiene espacios
+o barras, indica un ID estable de equipo para reutilizarlo en las siguientes revisiones.
+
+La web registra los originales en `POST /documents` y envía sus IDs a `POST /jobs`.
+La revisión se guarda por proyecto, ID estable de equipo y revisión, con origen y
+evidencia por campo. El enlace `/pipeline?trabajo=<id>` recupera el historial SSE al
+recargar. **Ver resultado IFC DRAFT** abre el modelo, los originales verificados y los
+campos trazables. La pantalla de revisión interactiva A/B sigue dedicada a la demo.
+
+Para probar con un equipo distinto de V-101, genera un conjunto desde la raíz:
+
+```powershell
+uv run --extra api python -m synthetic --casos 1 --estilos rotulado --salida generated/integracion-fixture
+```
+
+Selecciona el PDF y el XLSX de `rev1` en la misma carpeta del equipo. Usa el origen
+**Sintéticos de prueba**. Para los originales del reto, ejecuta dentro del entorno
+autorizado de Databricks. El formulario está pensado para una revisión por trabajo.
+Para una carpeta con varios equipos y revisiones, usa `databricks/01_procesar_lote.py`
+según [el flujo del evento](FLUJO_IA.md).
 
 `corepack pnpm gen:api` desde web/ exporta `create_app().openapi()` con uv y regenera
 openapi.json y schema.ts con openapi-typescript, sin necesitar un servidor en ejecución.

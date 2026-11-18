@@ -66,6 +66,11 @@ class JobInput(Model):
     retry_backoff_seconds: float = Field(default=1, ge=0, le=30)
 
 
+class EquipmentJobInput(JobInput):
+    tag: str = Field(min_length=1, max_length=120, pattern=r"^\S(?:[^\r\n]*\S)?$")
+    revision: str = Field(min_length=1, max_length=50, pattern=r"^[^:/\\\r\n]+$")
+
+
 class StudyInput(Model):
     conjuntos: list[Literal["s-dev", "s-reservado", "s-adversarial", "s-mecanico"]] = Field(
         default_factory=lambda: ["s-dev"], min_length=1, max_length=4
@@ -375,6 +380,7 @@ def create_app(
                 item["ifcUrl"] = (
                     f"/revisions/{quote(row.id, safe='')}/ifc?draft=true&v={row.version}"
                 )
+                item["revision_id"] = row.id
                 item["status"] = "approved" if revision.approval else "draft"
             return list(grouped.values())
 
@@ -390,6 +396,12 @@ def create_app(
             ).first()
             if row is None:
                 raise HTTPException(404, "No existe esa revisión del equipo")
+            return JSONResponse(json.loads(row.payload), headers={"ETag": f'"{row.version}"'})
+
+    @app.get("/revisions/{identity}", response_model=Revision)
+    def revision_by_id(request: Request, identity: str):
+        with Session(request.app.state.store.engine) as session:
+            row = get_revision(session, identity)
             return JSONResponse(json.loads(row.payload), headers={"ETag": f'"{row.version}"'})
 
     @app.get("/revisions/{identity}/fields")
@@ -683,6 +695,16 @@ def create_app(
     async def create_job(
         request: Request, tag: str, body: JobInput, idempotency_key: str | None = Header(None)
     ):
+        return await submit_job(request, tag, body, idempotency_key)
+
+    @app.post("/jobs", status_code=202)
+    async def create_equipment_job(
+        request: Request, body: EquipmentJobInput, idempotency_key: str | None = Header(None)
+    ):
+        # El tag va en el cuerpo para admitir identificadores de plano con barras.
+        return await submit_job(request, body.tag, body, idempotency_key)
+
+    async def submit_job(request: Request, tag: str, body: JobInput, idempotency_key: str | None):
         def action(session):
             logical_ids = set()
             for identity in body.documents:
@@ -727,7 +749,10 @@ def create_app(
             return {"data": {"job_id": job.id, "status": "queued"}, "status": 202}
 
         result = request.app.state.store.perform(
-            f"POST jobs/{tag}", require_key(idempotency_key), body.model_dump(mode="json"), action
+            f"POST jobs/{tag}",
+            require_key(idempotency_key),
+            body.model_dump(mode="json", exclude={"tag"}),
+            action,
         )
         await request.app.state.queue.enqueue(result["data"]["job_id"])
         return reply(result)
@@ -741,6 +766,15 @@ def create_app(
             result = record.model_dump(exclude={"request_json", "run_json", "warnings_json"})
             result["run"] = json.loads(record.run_json) if record.run_json else None
             result["warnings"] = json.loads(record.warnings_json)
+            if record.kind == "pipeline":
+                config = json.loads(record.request_json)
+                result["strategy"] = config.get("strategy")
+                result["dataset"] = config.get("dataset")
+                result["documents"] = [
+                    doc.filename
+                    for doc_id in config.get("documents", [])
+                    if (doc := session.get(DocumentRecord, doc_id)) is not None
+                ]
             return result
 
     @app.post("/jobs/{identity}/cancel")

@@ -138,10 +138,11 @@ export async function getStudy(): Promise<StudyResponse> {
 
 export type EquipmentRow = {
   project_id?: string; equipment_id?: string;
+  revision_id?: string;
   tag: string;
   kind: string;
   area: string;
-  revisions: RevisionId[];
+  revisions: string[];
   status: "draft" | "review" | "approved" | "changed";
   ifcUrl: string;
   /** true = equipo de relleno para la escena de planta; no tiene datos detrás. */

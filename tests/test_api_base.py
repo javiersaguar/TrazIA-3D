@@ -85,6 +85,25 @@ def test_upload_hash_dedupe_and_idempotency(client):
     assert client.app.state.store.read(first.json()["sha256"]) == b"original"
 
 
+def test_generic_job_routes_keep_idempotency_and_return_full_revision(client):
+    body = job_body(client, project_id="ensayo", equipment_id="equipo-externo")
+    request_headers = headers()
+    response = client.post("/jobs", json={**body, "tag": "V-101"}, headers=request_headers)
+    assert response.status_code == 202, response.text
+    assert client.post("/equipment/V-101/jobs", json=body, headers=request_headers).json() == (
+        response.json()
+    )
+    job = wait_job(client, response.json()["job_id"])
+    assert job["status"] == "done", job
+    assert job["dataset"] == "synthetic"
+    assert job["strategy"] == "b_reglas"
+    assert len(job["documents"]) == 2
+    record = client.get(f"/revisions/{job['revision_id']}")
+    assert record.headers["etag"] == '"1"'
+    assert record.json()["equipment"]["id"] == "equipo-externo"
+    assert record.json()["approval"] is None
+
+
 def test_upload_limits_and_missing_key(client):
     assert client.post("/documents", files={"file": ("file.pdf", b"x")}).status_code == 428
     assert (

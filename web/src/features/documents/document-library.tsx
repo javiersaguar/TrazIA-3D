@@ -1,6 +1,7 @@
 "use client";
 
 import { FileUp, FolderOpen, Plus, Shapes } from "lucide-react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
@@ -8,6 +9,7 @@ import { toast } from "sonner";
 import { Segmented } from "@/components/ui/controls";
 import { Button, Icon, Panel } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
+import { apiEnabled } from "@/lib/api/config";
 import { useMounted } from "@/lib/use-mounted";
 import { kindFromFilename, saveDocument, tagFromFilename, useCatalogue } from "./catalogue";
 import { DocumentsTab, fieldClass } from "./documents-tab";
@@ -111,6 +113,13 @@ export function DocumentLibrary() {
           </Button>
         </div>
       </header>
+
+      {apiEnabled && view === "documentos" ? (
+        <Panel className="flex flex-wrap items-center justify-between gap-3 p-4">
+          <p className="text-sm text-muted">Para extraer cotas y generar un IFC DRAFT, carga los originales de una revisión en el Pipeline.</p>
+          <Link href="/pipeline" className="text-sm font-medium text-accent-text underline">Procesar planos con la API</Link>
+        </Panel>
+      ) : null}
 
       {form ? (
         <Panel className="p-5">

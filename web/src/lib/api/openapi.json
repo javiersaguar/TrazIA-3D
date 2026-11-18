@@ -1288,6 +1288,45 @@
         }
       }
     },
+    "/revisions/{identity}": {
+      "get": {
+        "summary": "Revision By Id",
+        "operationId": "revision_by_id_revisions__identity__get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Revision"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/revisions/{identity}/fields": {
       "get": {
         "summary": "Review Fields",
@@ -1829,6 +1868,60 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/JobInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs": {
+      "post": {
+        "summary": "Create Equipment Job",
+        "operationId": "create_equipment_job_jobs_post",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EquipmentJobInput"
               }
             }
           }
@@ -3772,6 +3865,117 @@
           "nozzles"
         ],
         "title": "Equipment"
+      },
+      "EquipmentJobInput": {
+        "properties": {
+          "documents": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 30,
+            "minItems": 1,
+            "title": "Documents"
+          },
+          "project_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Project Id",
+            "default": "DEMO-PLANT"
+          },
+          "equipment_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Equipment Id",
+            "description": "ID estable del equipo; no cambia al renombrar el tag",
+            "default": "vessel-001"
+          },
+          "revision": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 1,
+            "pattern": "^[^:/\\\\\\r\\n]+$",
+            "title": "Revision"
+          },
+          "strategy": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Strategy",
+            "default": "b_reglas"
+          },
+          "use_learning": {
+            "type": "boolean",
+            "title": "Use Learning",
+            "default": true
+          },
+          "providers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Providers"
+          },
+          "dataset": {
+            "type": "string",
+            "enum": [
+              "synthetic",
+              "real"
+            ],
+            "title": "Dataset",
+            "default": "synthetic"
+          },
+          "previous_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Id"
+          },
+          "timeout_seconds": {
+            "type": "number",
+            "maximum": 3600,
+            "exclusiveMinimum": 0,
+            "title": "Timeout Seconds",
+            "default": 300
+          },
+          "max_attempts": {
+            "type": "integer",
+            "maximum": 5,
+            "minimum": 1,
+            "title": "Max Attempts",
+            "default": 3
+          },
+          "retry_backoff_seconds": {
+            "type": "number",
+            "maximum": 30,
+            "minimum": 0,
+            "title": "Retry Backoff Seconds",
+            "default": 1
+          },
+          "tag": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^\\S(?:[^\\r\\n]*\\S)?$",
+            "title": "Tag"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "documents",
+          "revision",
+          "tag"
+        ],
+        "title": "EquipmentJobInput"
       },
       "FieldInput": {
         "properties": {
