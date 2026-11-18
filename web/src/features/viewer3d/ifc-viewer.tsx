@@ -5,6 +5,7 @@ import { apiEnabled, apiURL } from "@/lib/api/config";
 import { toast } from "sonner";
 
 import { Grid } from "@react-three/drei";
+import { useReducedMotion } from "motion/react";
 import {
   Crosshair,
   Eye,
@@ -67,7 +68,12 @@ export function IfcViewer({
   performanceSample,
   holdPrevious = false,
   scenario,
+  animateEnvironment = true,
 }: ExtendedViewerProps) {
+  const contextual = scenario && scenario !== "neutral" ? scenario : undefined;
+  const reducedMotion = useReducedMotion();
+  const environmentMoving = animateEnvironment && reducedMotion === false &&
+    contextual !== undefined;
   const load = useIfcModel(ifcUrl, holdPrevious),
     products = usePreparedModel(load.model);
   const [selection, setSelection] = useState<string>();
@@ -158,30 +164,32 @@ export function IfcViewer({
       data-parse-ms={model?.parseMs.toFixed(2)}
       data-ifc-url={model?.url}
       data-scenario={scenario}
+      data-environment-motion={scenario ? (environmentMoving ? "on" : "off") : undefined}
       data-provenance={model?.products.some(p => p.psets.TrazIA_Traceability?.Dataset === "real") ? "Datos reales" : model?.products.some(p => p.psets.TrazIA_Traceability?.Dataset === "synthetic") ? "Datos sintéticos" : "Procedencia sin declarar"}
       data-approval={model?.products.some(p => p.psets.TrazIA_Traceability?.Draft === true) ? "DRAFT · requiere revisión" : "Consultar aprobación en IFC"}
     >
       {model ? (
         <SceneCanvas label="Modelo IFC; usa el árbol para seleccionar componentes"
-          initialRotating={!scenario} shadows={!!scenario} pixelBudget={scenario ? 880_000 : undefined}>
-          <Studio effects={!scenario} stage={!scenario} />
-          {scenario ? <ProcessEnvironment id={scenario} /> : null}
+          initialRotating={!scenario} shadows={!!contextual} pixelBudget={scenario ? 880_000 : undefined}>
+          <Studio effects={!scenario} stage={!contextual} />
+          {contextual ? <ProcessEnvironment id={contextual} motion={environmentMoving} /> : null}
           <CameraRig
             bounds={displayBounds ?? model.bounds}
             orbitCenter={displayBounds ? undefined : products.find(product => product.semanticId === "shell")?.center}
+            framing={scenario ? 1.18 : undefined}
             view={activeView}
             handle={camera}
             measureKey={measureKey}
             onMeasure={onMeasure}
           />
-          {!scenario ? <Grid
+          {!contextual ? <Grid
             position={[0, -0.015, 0]}
-            args={[20, 20]}
-            cellSize={0.5}
-            sectionSize={2}
+            args={scenario ? [96, 72] : [20, 20]}
+            cellSize={scenario ? 2 : 0.5}
+            sectionSize={scenario ? 10 : 2}
             cellColor={BRAND.surfaceRaised}
             sectionColor={BRAND.border}
-            fadeDistance={20}
+            fadeDistance={scenario ? 95 : 20}
             infiniteGrid
           /> : null}
           {visibleProducts.map((product) => {

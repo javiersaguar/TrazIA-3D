@@ -6,6 +6,14 @@ La preferencia de entorno se guarda por proyecto en el navegador. El contraste
 visual se aplica a cualquier proyecto. El escenario base identifica la
 implantación para la que se prepararon los planos.
 
+**Neutro · estudio** muestra el mismo IFC con luz de estudio y rejilla.
+Mar abierto y Costa y muelle tienen oleaje. En Desierto las plantas rodantes
+se desplazan con ráfagas y rebotes leves delante y detrás de la instalación.
+El complejo industrial muestra vapor en las chimeneas del fondo.
+El control de pausa es independiente del giro de la cámara. El movimiento se
+detiene fuera del visor visible y se desactiva con la preferencia de
+movimiento reducido del sistema.
+
 | Proyecto | Escenario base | Cambios ensayables |
 | --- | --- | --- |
 | SIM-MAR · Plataforma de producción | Mar abierto | Virola del separador V-110 y elevación del tramo GS-04 |
@@ -17,6 +25,14 @@ La selección de una pieza muestra los cambios disponibles y carga la variante
 IFC correspondiente. Puedes aplicar cada cambio por separado o cargar B para
 ver ambos. Los identificadores IFC de los equipos y las líneas se conservan.
 Cada extremo de tubería comparte coordenadas con el puerto al que conecta.
+
+La cubierta de SIM-MAR está a +16 m en el sistema local del modelo. El IFC
+incluye el entramado de vigas y la estructura arriostrada de seis patas,
+con defensas, escala y pasarela de embarque. Los equipos y líneas de los
+cuatro complejos incorporan detalles según su familia, como bridas con
+pernos, volantes de válvula, descansillos o ventiladores con aspas y guardas.
+Los planos y las listas proceden de esa geometría. El agua, las dunas y las
+plantas rodantes se dibujan en el visor como contexto visual.
 
 ## Planos, listas y carga al pipeline
 

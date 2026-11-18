@@ -9,8 +9,19 @@ test("los proyectos de proceso conservan el entorno y aplican cambios IFC por pi
   const viewer = page.getByTestId("ifc-viewer");
   await expect(viewer).toHaveAttribute("data-ifc-url", /SIM-MAR-A\.ifc$/, { timeout: 30_000 });
   await expect(viewer).toHaveAttribute("data-scenario", "ocean");
+  const animation = page.getByRole("button", { name: "Animación del entorno" });
+  await expect(viewer).toHaveAttribute("data-environment-motion", "on");
+  await animation.click();
+  await expect(viewer).toHaveAttribute("data-environment-motion", "off");
+  await page.getByLabel("Entorno del visor").selectOption("neutral");
+  await expect(viewer).toHaveAttribute("data-scenario", "neutral");
+  await expect(viewer).toHaveAttribute("data-ifc-url", /SIM-MAR-A\.ifc$/);
+  await expect(animation).toHaveCount(0);
+  await page.reload();
+  await expect(viewer).toHaveAttribute("data-scenario", "neutral");
   await page.getByLabel("Entorno del visor").selectOption("desert");
   await expect(viewer).toHaveAttribute("data-scenario", "desert");
+  await expect(viewer).toHaveAttribute("data-environment-motion", "on");
   await expect(viewer).toHaveAttribute("data-ifc-url", /SIM-MAR-A\.ifc$/);
   await page.reload();
   await expect(viewer).toHaveAttribute("data-scenario", "desert");
@@ -24,6 +35,13 @@ test("los proyectos de proceso conservan el entorno y aplican cambios IFC por pi
   const zip = await page.getByRole("link", { name: "Descargar dossier ZIP" }).getAttribute("href");
   expect(zip).toMatch(/dossier-B\.zip$/);
   expect((await request.get(zip!)).ok()).toBe(true);
+});
+
+test("el visor de proceso respeta la preferencia de movimiento reducido", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/proyectos-proceso/plataforma-marina");
+  await expect(page.getByTestId("ifc-viewer")).toHaveAttribute("data-environment-motion", "off");
+  await expect(page.getByRole("button", { name: "Animación del entorno" })).toHaveCount(0);
 });
 
 test("navegación de producto agrupada y ajustes en el pie", async ({page})=>{

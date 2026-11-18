@@ -81,7 +81,11 @@ const OverlayContext = createContext<RefObject<HTMLDivElement | null> | null>(
 );
 
 const PixelBudgetContext = createContext(1_000_000);
-const OrbitContext = createContext({ enabled: true, pause: () => {} });
+const OrbitContext = createContext({ active: true, enabled: true, pause: () => {} });
+
+export function useSceneActivity() {
+  return useContext(OrbitContext).active;
+}
 export const ORBIT_SECONDS = 60;
 
 export function SceneLabel(props: ComponentProps<typeof DreiHtml>) {
@@ -104,6 +108,7 @@ export function CameraRig({
   interactive = true,
   orbit = true,
   orbitCenter,
+  framing = 1.4,
   link,
 }: {
   bounds: Bounds;
@@ -115,6 +120,7 @@ export function CameraRig({
   interactive?: boolean;
   orbit?: boolean;
   orbitCenter?: Vec3;
+  framing?: number;
   link?: CameraLink;
 }) {
   const controls = useRef<CameraControls>(null);
@@ -188,7 +194,7 @@ export function CameraRig({
       Math.min(
         viewport.width / Math.max(projected.x, 0.1),
         viewport.height / Math.max(projected.y, 0.1),
-      ) / 1.4;
+      ) / framing;
     void controls.current?.setLookAt(
       eye.x,
       eye.y,
@@ -656,7 +662,7 @@ export function SceneCanvas({
     onRotationChange?.(value);
   }, [onRotationChange]);
   const reduce = useReducedMotion();
-  const rotation = useMemo(() => ({ enabled: active && rotating, pause: () => setRotating(false) }), [active, rotating, setRotating]);
+  const rotation = useMemo(() => ({ active, enabled: active && rotating, pause: () => setRotating(false) }), [active, rotating, setRotating]);
   useEffect(() => {
     let visible = true;
     const update = () => setActive(visible && !document.hidden);

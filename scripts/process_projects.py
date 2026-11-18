@@ -56,7 +56,7 @@ PROJECTS = (
         "Plataforma marina de producción",
         "Mar abierto",
         "Colector de producción, separación de crudo, gas y agua, compresión y bombeo de crudo.",
-        7.0,
+        16.0,
         (
             Equipment(
                 "M-101",

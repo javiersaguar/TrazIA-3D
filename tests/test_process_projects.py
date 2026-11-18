@@ -26,6 +26,24 @@ def test_process_project_revisions_keep_ports_and_guid(project):
         assert item["triangles"] <= 45_000
         model = ifcopenshell.open(str(path))
         physical = [p for p in model.by_type("IfcElement") if p.Representation]
+        if project["id"] == "plataforma-marina":
+            structure = next(part for part in physical if part.Tag == "ST-00")
+            levels = [
+                z
+                for mesh in structure.Representation.Representations[0].Items
+                for _, _, z in mesh.Coordinates.CoordList
+            ]
+            assert model.by_type("IfcBuildingStorey")[0].Elevation == 16.0
+            assert min(levels) < -8.0 and 16.0 in levels
+            vessel = next(part for part in physical if part.Tag == "V-110")
+            assert (
+                min(
+                    z
+                    for mesh in vessel.Representation.Representations[0].Items
+                    for _, _, z in mesh.Coordinates.CoordList
+                )
+                >= 16.0
+            )
         identities.append({p.Name: p.GlobalId for p in physical})
         ports = model.by_type("IfcRelConnectsPorts")
         assert len(ports) == 2 * len(project["lines"])

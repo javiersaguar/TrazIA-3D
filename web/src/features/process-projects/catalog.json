@@ -107,23 +107,23 @@
     "states": {
       "00": {
         "file": "SIM-MAR-A.ifc",
-        "bytes": 643415,
-        "triangles": 15828
+        "bytes": 1256988,
+        "triangles": 29732
       },
       "01": {
         "file": "SIM-MAR-Ensayo-01.ifc",
-        "bytes": 641519,
-        "triangles": 15828
+        "bytes": 1254625,
+        "triangles": 29732
       },
       "10": {
         "file": "SIM-MAR-Ensayo-10.ifc",
-        "bytes": 642077,
-        "triangles": 15828
+        "bytes": 1253700,
+        "triangles": 29732
       },
       "11": {
         "file": "SIM-MAR-B.ifc",
-        "bytes": 643411,
-        "triangles": 15828
+        "bytes": 1254571,
+        "triangles": 29732
       }
     },
     "documents": {
@@ -307,23 +307,23 @@
     "states": {
       "00": {
         "file": "SIM-DES-A.ifc",
-        "bytes": 686268,
-        "triangles": 16728
+        "bytes": 1165077,
+        "triangles": 27680
       },
       "01": {
         "file": "SIM-DES-Ensayo-01.ifc",
-        "bytes": 685490,
-        "triangles": 16728
+        "bytes": 1162065,
+        "triangles": 27680
       },
       "10": {
         "file": "SIM-DES-Ensayo-10.ifc",
-        "bytes": 689690,
-        "triangles": 16888
+        "bytes": 1168266,
+        "triangles": 27840
       },
       "11": {
         "file": "SIM-DES-B.ifc",
-        "bytes": 692142,
-        "triangles": 16888
+        "bytes": 1168482,
+        "triangles": 27840
       }
     },
     "documents": {
@@ -513,23 +513,23 @@
     "states": {
       "00": {
         "file": "SIM-GNL-A.ifc",
-        "bytes": 695630,
-        "triangles": 17152
+        "bytes": 1132345,
+        "triangles": 27388
       },
       "01": {
         "file": "SIM-GNL-Ensayo-01.ifc",
-        "bytes": 694449,
-        "triangles": 17152
+        "bytes": 1131145,
+        "triangles": 27388
       },
       "10": {
         "file": "SIM-GNL-Ensayo-10.ifc",
-        "bytes": 697246,
-        "triangles": 17232
+        "bytes": 1131768,
+        "triangles": 27468
       },
       "11": {
         "file": "SIM-GNL-B.ifc",
-        "bytes": 699465,
-        "triangles": 17232
+        "bytes": 1133974,
+        "triangles": 27468
       }
     },
     "documents": {
@@ -713,23 +713,23 @@
     "states": {
       "00": {
         "file": "SIM-REF-A.ifc",
-        "bytes": 633932,
-        "triangles": 15552
+        "bytes": 1106867,
+        "triangles": 26232
       },
       "01": {
         "file": "SIM-REF-Ensayo-01.ifc",
-        "bytes": 632328,
-        "triangles": 15552
+        "bytes": 1105208,
+        "triangles": 26232
       },
       "10": {
         "file": "SIM-REF-Ensayo-10.ifc",
-        "bytes": 636562,
-        "triangles": 15652
+        "bytes": 1109700,
+        "triangles": 26332
       },
       "11": {
         "file": "SIM-REF-B.ifc",
-        "bytes": 638186,
-        "triangles": 15652
+        "bytes": 1111275,
+        "triangles": 26332
       }
     },
     "documents": {

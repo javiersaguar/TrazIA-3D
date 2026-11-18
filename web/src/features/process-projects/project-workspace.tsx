@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Download, FileSpreadsheet, FileText, RotateCcw } from "lucide-react";
+import { ArrowLeft, Download, FileSpreadsheet, FileText, Pause, Play, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
 import { IfcViewer } from "@/components/three";
@@ -12,7 +12,7 @@ import { formatNumber } from "@/lib/format";
 import { processAsset, type ProcessProject } from "./catalog";
 
 const scenarios: Record<ProcessEnvironmentId, string> = {
-  ocean: "Mar abierto", desert: "Desierto", coast: "Costa y muelle", industrial: "Complejo industrial",
+  neutral: "Neutro · estudio", ocean: "Mar abierto", desert: "Desierto", coast: "Costa y muelle", industrial: "Complejo industrial",
 };
 const control = "h-9 rounded-[var(--radius-control)] border border-border bg-surface px-3 text-[13px] text-text";
 const link = "inline-flex items-center gap-1 text-sm font-medium text-accent-text underline-offset-2 hover:underline";
@@ -27,6 +27,7 @@ export function ProcessProjectWorkspace({ project }: { project: ProcessProject }
     try { return window.localStorage.getItem(key); } catch { return null; }
   }, () => null);
   const [localScenario, setScenario] = useState<ProcessEnvironmentId>();
+  const [animateEnvironment, setAnimateEnvironment] = useState(true);
   const scenario = localScenario ?? (persisted && Object.hasOwn(scenarios, persisted) ? persisted as ProcessEnvironmentId : project.preset);
   function chooseScenario(next: ProcessEnvironmentId) {
     setScenario(next);
@@ -63,11 +64,21 @@ export function ProcessProjectWorkspace({ project }: { project: ProcessProject }
         <h1 className="text-2xl font-semibold text-strong">{project.name}</h1>
         <p className="text-sm text-muted">{project.description}</p>
       </div>
-      <label className="grid gap-1 text-xs text-muted">Entorno del visor
-        <select className={control} value={scenario} onChange={e => chooseScenario(e.target.value as ProcessEnvironmentId)}>
-          {Object.entries(scenarios).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-        </select>
-      </label>
+      <div className="flex flex-wrap items-end gap-2">
+        <label className="grid gap-1 text-xs text-muted">Entorno del visor
+          <select className={control} value={scenario} onChange={e => chooseScenario(e.target.value as ProcessEnvironmentId)}>
+            {Object.entries(scenarios).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </select>
+        </label>
+        {scenario !== "neutral" ? (
+          <button type="button" aria-label="Animación del entorno" aria-pressed={animateEnvironment}
+            className={cn(control, "inline-flex items-center gap-1.5 motion-reduce:hidden")}
+            onClick={() => setAnimateEnvironment(active => !active)}>
+            <Icon icon={animateEnvironment ? Pause : Play} size={14} />
+            {animateEnvironment ? "Pausar entorno" : "Animar entorno"}
+          </button>
+        ) : null}
+      </div>
     </header>
 
     <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
@@ -76,7 +87,7 @@ export function ProcessProjectWorkspace({ project }: { project: ProcessProject }
           description={`${project.equipment.length} equipos · ${project.lines.length} líneas · ${formatNumber(state.triangles)} triángulos IFC`}
           actions={<a href={url} download className={link}><Icon icon={Download} size={15} /> Descargar IFC</a>} />
         <div className="h-[min(64vh,660px)] min-h-[350px] px-3 pb-3">
-          <IfcViewer ifcUrl={url} scenario={scenario} holdPrevious selectedId={selected} onSelect={setSelected}
+          <IfcViewer ifcUrl={url} scenario={scenario} animateEnvironment={animateEnvironment} holdPrevious selectedId={selected} onSelect={setSelected}
             elementStates={elementStates} />
         </div>
         <p className="min-h-9 px-4 pb-3 text-xs text-muted">

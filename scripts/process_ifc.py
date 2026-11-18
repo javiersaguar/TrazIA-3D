@@ -66,6 +66,7 @@ def create_ifc(path, project, revision, equipment, lines, paths, parts):
     site = root("IfcSite", "site", project.setting)
     building = root("IfcBuilding", "module", "Complejo de proceso")
     floor = root("IfcBuildingStorey", "deck", "Nivel de proceso")
+    floor.Elevation = project.deck
     for parent, child in ((container, site), (site, building), (building, floor)):
         ifcopenshell.api.aggregate.assign_object(model, products=[child], relating_object=parent)
 
