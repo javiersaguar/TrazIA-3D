@@ -33,6 +33,7 @@ no se incluye ni se modifica su código en este repositorio.
 | Redis 7.2 | BSD-3-Clause | Servidor de cola (rama 7.2, no Redis posterior) |
 | Ollama 0.40.11 | MIT | Servicio local; sin pesos incluidos |
 | PyYAML 6.0.3 | MIT | Herramienta temporal de validación YAML; no dependencia de runtime |
+| python-pptx | MIT | Exportar el pitch a `.pptx` (`uv run --with`); no dependencia de runtime |
 
 Licencia de [Redis 7.2](https://raw.githubusercontent.com/redis/redis/7.2/COPYING).
 Las imágenes upstream conservan los avisos de sus componentes de sistema.

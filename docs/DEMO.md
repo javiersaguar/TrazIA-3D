@@ -26,7 +26,8 @@ pnpm build; pnpm start                        # http://localhost:3000
 ```
 
 Sin `NEXT_PUBLIC_API_URL`, la web sigue funcionando con los datos sintéticos de `public/demo/`.
-Ese es el **plan B** si cae la API. El **plan C** es el vídeo (tarea 4.6), abierto en otra pestaña.
+Ese es el **plan B** si cae la API. El **plan C** es el vídeo (tarea 4.6), abierto en otra pestaña:
+`generated/video-respaldo/TrazIA-3D-demo-respaldo.mp4`, que graba `scripts/video_respaldo.py`.
 
 Comprobar en este orden, 30 minutos antes:
 

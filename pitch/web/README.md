@@ -75,7 +75,24 @@ seleccionada y la casilla **?fx=0** cambia solo el panel Actual.
    cifras_evento.json` (desde la raíz del repo) genera `src/cifras-evento.js`, que
    `pitch-data.js` aplica a la escena de escala. Con `null` se ven las sintéticas.
 5. Ejecutar las pruebas y volver a compilar. Ensayar con el portátil y el
-   proyector antes de entregar. El mismo guion sirve para montar el PowerPoint.
+   proyector antes de entregar.
+6. Regenerar el PowerPoint y el PDF de entrega (ver abajo).
+
+## Exportar a PowerPoint y PDF
+
+Las bases piden un `.pptx`, así que la web se exporta sin rehacer las diapositivas.
+Desde la raíz del repositorio, con las dependencias de `pitch/web` y de `web/` instaladas
+(Playwright y Google Chrome, los mismos de las pruebas de la web):
+
+```powershell
+uv run --with python-pptx python pitch/web/scripts/exportar_pptx.py
+```
+
+El script compila el pitch, captura las nueve escenas a 1920×1080 y escribe
+[`pitch/TrazIA-3D.pptx`](../TrazIA-3D.pptx), con el guion de cada escena en las notas del orador, y
+[`pitch/TrazIA-3D.pdf`](../TrazIA-3D.pdf). Cada diapositiva es una imagen de la escena ya
+animada: para cambiar un texto, se edita `src/pitch-data.js` y se vuelve a exportar. Hay que
+repetirlo siempre después de `bench.cifras aplicar`, para que el `.pptx` lleve las cifras del evento.
 
 ## Procedencia del boceto
 

@@ -4,6 +4,12 @@
     uv run python scripts/demo.py --sin-api      # plan B: web con los datos de public/demo
     uv run python scripts/demo.py --pitch        # además, el pitch compilado en :4173
     uv run python scripts/demo.py --construir    # recompilar la web aunque ya esté compilada
+    uv run python scripts/demo.py --guardar-inicial  # guardar el estado de la API como inicial
+    uv run python scripts/demo.py --reiniciar    # volver a ese estado y vaciar el navegador
+
+Reiniciar no borra nada: el estado de la API (base SQLite y store/) se aparta a
+generated/demo-apartado/<fecha>/ y se copia el guardado en generated/demo-inicial/. No toca
+cache/ ni private/. La primera pestaña, /reiniciar, vacía lo que la web guarda en el navegador.
 
 Comprueba lo que falta antes de que falte delante del jurado: dependencias de la web, la
 compilación con la URL de la API correcta (Next la fija al compilar), la carpeta de datos con
@@ -34,6 +40,10 @@ PESTANAS = (  # orden de docs/GUION_DEMO.md
     "/modelo?vista=cambios",
     "/impacto",
 )
+# Lo que la API escribe en TRAZIA_DATA al usar la demo. cache/ y private/ no se tocan nunca.
+ESTADO_API = ("trazia.sqlite3", "trazia.sqlite3-wal", "trazia.sqlite3-shm", "store")
+INICIAL = RAIZ / "generated" / "demo-inicial"
+APARTADO = RAIZ / "generated" / "demo-apartado"
 
 
 def ocupado(puerto: int) -> bool:
@@ -70,10 +80,48 @@ def compilar_web(api_url: str, forzar: bool) -> None:
     marca.write_text(api_url, encoding="utf-8")
 
 
-def comprobar_datos() -> dict:
+def carpeta_datos() -> Path:
     datos = Path(os.getenv("TRAZIA_DATA", RAIZ / "data"))
-    if not datos.is_absolute():
-        datos = RAIZ / datos
+    return datos if datos.is_absolute() else RAIZ / datos
+
+
+def guardar_inicial(datos: Path, destino: Path = INICIAL) -> list[str]:
+    """Copia el estado de la API (y nada más) como estado inicial de la demo."""
+    presentes = [nombre for nombre in ESTADO_API if (datos / nombre).exists()]
+    if not presentes:
+        raise SystemExit(f"No hay estado de la API en {datos}: arranca la demo una vez antes.")
+    if destino.exists():
+        shutil.rmtree(destino)
+    destino.mkdir(parents=True)
+    for nombre in presentes:
+        copiar(datos / nombre, destino / nombre)
+    return presentes
+
+
+def reiniciar_api(datos: Path, inicial: Path = INICIAL, apartado: Path = APARTADO) -> Path | None:
+    """Aparta el estado actual de la API y restaura el inicial. None si no hay inicial guardado."""
+    if not inicial.is_dir():
+        return None
+    copia = apartado / time.strftime("%Y%m%d-%H%M%S")
+    copia.mkdir(parents=True, exist_ok=True)
+    for nombre in ESTADO_API:
+        if (datos / nombre).exists():
+            shutil.move(str(datos / nombre), str(copia / nombre))
+    for nombre in ESTADO_API:
+        if (inicial / nombre).exists():
+            copiar(inicial / nombre, datos / nombre)
+    return copia
+
+
+def copiar(origen: Path, destino: Path) -> None:
+    if origen.is_dir():
+        shutil.copytree(origen, destino)
+    else:
+        shutil.copy2(origen, destino)
+
+
+def comprobar_datos() -> dict:
+    datos = carpeta_datos()
     cache = datos / "cache"
     if not cache.is_dir() or not any(cache.iterdir()):
         print(
@@ -93,6 +141,8 @@ def main(argv=None) -> int:
     parser.add_argument("--pitch", action="store_true", help="Servir también el pitch")
     parser.add_argument("--construir", action="store_true", help="Recompilar web y pitch")
     parser.add_argument("--no-abrir", action="store_true", help="No abrir el navegador")
+    parser.add_argument("--guardar-inicial", action="store_true", help="Guardar el estado inicial")
+    parser.add_argument("--reiniciar", action="store_true", help="Volver al estado inicial")
     parser.add_argument("--puerto-api", type=int, default=8000)
     parser.add_argument("--puerto-web", type=int, default=3000)
     parser.add_argument("--puerto-pitch", type=int, default=4173)
@@ -101,11 +151,23 @@ def main(argv=None) -> int:
     for programa in ("uv", "corepack"):
         if shutil.which(programa) is None:
             raise SystemExit(f"Falta «{programa}» en el PATH.")
+    if args.guardar_inicial:
+        if ocupado(args.puerto_api):
+            raise SystemExit("Para la API antes de guardar su estado.")
+        guardados = guardar_inicial(carpeta_datos())
+        print(f"✓ Estado inicial guardado en {INICIAL.relative_to(RAIZ)}: {', '.join(guardados)}")
+        return 0
     puertos = [args.puerto_web] + ([] if args.sin_api else [args.puerto_api])
     puertos += [args.puerto_pitch] if args.pitch else []
     for puerto in puertos:
         if ocupado(puerto):
             raise SystemExit(f"El puerto {puerto} ya está en uso: para lo que lo ocupa.")
+    if args.reiniciar and not args.sin_api:
+        copia = reiniciar_api(carpeta_datos())
+        if copia is None:
+            print("! Sin estado inicial guardado: solo se vacía el navegador (--guardar-inicial).")
+        else:
+            print(f"✓ API en su estado inicial. El anterior queda en {copia.relative_to(RAIZ)}")
     if not (WEB / "node_modules").is_dir():
         ejecutar([*PNPM, "install", "--frozen-lockfile"], WEB)
     api_url = "" if args.sin_api else f"http://127.0.0.1:{args.puerto_api}"
@@ -147,8 +209,11 @@ def main(argv=None) -> int:
         if args.pitch:
             esperar(args.puerto_pitch, "Pitch")
         base = f"http://localhost:{args.puerto_web}"
+        pestanas = list(PESTANAS)
+        if args.reiniciar:  # vacía el navegador y sigue en /documentos
+            pestanas[0] = "/reiniciar?destino=/documentos"
         if not args.no_abrir:
-            for ruta in PESTANAS:
+            for ruta in pestanas:
                 webbrowser.open_new_tab(base + ruta)
             if args.pitch:
                 webbrowser.open_new_tab(f"http://127.0.0.1:{args.puerto_pitch}")

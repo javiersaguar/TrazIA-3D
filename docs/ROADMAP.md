@@ -439,7 +439,7 @@ agente de Fase 2; no se editan las estrategias ni sus carpetas.
   *02/11:* evaluación sintética adicional cerrada; prioridades empeoran el conjunto reservado y quedan rechazadas, recalibración B+OCR aislada mejora ECE externa sin alcanzar 0,05, D sin propuesta por su ruta de fusión. Cero sesiones humanas. [Ablaciones](evidencias/fase3/02nov-aprendizaje/README.md); no se cierra la evaluación representativa.
 - [x] **3.9 (I)** Vista Cambios con morph 3D por GUID, fantasma rev1, marcadores Δ y grafo de impacto.
 - [x] **3.10 (I)** Momento firma «del plano al modelo» (`/lab/firma`).
-- [ ] **3.11 (J)** Guion de 6 min v1 + `.pptx` v0 con la diapositiva «Elegimos con datos». *16/11:* guion v1 en [GUION_DEMO.md](GUION_DEMO.md) (voz, pantallas, tomas y clips de IA). *17/11:* la presentación es el pitch en React de `pitch/web` (boceto hecho), no un `.pptx`; cifras de TR con `bench.cifras` y capturas con `capturas:guion` ([AUTOMATIZACION.md](AUTOMATIZACION.md)). Falta cerrar el contenido final.
+- [ ] **3.11 (J)** Guion de 6 min v1 + `.pptx` v0 con la diapositiva «Elegimos con datos». *16/11:* guion v1 en [GUION_DEMO.md](GUION_DEMO.md) (voz, pantallas, tomas y clips de IA). *17/11:* la presentación es el pitch en React de `pitch/web` (boceto hecho), no un `.pptx`; cifras de TR con `bench.cifras` y capturas con `capturas:guion` ([AUTOMATIZACION.md](AUTOMATIZACION.md)). Falta cerrar el contenido final. *18/11:* `pitch/web/scripts/exportar_pptx.py` exporta las nueve escenas a [`pitch/TrazIA-3D.pptx`](../pitch/TrazIA-3D.pptx) (guion en las notas) y PDF; v0 con cifras sintéticas, a regenerar con las del evento.
   - [x] Boceto previo: [storyboard de seis minutos](../pitch/BOCETO_PRESENTACION.md) y plan de pantalla/Recordly, webcam, cámara, micros, vídeos ilustrativos y montaje. No es el `.pptx` ni la edición final.
 
 ### Fase 4 · Endurecer (22 – 24 nov)
@@ -448,12 +448,12 @@ agente de Fase 2; no se editan las estrategias ni sus carpetas.
 - [x] **4.2** **Modo offline:** `TRAZIA_OFFLINE=1` sirve resultados de modelos cacheados por hash. Si cae la red el viernes, la demo funciona igual. *Implementado 30/10:* caché de visión y copiloto, invalidación y errores recuperables; requiere preparar los cachés antes del ensayo. Además, la API guarda los trabajos validados y en offline los repite sin ejecutar el pipeline: 0,022 s frente a 3,192 s. [Alcance y pruebas](BACKEND_2026-10-30.md).
 - [ ] **4.3** Dos ensayos cronometrados del pitch (6:00 exactos) con alguien externo haciendo de jurado de TR.
   - [x] Estructura preliminar para ensayar preparada en el storyboard. Los dos ensayos finales se harán con la demo del evento.
-- [ ] **4.4** `PREVIOUS_WORK.md` redactado; tag preparado.
+- [ ] **4.4** `PREVIOUS_WORK.md` redactado; tag preparado. *18/11:* borrador actualizado con toda la base hasta el 18/11; el tag lo crea `scripts/arranque_evento.py --aplicar` al empezar.
   - [x] [Declaración previa en borrador](../PREVIOUS_WORK.md); commit, tag e inventario definitivo se cerrarán allí.
 - [ ] **4.5** Instalación en limpio en **los 4 portátiles** (Windows y Linux) siguiendo solo el README, incluidos los modelos locales descargados de antemano.
   - [x] [Checklist de instalación por compañero](PREPARACION_PORTATILES.md). Sigue pendiente ejecutarla en cada portátil.
-- [ ] **4.6** Vídeo de respaldo de la demo (1080p, 60 fps). *16/11:* guion de grabación y montaje en [GUION_DEMO.md](GUION_DEMO.md), a 30 fps como el vídeo de 45 s.
-- [ ] **4.7** Lista de preguntas difíciles y respuestas (J.5).
+- [ ] **4.6** Vídeo de respaldo de la demo (1080p, 60 fps). *16/11:* guion de grabación y montaje en [GUION_DEMO.md](GUION_DEMO.md), a 30 fps como el vídeo de 45 s. *18/11:* versión automática de plan C: `uv run --with imageio-ffmpeg python scripts/video_respaldo.py` recorre el guion con Playwright y deja `generated/video-respaldo/TrazIA-3D-demo-respaldo.mp4` (2:28, 1080p30, rótulos sin voz, solo con los datos sintéticos de la web; no se versiona). Falta el montaje final con voz y las cifras del evento ([AUTOMATIZACION.md](AUTOMATIZACION.md#vídeo-de-respaldo)).
+- [x] **4.7** Lista de preguntas difíciles y respuestas (J.5). *18/11:* [PREGUNTAS_JURADO.md](PREGUNTAS_JURADO.md), con cifra y fuente en cada respuesta.
   - [x] [Borrador de preguntas y respuestas](../pitch/PREGUNTAS_BORRADOR.md); respuestas con datos reales después del evento.
 - [ ] **4.8** Kit físico: cargadores, regleta, adaptador HDMI/USB-C, ratón, hotspot móvil.
 - [ ] **4.9** `THIRD_PARTY.md` con cada dependencia y modelo y su licencia (DEC-30).
@@ -1256,7 +1256,7 @@ las sesiones humanas pendientes del roadmap general no se dan por realizados por
 
 ### Demo (antes de entrar a la sala)
 - [ ] Portátil enchufado, notificaciones desactivadas, pestañas preparadas, zoom ajustado
-- [ ] Estado inicial de la demo reseteado con un comando (`trazia demo reset`)
+- [ ] Estado inicial de la demo reseteado con un comando: `uv run python scripts/demo.py --reiniciar` (guardar antes el estado con `--guardar-inicial`)
 - [ ] Vídeo de respaldo abierto; modo offline listo
 - [ ] Cronómetro
 

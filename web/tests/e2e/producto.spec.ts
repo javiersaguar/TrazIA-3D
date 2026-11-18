@@ -256,3 +256,19 @@ test("Modelo › Diseños regenera el IFC en directo al cambiar medidas y piezas
  await page.getByRole("button",{name:"Restablecer",exact:true}).click();
  await expect(status).toHaveText("IFC publicado · 8 piezas");
 });
+
+test("/reiniciar vacía lo guardado en el navegador y vuelve a Documentos",async({page})=>{
+ await page.goto("/documentos");
+ await page.getByRole("button",{name:"Nueva familia",exact:true}).click();
+ await page.getByRole("form",{name:"Nueva familia"}).getByLabel("Nombre").fill("Familia para reiniciar");
+ await page.getByRole("button",{name:"Guardar",exact:true}).click();
+ await expect(page.getByText("Familia para reiniciar").first()).toBeVisible();
+ await page.goto("/modelo?vista=disenos&diseno=BC-AC101");
+ await page.getByRole("spinbutton",{name:"Alto",exact:true}).fill("4800");
+ await page.getByRole("spinbutton",{name:"Alto",exact:true}).press("Enter");
+ await page.goto("/reiniciar?destino=/documentos");
+ await expect(page.getByRole("status")).toContainText("Demo reiniciada");
+ await page.waitForURL("**/documentos");
+ await expect(page.getByText("Familia para reiniciar")).toHaveCount(0);
+ expect(await page.evaluate(()=>window.localStorage.getItem("trazia-design-edits"))).toBeNull();
+});
