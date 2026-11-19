@@ -7,8 +7,10 @@ export function validPose(value: unknown): value is CameraPose {
   const pose = value as CameraPose;
   const vector = (v: unknown): v is [number, number, number] =>
     Array.isArray(v) && v.length === 3 && v.every(n => typeof n === "number" && Number.isFinite(n));
+  // En perspectiva el zoom equivalente de una vista lejana puede quedar por debajo del mínimo ortográfico.
+  const minimum = pose.projection === "perspective" ? 0.05 : 5;
   return vector(pose.eye) && vector(pose.target) && Number.isFinite(pose.zoom)
-    && pose.zoom >= 5 && pose.zoom <= 650
+    && pose.zoom >= minimum && pose.zoom <= 650
     && pose.eye.some((v, i) => Math.abs(v - pose.target[i]!) > 1e-6);
 }
 export function readViews(raw: string | null): SavedView[] {

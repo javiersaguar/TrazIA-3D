@@ -29,10 +29,11 @@ export default defineConfig({
     launchOptions: cpuOnly ? { args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"] } : undefined,
   },
   projects: [
-    { name: "humo", testMatch: /(?:humo|api|study|3d|producto|k8|fluidez|intro)\.spec\.ts/ },
+    { name: "humo", testMatch: /(?:humo|api|study|3d|producto|k8|fluidez|intro|planta)\.spec\.ts/ },
     { name: "capturas", testMatch: /capturas\.spec\.ts/ },
     { name: "guion", testMatch: /guion\.spec\.ts/ },
     { name: "video", testMatch: /video-respaldo\.spec\.ts/ },
+    { name: "miniaturas", testMatch: /miniaturas\.spec\.ts/ },
   ],
   webServer: [
     ...(connected && !process.env.PW_EXTERNAL_API ? [{

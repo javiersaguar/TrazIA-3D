@@ -1,5 +1,9 @@
 import type { Vec3 } from "@/workers/ifc-protocol";
-export type CameraPose = { eye: Vec3; target: Vec3; zoom: number };
+/**
+ * Pose de cámara. En perspectiva `zoom` es el zoom ortográfico equivalente (misma altura visible a
+ * la distancia del objetivo), para que las vistas guardadas y el BCF sirvan en las dos proyecciones.
+ */
+export type CameraPose = { eye: Vec3; target: Vec3; zoom: number; projection?: "perspective" | "orthographic" };
 /** Canal efímero entre los dos visores. No provoca renders de React. */
 export class CameraLink {
   private listeners = new Map<symbol, (pose: CameraPose) => void>();

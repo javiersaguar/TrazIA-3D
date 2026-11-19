@@ -652,3 +652,14 @@ rechaza el GA registrado/identificado como derivado. No hay ocultación de líne
 resistente o de fabricación. ReportLab pasa también al extra `api`; `uv.lock` mantiene las
 versiones anteriores. Cancelar impide publicar, aunque un hilo de cálculo nativo ya iniciado
 puede acabar en segundo plano. [Evidencias reproducibles](evidencias/k8/README.md).
+## Borrador de planta sintética
+
+`POST /proyectos-proceso/{project_id}/borrador` devuelve un IFC4 `DRAFT`.
+El cuerpo JSON contiene `applied` con los tags de los cambios A/B activos y
+`adjustments` con hasta ocho objetos `{tag, field, value}`. Los campos
+publicados por componente son `length`, `width`, `height` y `rack_z` en
+metros, y `dn` en milímetros enteros. `rack_z` es relativo a la cubierta.
+
+La operación se limita al catálogo público sintético y genera un archivo
+efímero. Los errores de entrada o de geometría devuelven 422. Un proyecto
+desconocido devuelve 404 y un generador ocupado, 429.

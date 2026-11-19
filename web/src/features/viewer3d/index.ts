@@ -10,6 +10,9 @@ export type {
   Annotation,
   IfcViewerProps,
   PlantEquipment,
+  PlantProductInfo,
   PlantSceneProps,
   RevisionMorphProps,
+  ViewerOverlayContext,
+  ViewerProjection,
 } from "./types";

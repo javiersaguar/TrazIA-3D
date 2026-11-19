@@ -7,9 +7,10 @@ visual se aplica a cualquier proyecto. El escenario base identifica la
 implantación para la que se prepararon los planos.
 
 **Neutro · estudio** muestra el mismo IFC con luz de estudio y rejilla.
-Mar abierto y Costa y muelle tienen oleaje. En Desierto las plantas rodantes
-se desplazan con ráfagas y rebotes leves delante y detrás de la instalación.
-El complejo industrial muestra vapor en las chimeneas del fondo.
+Mar abierto tiene oleaje, espuma alrededor de los apoyos, gaviotas y un
+buque de apoyo. Costa y muelle tiene oleaje con abrigo, un metanero y un
+remolcador. En Desierto se animan las plantas rodantes y el polvo. Las
+unidades vecinas de la refinería tienen chimeneas con vapor y balizas.
 El control de pausa es independiente del giro de la cámara. El movimiento se
 detiene fuera del visor visible y se desactiva con la preferencia de
 movimiento reducido del sistema.
@@ -21,10 +22,20 @@ movimiento reducido del sistema.
 | SIM-GNL · Terminal de almacenamiento | Costa y muelle | Envolvente de tanque T-340 y desvío de línea LNG-21 |
 | SIM-REF · Ampliación de refinería | Complejo industrial | Altura del reactor R-440 y elevación de la conexión LP-33 |
 
-La selección de una pieza muestra los cambios disponibles y carga la variante
-IFC correspondiente. Puedes aplicar cada cambio por separado o cargar B para
-ver ambos. Los identificadores IFC de los equipos y las líneas se conservan.
-Cada extremo de tubería comparte coordenadas con el puerto al que conecta.
+El primer clic selecciona el equipo o línea y el siguiente baja a la pieza.
+La cámara calcula un encuadre en perspectiva según el tamaño, la elevación y
+la visibilidad. Las piezas que siguen tapando la selección se atenúan y
+**Aislar selección** permite inspeccionarla sola. Desde la ficha se abren las
+piezas IFC, sus propiedades e identificadores y las cotas X, Y y Z. <kbd>Esc</kbd>
+sube al conjunto o a la vista general. Alzado y Planta son vistas ortográficas.
+
+Los cambios preparados de la revisión B se pueden aplicar también por
+separado. Con la API conectada, **Ensayar cambios** admite las dimensiones
+del equipo y los parámetros de la línea publicados en su ficha. La API
+regenera la planta, comprueba el IFC4 y mantiene los GUID de los elementos
+que conservan su identidad. Los puertos coinciden con sus conexiones.
+El ensayo es un IFC DRAFT descargable. Los planos y Excel corresponden a
+las revisiones documentales A y B.
 
 La cubierta de SIM-MAR está a +16 m en el sistema local del modelo. El IFC
 incluye el entramado de vigas y la estructura arriostrada de seis patas,
@@ -57,12 +68,14 @@ uv run --extra dev --extra api python scripts/make_process_projects.py
 uv run --extra dev --extra api python -m pytest -q tests/test_process_projects.py
 ```
 
-La definición común vive en `scripts/process_projects.py`. El generador
+La definición común vive en `src/trazia/process_catalog/process_projects.py`. El generador
 produce los archivos de `web/public/demo/proceso/` y el catálogo del
 frontend. Valida el esquema IFC4 y aplica un presupuesto por variante de
-1,35 MB y 45.000 triángulos. Las miniaturas WebP capturan el IFC A en su
-entorno por defecto. El navegador carga primero esas miniaturas en el
-catálogo y solicita el visor y una sola variante al abrir el proyecto.
+3,5 MB descargables, 900 KB de transporte y 95.000 triángulos.
+Las piezas repetidas reutilizan mallas mediante `IfcMappedItem`.
+El navegador descomprime el IFC de demostración en el worker y solicita una
+sola variante al abrir el proyecto. Las miniaturas WebP se regeneran con
+`uv run python scripts/miniaturas_proceso.py` y capturan la revisión A.
 
 Los escenarios se inspiran en tipos de proyectos publicados por Técnicas
 Reunidas. Las distribuciones, materiales, dimensiones y cambios del

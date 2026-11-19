@@ -21,7 +21,14 @@ import { acceleratedRaycast } from "three-mesh-bvh";
 import type { Vec3 } from "@/workers/ifc-protocol";
 import type { PreparedProduct } from "./model-resource";
 import { parentElementId } from "./semantic";
-import { BasicMaterial, SteelMaterial } from "./materials";
+import { BasicMaterial, PlantMaterial, SteelMaterial } from "./materials";
+import { surfaceFinish } from "./plant-materials";
+
+/** Opacidad de lo que aún tapa el componente encuadrado. */
+export const GHOST_OPACITY = 0.16;
+/** Un clic tras arrastrar más de estos píxeles es una órbita, no una selección. */
+const CLICK_SLOP_PX = 5;
+const noRaycast = () => null;
 
 export type ElementState =
   "draft" | "approved" | "assumed" | "changed" | "conflict";
@@ -96,6 +103,7 @@ export function ProductMesh({
   onFocus,
   color,
   useIfcColors = false,
+  ghost = false,
 }: {
   product: PreparedProduct;
   position?: Vec3;
@@ -109,7 +117,10 @@ export function ProductMesh({
   wireframe?: boolean;
   immediate?: boolean;
   color?: string;
+  /** Color y acabado PBR de cada geometría según su estilo IFC (escenarios de proceso). */
   useIfcColors?: boolean;
+  /** Tapa el componente encuadrado: se atenúa, deja de escribir profundidad y no intercepta clics. */
+  ghost?: boolean;
   onSelect?(id: string): void;
   onHover?(id: string | null): void;
   onFocus?(id: string): void;
@@ -122,15 +133,20 @@ export function ProductMesh({
     sx: scale[0],
     sy: scale[1],
     sz: scale[2],
-    opacity: mode === "xray" ? opacity * 0.22 : opacity,
+    opacity: mode === "xray" ? opacity * 0.22 : ghost ? Math.min(opacity, GHOST_OPACITY) : opacity,
     immediate: immediate || !!reduced,
     config: config.default,
   });
+  const finishes = useMemo(
+    () => (useIfcColors ? product.parts.map((part) => surfaceFinish(part.style, part.color)) : null),
+    [useIfcColors, product.parts],
+  );
   const tint = color ?? STATE_COLORS[state];
   const activeColor = tint;
   const click = (event: ThreeEvent<MouseEvent>) => {
     if (planes?.some(plane => plane.distanceToPoint(event.point) < 0)) return;
     event.stopPropagation();
+    if (event.delta > CLICK_SLOP_PX) return;
     onSelect?.(product.semanticId);
   };
   const over = (event: ThreeEvent<PointerEvent>) => {
@@ -143,7 +159,8 @@ export function ProductMesh({
     event.stopPropagation();
     onFocus?.(product.semanticId);
   };
-  const interactive = opacity > 0.05 && !wireframe && !!onSelect;
+  const interactive = opacity > 0.05 && !wireframe && !!onSelect && !ghost;
+  const depthWrite = mode !== "xray" && opacity >= 0.99 && !ghost;
   return (
     <Select enabled={selected || hovered}>
       <animated.group
@@ -155,33 +172,44 @@ export function ProductMesh({
         scale-z={spring.sz}
         dispose={null}
       >
-        {product.geometries.map((geometry, i) => (
+        {product.geometries.map((geometry, i) => {
+          const part = product.parts[i];
+          const paint = useIfcColors && state !== "changed" && part
+            ? `#${new Color().setRGB(...part.color.slice(0, 3) as Vec3, SRGBColorSpace).getHexString()}`
+            : activeColor;
+          // Con acabados PBR el resaltado es un tinte leve: el contorno marca la selección sin lavar el material.
+          const surface = {
+            color: paint,
+            emissive: selected || hovered ? BRAND.sky : BRAND.black,
+            emissiveIntensity: useIfcColors ? (selected ? 0.05 : hovered ? 0.04 : 0) : selected ? 0.12 : hovered ? 0.05 : 0,
+            transparent: true,
+            opacity: spring.opacity,
+            depthWrite,
+            wireframe: wireframe || state === "assumed",
+            clippingPlanes: planes ?? [],
+          };
+          return (
           <mesh
             key={i}
             geometry={geometry}
             castShadow={useIfcColors}
             receiveShadow={useIfcColors}
-            raycast={acceleratedRaycast}
+            raycast={ghost ? noRaycast : acceleratedRaycast}
             onClick={interactive ? click : undefined}
             onPointerOver={interactive ? over : undefined}
             onPointerOut={interactive ? () => onHover?.(null) : undefined}
             onDoubleClick={interactive ? focus : undefined}
           >
-            <SteelMaterial
-              color={useIfcColors && state !== "changed" && product.parts[i]
-                ? `#${new Color().setRGB(...product.parts[i].color.slice(0, 3) as Vec3, SRGBColorSpace).getHexString()}`
-                : activeColor}
-              metalness={wireframe ? 0 : useIfcColors ? 0.42 : 0.85}
-              roughness={useIfcColors ? 0.51 : 0.34}
-              emissive={selected || hovered ? BRAND.sky : BRAND.black}
-              emissiveIntensity={selected ? 0.12 : hovered ? 0.04 : 0}
-              transparent
-              opacity={spring.opacity}
-              depthWrite={mode !== "xray" && opacity >= 0.99}
-              wireframe={wireframe || state === "assumed"}
-              clippingPlanes={planes ?? []}
-            />
-            {(selected || hovered) && opacity > 0.01 ? (
+            {finishes?.[i] ? (
+              <PlantMaterial finish={finishes[i]} {...surface} {...(wireframe ? { metalness: 0 } : {})} />
+            ) : (
+              <SteelMaterial
+                {...surface}
+                metalness={wireframe ? 0 : 0.85}
+                roughness={0.34}
+              />
+            )}
+            {(selected || hovered) && opacity > 0.01 && !ghost && !useIfcColors ? (
               <Edges
                 threshold={20}
                 color={selected ? BRAND.skyPale : BRAND.skyLight}
@@ -189,8 +217,9 @@ export function ProductMesh({
               />
             ) : null}
           </mesh>
-        ))}
-        {selected && opacity > 0.01
+          );
+        })}
+        {selected && opacity > 0.01 && !ghost
           ? product.geometries.map((geometry, i) => (
               <mesh
                 key={`outline-${i}`}

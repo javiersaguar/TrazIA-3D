@@ -2,14 +2,16 @@
 
 import { ArrowLeft, Download, FileSpreadsheet, FileText, Pause, Play, RotateCcw } from "lucide-react";
 import Link from "next/link";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { IfcViewer } from "@/components/three";
 import { Badge, Button, Icon, Panel, PanelHeader } from "@/components/ui/primitives";
 import type { ElementState } from "@/features/viewer3d/product-mesh";
-import type { ProcessEnvironmentId } from "@/features/viewer3d/types";
+import type { PlantProductInfo, ProcessEnvironmentId } from "@/features/viewer3d/types";
+import { apiURL } from "@/lib/api/config";
 import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
-import { processAsset, type ProcessProject } from "./catalog";
+import { processAsset, type Parameter, type ProcessProject } from "./catalog";
+import { ComponentInspector, type Inputs } from "./component-inspector";
 
 const scenarios: Record<ProcessEnvironmentId, string> = {
   neutral: "Neutro · estudio", ocean: "Mar abierto", desert: "Desierto", coast: "Costa y muelle", industrial: "Complejo industrial",
@@ -35,22 +37,85 @@ export function ProcessProjectWorkspace({ project }: { project: ProcessProject }
   }
 
   const [applied, setApplied] = useState<string[]>([]);
-  const [selected, setSelected] = useState<string>();
+  const [selected, setSelected] = useState("");
+  const [products, setProducts] = useState<PlantProductInfo[]>([]);
+  const [dimensions, setDimensions] = useState(false);
+  const [inputs, setInputs] = useState<Inputs>({});
+  const [draft, setDraft] = useState<string>();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const inflight = useRef<AbortController | null>(null);
+  useEffect(() => {
+    return () => inflight.current?.abort();
+  }, []);
+  useEffect(() => {
+    return () => { if (draft) URL.revokeObjectURL(draft); };
+  }, [draft]);
   const [documentRevision, setDocumentRevision] = useState<"A" | "B">("A");
   const suffix = project.changes.map(change => applied.includes(change.tag) ? "1" : "0").join("");
   const revision = applied.length === 0 ? "A" : applied.length === project.changes.length ? "B" : null;
   const state = project.states[suffix]!;
-  const url = processAsset(project, state.file);
+  const url = draft ?? processAsset(project, state.file);
   const docs = project.documents[revision ?? documentRevision];
   const elementStates: Record<string, ElementState> = Object.fromEntries(applied.map(tag => [`element:${tag}`, "changed"]));
-  const selectedTag = selected?.replace(/^element:/, "");
+  const byId = useMemo(() => new Map(products.map(item => [item.semanticId, item])), [products]);
+  const current = byId.get(selected);
+  const selectedTag = current?.tag ?? selected.replace(/^element:/, "");
   const info = project.equipment.find(item => item.tag === selectedTag);
   const route = project.lines.find(item => item.tag === selectedTag);
+  const editTag = current?.parentId ? byId.get(current.parentId)?.tag : selectedTag;
+  const editFields = project.equipment.find(item => item.tag === editTag)?.editFields
+    ?? project.lines.find(item => item.tag === editTag)?.editFields;
+
+  function resetDraft() {
+    setDraft(undefined);
+    setInputs({});
+    setError("");
+  }
+
+  async function preview() {
+    const adjustments = Object.entries(inputs).flatMap(([tag, fields]) =>
+      Object.entries(fields).filter(([, value]) => value.trim()).map(([field, value]) => ({ tag, field, value: Number(value) })));
+    if (!adjustments.length || inflight.current) return;
+    if (adjustments.length > 8) {
+      setError("El borrador admite hasta ocho parámetros por ensayo.");
+      return;
+    }
+    const controller = new AbortController();
+    inflight.current = controller;
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch(apiURL(`/proyectos-proceso/${project.id}/borrador`), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({ applied, adjustments }),
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null) as { detail?: unknown } | null;
+        setError(typeof payload?.detail === "string" ? payload.detail : "No se pudo validar el borrador. Revisa las cotas.");
+        return;
+      }
+      const file = await response.blob();
+      if (!controller.signal.aborted) setDraft(URL.createObjectURL(file));
+    } catch {
+      if (!controller.signal.aborted) setError("No se pudo conectar con la API. Puedes volver a previsualizar el borrador.");
+    } finally {
+      inflight.current = null;
+      if (!controller.signal.aborted) setBusy(false);
+    }
+  }
+
+  function editInput(tag: string, field: Parameter, value: string) {
+    setInputs(previous => ({ ...previous, [tag]: { ...previous[tag], [field]: value } }));
+  }
 
   function loadRevision(next: "A" | "B") {
+    resetDraft();
     setDocumentRevision(next);
     setApplied(next === "B" ? project.changes.map(change => change.tag) : []);
-    setSelected(undefined);
+    setSelected("");
   }
 
   return <div className="space-y-5">
@@ -81,37 +146,46 @@ export function ProcessProjectWorkspace({ project }: { project: ProcessProject }
       </div>
     </header>
 
-    <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_320px] 2xl:grid-cols-[minmax(0,1fr)_360px]">
       <Panel className="overflow-hidden">
         <PanelHeader title="Modelo de planta"
-          description={`${project.equipment.length} equipos · ${project.lines.length} líneas · ${formatNumber(state.triangles)} triángulos IFC`}
-          actions={<a href={url} download className={link}><Icon icon={Download} size={15} /> Descargar IFC</a>} />
+          description={`${project.equipment.length} equipos · ${project.lines.length} líneas · ${draft ? "Borrador personalizado" : formatNumber(state.triangles) + " triángulos IFC"}`}
+          actions={<a href={url} download={draft ? `${project.code}-ENSAYO-DRAFT.ifc` : state.file} className={link}><Icon icon={Download} size={15} /> Descargar IFC</a>} />
         <div className="h-[min(64vh,660px)] min-h-[350px] px-3 pb-3">
-          <IfcViewer ifcUrl={url} scenario={scenario} animateEnvironment={animateEnvironment} holdPrevious selectedId={selected} onSelect={setSelected}
+          <IfcViewer ifcUrl={url} ifcGzipUrl={draft ? undefined : processAsset(project, state.transport)}
+            scenario={scenario} animateEnvironment={animateEnvironment} holdPrevious selectedId={selected}
+            onSelect={setSelected} onProducts={setProducts} showSelectionDimensions={dimensions}
             elementStates={elementStates} />
         </div>
         <p className="min-h-9 px-4 pb-3 text-xs text-muted">
-          {info ? `${info.tag} · ${info.name} · ${info.service}`
+          {current?.parentId ? current.label ?? current.name : info ? `${info.tag} · ${info.name} · ${info.service}`
             : route ? `${route.tag} · ${route.fluid} · ${route.start} → ${route.end}`
               : "Selecciona un equipo o una tubería para consultar su tag y servicio."}
         </p>
       </Panel>
 
-      <Panel className="space-y-4 p-4">
+      <ComponentInspector products={byId} selected={selected} select={setSelected}
+        editFields={editFields} inputs={inputs} onInput={editInput}
+        dimensions={dimensions} setDimensions={setDimensions} onPreview={() => void preview()}
+        onReset={resetDraft} busy={busy} error={error} draft={!!draft} />
+    </div>
+
+    <Panel className="space-y-4 p-4">
         <div className="flex items-start justify-between gap-2">
           <h2 className="font-semibold text-strong">Cambios por pieza</h2>
           <Badge tone={revision ? "neutral" : "warning"}>{revision ? `Rev. ${revision}` : "Ensayo parcial"}</Badge>
         </div>
         <div className="flex flex-wrap gap-2" role="group" aria-label="Cargar revisión">
-          <Button size="sm" aria-pressed={revision === "A"} onClick={() => loadRevision("A")}>Revisión A</Button>
-          <Button size="sm" aria-pressed={revision === "B"} onClick={() => loadRevision("B")}>Revisión B</Button>
+          <Button size="sm" disabled={busy} aria-pressed={revision === "A"} onClick={() => loadRevision("A")}>Revisión A</Button>
+          <Button size="sm" disabled={busy} aria-pressed={revision === "B"} onClick={() => loadRevision("B")}>Revisión B</Button>
         </div>
-        <div className="space-y-2">
+        <div className="grid gap-2 md:grid-cols-2">
           {project.changes.map(change => (
             <label key={change.tag} className={cn("flex cursor-pointer items-start gap-3 rounded-md border p-3",
               applied.includes(change.tag) ? "border-accent bg-accent-soft" : "border-border")}>
-              <input type="checkbox" className="mt-1 accent-[var(--color-accent)]" checked={applied.includes(change.tag)}
+              <input type="checkbox" className="mt-1 accent-[var(--color-accent)]" disabled={busy} checked={applied.includes(change.tag)}
                 onChange={event => {
+                  resetDraft();
                   setSelected(`element:${change.tag}`);
                   setApplied(current => event.target.checked ? [...current, change.tag] : current.filter(tag => tag !== change.tag));
                 }} />
@@ -123,16 +197,15 @@ export function ProcessProjectWorkspace({ project }: { project: ProcessProject }
             </label>
           ))}
         </div>
-        {applied.length ? <Button size="sm" onClick={() => loadRevision("A")}><Icon icon={RotateCcw} size={14} /> Restablecer A</Button> : null}
-        {!revision ? <p className="text-xs text-muted">El IFC descargado contiene solo los cambios seleccionados. Las hojas adjuntas corresponden a A o B.</p> : null}
-      </Panel>
-    </div>
+        {applied.length ? <Button size="sm" disabled={busy} onClick={() => loadRevision("A")}><Icon icon={RotateCcw} size={14} /> Restablecer A</Button> : null}
+        {draft || !revision ? <p className="text-xs text-muted">Los planos y las hojas corresponden a la revisión documental A o B.</p> : null}
+    </Panel>
 
     <Panel>
       <PanelHeader title="Planos y hojas de datos"
         description="Cada revisión tiene el GA de implantación y un plano y un Excel por equipo."
         actions={<label className="flex items-center gap-2 text-xs text-muted">Revisión documental
-          <select className={control} value={revision ?? documentRevision}
+          <select className={control} disabled={busy} value={revision ?? documentRevision}
             onChange={event => {
               const next = event.target.value as "A" | "B";
               if (revision) loadRevision(next);

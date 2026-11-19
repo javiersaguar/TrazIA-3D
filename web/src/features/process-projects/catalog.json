@@ -11,43 +11,122 @@
         "tag": "M-101",
         "name": "Colector de producción",
         "family": "manifold",
-        "service": "Entrada multifásica"
+        "service": "Entrada multifásica",
+        "editFields": {
+          "length": {
+            "min": 4.5,
+            "max": 5.5,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "V-110",
         "name": "Separador trifásico",
         "family": "horizontal",
-        "service": "Separación primaria"
+        "service": "Separación primaria",
+        "editFields": {
+          "length": {
+            "min": 8.1,
+            "max": 9.9,
+            "step": 0.01
+          },
+          "width": {
+            "min": 2.97,
+            "max": 4.51,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "V-120",
         "name": "Depurador de gas",
         "family": "vertical",
-        "service": "Retención de arrastres"
+        "service": "Retención de arrastres",
+        "editFields": {
+          "width": {
+            "min": 2.7,
+            "max": 3.3,
+            "step": 0.01
+          },
+          "height": {
+            "min": 6.66,
+            "max": 8.14,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "K-130",
         "name": "Compresor centrífugo",
         "family": "compressor",
-        "service": "Gas de exportación"
+        "service": "Gas de exportación",
+        "editFields": {
+          "length": {
+            "min": 6.3,
+            "max": 7.7,
+            "step": 0.01
+          },
+          "width": {
+            "min": 3.78,
+            "max": 4.62,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "E-140",
         "name": "Aeroenfriador de descarga",
         "family": "air-cooler",
-        "service": "Enfriamiento de gas"
+        "service": "Enfriamiento de gas",
+        "editFields": {
+          "length": {
+            "min": 7.2,
+            "max": 8.8,
+            "step": 0.01
+          },
+          "width": {
+            "min": 5.04,
+            "max": 6.16,
+            "step": 0.01
+          },
+          "height": {
+            "min": 4.5,
+            "max": 5.5,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "P-150",
         "name": "Bombeo de crudo",
         "family": "pump",
-        "service": "Salida de crudo"
+        "service": "Salida de crudo",
+        "editFields": {
+          "length": {
+            "min": 5.4,
+            "max": 6.6,
+            "step": 0.01
+          },
+          "width": {
+            "min": 2.88,
+            "max": 3.52,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "H-160",
         "name": "Hidrociclones de agua",
         "family": "cyclone",
-        "service": "Agua producida"
+        "service": "Agua producida",
+        "editFields": {
+          "height": {
+            "min": 3.6,
+            "max": 4.4,
+            "step": 0.01
+          }
+        }
       }
     ],
     "lines": [
@@ -55,37 +134,109 @@
         "tag": "MP-01",
         "start": "M-101",
         "end": "V-110",
-        "fluid": "Mezcla"
+        "fluid": "Mezcla",
+        "editFields": {
+          "dn": {
+            "min": 495.0,
+            "max": 605.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 3.15,
+            "max": 3.85,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "GS-02",
         "start": "V-110",
         "end": "V-120",
-        "fluid": "Gas"
+        "fluid": "Gas",
+        "editFields": {
+          "dn": {
+            "min": 360.0,
+            "max": 440.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 3.78,
+            "max": 4.62,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "GS-03",
         "start": "V-120",
         "end": "K-130",
-        "fluid": "Gas"
+        "fluid": "Gas",
+        "editFields": {
+          "dn": {
+            "min": 405.0,
+            "max": 495.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 3.15,
+            "max": 3.85,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "GS-04",
         "start": "K-130",
         "end": "E-140",
-        "fluid": "Gas"
+        "fluid": "Gas",
+        "editFields": {
+          "dn": {
+            "min": 405.0,
+            "max": 495.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 4.05,
+            "max": 6.82,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "OL-05",
         "start": "V-110",
         "end": "P-150",
-        "fluid": "Crudo"
+        "fluid": "Crudo",
+        "editFields": {
+          "dn": {
+            "min": 315.0,
+            "max": 385.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 2.61,
+            "max": 3.19,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "WP-06",
         "start": "V-110",
         "end": "H-160",
-        "fluid": "Agua"
+        "fluid": "Agua",
+        "editFields": {
+          "dn": {
+            "min": 270.0,
+            "max": 330.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 3.42,
+            "max": 4.18,
+            "step": 0.01
+          }
+        }
       }
     ],
     "changes": [
@@ -107,23 +258,31 @@
     "states": {
       "00": {
         "file": "SIM-MAR-A.ifc",
-        "bytes": 1256988,
-        "triangles": 29732
+        "bytes": 2302148,
+        "triangles": 87236,
+        "transport": "SIM-MAR-A.ifc.gz",
+        "transportBytes": 519024
       },
       "01": {
         "file": "SIM-MAR-Ensayo-01.ifc",
-        "bytes": 1254625,
-        "triangles": 29732
+        "bytes": 2300135,
+        "triangles": 87172,
+        "transport": "SIM-MAR-Ensayo-01.ifc.gz",
+        "transportBytes": 518126
       },
       "10": {
         "file": "SIM-MAR-Ensayo-10.ifc",
-        "bytes": 1253700,
-        "triangles": 29732
+        "bytes": 2304444,
+        "triangles": 87320,
+        "transport": "SIM-MAR-Ensayo-10.ifc.gz",
+        "transportBytes": 518793
       },
       "11": {
         "file": "SIM-MAR-B.ifc",
-        "bytes": 1254571,
-        "triangles": 29732
+        "bytes": 2303023,
+        "triangles": 87256,
+        "transport": "SIM-MAR-B.ifc.gz",
+        "transportBytes": 519206
       }
     },
     "documents": {
@@ -211,43 +370,132 @@
         "tag": "V-210",
         "name": "Separador de entrada",
         "family": "horizontal",
-        "service": "Gas húmedo y condensado"
+        "service": "Gas húmedo y condensado",
+        "editFields": {
+          "length": {
+            "min": 7.2,
+            "max": 8.8,
+            "step": 0.01
+          },
+          "width": {
+            "min": 2.79,
+            "max": 3.41,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "F-220",
         "name": "Filtro coalescente",
         "family": "vertical",
-        "service": "Protección de la columna"
+        "service": "Protección de la columna",
+        "editFields": {
+          "width": {
+            "min": 2.34,
+            "max": 2.86,
+            "step": 0.01
+          },
+          "height": {
+            "min": 5.4,
+            "max": 6.6,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "C-230",
         "name": "Columna de deshidratación TEG",
         "family": "column",
-        "service": "Retirada de humedad"
+        "service": "Retirada de humedad",
+        "editFields": {
+          "width": {
+            "min": 3.15,
+            "max": 3.85,
+            "step": 0.01
+          },
+          "height": {
+            "min": 13.5,
+            "max": 19.25,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "K-240",
         "name": "Compresor de gas seco",
         "family": "compressor",
-        "service": "Gas tratado"
+        "service": "Gas tratado",
+        "editFields": {
+          "length": {
+            "min": 7.02,
+            "max": 8.58,
+            "step": 0.01
+          },
+          "width": {
+            "min": 3.78,
+            "max": 4.62,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "E-250",
         "name": "Banco de aeroenfriamiento",
         "family": "air-cooler",
-        "service": "Refrigeración por aire"
+        "service": "Refrigeración por aire",
+        "editFields": {
+          "length": {
+            "min": 8.55,
+            "max": 10.45,
+            "step": 0.01
+          },
+          "width": {
+            "min": 5.76,
+            "max": 7.04,
+            "step": 0.01
+          },
+          "height": {
+            "min": 4.59,
+            "max": 5.61,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "T-260",
         "name": "Tanque de condensado",
         "family": "tank",
-        "service": "Almacenamiento intermedio"
+        "service": "Almacenamiento intermedio",
+        "editFields": {
+          "width": {
+            "min": 7.92,
+            "max": 9.68,
+            "step": 0.01
+          },
+          "height": {
+            "min": 5.85,
+            "max": 7.15,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "P-270",
         "name": "Bombas de condensado",
         "family": "pump",
-        "service": "Trasiego de líquido"
+        "service": "Trasiego de líquido",
+        "editFields": {
+          "length": {
+            "min": 5.76,
+            "max": 7.04,
+            "step": 0.01
+          },
+          "width": {
+            "min": 3.06,
+            "max": 3.74,
+            "step": 0.01
+          }
+        }
       }
     ],
     "lines": [
@@ -255,37 +503,109 @@
         "tag": "WG-11",
         "start": "V-210",
         "end": "F-220",
-        "fluid": "Gas"
+        "fluid": "Gas",
+        "editFields": {
+          "dn": {
+            "min": 405.0,
+            "max": 495.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 3.42,
+            "max": 4.18,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "WG-12",
         "start": "F-220",
         "end": "C-230",
-        "fluid": "Gas"
+        "fluid": "Gas",
+        "editFields": {
+          "dn": {
+            "min": 360.0,
+            "max": 440.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 3.42,
+            "max": 4.18,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "DG-13",
         "start": "C-230",
         "end": "K-240",
-        "fluid": "Gas"
+        "fluid": "Gas",
+        "editFields": {
+          "dn": {
+            "min": 360.0,
+            "max": 440.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 4.14,
+            "max": 5.06,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "DG-14",
         "start": "K-240",
         "end": "E-250",
-        "fluid": "Gas"
+        "fluid": "Gas",
+        "editFields": {
+          "dn": {
+            "min": 405.0,
+            "max": 660.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 4.14,
+            "max": 5.06,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "CL-15",
         "start": "V-210",
         "end": "T-260",
-        "fluid": "Condensado"
+        "fluid": "Condensado",
+        "editFields": {
+          "dn": {
+            "min": 270.0,
+            "max": 330.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 2.52,
+            "max": 3.08,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "CL-16",
         "start": "T-260",
         "end": "P-270",
-        "fluid": "Condensado"
+        "fluid": "Condensado",
+        "editFields": {
+          "dn": {
+            "min": 225.0,
+            "max": 275.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 2.25,
+            "max": 2.75,
+            "step": 0.01
+          }
+        }
       }
     ],
     "changes": [
@@ -307,23 +627,31 @@
     "states": {
       "00": {
         "file": "SIM-DES-A.ifc",
-        "bytes": 1165077,
-        "triangles": 27680
+        "bytes": 2021712,
+        "triangles": 79894,
+        "transport": "SIM-DES-A.ifc.gz",
+        "transportBytes": 456135
       },
       "01": {
         "file": "SIM-DES-Ensayo-01.ifc",
-        "bytes": 1162065,
-        "triangles": 27680
+        "bytes": 2024722,
+        "triangles": 80118,
+        "transport": "SIM-DES-Ensayo-01.ifc.gz",
+        "transportBytes": 457199
       },
       "10": {
         "file": "SIM-DES-Ensayo-10.ifc",
-        "bytes": 1168266,
-        "triangles": 27840
+        "bytes": 2039602,
+        "triangles": 80470,
+        "transport": "SIM-DES-Ensayo-10.ifc.gz",
+        "transportBytes": 460214
       },
       "11": {
         "file": "SIM-DES-B.ifc",
-        "bytes": 1168482,
-        "triangles": 27840
+        "bytes": 2043266,
+        "triangles": 80694,
+        "transport": "SIM-DES-B.ifc.gz",
+        "transportBytes": 462597
       }
     },
     "documents": {
@@ -411,43 +739,122 @@
         "tag": "LA-310",
         "name": "Brazo marino de descarga",
         "family": "arm",
-        "service": "Recepción desde buque"
+        "service": "Recepción desde buque",
+        "editFields": {
+          "height": {
+            "min": 9.9,
+            "max": 12.1,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "M-320",
         "name": "Colector criogénico",
         "family": "manifold",
-        "service": "Distribución de GNL"
+        "service": "Distribución de GNL",
+        "editFields": {
+          "length": {
+            "min": 4.95,
+            "max": 6.05,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "T-330",
         "name": "Tanque criogénico A",
         "family": "tank",
-        "service": "Contención primaria"
+        "service": "Contención primaria",
+        "editFields": {
+          "width": {
+            "min": 11.7,
+            "max": 14.3,
+            "step": 0.01
+          },
+          "height": {
+            "min": 9.45,
+            "max": 11.55,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "T-340",
         "name": "Tanque criogénico B",
         "family": "tank",
-        "service": "Almacenamiento en paralelo"
+        "service": "Almacenamiento en paralelo",
+        "editFields": {
+          "width": {
+            "min": 11.7,
+            "max": 14.3,
+            "step": 0.01
+          },
+          "height": {
+            "min": 9.45,
+            "max": 13.31,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "P-350",
         "name": "Bombas de trasiego",
         "family": "pump",
-        "service": "Envío a vaporización"
+        "service": "Envío a vaporización",
+        "editFields": {
+          "length": {
+            "min": 5.94,
+            "max": 7.26,
+            "step": 0.01
+          },
+          "width": {
+            "min": 3.6,
+            "max": 4.4,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "E-360",
         "name": "Banco de vaporización",
         "family": "vaporizer",
-        "service": "Entrega de gas"
+        "service": "Entrega de gas",
+        "editFields": {
+          "length": {
+            "min": 7.2,
+            "max": 8.8,
+            "step": 0.01
+          },
+          "width": {
+            "min": 4.86,
+            "max": 5.94,
+            "step": 0.01
+          },
+          "height": {
+            "min": 4.32,
+            "max": 5.28,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "K-370",
         "name": "Compresor de gas de evaporación",
         "family": "compressor",
-        "service": "Retorno de vapores"
+        "service": "Retorno de vapores",
+        "editFields": {
+          "length": {
+            "min": 6.12,
+            "max": 7.48,
+            "step": 0.01
+          },
+          "width": {
+            "min": 3.6,
+            "max": 4.4,
+            "step": 0.01
+          }
+        }
       }
     ],
     "lines": [
@@ -455,43 +862,127 @@
         "tag": "LNG-21",
         "start": "LA-310",
         "end": "M-320",
-        "fluid": "GNL"
+        "fluid": "GNL",
+        "editFields": {
+          "dn": {
+            "min": 495.0,
+            "max": 605.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 2.88,
+            "max": 3.52,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "LNG-22",
         "start": "M-320",
         "end": "T-330",
-        "fluid": "GNL"
+        "fluid": "GNL",
+        "editFields": {
+          "dn": {
+            "min": 405.0,
+            "max": 495.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 3.78,
+            "max": 4.62,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "LNG-23",
         "start": "M-320",
         "end": "T-340",
-        "fluid": "GNL"
+        "fluid": "GNL",
+        "editFields": {
+          "dn": {
+            "min": 405.0,
+            "max": 495.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 3.78,
+            "max": 4.62,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "LNG-24",
         "start": "T-330",
         "end": "P-350",
-        "fluid": "GNL"
+        "fluid": "GNL",
+        "editFields": {
+          "dn": {
+            "min": 360.0,
+            "max": 440.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 2.52,
+            "max": 3.08,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "LNG-25",
         "start": "P-350",
         "end": "E-360",
-        "fluid": "GNL"
+        "fluid": "GNL",
+        "editFields": {
+          "dn": {
+            "min": 405.0,
+            "max": 495.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 2.97,
+            "max": 3.63,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "BOG-26",
         "start": "T-340",
         "end": "K-370",
-        "fluid": "Gas"
+        "fluid": "Gas",
+        "editFields": {
+          "dn": {
+            "min": 270.0,
+            "max": 330.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 5.22,
+            "max": 6.38,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "BOG-27",
         "start": "K-370",
         "end": "M-320",
-        "fluid": "Gas"
+        "fluid": "Gas",
+        "editFields": {
+          "dn": {
+            "min": 315.0,
+            "max": 385.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 4.68,
+            "max": 5.72,
+            "step": 0.01
+          }
+        }
       }
     ],
     "changes": [
@@ -513,23 +1004,31 @@
     "states": {
       "00": {
         "file": "SIM-GNL-A.ifc",
-        "bytes": 1132345,
-        "triangles": 27388
+        "bytes": 2038508,
+        "triangles": 83066,
+        "transport": "SIM-GNL-A.ifc.gz",
+        "transportBytes": 472441
       },
       "01": {
         "file": "SIM-GNL-Ensayo-01.ifc",
-        "bytes": 1131145,
-        "triangles": 27388
+        "bytes": 2037945,
+        "triangles": 83066,
+        "transport": "SIM-GNL-Ensayo-01.ifc.gz",
+        "transportBytes": 471950
       },
       "10": {
         "file": "SIM-GNL-Ensayo-10.ifc",
-        "bytes": 1131768,
-        "triangles": 27468
+        "bytes": 2049787,
+        "triangles": 83368,
+        "transport": "SIM-GNL-Ensayo-10.ifc.gz",
+        "transportBytes": 474058
       },
       "11": {
         "file": "SIM-GNL-B.ifc",
-        "bytes": 1133974,
-        "triangles": 27468
+        "bytes": 2050362,
+        "triangles": 83368,
+        "transport": "SIM-GNL-B.ifc.gz",
+        "transportBytes": 474685
       }
     },
     "documents": {
@@ -617,43 +1116,127 @@
         "tag": "M-410",
         "name": "Colector de alimentación",
         "family": "manifold",
-        "service": "Entrada de destilados"
+        "service": "Entrada de destilados",
+        "editFields": {
+          "length": {
+            "min": 5.22,
+            "max": 6.38,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "P-420",
         "name": "Bombas de alimentación",
         "family": "pump",
-        "service": "Impulsión"
+        "service": "Impulsión",
+        "editFields": {
+          "length": {
+            "min": 5.94,
+            "max": 7.26,
+            "step": 0.01
+          },
+          "width": {
+            "min": 3.15,
+            "max": 3.85,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "E-430",
         "name": "Intercambiador de recuperación térmica",
         "family": "horizontal",
-        "service": "Recuperación de calor"
+        "service": "Recuperación de calor",
+        "editFields": {
+          "length": {
+            "min": 7.65,
+            "max": 9.35,
+            "step": 0.01
+          },
+          "width": {
+            "min": 2.97,
+            "max": 3.63,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "R-440",
         "name": "Reactor de tratamiento",
         "family": "column",
-        "service": "Tratamiento de destilado"
+        "service": "Tratamiento de destilado",
+        "editFields": {
+          "width": {
+            "min": 3.6,
+            "max": 4.4,
+            "step": 0.01
+          },
+          "height": {
+            "min": 11.7,
+            "max": 16.5,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "V-450",
         "name": "Separador de producto",
         "family": "vertical",
-        "service": "Separación"
+        "service": "Separación",
+        "editFields": {
+          "width": {
+            "min": 2.7,
+            "max": 3.3,
+            "step": 0.01
+          },
+          "height": {
+            "min": 6.3,
+            "max": 7.7,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "E-460",
         "name": "Aeroenfriador de producto",
         "family": "air-cooler",
-        "service": "Acondicionamiento"
+        "service": "Acondicionamiento",
+        "editFields": {
+          "length": {
+            "min": 7.2,
+            "max": 8.8,
+            "step": 0.01
+          },
+          "width": {
+            "min": 5.04,
+            "max": 6.16,
+            "step": 0.01
+          },
+          "height": {
+            "min": 4.32,
+            "max": 5.28,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "T-470",
         "name": "Tanque de producto",
         "family": "tank",
-        "service": "Almacenamiento"
+        "service": "Almacenamiento",
+        "editFields": {
+          "width": {
+            "min": 9.0,
+            "max": 11.0,
+            "step": 0.01
+          },
+          "height": {
+            "min": 6.3,
+            "max": 7.7,
+            "step": 0.01
+          }
+        }
       }
     ],
     "lines": [
@@ -661,37 +1244,109 @@
         "tag": "LP-31",
         "start": "M-410",
         "end": "P-420",
-        "fluid": "Crudo"
+        "fluid": "Crudo",
+        "editFields": {
+          "dn": {
+            "min": 315.0,
+            "max": 385.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 2.79,
+            "max": 3.41,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "LP-32",
         "start": "P-420",
         "end": "E-430",
-        "fluid": "Crudo"
+        "fluid": "Crudo",
+        "editFields": {
+          "dn": {
+            "min": 315.0,
+            "max": 385.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 3.69,
+            "max": 4.51,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "LP-33",
         "start": "E-430",
         "end": "R-440",
-        "fluid": "Crudo"
+        "fluid": "Crudo",
+        "editFields": {
+          "dn": {
+            "min": 360.0,
+            "max": 440.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 4.05,
+            "max": 6.6,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "LP-34",
         "start": "R-440",
         "end": "V-450",
-        "fluid": "Crudo"
+        "fluid": "Crudo",
+        "editFields": {
+          "dn": {
+            "min": 378.0,
+            "max": 462.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 3.42,
+            "max": 4.18,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "LP-35",
         "start": "V-450",
         "end": "E-460",
-        "fluid": "Condensado"
+        "fluid": "Condensado",
+        "editFields": {
+          "dn": {
+            "min": 315.0,
+            "max": 385.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 3.51,
+            "max": 4.29,
+            "step": 0.01
+          }
+        }
       },
       {
         "tag": "LP-36",
         "start": "E-460",
         "end": "T-470",
-        "fluid": "Condensado"
+        "fluid": "Condensado",
+        "editFields": {
+          "dn": {
+            "min": 360.0,
+            "max": 440.0,
+            "step": 1
+          },
+          "rack_z": {
+            "min": 2.97,
+            "max": 3.63,
+            "step": 0.01
+          }
+        }
       }
     ],
     "changes": [
@@ -713,23 +1368,31 @@
     "states": {
       "00": {
         "file": "SIM-REF-A.ifc",
-        "bytes": 1106867,
-        "triangles": 26232
+        "bytes": 1960248,
+        "triangles": 83376,
+        "transport": "SIM-REF-A.ifc.gz",
+        "transportBytes": 444920
       },
       "01": {
         "file": "SIM-REF-Ensayo-01.ifc",
-        "bytes": 1105208,
-        "triangles": 26232
+        "bytes": 1959918,
+        "triangles": 83376,
+        "transport": "SIM-REF-Ensayo-01.ifc.gz",
+        "transportBytes": 444259
       },
       "10": {
         "file": "SIM-REF-Ensayo-10.ifc",
-        "bytes": 1109700,
-        "triangles": 26332
+        "bytes": 1969692,
+        "triangles": 83704,
+        "transport": "SIM-REF-Ensayo-10.ifc.gz",
+        "transportBytes": 446904
       },
       "11": {
         "file": "SIM-REF-B.ifc",
-        "bytes": 1111275,
-        "triangles": 26332
+        "bytes": 1970024,
+        "triangles": 83704,
+        "transport": "SIM-REF-B.ifc.gz",
+        "transportBytes": 447461
       }
     },
     "documents": {

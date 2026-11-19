@@ -1,4 +1,4 @@
-"""Definición de tres complejos sintéticos. Coordenadas y dimensiones en metros."""
+"""Definición de los complejos sintéticos. Coordenadas y dimensiones en metros."""
 
 from dataclasses import dataclass
 
@@ -47,6 +47,50 @@ class Project:
     equipment: tuple[Equipment, ...]
     lines: tuple[Line, ...]
     changes: tuple[Change, ...]
+
+
+EQUIPMENT_FIELDS = {
+    "horizontal": ("length", "width"),
+    "vertical": ("width", "height"),
+    "column": ("width", "height"),
+    "tank": ("width", "height"),
+    "pump": ("length", "width"),
+    "compressor": ("length", "width"),
+    "air-cooler": ("length", "width", "height"),
+    "vaporizer": ("length", "width", "height"),
+    "cyclone": ("height",),
+    "arm": ("height",),
+    "manifold": ("length",),
+}
+SIZE_AXIS = {"length": 0, "width": 1, "height": 2}
+
+
+def edit_fields(project, tag):
+    """Rangos de ensayo locales que mantienen el complejo dentro de su implantación."""
+    equipment = next((item for item in project.equipment if item.tag == tag), None)
+    line = next((item for item in project.lines if item.tag == tag), None)
+    if equipment:
+        fields = {
+            field: equipment.size[SIZE_AXIS[field]] for field in EQUIPMENT_FIELDS[equipment.family]
+        }
+    elif line:
+        fields = {"dn": line.dn, "rack_z": line.rack_z}
+    else:
+        return {}
+    result = {}
+    for field, value in fields.items():
+        reference = [value] + [
+            change.after
+            for change in project.changes
+            if change.tag == tag and change.property == field
+        ]
+        step = 1 if field == "dn" else 0.01
+        result[field] = {
+            "min": round(0.90 * min(reference), 0 if step == 1 else 2),
+            "max": round(1.10 * max(reference), 0 if step == 1 else 2),
+            "step": step,
+        }
+    return result
 
 
 PROJECTS = (
@@ -194,7 +238,7 @@ PROJECTS = (
             Line("DG-13", "C-230", "K-240", "Gas", 400, -6, 4.6),
             Line("DG-14", "K-240", "E-250", "Gas", 450, -4.5, 4.6),
             Line("CL-15", "V-210", "T-260", "Condensado", 300, 9, 2.8),
-            Line("CL-16", "T-260", "P-270", "Condensado", 250, 14, 2.5),
+            Line("CL-16", "T-260", "P-270", "Condensado", 250, 11, 2.5),
         ),
         (
             Change("C-230", "Elevar la columna y su plataforma de acceso", "height", 15, 17.5, "m"),
@@ -345,7 +389,7 @@ PROJECTS = (
             Line("LP-33", "E-430", "R-440", "Crudo", 400, -6.5, 4.5),
             Line("LP-34", "R-440", "V-450", "Crudo", 420, -4, 3.8),
             Line("LP-35", "V-450", "E-460", "Condensado", 350, 10, 3.9),
-            Line("LP-36", "E-460", "T-470", "Condensado", 400, 22, 3.3),
+            Line("LP-36", "E-460", "T-470", "Condensado", 400, 24.5, 3.3),
         ),
         (
             Change("R-440", "Elevar la plataforma del reactor", "height", 13, 15, "m"),

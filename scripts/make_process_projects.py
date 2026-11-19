@@ -1,14 +1,16 @@
 """Genera IFC, planos y libros de proyectos sintéticos desde una definición común."""
 
+import gzip
 import json
 from itertools import product
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from process_documents import equipment_pdf, equipment_workbook, project_pdf, workbook
-from process_geometry import scene
-from process_ifc import create_ifc
-from process_projects import PROJECTS
+
+from trazia.process_catalog.process_geometry import scene
+from trazia.process_catalog.process_ifc import MAX_IFC_BYTES, create_ifc
+from trazia.process_catalog.process_projects import PROJECTS, edit_fields
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "web/public/demo/proceso"
@@ -19,6 +21,7 @@ PRESET = {
     "terminal-costera": "coast",
     "refineria-activa": "industrial",
 }
+MAX_TRANSPORT_BYTES = 900_000
 
 
 def generate(project):
@@ -35,9 +38,18 @@ def generate(project):
         path = folder / f"{project.code}-{rev}.ifc"
         triangles = create_ifc(path, project, rev, equipment, lines, routes, parts)
         size = path.stat().st_size
-        if size > 1_350_000:
-            raise ValueError(f"{path.name} excede el límite de 1,35 MB")
-        states[key] = {"file": path.name, "bytes": size, "triangles": triangles}
+        packed = gzip.compress(path.read_bytes(), compresslevel=9, mtime=0)
+        if size > MAX_IFC_BYTES or len(packed) > MAX_TRANSPORT_BYTES:
+            raise ValueError(f"{path.name} excede el presupuesto: {size} bytes, {len(packed)} gzip")
+        transport = f"{path.name}.gz"
+        (folder / transport).write_bytes(packed)
+        states[key] = {
+            "file": path.name,
+            "bytes": size,
+            "triangles": triangles,
+            "transport": transport,
+            "transportBytes": len(packed),
+        }
         if not official:
             continue
         ga = f"GA_{project.code}_rev{rev}.pdf"
@@ -68,11 +80,23 @@ def generate(project):
         "description": project.description,
         "preset": PRESET[project.id],
         "equipment": [
-            {"tag": item.tag, "name": item.name, "family": item.family, "service": item.service}
+            {
+                "tag": item.tag,
+                "name": item.name,
+                "family": item.family,
+                "service": item.service,
+                "editFields": edit_fields(project, item.tag),
+            }
             for item in project.equipment
         ],
         "lines": [
-            {"tag": line.tag, "start": line.start, "end": line.end, "fluid": line.fluid}
+            {
+                "tag": line.tag,
+                "start": line.start,
+                "end": line.end,
+                "fluid": line.fluid,
+                "editFields": edit_fields(project, line.tag),
+            }
             for line in project.lines
         ],
         "changes": [

@@ -1,11 +1,29 @@
 import type { PropertySets } from "@/workers/ifc-protocol";
 
+/**
+ * Identidad estable de un producto o ensamblaje IFC.
+ *
+ * Proyectos de proceso (pset TrazIA_Traceability con ProcessProject):
+ * - raíz de equipo, línea o estructura → `element:TAG` (Component, o el Tag/Name del IFC);
+ * - pieza agregada (ParentComponent) → `detail:element:TAG/clave`, con `clave` sacada de
+ *   Component = "TAG/clave". parentElementId() la devuelve a `element:TAG`.
+ */
 export function semanticId(
   name: string,
   ifcType: string,
   psets: PropertySets = {},
+  tag?: string,
 ): string {
-  if (psets.TrazIA_Traceability?.ProcessProject) return `element:${name}`;
+  const trace = psets.TrazIA_Traceability;
+  if (trace?.ProcessProject) {
+    const component = String(trace.Component ?? tag ?? name);
+    const parent = trace.ParentComponent ? String(trace.ParentComponent) : "";
+    if (!parent) return `element:${component}`;
+    const key = component.startsWith(`${parent}/`)
+      ? component.slice(parent.length + 1)
+      : component.split("/").slice(1).join("/") || component;
+    return `detail:element:${parent}/${key}`;
+  }
   const identity = psets.TrazIA_Identity ?? psets.GA2MODEL_Identity;
   const component = String(
     identity?.ComponentId ?? identity?.NozzleId ?? name.split("/").at(-1) ?? "",
@@ -86,4 +104,52 @@ export function elementLabel(id: string): string {
     labels[id] ??
     id.replace("nozzle:", "Boquilla ").replace("element:", "Elemento ")
   );
+}
+
+/** Lo mínimo para rotular un producto o un ensamblaje leído del IFC. */
+export type LabelSource = {
+  semanticId: string;
+  name: string;
+  tag?: string;
+  description?: string;
+  psets: PropertySets;
+};
+
+const text = (value: unknown) => (typeof value === "string" && value.trim() ? value.trim() : undefined);
+
+/** Tag de proceso: "P-150" en la raíz y "P-150/motor-a" en una pieza. */
+export function processTag(source: LabelSource): string | undefined {
+  if (!source.psets.TrazIA_Traceability?.ProcessProject) return undefined;
+  return text(source.psets.TrazIA_Traceability.Component) ?? text(source.tag) ?? text(source.name);
+}
+
+/** Nombre legible corto: la Description de la pieza o del equipo ("Virola", "Bomba de inyección"). */
+export function shortLabel(source: LabelSource): string {
+  const trace = source.psets.TrazIA_Traceability;
+  if (trace?.ProcessProject) {
+    const description = text(trace.Description) ?? text(source.description);
+    const name = text(source.name);
+    if (description) return description;
+    if (name?.includes("·")) return name.split("·").slice(1).join("·").trim();
+    return processTag(source) ?? source.name;
+  }
+  return elementLabel(source.semanticId);
+}
+
+/**
+ * Rótulo «tag · nombre» para la etiqueta flotante, la leyenda y el árbol:
+ * "P-150 · Bomba de inyección" en la raíz y "P-150 · Motor A" en una pieza.
+ */
+export function productLabel(source: LabelSource): string {
+  const trace = source.psets.TrazIA_Traceability;
+  if (!trace?.ProcessProject) return elementLabel(source.semanticId);
+  const name = text(source.name);
+  const parent = text(trace.ParentComponent);
+  if (parent) {
+    if (name?.includes("·")) return name;
+    return `${parent} · ${shortLabel(source)}`;
+  }
+  const tag = processTag(source) ?? source.name;
+  const description = shortLabel(source);
+  return description && description !== tag ? `${tag} · ${description}` : tag;
 }

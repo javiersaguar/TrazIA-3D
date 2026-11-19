@@ -2,7 +2,9 @@
 import type { PreparedProduct } from "./model-resource";
 import { elementLabel } from "./semantic";
 import { ifcTraces } from "./ifc-trace";
-function tracedFields(product?: PreparedProduct) {
+/** Lo que muestra el inspector: un producto con geometría o un ensamblaje (equipo descompuesto). */
+export type InspectorSubject = Pick<PreparedProduct, "semanticId" | "ifcType" | "globalId" | "name" | "psets"> & { label?: string };
+function tracedFields(product?: InspectorSubject) {
   return Object.entries(product ? ifcTraces(product.psets) : {}).map(([path, field]) => ({
     path, confidence: field.source.confidence,
     source: `${field.source.document_id}${field.source.page ? ` · pág. ${field.source.page}` : ""}${field.source.locator ? ` · ${field.source.locator}` : ""}${field.source.sheet ? ` · ${field.source.sheet}` : ""}${field.source.cell ? ` · ${field.source.cell}` : ""}`,
@@ -12,7 +14,7 @@ export function IfcInspector({
   product,
   onClose,
 }: {
-  product?: PreparedProduct;
+  product?: InspectorSubject;
   onClose(): void;
 }) {
   const traces = tracedFields(product);
@@ -34,7 +36,7 @@ export function IfcInspector({
       </div>
       {product ? (
         <>
-          <p className="font-medium">{elementLabel(product.semanticId)}</p>
+          <p className="font-medium">{product.label ?? elementLabel(product.semanticId)}</p>
           <p className="mt-1 text-muted">{product.ifcType}</p>
           <p className="mt-3 text-faint">GlobalId</p>
           <code className="break-all" data-testid="inspector-guid">

@@ -1,14 +1,17 @@
 """Integridad del catálogo de proyectos y lectura de sus documentos de equipo."""
 
+import gzip
 import json
 from pathlib import Path
 from zipfile import ZipFile
 
 import ifcopenshell
 import pytest
+from ifcopenshell.util.element import get_psets
 from openpyxl import load_workbook
 
 from trazia.pipeline import InputDocument, process
+from trazia.process_catalog.process_ifc import MAX_IFC_BYTES, MAX_TRIANGLES
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = json.loads(
@@ -22,37 +25,46 @@ def test_process_project_revisions_keep_ports_and_guid(project):
     identities = []
     for item in project["states"].values():
         path = folder / item["file"]
-        assert path.stat().st_size == item["bytes"] <= 1_350_000
-        assert item["triangles"] <= 45_000
+        assert path.stat().st_size == item["bytes"] <= MAX_IFC_BYTES
+        assert item["triangles"] <= MAX_TRIANGLES
+        packed = folder / item["transport"]
+        assert packed.stat().st_size == item["transportBytes"] <= 900_000
+        assert gzip.decompress(packed.read_bytes()) == path.read_bytes()
         model = ifcopenshell.open(str(path))
-        physical = [p for p in model.by_type("IfcElement") if p.Representation]
-        if project["id"] == "plataforma-marina":
-            structure = next(part for part in physical if part.Tag == "ST-00")
-            levels = [
-                z
-                for mesh in structure.Representation.Representations[0].Items
-                for _, _, z in mesh.Coordinates.CoordList
-            ]
-            assert model.by_type("IfcBuildingStorey")[0].Elevation == 16.0
-            assert min(levels) < -8.0 and 16.0 in levels
-            vessel = next(part for part in physical if part.Tag == "V-110")
+        physical = [p for p in model.by_type("IfcElement") if p.Representation is not None]
+        assert len(physical) > 100
+        root = {p.Tag: p for p in model.by_type("IfcElement") if p.Tag and "/" not in p.Tag}
+        assert set(root) == {
+            *[entry["tag"] for entry in project["equipment"]],
+            *[entry["tag"] for entry in project["lines"]],
+            "ST-00",
+        }
+        assert model.by_type("IfcMappedItem")
+        for element in physical:
+            trace = get_psets(element)
             assert (
-                min(
-                    z
-                    for mesh in vessel.Representation.Representations[0].Items
-                    for _, _, z in mesh.Coordinates.CoordList
-                )
-                >= 16.0
+                trace["TrazIA_Dimensiones"]["CotaSuperiorM"]
+                >= trace["TrazIA_Dimensiones"]["CotaInferiorM"]
             )
-        identities.append({p.Name: p.GlobalId for p in physical})
+            assert trace["TrazIA_Traceability"]["Dataset"] == "synthetic"
+            assert element.Decomposes[0].RelatingObject.Tag == element.Tag.split("/")[0]
+        if project["id"] == "plataforma-marina":
+            assert model.by_type("IfcBuildingStorey")[0].Elevation == 16.0
+            jacket = next(part for part in physical if part.Tag == "ST-00/jacket-patas")
+            shell = next(part for part in physical if part.Tag.startswith("V-110/virola"))
+            assert get_psets(jacket)["TrazIA_Dimensiones"]["CotaInferiorM"] < -8
+            assert get_psets(shell)["TrazIA_Dimensiones"]["CotaInferiorM"] >= 16
+        identities.append({p.Tag: p.GlobalId for p in [*root.values(), *physical]})
         ports = model.by_type("IfcRelConnectsPorts")
         assert len(ports) == 2 * len(project["lines"])
         for link in ports:
             first = link.RelatingPort.ObjectPlacement.RelativePlacement.Location.Coordinates
             second = link.RelatedPort.ObjectPlacement.RelativePlacement.Location.Coordinates
             assert first == second
-    assert identities and all(identity == identities[0] for identity in identities)
-    assert len(identities[0]) == len(project["equipment"]) + len(project["lines"]) + 1
+    for identity in identities[1:]:
+        assert all(
+            identities[0][tag] == identity[tag] for tag in identity.keys() & identities[0].keys()
+        )
 
 
 @pytest.mark.parametrize("project", CATALOG, ids=lambda project: project["id"])

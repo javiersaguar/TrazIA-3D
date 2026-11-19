@@ -6,9 +6,10 @@ from make_industrial_designs import hull
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
-from process_geometry import PALETTE
 from reportlab.lib.pagesizes import A3, landscape
 from reportlab.pdfgen.canvas import Canvas
+
+from trazia.process_catalog.process_geometry import PALETTE
 
 PAGE_W, PAGE_H = landscape(A3)
 INK = "#18354b"
@@ -64,7 +65,8 @@ def frame(pdf, project, revision, sheet, title, page):
 def chart(pdf, area, axes, parts, *, line_paths=None, equipment=None):
     x, y, width, height = area
     a, b = axes
-    vertices = [p for part in parts for mesh in part.meshes.values() for p in mesh.vertices]
+    drawings = [(part, part.drawing()) for part in parts]
+    vertices = [point for _, drawing in drawings for _, mesh in drawing for point in mesh.vertices]
     low_a, high_a = min(v[a] for v in vertices), max(v[a] for v in vertices)
     low_b, high_b = min(v[b] for v in vertices), max(v[b] for v in vertices)
     scale = min((width - 50) / (high_a - low_a), (height - 70) / (high_b - low_b))
@@ -84,17 +86,19 @@ def chart(pdf, area, axes, parts, *, line_paths=None, equipment=None):
     text(pdf, x + 12, y + height - 22, header, 11, True)
     text(pdf, x + 12, y + 9, f"1:{1000 / (scale * 25.4 / 72):.0f}   ·   m en el modelo", 9)
     depth = ({0, 1, 2} - {a, b}).pop()
-    for part in sorted(parts, key=lambda item: item.kind != "structure"):
+    for part, drawing in sorted(drawings, key=lambda item: item[0].kind != "structure"):
         if part.kind == "pipe":
             continue
         faces = [
             (material, [mesh.vertices[i] for i in face])
-            for material, mesh in part.meshes.items()
+            for material, mesh in drawing
             for face in mesh.faces
         ]
         if equipment is not None and part.kind != "structure":
             faces = [
-                (material, mesh.vertices) for material, mesh in part.meshes.items() if mesh.vertices
+                (material, mesh.vertices[first:last])
+                for material, mesh in drawing
+                for first, last, _ in mesh.groups
             ]
         for material, points in sorted(
             faces,
@@ -248,7 +252,9 @@ def project_pdf(target, project, revision, equipment, lines, paths, parts):
 def equipment_pdf(target, project, revision, eq, part, lines, routes):
     pdf = Canvas(str(target), pagesize=(PAGE_W, PAGE_H), invariant=1, pageCompression=1)
     pdf.setTitle(f"{eq.tag} · GA de equipo · Rev {revision}")
-    frame(pdf, project, revision, eq.tag, eq.name, "01 / 01")
+    remaining = part.details[8:]
+    pages = 1 + (len(remaining) + 36) // 37
+    frame(pdf, project, revision, eq.tag, eq.name, f"01 / {pages:02}")
     text(pdf, 48, 711, f"TAG = {eq.tag}", 13, True)
     text(pdf, 490, 711, f"{eq.service}   |   Cota del piso: {project.deck:g} m", 10)
     chart(pdf, (46, 347, 545, 345), (0, 2), [part])
@@ -279,10 +285,29 @@ def equipment_pdf(target, project, revision, eq, part, lines, routes):
         46,
         190,
         ("Componente", "Acabado de referencia", "Función"),
-        part.details,
+        part.details[:8],
         (360, 265, 474),
         height=15,
     )
+    for start in range(0, len(remaining), 37):
+        pdf.showPage()
+        frame(
+            pdf,
+            project,
+            revision,
+            eq.tag,
+            f"{eq.name} · Despiece",
+            f"{start // 37 + 2:02} / {pages:02}",
+        )
+        table(
+            pdf,
+            46,
+            709,
+            ("Componente", "Acabado de referencia", "Función"),
+            remaining[start : start + 37],
+            (360, 265, 474),
+            height=17,
+        )
     pdf.save()
 
 
@@ -446,7 +471,7 @@ def equipment_workbook(path_, project, revision, eq, part, lines, routes):
 
 
 def envelope_rows(part):
-    vertices = [point for mesh in part.meshes.values() for point in mesh.vertices]
+    vertices = part.vertices
     for index, axis in enumerate("XYZ"):
         values = [point[index] for point in vertices]
         origin = min(values)

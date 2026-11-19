@@ -25,6 +25,7 @@ import {
   useContext,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useRef,
   useMemo,
   useState,
@@ -40,9 +41,12 @@ import {
   CanvasTexture,
   Matrix4,
   OrthographicCamera,
+  PerspectiveCamera,
   RepeatWrapping,
   SRGBColorSpace,
+  Sphere,
   Vector3,
+  type Camera as ThreeCamera,
   type DirectionalLight,
 } from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
@@ -51,11 +55,25 @@ import { BRAND } from "@/lib/brand";
 import type { Bounds, Vec3 } from "@/workers/ifc-protocol";
 import styles from "./viewer.module.css";
 import type { CameraLink, CameraPose } from "./camera-link";
+import { fitDistance, overviewFraming, type Lens, type OverviewOptions } from "./framing";
 import { validPose } from "./saved-views";
 import { capturePng } from "./capture";
 import { toast } from "sonner";
 
 export type View = "iso" | "front" | "top" | "plan";
+export type Projection = "perspective" | "orthographic";
+/** Campo de visión vertical de la cámara en perspectiva de los escenarios, en grados. */
+export const PERSPECTIVE_FOV = 35;
+/**
+ * Vista general en perspectiva: tres cuartos y el horizonte cerca del borde superior. Con 35° de
+ * campo vertical, el horizonte solo entra si la cámara se inclina menos de 17,5°; con el ojo a 21°
+ * sobre el centro la planta llena el cuadro casi como una vista centrada a 24° (ver framing.test).
+ */
+const OVERVIEW: OverviewOptions = { azimuth: 40, elevation: 21, horizon: 0.93, margin: 1.05 };
+/** Si dejar ver el horizonte aleja la cámara más que esto, la vista general se centra sin él. */
+const HORIZON_COST = 1.3;
+/** Encuadre calculado fuera (framing.ts): ojo, objetivo, zoom ortográfico y límites del foco. */
+export type Shot = { eye: Vec3; target: Vec3; zoom?: number; focus?: Bounds };
 export type CameraHandle = {
   view(v: View): void;
   fit(bounds?: Bounds, normal?: Vec3): void;
@@ -64,6 +82,12 @@ export type CameraHandle = {
   pose?(): CameraPose;
   restore?(pose: CameraPose): void;
   snapshot?(): Promise<{ blob: Blob; pose: CameraPose; up: Vec3; viewportHeight: number }>;
+  /** Lente de la cámara actual, para calcular un encuadre. */
+  lens?(): Lens;
+  /** Ojo y punto de órbita actuales. */
+  current?(): { eye: Vec3; target: Vec3 };
+  /** Transición suave al encuadre; el objetivo pasa a ser el punto de órbita. Resuelve al llegar. */
+  lookAt?(shot: Shot, smooth?: boolean): Promise<void>;
 };
 export type PerformanceSample = {
   fps: number;
@@ -98,6 +122,46 @@ export function SceneLabel(props: ComponentProps<typeof DreiHtml>) {
   );
 }
 
+/** Cámara en perspectiva que sustituye a la ortográfica del lienzo mientras está montada. */
+function PerspectiveDefault({ fov }: { fov: number }) {
+  const set = useThree((state) => state.set),
+    get = useThree((state) => state.get);
+  const lens = useRef<PerspectiveCamera | null>(null);
+  const initialFov = useRef(fov);
+  useLayoutEffect(() => {
+    const { camera: previous, size } = get();
+    const camera = new PerspectiveCamera(initialFov.current, size.width / Math.max(1, size.height), 0.2, 5000);
+    camera.position.copy(previous.position);
+    camera.quaternion.copy(previous.quaternion);
+    camera.updateProjectionMatrix();
+    lens.current = camera;
+    set({ camera });
+    return () => {
+      lens.current = null;
+      set({ camera: previous });
+    };
+  }, [get, set]);
+  useLayoutEffect(() => {
+    if (lens.current && lens.current.fov !== fov) {
+      lens.current.fov = fov;
+      lens.current.updateProjectionMatrix();
+    }
+  }, [fov]);
+  return null;
+}
+
+const isPerspective = (camera: ThreeCamera): camera is PerspectiveCamera =>
+  (camera as PerspectiveCamera).isPerspectiveCamera === true;
+const tanHalf = (fov: number) => Math.tan((fov * Math.PI) / 360);
+const boxCorners = (box: Box3) => {
+  const result: Vector3[] = [];
+  for (const x of [box.min.x, box.max.x]) for (const y of [box.min.y, box.max.y]) for (const z of [box.min.z, box.max.z]) {
+    result.push(new Vector3(x, y, z));
+  }
+  return result;
+};
+type Pending = { kind: "view"; view: View; smooth: boolean } | { kind: "refit" };
+
 export function CameraRig({
   bounds,
   view = "iso",
@@ -110,6 +174,11 @@ export function CameraRig({
   orbitCenter,
   framing = 1.4,
   link,
+  projection = "orthographic",
+  fov = PERSPECTIVE_FOV,
+  groundY,
+  onRest,
+  onProjection,
 }: {
   bounds: Bounds;
   view?: View;
@@ -122,6 +191,16 @@ export function CameraRig({
   orbitCenter?: Vec3;
   framing?: number;
   link?: CameraLink;
+  /** Perspectiva solo en los escenarios; las vistas técnicas y el resto de pantallas siguen ortográficas. */
+  projection?: Projection;
+  /** Campo de visión vertical en perspectiva, en grados. */
+  fov?: number;
+  /** Cota del suelo o del agua: la vista general en perspectiva no encuadra lo que queda por debajo. */
+  groundY?: number;
+  /** La cámara se ha detenido después de que el usuario la moviera. */
+  onRest?(): void;
+  /** Proyección de la cámara activa, al montar y cada vez que cambia (ya con la pose trasladada). */
+  onProjection?(projection: Projection): void;
 }) {
   const controls = useRef<CameraControls>(null);
   const rotation = useContext(OrbitContext);
@@ -131,6 +210,8 @@ export function CameraRig({
   const holdOrbit = () => { resumeAt.current = performance.now() + 6000; };
   const { camera, gl, scene, invalidate, size: viewport } = useThree();
   const reduce = useReducedMotion();
+  const wantsPerspective = projection === "perspective";
+  const perspective = isPerspective(camera);
   const canvasNode = useRef<HTMLCanvasElement | null>(null);
   useEffect(() => {
     canvasNode.current = gl.domElement;
@@ -147,14 +228,19 @@ export function CameraRig({
       }),
     [link, invalidate],
   );
+  /** Zoom ortográfico equivalente: en perspectiva, la altura visible a la distancia del objetivo. */
+  const equivalentZoom = () => {
+    if (!isPerspective(camera)) return (camera as OrthographicCamera).zoom;
+    const target = controls.current?.getTarget(new Vector3());
+    const distance = target ? camera.position.distanceTo(target) : 1;
+    return viewport.height / Math.max(1e-6, 2 * distance * tanHalf(camera.fov));
+  };
   const lastPose = useRef(0);
   const publishPose = () => {
     const now = performance.now();
     if (now - lastPose.current > 100) {
-      canvasNode.current?.setAttribute(
-        "data-camera-zoom",
-        String((camera as OrthographicCamera).zoom),
-      );
+      canvasNode.current?.setAttribute("data-camera-zoom", String(equivalentZoom()));
+      canvasNode.current?.setAttribute("data-camera-projection", isPerspective(camera) ? "perspective" : "orthographic");
       canvasNode.current?.setAttribute("data-camera-position", camera.position.toArray().join(","));
       canvasNode.current?.setAttribute("data-camera-target", controls.current?.getTarget(new Vector3()).toArray().join(",") ?? "");
       lastPose.current = now;
@@ -172,14 +258,28 @@ export function CameraRig({
         zoom: (camera as OrthographicCamera).zoom,
       });
   };
+  const publishNow = () => {
+    lastPose.current = 0;
+    publishPose();
+  };
   const focusBounds = useRef<Bounds | null>(null),
     focusNormal = useRef<Vec3 | undefined>(undefined);
+  // Encuadre calculado fuera (lookAt): sobrevive a un cambio de límites del modelo (revisión A → B).
+  const framed = useRef(false);
+  // El usuario ha movido la cámara desde la última vista o encuadre: un resize no la recoloca.
+  const userMoved = useRef(false);
+  const controlling = useRef(false);
+  const pending = useRef<Pending | null>(null);
   const sample = useRef({
     key: 0,
     started: 0,
     previous: 0,
     deltas: [] as number[],
   });
+  const lens = (): Lens =>
+    isPerspective(camera)
+      ? { kind: "perspective", fov: camera.fov, aspect: viewport.width / Math.max(1, viewport.height) }
+      : { kind: "orthographic", width: viewport.width, height: viewport.height };
   const frame = (box: Box3, eye: Vector3, smooth: boolean) => {
     const center = box.getCenter(new Vector3());
     const transform = new Matrix4()
@@ -214,13 +314,33 @@ export function CameraRig({
       controls.current?.update(0);
       controls.current?.setOrbitPoint(...orbitCenter);
       controls.current?.update(0);
-      lastPose.current = 0;
-      publishPose();
+      publishNow();
     }
-    if (reduce) { lastPose.current = 0; publishPose(); }
+    if (reduce) publishNow();
     invalidate();
   };
+  /** Vista general en perspectiva: tres cuartos, elevada, la planta llenando el cuadro y algo de cielo. */
+  const overview = (smooth: boolean) => {
+    const box = asBox(bounds);
+    if (groundY !== undefined && box.max.y > groundY + 1) box.min.y = Math.max(box.min.y, groundY);
+    const center = box.getCenter(new Vector3());
+    const perspectiveLens = { kind: "perspective" as const, fov, aspect: viewport.width / Math.max(1, viewport.height) };
+    const points = boxCorners(box);
+    const centered = overviewFraming(points, center, perspectiveLens, { ...OVERVIEW, horizon: undefined });
+    const withHorizon = overviewFraming(points, center, perspectiveLens, OVERVIEW);
+    const shot = withHorizon && (!centered || withHorizon.distance <= centered.distance * HORIZON_COST) ? withHorizon : centered;
+    if (!shot) return false;
+    const move = smooth && !reduce;
+    void controls.current?.setLookAt(...(shot.eye.toArray() as Vec3), ...(shot.target.toArray() as Vec3), move);
+    if (!move) {
+      controls.current?.update(0);
+      publishNow();
+    }
+    invalidate();
+    return true;
+  };
   const show = (next: View, smooth: boolean) => {
+    if (isPerspective(camera) && next === "iso" && overview(smooth)) return;
     const box = asBox(bounds),
       center = box.getCenter(new Vector3()),
       size = box.getSize(new Vector3());
@@ -249,6 +369,38 @@ export function CameraRig({
       smooth,
     );
   };
+  /** Reajuste tras un cambio de tamaño del visor. */
+  const refit = (currentView: View) => {
+    if (!isPerspective(camera)) {
+      fitCurrent(focusBounds.current ?? bounds, false);
+      return;
+    }
+    // En perspectiva el aspecto se actualiza solo; se recoloca si nadie ha movido la cámara.
+    if (userMoved.current) return;
+    if (!focusBounds.current) {
+      show(currentView, false);
+      return;
+    }
+    const box = asBox(focusBounds.current),
+      center = box.getCenter(new Vector3());
+    const direction = camera.position.clone().sub(controls.current?.getTarget(new Vector3()) ?? center).normalize();
+    const { distance } = fitDistance(box, direction, lens(), 1.3);
+    const eye = center.clone().addScaledVector(direction, distance);
+    void controls.current?.setLookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z, false);
+    controls.current?.update(0);
+    publishNow();
+    invalidate();
+  };
+  const run = (request: Pending) => {
+    if (request.kind === "refit") refit(configured.current.view);
+    else {
+      focusBounds.current = null;
+      focusNormal.current = undefined;
+      framed.current = false;
+      userMoved.current = false;
+      show(request.view, request.smooth);
+    }
+  };
   const boundsKey = [...bounds.min, ...bounds.max].join(":");
   const configured = useRef({
     view,
@@ -260,19 +412,18 @@ export function CameraRig({
   useEffect(() => {
     const previous = configured.current;
     if (previous.initialized && previous.view !== view) rotation.pause();
+    let request: Pending | null = null;
     if (
       !previous.initialized ||
       previous.view !== view ||
-      previous.boundsKey !== boundsKey
+      (previous.boundsKey !== boundsKey && !framed.current)
     ) {
-      focusBounds.current = null;
-      focusNormal.current = undefined;
-      show(view, previous.initialized && previous.view !== view);
+      request = { kind: "view", view, smooth: previous.initialized && previous.view !== view };
     } else if (
       previous.width !== viewport.width ||
       previous.height !== viewport.height
     ) {
-      fitCurrent(focusBounds.current ?? bounds, false);
+      request = { kind: "refit" };
     }
     configured.current = {
       view,
@@ -281,36 +432,96 @@ export function CameraRig({
       height: viewport.height,
       initialized: true,
     };
+    // Con un cambio de proyección pendiente, la vista se aplica a la cámara nueva.
+    if (request) {
+      if (wantsPerspective !== perspective) pending.current = request;
+      else run(request);
+    }
     // Una nueva vista tiene prioridad sobre el resize; un resize conserva el foco del cambio.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view, boundsKey, viewport.width, viewport.height]);
+  // Cambio de proyección: la cámara nueva hereda dirección y objetivo con la misma altura visible.
+  const seenCamera = useRef<ThreeCamera>(camera);
+  const seenControls = useRef<CameraControls | null>(null);
+  useEffect(() => {
+    const previous = seenCamera.current,
+      previousControls = seenControls.current,
+      next = controls.current;
+    seenCamera.current = camera;
+    seenControls.current = next;
+    if (previous === camera || !next) {
+      onProjection?.(isPerspective(camera) ? "perspective" : "orthographic");
+      return;
+    }
+    const target = previousControls?.getTarget(new Vector3()) ?? asBox(bounds).getCenter(new Vector3());
+    const offset = previous.position.clone().sub(target);
+    const direction = offset.lengthSq() > 1e-8 ? offset.normalize() : new Vector3(0.6, 0.5, 0.6).normalize();
+    const height = Math.max(1, viewport.height);
+    const visible = isPerspective(previous)
+      ? 2 * previous.position.distanceTo(target) * tanHalf(previous.fov)
+      : height / Math.max(1e-6, (previous as OrthographicCamera).zoom);
+    if (isPerspective(camera)) {
+      const eye = target.clone().addScaledVector(direction, visible / (2 * tanHalf(camera.fov)));
+      void next.setLookAt(eye.x, eye.y, eye.z, target.x, target.y, target.z, false);
+    } else {
+      // El ojo ortográfico se aleja lo bastante para que el plano cercano no recorte la planta.
+      const radius = asBox(bounds).getBoundingSphere(new Sphere()).radius;
+      const eye = target.clone().addScaledVector(direction, Math.max(20, radius * 2.5));
+      void next.setLookAt(eye.x, eye.y, eye.z, target.x, target.y, target.z, false);
+      void next.zoomTo(Math.min(650, Math.max(5, height / Math.max(visible, 1e-3))), false);
+    }
+    next.update(0);
+    const request = pending.current;
+    pending.current = null;
+    if (request) run(request);
+    publishNow();
+    invalidate();
+    onProjection?.(isPerspective(camera) ? "perspective" : "orthographic");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [camera]);
+  const poseNow = (): CameraPose => ({
+    eye: camera.position.toArray() as Vec3,
+    target: (controls.current?.getTarget(new Vector3()) ?? new Vector3()).toArray() as Vec3,
+    zoom: equivalentZoom(),
+    projection: isPerspective(camera) ? "perspective" : "orthographic",
+  });
   useImperativeHandle(handle, () => ({
     snapshot: async () => {
       gl.render(scene, camera);
-      const pose = { eye: camera.position.toArray() as Vec3,
-        target: (controls.current?.getTarget(new Vector3()) ?? new Vector3()).toArray() as Vec3,
-        zoom: (camera as OrthographicCamera).zoom };
+      const pose = poseNow();
       const up = new Vector3(0, 1, 0).applyQuaternion(camera.quaternion).toArray() as Vec3;
       return { blob: await capturePng(gl.domElement), pose, up, viewportHeight: viewport.height };
     },
-    pose: () => ({ eye: camera.position.toArray() as Vec3,
-      target: (controls.current?.getTarget(new Vector3()) ?? new Vector3()).toArray() as Vec3,
-      zoom: (camera as OrthographicCamera).zoom }),
+    pose: poseNow,
     restore: (pose) => {
       if (!validPose(pose)) return;
       rotation.pause(); controls.current?.stop();
-      void controls.current?.setLookAt(...pose.eye, ...pose.target, !reduce);
-      void controls.current?.zoomTo(pose.zoom, !reduce);
+      framed.current = false;
+      focusBounds.current = null;
+      userMoved.current = true;
+      if (isPerspective(camera)) {
+        // La distancia sale del zoom equivalente: sirve igual para vistas guardadas en ortográfica.
+        const target = new Vector3(...pose.target);
+        const direction = new Vector3(...pose.eye).sub(target).normalize();
+        const eye = target.clone().addScaledVector(direction, viewport.height / (2 * pose.zoom * tanHalf(camera.fov)));
+        void controls.current?.setLookAt(eye.x, eye.y, eye.z, ...pose.target, !reduce);
+      } else {
+        void controls.current?.setLookAt(...pose.eye, ...pose.target, !reduce);
+        void controls.current?.zoomTo(pose.zoom, !reduce);
+      }
       invalidate();
     },
     view: (next) => {
       rotation.pause();
-      focusBounds.current = null;
-      focusNormal.current = undefined;
-      show(next, true);
+      if (wantsPerspective !== perspective) {
+        pending.current = { kind: "view", view: next, smooth: true };
+        return;
+      }
+      run({ kind: "view", view: next, smooth: true });
     },
     fit: (target, normal) => {
       holdOrbit();
+      framed.current = false;
       focusBounds.current = target ?? bounds;
       focusNormal.current = normal;
       void controls.current?.fitToBox(asBox(focusBounds.current), !reduce, {
@@ -336,12 +547,44 @@ export function CameraRig({
       }
       invalidate();
     },
+    lens,
+    current: () => ({
+      eye: camera.position.toArray() as Vec3,
+      target: (controls.current?.getTarget(new Vector3()) ?? new Vector3()).toArray() as Vec3,
+    }),
+    lookAt: (shot, smooth = true) => {
+      holdOrbit();
+      controls.current?.stop();
+      framed.current = !!shot.focus;
+      focusBounds.current = shot.focus ?? null;
+      focusNormal.current = undefined;
+      userMoved.current = false;
+      const move = smooth && !reduce;
+      const arrived = [controls.current?.setLookAt(...shot.eye, ...shot.target, move)];
+      if (shot.zoom !== undefined && !isPerspective(camera)) {
+        arrived.push(controls.current?.zoomTo(Math.min(650, Math.max(5, shot.zoom)), move));
+      }
+      if (!move) {
+        controls.current?.update(0);
+        publishNow();
+      }
+      invalidate();
+      return Promise.all(arrived).then(() => {
+        publishNow();
+      });
+    },
     zoom: (factor) => {
       holdOrbit();
-      void controls.current?.zoomTo(
-        (camera as OrthographicCamera).zoom * factor,
-        !reduce,
-      );
+      if (isPerspective(camera)) {
+        // En perspectiva acercar es avanzar (dolly) hacia el objetivo.
+        const distance = controls.current?.distance ?? 1;
+        void controls.current?.dollyTo(distance / factor, !reduce);
+      } else {
+        void controls.current?.zoomTo(
+          (camera as OrthographicCamera).zoom * factor,
+          !reduce,
+        );
+      }
       invalidate();
     },
     capture: () => {
@@ -405,30 +648,46 @@ export function CameraRig({
   useEffect(() => {
     if (measureKey) invalidate();
   }, [measureKey, invalidate]);
+  const radius = useMemo(() => asBox(bounds).getBoundingSphere(new Sphere()).radius, [bounds]);
   return (
-    <CameraControls
-      ref={controls}
-      enabled={interactive}
-      makeDefault
-      smoothTime={reduce ? 0 : 0.25}
-      draggingSmoothTime={0.1}
-      minZoom={5}
-      maxZoom={650}
-      maxPolarAngle={Math.PI * 0.98}
-      regress
-      onUpdate={publishPose}
-      onControl={holdOrbit}
-      onControlEnd={() => { holding.current = false; holdOrbit(); }}
-      onControlStart={() => {
-        holding.current = true;
-        controls.current?.stop();
-        onUserControl?.();
-      }}
-    />
+    <>
+      {wantsPerspective ? <PerspectiveDefault fov={fov} /> : null}
+      <CameraControls
+        ref={controls}
+        enabled={interactive}
+        makeDefault
+        smoothTime={reduce ? 0 : 0.25}
+        draggingSmoothTime={0.1}
+        minZoom={5}
+        maxZoom={650}
+        minDistance={perspective ? 0.6 : Number.EPSILON}
+        maxDistance={perspective ? Math.max(80, radius * 7) : Infinity}
+        dollyToCursor={perspective}
+        // En perspectiva la cámara no baja del horizonte: debajo solo hay agua o terreno.
+        maxPolarAngle={perspective ? Math.PI * 0.475 : Math.PI * 0.98}
+        regress
+        onUpdate={publishPose}
+        onControl={holdOrbit}
+        onControlEnd={() => { holding.current = false; holdOrbit(); }}
+        onControlStart={() => {
+          holding.current = true;
+          controlling.current = true;
+          userMoved.current = true;
+          controls.current?.stop();
+          onUserControl?.();
+        }}
+        onRest={() => {
+          if (!controlling.current) return;
+          controlling.current = false;
+          publishNow();
+          onRest?.();
+        }}
+      />
+    </>
   );
 }
 
-function AdaptiveResolution() {
+export function AdaptiveResolution() {
   const { size, setDpr } = useThree();
   const pixelBudget = useContext(PixelBudgetContext);
   const quality = useThree((state) => state.performance.current);
@@ -642,6 +901,7 @@ export function SceneCanvas({
   pixelBudget = 1_000_000,
   initialRotating = true,
   shadows = false,
+  onPointerMissed,
 }: {
   pixelBudget?: number;
   children: ReactNode;
@@ -651,6 +911,8 @@ export function SceneCanvas({
   initialRotating?: boolean;
   shadows?: boolean;
   onRotationChange?(value: boolean): void;
+  /** Clic (sin arrastre) que no ha tocado ningún objeto con eventos. */
+  onPointerMissed?(event: MouseEvent): void;
 }) {
   const portal = useRef<HTMLDivElement>(null),
     root = useRef<HTMLDivElement>(null);
@@ -699,6 +961,7 @@ export function SceneCanvas({
             gl.toneMapping = AgXToneMapping;
             gl.toneMappingExposure = 1.1;
           }}
+          onPointerMissed={onPointerMissed}
           aria-label={label}
         >
           <Selection>
