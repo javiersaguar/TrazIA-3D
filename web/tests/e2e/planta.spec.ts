@@ -115,3 +115,24 @@ test("la ficha abre una pieza, muestra sus cotas y genera un borrador IFC", asyn
   await sheet.getByRole("button", { name: "Descartar borrador" }).click();
   await expect(viewer).toHaveAttribute("data-ifc-url", /SIM-MAR-A\.ifc$/);
 });
+
+test("sin API la ficha escala el equipo en el navegador y avisa de las líneas que revisar", async ({ page }) => {
+  test.skip(!!process.env.NEXT_PUBLIC_API_URL, "Con API el borrador lo genera el servidor");
+  test.setTimeout(95_000);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/proyectos-proceso/plataforma-marina");
+  const viewer = page.getByTestId("ifc-viewer");
+  const sheet = page.getByRole("region", { name: "Ficha de componente" });
+  await expect(viewer).toHaveAttribute("data-phase", "ready", { timeout: 30_000 });
+  await sheet.getByRole("button", { name: /^V-110 ·/ }).click();
+  await expect(sheet.getByText(/navegador escala la geometría IFC/)).toBeVisible();
+  await sheet.getByLabel(/Largo nominal/).fill("9.9");
+  await sheet.getByRole("button", { name: "Previsualizar borrador" }).click();
+  await expect(viewer).toHaveAttribute("data-ifc-url", /^blob:/, { timeout: 45_000 });
+  await expect(viewer).toHaveAttribute("data-phase", "ready", { timeout: 30_000 });
+  await expect(sheet.getByText("Actual 9,9", { exact: true })).toBeVisible();
+  await expect(sheet.getByText(/Revisar conexiones: .*OL-05/)).toBeVisible();
+  await expect(page.getByRole("link", { name: "Descargar IFC", exact: true })).toHaveAttribute("download", "SIM-MAR-ENSAYO-DRAFT.ifc");
+  await sheet.getByRole("button", { name: "Descartar borrador" }).click();
+  await expect(viewer).toHaveAttribute("data-ifc-url", /SIM-MAR-A\.ifc$/);
+});

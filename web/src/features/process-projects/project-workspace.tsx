@@ -7,11 +7,12 @@ import { IfcViewer } from "@/components/three";
 import { Badge, Button, Icon, Panel, PanelHeader } from "@/components/ui/primitives";
 import type { ElementState } from "@/features/viewer3d/product-mesh";
 import type { PlantProductInfo, ProcessEnvironmentId } from "@/features/viewer3d/types";
-import { apiURL } from "@/lib/api/config";
+import { apiEnabled, apiURL } from "@/lib/api/config";
 import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
 import { processAsset, type Parameter, type ProcessProject } from "./catalog";
 import { ComponentInspector, type Inputs } from "./component-inspector";
+import { applyNominalEdits, linesToReview, type NominalField } from "./step-edit";
 
 const scenarios: Record<ProcessEnvironmentId, string> = {
   neutral: "Neutro · estudio", ocean: "Mar abierto", desert: "Desierto", coast: "Costa y muelle", industrial: "Complejo industrial",
@@ -44,6 +45,7 @@ export function ProcessProjectWorkspace({ project }: { project: ProcessProject }
   const [draft, setDraft] = useState<string>();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const inflight = useRef<AbortController | null>(null);
   useEffect(() => {
     return () => inflight.current?.abort();
@@ -71,6 +73,28 @@ export function ProcessProjectWorkspace({ project }: { project: ProcessProject }
     setDraft(undefined);
     setInputs({});
     setError("");
+    setNotice("");
+  }
+
+  /** Borrador sin API: el navegador reescribe el IFC de la variante cargada. */
+  async function localPreview(adjustments: { tag: string; field: string; value: number }[], signal: AbortSignal) {
+    const nominal = adjustments.filter((item): item is { tag: string; field: NominalField; value: number } =>
+      ["length", "width", "height"].includes(item.field) && Number.isFinite(item.value) && item.value > 0);
+    if (nominal.length !== adjustments.length) {
+      setError("Sin API solo se ensayan largo, ancho y altura de equipos.");
+      return;
+    }
+    const response = await fetch(processAsset(project, state.file), { signal });
+    if (!response.ok) throw new Error("ifc");
+    const families = Object.fromEntries(project.equipment.map(item => [item.tag, item.family]));
+    const { text, changed } = applyNominalEdits(await response.text(), nominal, families);
+    if (!changed.length) {
+      setError("No se encontraron las cotas nominales de ese equipo en el IFC.");
+      return;
+    }
+    const review = linesToReview(project.lines, changed.map(item => item.tag));
+    setNotice(review.length ? `Revisar conexiones: ${review.join(", ")}. Sus tuberías no se recalculan en el navegador.` : "");
+    if (!signal.aborted) setDraft(URL.createObjectURL(new Blob([text], { type: "application/x-step" })));
   }
 
   async function preview() {
@@ -85,7 +109,12 @@ export function ProcessProjectWorkspace({ project }: { project: ProcessProject }
     inflight.current = controller;
     setBusy(true);
     setError("");
+    setNotice("");
     try {
+      if (!apiEnabled) {
+        await localPreview(adjustments, controller.signal);
+        return;
+      }
       const response = await fetch(apiURL(`/proyectos-proceso/${project.id}/borrador`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -100,7 +129,7 @@ export function ProcessProjectWorkspace({ project }: { project: ProcessProject }
       const file = await response.blob();
       if (!controller.signal.aborted) setDraft(URL.createObjectURL(file));
     } catch {
-      if (!controller.signal.aborted) setError("No se pudo conectar con la API. Puedes volver a previsualizar el borrador.");
+      if (!controller.signal.aborted) setError(apiEnabled ? "No se pudo conectar con la API. Puedes volver a previsualizar el borrador." : "No se pudo preparar el borrador en el navegador.");
     } finally {
       inflight.current = null;
       if (!controller.signal.aborted) setBusy(false);
@@ -167,7 +196,7 @@ export function ProcessProjectWorkspace({ project }: { project: ProcessProject }
       <ComponentInspector products={byId} selected={selected} select={setSelected}
         editFields={editFields} inputs={inputs} onInput={editInput}
         dimensions={dimensions} setDimensions={setDimensions} onPreview={() => void preview()}
-        onReset={resetDraft} busy={busy} error={error} draft={!!draft} />
+        onReset={resetDraft} busy={busy} error={error} draft={!!draft} notice={notice} />
     </div>
 
     <Panel className="space-y-4 p-4">

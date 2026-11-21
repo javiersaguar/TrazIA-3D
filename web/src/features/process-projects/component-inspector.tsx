@@ -30,7 +30,7 @@ function title(item: PlantProductInfo) {
 
 export function ComponentInspector({
   products, selected, select, editFields, inputs, dimensions, setDimensions, onInput,
-  onPreview, onReset, busy, error, draft,
+  onPreview, onReset, busy, error, draft, notice,
 }: {
   products: Map<string, PlantProductInfo>;
   selected?: string;
@@ -45,6 +45,8 @@ export function ComponentInspector({
   busy: boolean;
   error: string;
   draft: boolean;
+  /** Aviso del borrador hecho en el navegador (líneas que revisar). */
+  notice?: string;
 }) {
   const [query, setQuery] = useState("");
   const item = selected ? products.get(selected) : undefined;
@@ -57,7 +59,9 @@ export function ComponentInspector({
   const roots = [...products.values()].filter(product => !product.parentId);
   const filtered = roots.filter(product => title(product).toLocaleLowerCase("es").includes(query.trim().toLocaleLowerCase("es")));
   const pending = Object.values(inputs).flatMap(Object.values).filter(value => value !== "").length;
-  const fields = Object.entries(editFields ?? {}) as [Parameter, NonNullable<EditFields[Parameter]>][];
+  const allFields = Object.entries(editFields ?? {}) as [Parameter, NonNullable<EditFields[Parameter]>][];
+  // Sin API, el navegador reescribe el IFC con las cotas del equipo; las de línea necesitan la API.
+  const fields = apiEnabled ? allFields : allFields.filter(([field]) => field === "length" || field === "width" || field === "height");
 
   return <Panel className="overflow-hidden" aria-label="Ficha de componente">
     <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
@@ -125,10 +129,10 @@ export function ComponentInspector({
           </li>)}
         </ul>
       </details> : null}
-      {fields.length && editOwner?.tag ? <form className="space-y-2 border-t border-border pt-3"
+      {allFields.length && editOwner?.tag ? <form className="space-y-2 border-t border-border pt-3"
         onSubmit={event => { event.preventDefault(); onPreview(); }}>
         <h4 className="text-sm font-semibold text-strong">{parent ? `Ensayar cambios en ${editOwner.tag}` : "Ensayar cambios"}</h4>
-        {apiEnabled ? fields.map(([field, range]) => {
+        {fields.length ? fields.map(([field, range]) => {
           const parameter = parameters[field];
           const current = editOwner.psets.TrazIA_Traceability?.[parameter.prop];
           const tag = editOwner.tag!;
@@ -140,8 +144,9 @@ export function ComponentInspector({
               disabled={busy} value={inputs[tag]?.[field] ?? ""} placeholder={typeof current === "number" ? String(current) : undefined}
               onChange={event => onInput(tag, field, event.target.value)} />
           </label>;
-        }) : <p className="text-xs text-muted">Conecta la API para generar un IFC con tus cotas.</p>}
-        {apiEnabled ? <div className="flex flex-wrap gap-2">
+        }) : <p className="text-xs text-muted">Los parámetros de línea se ensayan con la API conectada.</p>}
+        {!apiEnabled && fields.length ? <p className="text-xs text-muted">Sin API, el navegador escala la geometría IFC del equipo y actualiza su cota nominal.</p> : null}
+        {fields.length ? <div className="flex flex-wrap gap-2">
           <Button type="submit" size="sm" variant="primary" disabled={!pending || busy}>
             {busy ? "Generando IFC…" : "Previsualizar borrador"}
           </Button>
@@ -149,9 +154,10 @@ export function ComponentInspector({
         </div> : null}
       </form> : null}
     </div>}
-    {draft || pending || error ? <div className="space-y-1 border-t border-border px-4 py-3 text-xs text-muted">
+    {draft || pending || error || notice ? <div className="space-y-1 border-t border-border px-4 py-3 text-xs text-muted">
       {draft ? <Badge tone="warning">IFC DRAFT · Ensayo sintético</Badge> : null}
       {pending ? <p>{pending} {pending === 1 ? "parámetro introducido" : "parámetros introducidos"}</p> : null}
+      {notice ? <p>{notice}</p> : null}
       {error ? <p role="alert" className="text-strong">{error}</p> : null}
     </div> : null}
   </Panel>;

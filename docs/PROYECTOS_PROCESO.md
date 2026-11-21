@@ -34,6 +34,7 @@ separado. Con la API conectada, **Ensayar cambios** admite las dimensiones
 del equipo y los parámetros de la línea publicados en su ficha. La API
 regenera la planta, comprueba el IFC4 y mantiene los GUID de los elementos
 que conservan su identidad. Los puertos coinciden con sus conexiones.
+Sin API, el navegador ensaya el largo, el ancho y la altura de los equipos: escala su geometría IFC en proporción a la cota pedida, actualiza la cota nominal publicada y añade el pset `TrazIA_Edicion` con la envolvente anterior y la nueva. Las tuberías no se recalculan y la ficha indica las líneas conectadas que hay que revisar.
 El ensayo es un IFC DRAFT descargable. Los planos y Excel corresponden a
 las revisiones documentales A y B.
 
