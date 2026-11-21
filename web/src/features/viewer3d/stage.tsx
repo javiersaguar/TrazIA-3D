@@ -212,6 +212,26 @@ export function CameraRig({
   const reduce = useReducedMotion();
   const wantsPerspective = projection === "perspective";
   const perspective = isPerspective(camera);
+  const input = useThree(state => state.events.connected ?? state.gl.domElement);
+  useEffect(() => {
+    if (!interactive || !perspective) return;
+    // El pellizco del panel llega como Ctrl+rueda. En perspectiva debe mover la cámara.
+    const dollyPinch = (event: WheelEvent) => {
+      if (!event.ctrlKey) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      input.dispatchEvent(new WheelEvent("wheel", {
+        bubbles: true,
+        cancelable: true,
+        clientX: event.clientX,
+        clientY: event.clientY,
+        deltaY: event.deltaY,
+        deltaMode: event.deltaMode,
+      }));
+    };
+    input.addEventListener("wheel", dollyPinch, { capture: true, passive: false });
+    return () => input.removeEventListener("wheel", dollyPinch, true);
+  }, [input, interactive, perspective]);
   const canvasNode = useRef<HTMLCanvasElement | null>(null);
   useEffect(() => {
     canvasNode.current = gl.domElement;
@@ -658,6 +678,7 @@ export function CameraRig({
         makeDefault
         smoothTime={reduce ? 0 : 0.25}
         draggingSmoothTime={0.1}
+        dollySpeed={2}
         minZoom={5}
         maxZoom={650}
         minDistance={perspective ? 0.6 : Number.EPSILON}
